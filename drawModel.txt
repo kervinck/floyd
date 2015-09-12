@@ -1,0 +1,207 @@
+ 
+--- 1  Evaluation draw model
+
+def evaluate(board, wiloVector, drawVector):
+        wiloScore = ...snip... // a weighted sum of board features
+        drawScore = ...snip... // another weighted sum of board features
+
+        return sigmoid(drawScore) * 0.5
+             + sigmoid(wiloScore)
+             - sigmoid(wiloScore) * sigmoid(drawScore)
+
+
+--- 2  Where does this thing come from?
+
+--- 2.1  Calculating wiloScore and Wp
+
+First, there is the "wilo score" which pretends that draws do not
+exist. This score scales with the pseudo-elo difference on the
+board.  Here we define the pseudo-elo difference as the elo difference
+needed to have an equal expected outcome for both players while
+ignoring the possibility of a draw. For example, by pretending that
+drawn games result in a rematch from the starting position until
+there is a decision (aka a sudden death playoff).
+
+We estimate this pseudo-elo from the sum of the well-known evaluation
+parameters such as piece values, mobility, passers, etc., and then
+convert it to a pseudo winning expectation Wp using the sigmoid
+function:
+            Wp  := sigmoid(C * wiloScore)
+where
+    sigmoid(x)  :=  1 / (1 + exp(-x))
+and
+             C  :=  ln(10) / 4
+                =~  0.5756
+
+The scaling factor C is not fundamental. Its only purpose is to
+align the score with the traditional piece value scale in chess.
+
+The pseudo loss probability is given accordingly:
+
+            Lp  :=  sigmoid(-C * wiloScore)
+
+       Wp + Lp  =  1
+
+
+--- 2.2  The relation between wiloScore, draw rate and winning expectation
+
+However, in reality Wp doesn't equal the expected game result because
+there are draws and not re-matches. The idea is that the draw rate
+D can be predicted separately and doesn't influence the ratio between
+wins and losses.  The win/draw/loss expectations W, D and L are
+then given by:
+
+             W  :=  (1 - D) * Wp
+
+             L  :=  (1 - D) * (1 - Wp)
+
+     W + D + L  =  1
+
+Note that the rematch model indeed preserves the Wp/Lp ratio and D:
+
+            Wp  :=  W + D*W + D*D*W + D*D*D*W + ...
+                =  W / (1 - D)
+
+            Lp  :=  L + D*L + D*D*L + D*D*D*W + ...
+                =  L / (1 - D)
+
+       Wp / Lp  =  W / L
+
+
+--- 2.3  Calculating drawScore and D
+
+Second, the position's drawnness is calculated as a draw score,
+which is just a weighted sum of features, and then converted with
+the sigmoid function to give the draw rate D on a 0 to 1 scale:
+
+             D  :=  sigmoid(drawScore)
+
+A zero drawScore would be "neutral", meaning a 50% draw rate here.
+A positive drawScore characterizes a more drawish position ("drag"),
+while a negative drawScore characterizes a more sharp position.
+
+The actual draw rate depends on three properties: the intrinsic
+draw rate of the position (discussed here), the players' skill
+absolute level and the time control. More on those last two later.
+
+Using the sigmoid function at this place makes it possible to add
+multiple draw features in a saturating manner, which is analogous
+to evaluating wiloScore. Using the tuple-in-a-word approach of
+programs like Stockfish, we could even compute wiloScore and drawScore
+hand in hand. This optimization might be beneficial, because to
+some degree the feature sets overlap: both are largely impacted by
+material, passers and king safety.
+
+Also mind that, unlike the material unbalance and such, the draw
+score itself has no conventional meaning in chess.  Therefore there
+is no reason to scale it with a factor C as well.
+
+
+--- 2.4  Adding it all together
+
+Finally, Wp and D are combined into an estimated game result P:
+
+             P  :=  0*L + 0.5*D + 1*W
+                =  D/2 + Wp - Wp*D
+
+which explains the pseudo code snippet at the start of this discussion.
+
+We could convert P back to a conventional pawn scale score by
+applying the inverse sigmoid function on P:
+
+         score  =  logit(P) / C
+                =  ln(P / (1 - P)) / C
+
+
+--- 3  Draw model considerations
+
+--- 3.1  Draw model and contempt
+
+Using this draw model, contempt can be included by adding the
+players' pseudo-elo difference to wiloScore, where 1 pseudo-elo
+corresponds to approximately 1 centipawn (this relation should be
+tuned). This way the search can recognize that trading down to a
+more drawish position is bad for the stronger player, and that
+complicating the position is good for the stronger player. This is
+different from the more standard approaches of interpolating between
+middle-game and endgame scores.  This also differs from methods
+such choosing a non-zero draw value, using a constant contempt
+offset, or having the contempt offset tied to the playing side's
+queen value.
+
+
+--- 3.2  Draw model and time control
+
+The draw rate when playing from the opening position is generally
+not 50%: in lightning games it is much lower and in top-level
+correspondence chess it is much higher. Therefore we have effectively
+pegged our evaluation against some hypothetical "nominal time control
+(and skill level)" where the draw rate is 50% between equal players.
+
+In theory this time control effect could be incorporated into the
+evaluation by shifting the drawScore base offset: increase it in
+slow games and lower it for fast games.  However, such wouldn't
+change the move selection of negamax, because within the search
+tree the relative ordering between heuristic evaluations doesn't
+change:
+
+    d P / d Wp  =  d (D/2 + Wp - Wp*D) / d Wp
+                =  1 - D
+                >  0
+
+The comparison to game theoretical draws (0.5) is not impacted by
+varying D either, as can be concluded from comparing the signs of
+Wp and P after shifting both by -0.5:
+
+    (Wp-0.5) * (P-0.5)  =  (Wp-0.5) * (D/2 + Wp - Wp*D - 0.5)
+			=  (0.25 - Wp*(1-Wp)) * (1-D)
+		       >=  0
+
+[ On another game playing level the idea can be used when the
+players' clocks differ. The player with a time advantage can dictate,
+by moving faster or slower, the effective time control of the
+remainder of the game. When behind on the board, moving slower
+increases the draw rate. When ahead, moving faster decreases the
+draw rate, while, as long as he doesn't play faster than the
+opponent, W/L isn't affected. ]
+
+This base adjustment can be used to improve the evaluation accuracy
+in the tuning phase, by better predicting the outcome of positions
+in case they were gathered from collections of PGN games played
+under varying time controls. It can decrease the number of required
+positions for tuning all of the evaluation coefficients.
+
+
+-- 3.3  Draw model and absolute skill level
+
+It is known that the draw rate in real games also increase with
+skill. As time control and skill are interchangeable, the same
+arguments hold: for game playing purposes, it is not needed to
+include the absolute ratings into the evaluation, because they are
+constant and don't change the relation of heuristic evaluations to
+game theoretical scores. When tuning, this could be included.
+
+
+-- 4  Implementation notes
+
+exp() can be rather expensive. The model probably doesn't lose
+generality if a faster sigmoid-like function is used instead.
+One example is
+
+        fsigmoid(x)  :=  x / (1 + abs(x))
+
+You have to re-tune your vectors of course.
+
+log() can also be rather expensive. It is not needed to apply logit()
+within the search because the mapping is monotonic. It can therefore
+be delayed until it must appear on the program interface, if so
+desired.
+
+It is worth to consider letting go of scaling wiloScore with C.
+Instead, trust your tuner and don't interpret the resulting
+coefficients.  However, do keep C in the conversion with logit():
+the pawn scale is a de facto standard in chess after all. Also mind
+that the wiloVector coefficients will be approximately twice larger
+anyway, because the score is dragged down towards zero afterwards.
+
+

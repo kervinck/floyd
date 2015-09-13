@@ -6,14 +6,17 @@
  +----------------------------------------------------------------------*/
 
 /*
- *  This header is included twice from within evaluate.c, each time
- *  with a different definition for the macro X: the first time is
- *  to define enum identifiers for the evaluation coefficents, the
- *  second time to generate a table with their names so that the
- *  names are also available at runtime.
+ *  This header is included three times from within evaluate.c, each time
+ *  with a different definition for the macro X:
+ *  1. to define enum identifiers for the evaluation coefficents
+ *  2. to generate a table with names so that these are available at runtime
+ *  3. to generate a vector with default values
  */
 
 // {
+        X(eloDiff, 0),
+        X(tempo, 0),
+        X(winBonus, 3500),
 
         X(queenValue, 9000),
         X(rookValue, 5000),
@@ -62,6 +65,10 @@
         X(knightVsPawn, 0),
         X(knightVsPawn2, 0),
 
+        X(controlCenter, 60),
+        X(controlExtendedCenter, 50),
+        X(controlOutside, 40),
+
 #if 0
         X(attackForceQueen, 0),  X(attackForceQueenX, 0),
         X(attackForceRook, 0),   X(attackForceRookX, 0),
@@ -88,7 +95,7 @@
         X(passerVsPawn, 0),
 #endif
 
-        // Drawiness (draw, 0);. Positive is more drawish. Negative is more sharp
+        // Drawness. Positive is more drawish. Negative is more sharp
         X(drawOffset, 0),
         X(drawQueen, 0),
         X(drawRook, 0),
@@ -112,11 +119,6 @@
         X(drawUnlikeBishopsAndKnights, 0),
         // TODO: pawn and pawn block square colors
 
-        X(eloDiff, 0),
-
-        // Winning
-        X(sideToMoveBonus, 0),
-        X(winBonus, 3500),
 
 // }
 

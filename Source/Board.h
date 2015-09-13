@@ -46,8 +46,23 @@ static const int fileStep = fileB - fileA;
 typedef struct board *Board_t;
 
 struct side {
-        signed char attacks[boardSize];
+        unsigned char attacks[boardSize];
         int king;
+};
+
+/*
+ *      +-----+-----+-----+-----+-----+-----+-----+-----+
+ *      |   Pawns   |   Minors  |   Rooks   |Queen|King |
+ *      +-----+-----+-----+-----+-----+-----+-----+-----+
+ *           7..6        5..4        3..2      1     0
+ */
+
+enum {
+        attackKing   = 1,
+        attackQueen  = 2,
+        attackRook   = 4,
+        attackMinor  = 16,
+        attackPawn   = 64,
 };
 
 #define maxMoves 256

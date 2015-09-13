@@ -60,6 +60,7 @@ int rootSearch(Board_t self, int depth, searchInfo_fn *infoFunction, void *infoD
         int score;
         bool stop = false;
 
+        // TODO: aspiration search
         for (int iteration=0; iteration<=depth && !stop; iteration++) {
                 score = pvSearch(self, iteration, -maxInt, maxInt);
                 if (infoFunction != null)
@@ -73,6 +74,7 @@ int rootSearch(Board_t self, int depth, searchInfo_fn *infoFunction, void *infoD
  |      ttWrite                                                         |
  +----------------------------------------------------------------------*/
 
+// TODO: move to ttable.c
 static int ttWrite(Board_t self, int depth, int alpha, int beta, int score)
 {
         // DUMMY
@@ -83,6 +85,11 @@ static int ttWrite(Board_t self, int depth, int alpha, int beta, int score)
  |      pvSearch                                                        |
  +----------------------------------------------------------------------*/
 
+// TODO: pv creation
+// TODO: pv following
+// TODO: internal deepening
+// TODO: ttable
+// TODO: killers
 static int pvSearch(Board_t self, int depth, int alpha, int beta)
 {
         int check = inCheck(self);
@@ -141,6 +148,10 @@ static int pvSearch(Board_t self, int depth, int alpha, int beta)
  |      scout                                                           |
  +----------------------------------------------------------------------*/
 
+// TODO: ttable
+// TODO: killers
+// TODO: null move
+// TODO: internal deepening
 static int scout(Board_t self, int depth, int alpha)
 {
         if (depth == 0)
@@ -173,6 +184,7 @@ static int scout(Board_t self, int depth, int alpha)
  |      qSearch                                                         |
  +----------------------------------------------------------------------*/
 
+// TODO: ttable
 static int qSearch(Board_t self, int alpha)
 {
         int check = inCheck(self);
@@ -201,7 +213,7 @@ static int qSearch(Board_t self, int alpha)
 }
 
 /*----------------------------------------------------------------------+
- |      exchange                                                        |
+ |      exchange (SEE)                                                  |
  +----------------------------------------------------------------------*/
 
 static int exchange(Board_t self, int move)
@@ -235,6 +247,7 @@ static int compareMoves(const void *ap, const void *bp)
         return (a < b) - (a > b);
 }
 
+// TODO: recognize safe checks
 static int filterAndSort(Board_t self, int moveList[maxMoves], int nrMoves, int moveFilter)
 {
         intPair sortList[maxMoves];

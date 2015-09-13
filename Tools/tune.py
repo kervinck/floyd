@@ -5,7 +5,7 @@
 #
 #-----------------------------------------------------------------------
 
-import floyd
+import floyd as engine
 import json
 import math
 import sys
@@ -43,8 +43,8 @@ def getVector():
         try:
                 coef = 0
                 while True:
-                        value, id = floyd.setCoefficient(coef, 0)
-                        floyd.setCoefficient(coef, value) # TODO: HACK
+                        value, id = engine.setCoefficient(coef, 0)
+                        engine.setCoefficient(coef, value) # TODO: HACK
                         vector.append(value)
                         names.append(id)
                         coef += 1
@@ -53,10 +53,10 @@ def getVector():
         return vector, names
 
 #-----------------------------------------------------------------------
-#       evaluate
+#       evaluateVector
 #-----------------------------------------------------------------------
 
-def evaluate(tests, passive, fast):
+def evaluateVector(tests, passive, fast):
         """
         tests: list of (fen, result) tuples
         passive: (in/out) dict of positions whose score hasn't moved yet
@@ -67,7 +67,7 @@ def evaluate(tests, passive, fast):
         scores = []
         for pos, target in tests:
                 if not fast or pos not in passive:
-                        score, pv = floyd.search(pos, 0) # slow
+                        score, pv = engine.search(pos, 0) # slow
                         if pos in passive and score != passive[pos]:
                                 del passive[pos]
                 else:
@@ -104,10 +104,13 @@ def tuneSingle(coef, tests, initialValue, initialResidual, initialScores):
         slope = sigmoid * (1.0 - sigmoid)
         window = 0.02 / max(slope, 0.01) * 1e3
 
+        # Even is good as it increases the density around bestValue (1 ... 2 ... 3 .X. 4 ... 5 ... 6)
+        # Using 6 steps gives 2 in the middle and 2 on the sides, so on each side
+        # of bestValue at least two probes must be worse before breaking out.
         nrSteps = 6
 
-        # For switching fast mode
-        positions = zip(*tests)[0]
+        # For switching to fast mode
+        positions = [item[0] for item in tests]
         passive = dict(zip(positions, bestScores))
         lastActive, streak = None, 0
         fast = False
@@ -128,8 +131,8 @@ def tuneSingle(coef, tests, initialValue, initialResidual, initialScores):
                                 continue
                         exhausted = False
 
-                        floyd.setCoefficient(coef, nextValue)
-                        nextResidual, nextScores = evaluate(tests, passive, fast)
+                        engine.setCoefficient(coef, nextValue)
+                        nextResidual, nextScores = evaluateVector(tests, passive, fast)
                         cache[nextValue] = nextResidual
 
                         active = len(positions) - len(passive)
@@ -170,7 +173,7 @@ def tuneSingle(coef, tests, initialValue, initialResidual, initialScores):
                         window *= 1.5 # Slight increase and continue
 
         # Update vector
-        floyd.setCoefficient(coef, bestValue)
+        engine.setCoefficient(coef, bestValue)
 
         return bestValue, bestResidual, bestScores, active
 
@@ -218,7 +221,7 @@ if __name__ == '__main__':
                         values.update(json.load(fp))
                         vector = [values[name] for name in names]
                         for coef in range(len(vector)):
-                                floyd.setCoefficient(coef, vector[coef])
+                                engine.setCoefficient(coef, vector[coef])
         except IOError as err:
                 print err
                 print 'continue'
@@ -234,7 +237,7 @@ if __name__ == '__main__':
 
         # -- Step 3: Prepare. Calculate initial scores and residual
 
-        bestResidual, bestScores = evaluate(tests, {}, False)
+        bestResidual, bestScores = evaluateVector(tests, {}, False)
         print 'vector filename %s residual %.9f' % (repr(filename), bestResidual)
         print
 

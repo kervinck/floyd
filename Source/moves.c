@@ -538,7 +538,7 @@ extern void makeMove(Board_t self, int move)
  +----------------------------------------------------------------------*/
 
 // Helper to update slider attacks
-static void updateSliderAttacks(Board_t self, int from, int dirs, struct side *side)
+static void updateSliderAttacks(Board_t self, int from, int dirs, struct side *side, int attackValue)
 {
         dirs &= kingDirections[from];
         int dir = 0;
@@ -548,7 +548,7 @@ static void updateSliderAttacks(Board_t self, int from, int dirs, struct side *s
                 int to = from;
                 do {
                         to += kingStep[dir];
-                        side->attacks[to] = 1;
+                        side->attacks[to] += attackValue;
                         if (self->squares[to] != empty) break;
                 } while (dir & kingDirections[to]);
         } while (dirs -= dir); // remove and go to next
@@ -579,7 +579,7 @@ extern void updateSideInfo(Board_t self)
                                 dir -= dirs; // pick next
                                 dir &= dirs;
                                 int to = from + kingStep[dir];
-                                self->whiteSide.attacks[to] = 1;
+                                self->whiteSide.attacks[to] += attackKing;
                         } while (dirs -= dir); // remove and go to next
                         self->whiteSide.king = from;
                         break;
@@ -591,33 +591,33 @@ extern void updateSideInfo(Board_t self)
                                 dir -= dirs; // pick next
                                 dir &= dirs;
                                 int to = from + kingStep[dir];
-                                self->blackSide.attacks[to] = 1;
+                                self->blackSide.attacks[to] += attackKing;
                         } while (dirs -= dir); // remove and go to next
                         self->blackSide.king = from;
                         break;
 
                 case whiteQueen:
-                        updateSliderAttacks(self, from, dirsQueen, &self->whiteSide);
+                        updateSliderAttacks(self, from, dirsQueen, &self->whiteSide, attackQueen);
                         break;
 
                 case blackQueen:
-                        updateSliderAttacks(self, from, dirsQueen, &self->blackSide);
+                        updateSliderAttacks(self, from, dirsQueen, &self->blackSide, attackQueen);
                         break;
 
                 case whiteRook:
-                        updateSliderAttacks(self, from, dirsRook, &self->whiteSide);
+                        updateSliderAttacks(self, from, dirsRook, &self->whiteSide, attackRook);
                         break;
 
                 case blackRook:
-                        updateSliderAttacks(self, from, dirsRook, &self->blackSide);
+                        updateSliderAttacks(self, from, dirsRook, &self->blackSide, attackRook);
                         break;
 
                 case whiteBishop:
-                        updateSliderAttacks(self, from, dirsBishop, &self->whiteSide);
+                        updateSliderAttacks(self, from, dirsBishop, &self->whiteSide, attackMinor);
                         break;
 
                 case blackBishop:
-                        updateSliderAttacks(self, from, dirsBishop, &self->blackSide);
+                        updateSliderAttacks(self, from, dirsBishop, &self->blackSide, attackMinor);
                         break;
 
                 case whiteKnight:
@@ -627,7 +627,7 @@ extern void updateSideInfo(Board_t self)
                                 dir -= dirs; // pick next
                                 dir &= dirs;
                                 int to = from + knightJump[dir];
-                                self->whiteSide.attacks[to] = 1;
+                                self->whiteSide.attacks[to] += attackMinor;
                         } while (dirs -= dir); // remove and go to next
                         break;
 
@@ -638,22 +638,22 @@ extern void updateSideInfo(Board_t self)
                                 dir -= dirs; // pick next
                                 dir &= dirs;
                                 int to = from + knightJump[dir];
-                                self->blackSide.attacks[to] = 1;
+                                self->blackSide.attacks[to] += attackMinor;
                         } while (dirs -= dir); // remove and go to next
                         break;
 
                 case whitePawn:
                         if (file(from) != fileH)
-                                self->whiteSide.attacks[from+stepNE] = 1;
+                                self->whiteSide.attacks[from+stepNE] += attackPawn;
                         if (file(from) != fileA)
-                                self->whiteSide.attacks[from+stepNW] = 1;
+                                self->whiteSide.attacks[from+stepNW] += attackPawn;
                         break;
 
                 case blackPawn:
                         if (file(from) != fileH)
-                                self->blackSide.attacks[from+stepSE] = 1;
+                                self->blackSide.attacks[from+stepSE] = attackPawn;
                         if (file(from) != fileA)
-                                self->blackSide.attacks[from+stepSW] = 1;
+                                self->blackSide.attacks[from+stepSW] = attackPawn;
                         break;
                 }
         }

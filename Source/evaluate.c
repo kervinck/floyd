@@ -78,13 +78,17 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
         struct evaluation e;
         memset(&e, 0, sizeof e);
 
-        if (!v) v = globalVector;
+        if (v == null)
+                v = globalVector;
 
-        //updateSideInfo(self);
+        /*--------------------------------------------------------------+
+         |      Feature extraction                                      |
+         +--------------------------------------------------------------*/
 
-        /*
-         *  Scan board for pieces
-         */
+        // Update attack tables and king locations
+        updateSideInfo(self);
+
+        // Scan board for pieces
         for (int square=0; square<boardSize; square++) {
 
                 int piece = self->squares[square];
@@ -96,7 +100,9 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
                 int rank = rank(square);
 
                 //int flank = isKingSide(file);
-                int squareColor = (file ^ rank) & 1; // abstract "even" or "odd", don't know/care if it is light or dark
+
+                // abstract "even" or "odd" square color
+                int squareColor = (file ^ rank) & 1;
 
                 switch (piece) {
                 case whiteKing:
@@ -152,9 +158,9 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
         e.nrMinors[white] = e.nrBishops[white] + e.nrKnights[white];
         e.nrMinors[black] = e.nrBishops[black] + e.nrKnights[black];
 
-        /*
-         *  Material imbalances
-         */
+        /*--------------------------------------------------------------+
+         |      Material                                                |
+         +--------------------------------------------------------------*/
 
         for (int side=white; side<=black; side++) {
                 int xside = other(side);
@@ -167,51 +173,90 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
                                + v[queenAndBishop]  * e.nrBishops[side]
                                + v[queenAndKnight]  * e.nrKnights[side]
                                + v[queenAndPawn]    * e.nrPawns[side]
-                               + v[queenAndPawn2]   * e.nrPawns[side] * e.nrPawns[side] / 8
-                               + v[queenVsRook]     * e.nrRooks[side]
-                               + v[queenVsBishop]   * e.nrBishops[side]
-                               + v[queenVsKnight]   * e.nrKnights[side]
+                               + v[queenAndPawn2]   * e.nrPawns[side] * e.nrPawns[side] /8
+                               + v[queenVsRook]     * e.nrRooks[xside]
+                               + v[queenVsBishop]   * e.nrBishops[xside]
+                               + v[queenVsKnight]   * e.nrKnights[xside]
                                + v[queenVsPawn]     * e.nrPawns[xside]
-                               + v[queenVsPawn2]    * e.nrPawns[xside] * e.nrPawns[xside] / 8
-                        )
-                        + e.nrRooks[side] * (
+                               + v[queenVsPawn2]    * e.nrPawns[xside] * e.nrPawns[xside] /8
+                        ) + e.nrRooks[side] * (
                                + v[rookValue]
                                + v[rookAndRook]     * (e.nrRooks[side] - 1)
                                + v[rookAndBishop]   * e.nrBishops[side]
                                + v[rookAndKnight]   * e.nrKnights[side]
                                + v[rookAndPawn]     * e.nrPawns[side]
-                               + v[rookAndPawn2]    * e.nrPawns[side] * e.nrPawns[side] / 8
+                               + v[rookAndPawn2]    * e.nrPawns[side] * e.nrPawns[side] /8
                                + v[rookVsBishop]    * e.nrBishops[xside]
                                + v[rookVsKnight]    * e.nrKnights[xside]
                                + v[rookVsPawn]      * e.nrPawns[xside]
-                               + v[rookVsPawn2]     * e.nrPawns[xside] * e.nrPawns[xside] / 8
-                        )
-                        + e.nrBishops[side] * (
+                               + v[rookVsPawn2]     * e.nrPawns[xside] * e.nrPawns[xside] /8
+                        ) + e.nrBishops[side] * (
                                + v[bishopValue]
                                + v[bishopAndBishop] * (e.nrBishops[side] - 1)
                                + v[bishopAndKnight] * e.nrKnights[side]
                                + v[bishopAndPawn]   * e.nrPawns[side]   
-                               + v[bishopAndPawn2]  * e.nrPawns[side] * e.nrPawns[side] / 8
-                               + v[bishopVsKnight]  * e.nrKnights[side]
+                               + v[bishopAndPawn2]  * e.nrPawns[side] * e.nrPawns[side] /8
+                               + v[bishopVsKnight]  * e.nrKnights[xside]
                                + v[bishopVsPawn]    * e.nrPawns[xside]
-                               + v[bishopVsPawn2]   * e.nrPawns[xside] * e.nrPawns[xside] / 8
-                        )
-                        + e.nrKnights[side] * (
+                               + v[bishopVsPawn2]   * e.nrPawns[xside] * e.nrPawns[xside] /8
+                        ) + e.nrKnights[side] * (
                                + v[knightValue]
                                + v[knightAndKnight] * (e.nrKnights[side] - 1)
                                + v[knightAndPawn]   * e.nrPawns[side]
-                               + v[knightAndPawn2]  * e.nrPawns[side] * e.nrPawns[side] / 8
+                               + v[knightAndPawn2]  * e.nrPawns[side] * e.nrPawns[side] /8
                                + v[knightVsPawn]    * e.nrPawns[xside]
-                               + v[knightVsPawn2]   * e.nrPawns[xside] * e.nrPawns[xside] / 8
+                               + v[knightVsPawn2]   * e.nrPawns[xside] * e.nrPawns[xside] /8
                         );
 
                 for (int i=0; i<e.nrPawns[side]; i++)
                         e.material[side] += v[pawnValue1+i];
         }
 
-        /*
-         *  Pawn evaluation
-         */
+        /*--------------------------------------------------------------+
+         |      Board control                                           |
+         +--------------------------------------------------------------*/
+
+
+        #define isCenter(sq)\
+                  ((sq)==d4 || (sq)==d5 \
+                || (sq)==e4 || (sq)==e5)
+
+        #define isExtendedCenter(sq)\
+                  ((sq)==c3 || (sq)==c4 || (sq)==c5 || (sq)==c6 \
+                || (sq)==d3 ||                         (sq)==d6 \
+                || (sq)==e3 ||                         (sq)==e6 \
+                || (sq)==f3 || (sq)==f4 || (sq)==f5 || (sq)==f6)
+
+#if 0
+        #define isBlackSide(sq)\
+                (rank(sq)==rank4 || rank(sq)==rank5 || rank(sq)==rank6 || rank(sq)==rank7)
+
+        #define isKingFlank(sq)\
+                (file(sq)==fileE || file(sq)==fileF || file(sq)==fileG || file(sq)==fileH)
+#endif
+
+        for (int square=0; square<boardSize; square++) {
+                int wAttack = self->whiteSide.attacks[square];
+                int bAttack = self->blackSide.attacks[square];
+
+                int controlValue;
+                if (isCenter(square))
+                        controlValue = v[controlCenter];
+                else if (isExtendedCenter(square))
+                        controlValue = v[controlExtendedCenter];
+                else
+                        controlValue = v[controlOutside];
+
+                if (wAttack > bAttack)
+                        e.control[white] += controlValue;
+
+                if (wAttack < bAttack)
+                        e.control[black] += controlValue;
+        }
+
+        /*--------------------------------------------------------------+
+         |      Pawns                                                   |
+         +--------------------------------------------------------------*/
 
         for (int file=fileA; file!=fileH+fileStep; file+=fileStep)
                 for (int side=white; side<=black; side++) {
@@ -220,9 +265,9 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
                 }
 
 
-        /*
-         *  Draw rate prediction ("draw")
-         */
+        /*--------------------------------------------------------------+
+         |      Draw rate prediction ("draw")                           |
+         +--------------------------------------------------------------*/
 
         int drawScore = v[drawOffset]
                 + nrQueens  * v[drawQueen]
@@ -255,15 +300,19 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
         int bUnlike1 = e.nrBishopsX[black] > 0;
         if (wUnlike0 != wUnlike1 && bUnlike0 != bUnlike1
          && wUnlike0 != bUnlike0 && wUnlike1 != bUnlike1) {
-                drawScore += v[drawUnlikeBishops];
-                if (nrQueens)  drawScore += v[drawUnlikeBishopsAndQueens];
-                if (nrRooks)   drawScore += v[drawUnlikeBishopsAndRooks];
-                if (nrKnights) drawScore += v[drawUnlikeBishopsAndKnights];
+                if (nrQueens > 0)
+                        drawScore += v[drawUnlikeBishopsAndQueens];
+                else if (nrRooks > 0)
+                        drawScore += v[drawUnlikeBishopsAndRooks];
+                else if (nrKnights > 0)
+                        drawScore += v[drawUnlikeBishopsAndKnights];
+                else 
+                        drawScore += v[drawUnlikeBishops];
         }
 
         // Each side has a piece the other doesn't have (don't count pawns)
         int deltaQueens = e.nrQueens[white] - e.nrQueens[black];
-        int deltaRooks = e.nrRooks[white] - e.nrRooks[black];
+        int deltaRooks  = e.nrRooks[white]  - e.nrRooks[black];
         int deltaMinors = e.nrMinors[white] - e.nrMinors[black];
         if (min(min(deltaQueens, deltaRooks), deltaMinors) < 0
          && max(max(deltaQueens, deltaRooks), deltaMinors) > 0) {
@@ -272,9 +321,9 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
                 if (deltaMinors) drawScore += v[drawMinorImbalance];
         }
 
-        /*
-         *  Sum everything
-         */
+        /*--------------------------------------------------------------+
+         |      Subtotal                                                |
+         +--------------------------------------------------------------*/
 
         int side = sideToMove(self);
         int xside = other(side);
@@ -293,19 +342,20 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
 
         int wiloScore = partial(side) - partial(xside);
 
-        wiloScore += v[sideToMoveBonus];
+        wiloScore += v[tempo]; // side to move bonus
 
-        /*
-         *  Contempt
-         */
+        /*--------------------------------------------------------------+
+         |      Contempt                                                |
+         +--------------------------------------------------------------*/
+
         if (side == white)
-                wiloScore += self->eloDiff * v[eloDiff] / 8;
+                wiloScore += self->eloDiff * v[eloDiff] / 10;
         else
-                wiloScore -= self->eloDiff * v[eloDiff] / 8;
+                wiloScore -= self->eloDiff * v[eloDiff] / 10;
 
-        /*
-         *  Special endgames
-         */
+        /*--------------------------------------------------------------+
+         |      Special endgames                                        |
+         +--------------------------------------------------------------*/
 
         // Ignore multiple same-side bishops on the same square color
         #define nrEffectiveBishops(side) (                     \
@@ -319,14 +369,13 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
                 wiloScore = 0;
 
         if (nrEffectivePieces == 3) {
-                int deltaMajors = e.nrQueens[side] - e.nrQueens[xside]
-                                + e.nrRooks[side] - e.nrRooks[xside];
-                wiloScore += deltaMajors * v[winBonus];
+                if (e.nrQueens[side] + e.nrRooks[side] > 0)
+                        wiloScore += v[winBonus];
 
-                if (nrBishops > 0)
-                        wiloScore = 0;
+                if (e.nrQueens[xside] + e.nrRooks[xside] > 0)
+                        wiloScore -= v[winBonus];
 
-                if (e.nrKnights[xside] > 0)
+                if (nrBishops + nrKnights > 0)
                         wiloScore = 0;
 
                 if (nrPawns > 0) {
@@ -352,6 +401,9 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
                 }
         }
 
+        /*--------------------------------------------------------------+
+         |      Total                                                   |
+         +--------------------------------------------------------------*/
 
         e.wiloScore = wiloScore;
         e.drawScore = drawScore;
@@ -363,6 +415,10 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
 
         static const double Ci = 4.0 / M_LN10;
         e.score = round(Ci * logit(e.P) * 1e+3);
+
+        /*--------------------------------------------------------------+
+         |      Return                                                  |
+         +--------------------------------------------------------------*/
 
         // Keep copy of the calculation if so requested
         if (Cc != null)

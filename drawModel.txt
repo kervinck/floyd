@@ -70,7 +70,7 @@ Note that the rematch model indeed preserves the Wp/Lp ratio and D:
 
 --- 2.3  Calculating drawScore and D
 
-Second, the position's drawnness is calculated as a draw score,
+Second, the position's drawness is calculated as a draw score,
 which is just a weighted sum of features, and then converted with
 the sigmoid function to give the draw rate D on a 0 to 1 scale:
 

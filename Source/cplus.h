@@ -10,8 +10,8 @@
 #define max(a, b) ((a) >= (b) ? (a) : (b))
 #define min(a, b) ((a) <= (b) ? (a) : (b))
 
-#define setMax(a,b) do{ if ((a) < (b)) { (a) = (b); } }while(0)
-#define setMin(a,b) do{ if ((a) > (b)) { (a) = (b); } }while(0)
+#define setMax(a, b) do{ if ((a) < (b)) { (a) = (b); } }while(0)
+#define setMin(a, b) do{ if ((a) > (b)) { (a) = (b); } }while(0)
 
 #define null      ((void*) 0)
 #define constNull ((const void*) 0)

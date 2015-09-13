@@ -34,7 +34,7 @@
 #define other(side) ((side) ^ 1)
 #define flip(fileOrRank) ((fileOrRank) ^ 7)
 
-#define isKingSide(file) (((file) ^ fileD) >> 2)
+#define isKingFlankFile(file) (((file) ^ fileD) >> 2)
 
 enum vector {
         #define X(id,value) id
@@ -68,6 +68,10 @@ int globalVector[] = {
 static double sigmoid(double x);
 static double logit(double p);
 static int squareOf(Board_t self, int piece);
+static int evaluatePawn(const int v[vectorLen],
+                        const char minRank[][2], const char maxRank[][2], int R,
+                        int file, int side,
+                        int king, int xking);
 
 /*----------------------------------------------------------------------+
  |      evaluate                                                        |
@@ -88,6 +92,25 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
         // Update attack tables and king locations
         updateSideInfo(self);
 
+        /*
+         *  First and last pawn rank (per file), to extract passers,
+         *  open files, doubled pawns, etc
+         */
+        char minPawnRank[10][2];
+        char maxPawnRank[10][2];
+        memset(minPawnRank, 7, sizeof minPawnRank);
+        memset(maxPawnRank, 0, sizeof maxPawnRank);
+
+        /*
+         *  Outmost files with pawns, to extract pawn span and center
+         */
+        char minPawnFile[2] = { 7, 7};
+        char maxPawnFile[2] = { 0, 0};
+#if 0
+        char pawnSpan[2]; // 0 .. 8
+        char pawnCenter[2]; // 0 .. 14  target for kings?
+#endif
+
         // Scan board for pieces
         for (int square=0; square<boardSize; square++) {
 
@@ -98,8 +121,6 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
 
                 int file = file(square);
                 int rank = rank(square);
-
-                //int flank = isKingSide(file);
 
                 // abstract "even" or "odd" square color
                 int squareColor = (file ^ rank) & 1;
@@ -136,15 +157,16 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
                         e.nrPawns[side]++;
                         e.nrPawnsX[side] += squareColor;
 
-                        setMax(e.maxPawnRank[file][side], rank);
-                        setMax(e.maxPawnRankX[file][side], flip(rank));
+                        setMin(minPawnRank[1+file][side], rank ^ rank1);
+                        setMax(maxPawnRank[1+file][side], rank ^ rank1);
 
-                        setMax(e.maxPawnFile[side], file);
-                        setMax(e.maxPawnFileX[side], flip(file));
+                        setMin(minPawnFile[side], file);
+                        setMax(maxPawnFile[side], file);
                         break;
                 }
         }
 
+        // Useful piece counters
         int nrKings   = e.nrKings[white]   + e.nrKings[black];
         int nrQueens  = e.nrQueens[white]  + e.nrQueens[black];
         int nrRooks   = e.nrRooks[white]   + e.nrRooks[black];
@@ -172,40 +194,40 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
                                + v[queenAndRook]    * e.nrRooks[side]
                                + v[queenAndBishop]  * e.nrBishops[side]
                                + v[queenAndKnight]  * e.nrKnights[side]
-                               + v[queenAndPawn]    * e.nrPawns[side]
-                               + v[queenAndPawn2]   * e.nrPawns[side] * e.nrPawns[side] /8
+                               + v[queenAndPawn_1]  * e.nrPawns[side]
+                               + v[queenAndPawn_2]  * e.nrPawns[side] * e.nrPawns[side] /8
                                + v[queenVsRook]     * e.nrRooks[xside]
                                + v[queenVsBishop]   * e.nrBishops[xside]
                                + v[queenVsKnight]   * e.nrKnights[xside]
-                               + v[queenVsPawn]     * e.nrPawns[xside]
-                               + v[queenVsPawn2]    * e.nrPawns[xside] * e.nrPawns[xside] /8
+                               + v[queenVsPawn_1]   * e.nrPawns[xside]
+                               + v[queenVsPawn_2]   * e.nrPawns[xside] * e.nrPawns[xside] /8
                         ) + e.nrRooks[side] * (
                                + v[rookValue]
                                + v[rookAndRook]     * (e.nrRooks[side] - 1)
                                + v[rookAndBishop]   * e.nrBishops[side]
                                + v[rookAndKnight]   * e.nrKnights[side]
-                               + v[rookAndPawn]     * e.nrPawns[side]
-                               + v[rookAndPawn2]    * e.nrPawns[side] * e.nrPawns[side] /8
+                               + v[rookAndPawn_1]   * e.nrPawns[side]
+                               + v[rookAndPawn_2]   * e.nrPawns[side] * e.nrPawns[side] /8
                                + v[rookVsBishop]    * e.nrBishops[xside]
                                + v[rookVsKnight]    * e.nrKnights[xside]
-                               + v[rookVsPawn]      * e.nrPawns[xside]
-                               + v[rookVsPawn2]     * e.nrPawns[xside] * e.nrPawns[xside] /8
+                               + v[rookVsPawn_1]    * e.nrPawns[xside]
+                               + v[rookVsPawn_2]    * e.nrPawns[xside] * e.nrPawns[xside] /8
                         ) + e.nrBishops[side] * (
                                + v[bishopValue]
                                + v[bishopAndBishop] * (e.nrBishops[side] - 1)
                                + v[bishopAndKnight] * e.nrKnights[side]
-                               + v[bishopAndPawn]   * e.nrPawns[side]   
-                               + v[bishopAndPawn2]  * e.nrPawns[side] * e.nrPawns[side] /8
+                               + v[bishopAndPawn_1] * e.nrPawns[side]
+                               + v[bishopAndPawn_2] * e.nrPawns[side] * e.nrPawns[side] /8
                                + v[bishopVsKnight]  * e.nrKnights[xside]
-                               + v[bishopVsPawn]    * e.nrPawns[xside]
-                               + v[bishopVsPawn2]   * e.nrPawns[xside] * e.nrPawns[xside] /8
+                               + v[bishopVsPawn_1]  * e.nrPawns[xside]
+                               + v[bishopVsPawn_2]  * e.nrPawns[xside] * e.nrPawns[xside] /8
                         ) + e.nrKnights[side] * (
                                + v[knightValue]
                                + v[knightAndKnight] * (e.nrKnights[side] - 1)
-                               + v[knightAndPawn]   * e.nrPawns[side]
-                               + v[knightAndPawn2]  * e.nrPawns[side] * e.nrPawns[side] /8
-                               + v[knightVsPawn]    * e.nrPawns[xside]
-                               + v[knightVsPawn2]   * e.nrPawns[xside] * e.nrPawns[xside] /8
+                               + v[knightAndPawn_1] * e.nrPawns[side]
+                               + v[knightAndPawn_2] * e.nrPawns[side] * e.nrPawns[side] /8
+                               + v[knightVsPawn_1]  * e.nrPawns[xside]
+                               + v[knightVsPawn_2]  * e.nrPawns[xside] * e.nrPawns[xside] /8
                         );
 
                 for (int i=0; i<e.nrPawns[side]; i++)
@@ -216,7 +238,6 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
          |      Board control                                           |
          +--------------------------------------------------------------*/
 
-
         #define isCenter(sq)\
                   ((sq)==d4 || (sq)==d5 \
                 || (sq)==e4 || (sq)==e5)
@@ -226,14 +247,6 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
                 || (sq)==d3 ||                         (sq)==d6 \
                 || (sq)==e3 ||                         (sq)==e6 \
                 || (sq)==f3 || (sq)==f4 || (sq)==f5 || (sq)==f6)
-
-#if 0
-        #define isBlackSide(sq)\
-                (rank(sq)==rank4 || rank(sq)==rank5 || rank(sq)==rank6 || rank(sq)==rank7)
-
-        #define isKingFlank(sq)\
-                (file(sq)==fileE || file(sq)==fileF || file(sq)==fileG || file(sq)==fileH)
-#endif
 
         for (int square=0; square<boardSize; square++) {
                 int wAttack = self->whiteSide.attacks[square];
@@ -258,12 +271,22 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
          |      Pawns                                                   |
          +--------------------------------------------------------------*/
 
-        for (int file=fileA; file!=fileH+fileStep; file+=fileStep)
-                for (int side=white; side<=black; side++) {
-                        
-                        //e.isOpen[side][file] = (minRank[side][file] + maxRank[side][file] == 0);
-                }
-
+        for (int file=fileA; file!=fileH+fileStep; file+=fileStep) {
+                e.pawns[white] += evaluatePawn(v,
+                                              &minPawnRank[1+file],
+                                              &maxPawnRank[1+file], 0,
+                                              file,
+                                              white,
+                                              self->whiteSide.king,
+                                              self->blackSide.king);
+                e.pawns[black] += evaluatePawn(v,
+                                              &maxPawnRank[1+file], // Note: reverse min/max
+                                              &minPawnRank[1+file], 7,
+                                              file,
+                                              black,
+                                              self->blackSide.king,
+                                              self->whiteSide.king);
+        }
 
         /*--------------------------------------------------------------+
          |      Draw rate prediction ("draw")                           |
@@ -306,7 +329,7 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
                         drawScore += v[drawUnlikeBishopsAndRooks];
                 else if (nrKnights > 0)
                         drawScore += v[drawUnlikeBishopsAndKnights];
-                else 
+                else
                         drawScore += v[drawUnlikeBishops];
         }
 
@@ -338,7 +361,8 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
                 + e.queens[side] \
                 + e.rooks[side] \
                 + e.bishops[side] \
-                + e.knights[side] )
+                + e.knights[side] \
+                + e.pawns[side])
 
         int wiloScore = partial(side) - partial(xside);
 
@@ -425,6 +449,115 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
                 *Cc = e;
 
         return e.score;
+}
+
+/*----------------------------------------------------------------------+
+ |      evaluatePawn                                                    |
+ +----------------------------------------------------------------------*/
+
+/*
+ *  TODO: `file' is given as 0 for fileA, regardless of the definition of fileA
+ */
+
+static int evaluatePawn(const int v[vectorLen],
+                        const char minRank[][2], const char maxRank[][2], int R, // For flipping ranks
+                        int file, int side,
+                        int king, int xking)
+{
+        int first = maxRank[0][side] ^ R; // Most advanced pawn, if any
+        int last  = minRank[0][side] ^ R; // Most backward pawn, if any
+
+        if (last > first) // No pawn
+                return 0;
+
+        int pawnScore = 0;
+        int F = isKingFlankFile(file(king)) ? fileA : fileH; // For flipping files TODO: flip 'file'
+        int xside = other(side);
+
+#if 0
+        // TODO: one file and one rank must be neutral
+        // OR: make the average neutral, which is much nicer
+        pawnScore = v[pawnA+(file^F)] + v[pawn2+(first^R)-1]; // Location
+#endif
+
+        /*
+         *  Pawn rank and file
+         *
+         *  Correct down for average to avoid tuning problems,
+         *  effectively creating only 7+5 = 12 degrees of freedom
+         *  for what is effectively a static pawn PST.
+         */
+
+        int pawnCommon = v[pawnA] + v[pawnB] + v[pawnC] + v[pawnD] +
+                         v[pawnE] + v[pawnF] + v[pawnG] + v[pawnH];
+
+        pawnScore += v[pawnA+(file^F)] - pawnCommon/8;
+
+        pawnCommon = v[pawn2] + v[pawn3] + v[pawn4] + v[pawn5] + v[pawn6] + v[pawn7];
+
+        pawnScore += v[pawn2+(first^F)-1] - pawnCommon/6;
+
+        /*
+         *  Doubled pawn
+         */
+
+        if (last < first)
+                pawnScore += v[doubledPawnA+(file^F)];
+
+        /*
+         *  Backward pawn
+         *
+         *  "A backward pawn is a pawn no longer defensible by own pawns and
+         *   whose stop square lacks pawn protection but is controlled by a
+         *   sentry."
+         *
+         *  TODO: (wiki)
+         *  "If two opposing pawns on adjacent files in knight distance are
+         *   mutually backward, the more advanced is not considered backward."
+         *
+         *  TODO: (wiki)
+         *  "A backward pawn is worse, or even a real Straggler, if on a
+         *   half-open file as suitable target of opponent rooks."
+         *
+         *  TODO: (Stockfish)
+         *  "if it can capture an enemy pawn it cannot be backward either"
+         */
+
+        if ((minRank[-1][side] ^ R) > first
+         && (minRank[+1][side] ^ R) > first
+         && first < 5
+         && ((minRank[-1][xside] ^ R) == first + 2
+          || (maxRank[-1][xside] ^ R) == first + 2
+          || (minRank[+1][xside] ^ R) == first + 2
+          || (maxRank[+1][xside] ^ R) == first + 2))
+                pawnScore += v[backwardPawnA+(file^F)];
+
+#if 0
+        /*
+         *  Isolated
+         */
+
+        /*
+         *  Half connected
+         */
+
+        /*
+         *  Full connected
+         */
+#endif
+
+        /*
+         *  Passer
+         */
+
+        if ((maxRank[-1][xside] ^ R) <= first
+         && (maxRank[ 0][xside] ^ R) <= first
+         && (maxRank[+1][xside] ^ R) <= first)                  // Passer
+                pawnScore += v[passerA_0+(file^F)]
+                           + v[passerA_1+(file^F)] * (first - 1)
+                           + v[passerA_2+(file^F)] * (first - 1) * (first - 2) / 4;
+
+        return pawnScore;
 }
 
 /*----------------------------------------------------------------------+

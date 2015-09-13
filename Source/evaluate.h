@@ -24,28 +24,6 @@ struct evaluation {
         int nrPawnsX[2];
 
         /*
-         *  First and last pawn rank (per file), to extract passers,
-         *  open files, doubled pawns, etc
-         */
-        int maxPawnRank[8][2];
-        int maxPawnRankX[8][2]; // max of the inverse (instead of min)
-
-        /*
-         *  Outmost files with pawns, to extract pawn span and center
-         */
-        int maxPawnFile[2];
-        int maxPawnFileX[2]; // max of the inverse (instead of min)
-
-        int pawnSpan[2]; // 0 .. 8
-        int pawnCenter[2]; // 0 .. 14   target for kings
-
-        bool isOpen[2][8];
-        bool isDoubled[2][8];
-        bool isIsolated[2][8];
-        bool isBackward[2][8];
-        bool isPassed[2][8];
-
-        /*
          *  Material
          */
         int material[2];

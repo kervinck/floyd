@@ -1,0 +1,29 @@
+
+|Todo| Add white/black testing [evaluate]
+
+|Todo| D dependency on W/L [drawmodel]
+
+Ref: http://talkchess.com/forum/viewtopic.php?p=639668#639668
+
+---
+You cannot require that d is independent of w since you may also want symmetry in w and l and 
+cov(w,d)=cov(l,d)=0 
+contradicts d+w+l=1.
+---
+
+|Todo| Check Rebel evaluation features [evaluate]
+
+Ref: http://www.top-5000.nl/authors/rebel/chess840.htm
+
+|Todo| Check Stockfish evaluation features [evaluate]
+
+|Todo| Check Fruit/Rybka evaluation features [evaluate]
+
+|Todo| Measure repeatibility of tuner [tune]
+
+Tune with 10 different subsets of ccrl @ 1M
+Observe variation of vector and residual 
+
+Tune with 10 different subsets of ccrl @ 100k
+Observe variation of vector and residual 
+

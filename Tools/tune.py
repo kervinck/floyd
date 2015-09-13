@@ -87,10 +87,10 @@ def scoreToP(score):
         return 1 / (1 + 10 ** (-score/4.0))
 
 #-----------------------------------------------------------------------
-#       tune
+#       tuneSingle
 #-----------------------------------------------------------------------
 
-def tune(coef, tests, initialValue, initialResidual, initialScores):
+def tuneSingle(coef, tests, initialValue, initialResidual, initialScores):
         """Tune a single coefficient using robust a form of hill-climbing"""
 
         print 'evaluate id %s value %d residual %.9f' % (names[coef], initialValue, initialResidual)
@@ -180,7 +180,7 @@ def tune(coef, tests, initialValue, initialResidual, initialScores):
 
 def writeVector(vector, filename):
         with open(filename, 'w') as fp:
-                json.dump(dict(zip(names, vector)), fp, indent=1, sort_keys=True)
+                json.dump(dict(zip(names, vector)), fp, indent=1, separators=(',', ': '), sort_keys=True)
                 fp.write('\n')
 
 #-----------------------------------------------------------------------
@@ -252,7 +252,7 @@ if __name__ == '__main__':
                 exhausted = True
                 for coef in coefList:
                         oldValue = vector[coef]
-                        newValue, newResidual, newScores, active = tune(coef, tests, oldValue, bestResidual, bestScores)
+                        newValue, newResidual, newScores, active = tuneSingle(coef, tests, oldValue, bestResidual, bestScores)
 
                         deltaResidual = newResidual - bestResidual
                         deltas[coef] = deltaResidual

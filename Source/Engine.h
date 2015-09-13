@@ -46,15 +46,15 @@ struct engine {
         intList pv;
 
         long milliSeconds;
-        unsigned long long nodeCounter;
+        long long nodeCounter;
 };
 
 /*----------------------------------------------------------------------+
  |      Functions                                                       |
  +----------------------------------------------------------------------*/
 
-// callback interface for search progress
-typedef bool searchInfo_fn(void *hook, int depth, long long nodes, int score);
+// callback interface for handling search progress
+typedef bool searchInfo_fn(void *infoData, int depth, long long nodes, int score);
 
 int rootSearch(Board_t self, int depth, searchInfo_fn *infoFunction, void *infoData);
 

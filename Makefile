@@ -11,10 +11,10 @@ test:
 	python Tools/searchtest.py
 
 tune:
-	bzcat Data/hybrid-450k-450k-100k.epd.bz2 | head -1000000 | python Tools/tune.py vector.json
+	bzcat Data/ccrl-shuffled-3M.epd.bz2 | head -1000000 | python Tools/tune.py vector.json
 
 ftune:
-	bzcat Data/hybrid-450k-450k-100k.epd.bz2 | head -100000 | python Tools/tune.py fvector.json
+	bzcat Data/ccrl-shuffled-3M.epd.bz2 | head -100000 | python Tools/tune.py fvector.json
 
 install:
 	python setup.py install --user

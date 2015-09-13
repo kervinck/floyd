@@ -1,0 +1,25 @@
+CFLAGS=-std=c99 -pedantic -Wall -O3
+
+all: module
+
+# python module
+module:
+	python setup.py build
+
+# TODO: allow testing before install
+test:
+	python Tools/searchtest.py
+
+tune:
+	bzcat Data/hybrid-450k-450k-100k.epd.bz2 | head -1000000 | python Tools/tune.py vector.json
+
+ftune:
+	bzcat Data/hybrid-450k-450k-100k.epd.bz2 | head -100000 | python Tools/tune.py fvector.json
+
+install:
+	python setup.py install --user
+
+clean:
+	python setup.py clean
+
+# vi: noexpandtab

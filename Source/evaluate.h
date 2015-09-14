@@ -24,6 +24,21 @@ struct evaluation {
         int nrPawnsX[2];
 
         /*
+         *  Maximum distance of pawn to rank1, for each file and both sides.
+         *  And then the same from rank8 point of view.
+         *  Used to detect open files, doubled pawns, passers, etc.
+         */
+        int maxPawnFromRank1[10][2];
+        int maxPawnFromRank8[10][2];
+
+        /*
+         *  Outmost files with pawns, to extract pawn span and center.
+         *  We don't calculate 'min' directly for easier initialization.
+         */
+        int maxPawnFromFileA[2]; 
+        int maxPawnFromFileH[2]; 
+
+        /*
          *  Material
          */
         int material[2];

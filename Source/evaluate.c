@@ -54,7 +54,7 @@ const char * const vectorLabels[] = {
 
 const int vectorLen = arrayLen(vectorLabels);
 
-// TODO: import the json file (at compile time)
+// TODO: should become default and const
 int globalVector[] = {
         #define X(id,value) [id] = (value)
         #include "vector.h"
@@ -66,12 +66,18 @@ int globalVector[] = {
  +----------------------------------------------------------------------*/
 
 static double sigmoid(double x);
+
 static double logit(double p);
+
 static int squareOf(Board_t self, int piece);
+
 static int evaluatePawn(const int v[vectorLen],
-                        const char minRank[][2], const char maxRank[][2], int R,
-                        int file, int side,
+                        const int minRank[][2],
+                        const int maxRank[][2],
+                        int fileIndex, int side,
                         int king, int xking);
+
+static int evaluateKnight(const int v[vectorLen], int fileIndex, int rankIndex);
 
 /*----------------------------------------------------------------------+
  |      evaluate                                                        |
@@ -92,20 +98,6 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
         // Update attack tables and king locations
         updateSideInfo(self);
 
-        /*
-         *  First and last pawn rank (per file), to extract passers,
-         *  open files, doubled pawns, etc
-         */
-        char minPawnRank[10][2];
-        char maxPawnRank[10][2];
-        memset(minPawnRank, 7, sizeof minPawnRank);
-        memset(maxPawnRank, 0, sizeof maxPawnRank);
-
-        /*
-         *  Outmost files with pawns, to extract pawn span and center
-         */
-        char minPawnFile[2] = { 7, 7};
-        char maxPawnFile[2] = { 0, 0};
 #if 0
         char pawnSpan[2]; // 0 .. 8
         char pawnCenter[2]; // 0 .. 14  target for kings?
@@ -115,12 +107,25 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
         for (int square=0; square<boardSize; square++) {
 
                 int piece = self->squares[square];
-                if (piece == empty) continue;
+                if (piece == empty)
+                        continue;
 
                 int side = pieceColor(piece);
 
+                // `file' and `rank' are fileA..H and rank1..8
                 int file = file(square);
                 int rank = rank(square);
+
+                /*
+                 *  `fileIndex' and `rankIndex' are relative to
+                 *  the applicible corner of reference
+                 */
+                int fileIndex = file ^ fileA;
+                int rankIndex = rank;
+                if (side == white)
+                        rankIndex ^= rank1;
+                else
+                        rankIndex ^= rank8;
 
                 // abstract "even" or "odd" square color
                 int squareColor = (file ^ rank) & 1;
@@ -150,6 +155,9 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
                 case whiteKnight:
                 case blackKnight:
                         e.nrKnights[side]++;
+                        // TODO: separate feature extraction from evaluation
+                        // (for example, pawn structure is not established here yet)
+                        e.knights[side] += evaluateKnight(v, fileIndex, rankIndex);
                         break;
 
                 case whitePawn:
@@ -157,11 +165,13 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
                         e.nrPawns[side]++;
                         e.nrPawnsX[side] += squareColor;
 
-                        setMin(minPawnRank[1+file][side], rank ^ rank1);
-                        setMax(maxPawnRank[1+file][side], rank ^ rank1);
+                        int fileIndex = file ^ fileA;
+                        setMax(e.maxPawnFromRank1[1+fileIndex][side], rank ^ rank1);
+                        setMax(e.maxPawnFromRank8[1+fileIndex][side], rank ^ rank8);
 
-                        setMin(minPawnFile[side], file);
-                        setMax(maxPawnFile[side], file);
+                        setMin(e.maxPawnFromFileA[side], file ^ fileA);
+                        setMax(e.maxPawnFromFileH[side], file ^ fileH);
+
                         break;
                 }
         }
@@ -271,21 +281,26 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
          |      Pawns                                                   |
          +--------------------------------------------------------------*/
 
-        for (int file=fileA; file!=fileH+fileStep; file+=fileStep) {
+        for (int fileIndex=0; fileIndex<8; fileIndex++) {
+
+                // TODO: flip file based on king location
+                // TODO: recognize opposite castled kings
+
                 e.pawns[white] += evaluatePawn(v,
-                                              &minPawnRank[1+file],
-                                              &maxPawnRank[1+file], 0,
-                                              file,
+                                              &e.maxPawnFromRank1[1+fileIndex],
+                                              &e.maxPawnFromRank8[1+fileIndex],
+                                              fileIndex,
                                               white,
                                               self->whiteSide.king,
                                               self->blackSide.king);
+
                 e.pawns[black] += evaluatePawn(v,
-                                              &maxPawnRank[1+file], // Note: reverse min/max
-                                              &minPawnRank[1+file], 7,
-                                              file,
+                                              &e.maxPawnFromRank8[1+fileIndex],
+                                              &e.maxPawnFromRank1[1+fileIndex],
+                                              fileIndex,
                                               black,
-                                              self->blackSide.king,
-                                              self->whiteSide.king);
+                                              square(0, 7) ^ self->blackSide.king,
+                                              square(0, 7) ^ self->whiteSide.king);
         }
 
         /*--------------------------------------------------------------+
@@ -333,15 +348,15 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
                         drawScore += v[drawUnlikeBishops];
         }
 
-        // Each side has a piece the other doesn't have (don't count pawns)
-        int deltaQueens = e.nrQueens[white] - e.nrQueens[black];
-        int deltaRooks  = e.nrRooks[white]  - e.nrRooks[black];
-        int deltaMinors = e.nrMinors[white] - e.nrMinors[black];
-        if (min(min(deltaQueens, deltaRooks), deltaMinors) < 0
-         && max(max(deltaQueens, deltaRooks), deltaMinors) > 0) {
-                if (deltaQueens) drawScore += v[drawQueenImbalance];
-                if (deltaRooks)  drawScore += v[drawRookImbalance];
-                if (deltaMinors) drawScore += v[drawMinorImbalance];
+        // In an imbalance each side has a piece the other doesn't have
+        int dQ = e.nrQueens[white] - e.nrQueens[black];
+        int dR = e.nrRooks[white]  - e.nrRooks[black];
+        int dM = e.nrMinors[white] - e.nrMinors[black];
+        if (min(min(dQ, dR), dM) < 0
+         && max(max(dQ, dR), dM) > 0) {
+                if (dQ) drawScore += v[drawQueenImbalance];
+                if (dR) drawScore += v[drawRookImbalance];
+                if (dM) drawScore += v[drawMinorImbalance];
         }
 
         /*--------------------------------------------------------------+
@@ -455,54 +470,46 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
  |      evaluatePawn                                                    |
  +----------------------------------------------------------------------*/
 
-/*
- *  TODO: `file' is given as 0 for fileA, regardless of the definition of fileA
- */
-
 static int evaluatePawn(const int v[vectorLen],
-                        const char minRank[][2], const char maxRank[][2], int R, // For flipping ranks
-                        int file, int side,
+                        const int maxPawnFromRank1[][2],
+                        const int maxPawnFromRank8[][2],
+                        int fileIndex,
+                        int side,
                         int king, int xking)
 {
-        int first = maxRank[0][side] ^ R; // Most advanced pawn, if any
-        int last  = minRank[0][side] ^ R; // Most backward pawn, if any
+        #define maxRank(i, j)  maxPawnFromRank1[i][j]
+        #define minRank(i, j) (maxPawnFromRank8[i][j] ^ 7)
 
-        if (last > first) // No pawn
+        int frontPawn = maxRank(0, side);
+        int backPawn  = minRank(0, side);
+
+        if (backPawn > frontPawn) // No pawn
                 return 0;
 
         int pawnScore = 0;
-        int F = isKingFlankFile(file(king)) ? fileA : fileH; // For flipping files TODO: flip 'file'
-        int xside = other(side);
-
-#if 0
-        // TODO: one file and one rank must be neutral
-        // OR: make the average neutral, which is much nicer
-        pawnScore = v[pawnA+(file^F)] + v[pawn2+(first^R)-1]; // Location
-#endif
-
-        /*
-         *  Pawn rank and file
-         *
-         *  Correct down for average to avoid tuning problems,
-         *  effectively creating only 7+5 = 12 degrees of freedom
-         *  for what is effectively a static pawn PST.
-         */
-
-        int pawnCommon = v[pawnA] + v[pawnB] + v[pawnC] + v[pawnD] +
-                         v[pawnE] + v[pawnF] + v[pawnG] + v[pawnH];
-
-        pawnScore += v[pawnA+(file^F)] - pawnCommon/8;
-
-        pawnCommon = v[pawn2] + v[pawn3] + v[pawn4] + v[pawn5] + v[pawn6] + v[pawn7];
-
-        pawnScore += v[pawn2+(first^F)-1] - pawnCommon/6;
 
         /*
          *  Doubled pawn
+         *
+         *  After this don't evaluate the back pawn in more detail
          */
 
-        if (last < first)
-                pawnScore += v[doubledPawnA+(file^F)];
+        if (backPawn < frontPawn)
+                pawnScore += v[doubledPawnA + fileIndex];
+
+        /*
+         *  File and rank dependent scoring (7+5=12 degrees of freedom)
+         */
+
+        if (fileIndex > 0)
+                pawnScore -= v[pawnByFile_0 + fileIndex - 1];
+        if (fileIndex < 7)
+                pawnScore += v[pawnByFile_0 + fileIndex];
+
+        if (frontPawn > 1)
+                pawnScore -= v[pawnByRank_0 + frontPawn - 2];
+        if (frontPawn < 6)
+                pawnScore += v[pawnByRank_0 + frontPawn - 1];
 
         /*
          *  Backward pawn
@@ -523,14 +530,16 @@ static int evaluatePawn(const int v[vectorLen],
          *  "if it can capture an enemy pawn it cannot be backward either"
          */
 
-        if ((minRank[-1][side] ^ R) > first
-         && (minRank[+1][side] ^ R) > first
-         && first < 5
-         && ((minRank[-1][xside] ^ R) == first + 2
-          || (maxRank[-1][xside] ^ R) == first + 2
-          || (minRank[+1][xside] ^ R) == first + 2
-          || (maxRank[+1][xside] ^ R) == first + 2))
-                pawnScore += v[backwardPawnA+(file^F)];
+        int xside = other(side);
+
+        if (minRank(-1, side) > frontPawn
+         && minRank(+1, side) > frontPawn
+         && frontPawn < 7 - 2
+         && (minRank(-1, xside) == frontPawn + 2
+          || maxRank(-1, xside) == frontPawn + 2
+          || minRank(+1, xside) == frontPawn + 2
+          || maxRank(+1, xside) == frontPawn + 2))
+                pawnScore += v[backwardPawnA + fileIndex];
 
 #if 0
         /*
@@ -550,14 +559,42 @@ static int evaluatePawn(const int v[vectorLen],
          *  Passer
          */
 
-        if ((maxRank[-1][xside] ^ R) <= first
-         && (maxRank[ 0][xside] ^ R) <= first
-         && (maxRank[+1][xside] ^ R) <= first)                  // Passer
-                pawnScore += v[passerA_0+(file^F)]
-                           + v[passerA_1+(file^F)] * (first - 1)
-                           + v[passerA_2+(file^F)] * (first - 1) * (first - 2) / 4;
+        if (maxRank(-1, xside) <= frontPawn
+         && maxRank( 0, xside) <= frontPawn
+         && maxRank(+1, xside) <= frontPawn)
+                pawnScore += v[passerA_0 + fileIndex]
+                           + v[passerA_1 + fileIndex] * (frontPawn - 1)
+                           + v[passerA_2 + fileIndex] * (frontPawn - 1) * (frontPawn - 2) / 4;
 
         return pawnScore;
+}
+
+/*----------------------------------------------------------------------+
+ |      evaluateKnight                                                  |
+ +----------------------------------------------------------------------*/
+
+static int evaluateKnight(const int v[vectorLen], int fileIndex, int rankIndex)
+{
+        int knightScore = 0;
+
+        /*
+         *  File and rank dependent scoring (7+7=14 degrees of freedom)
+         */
+
+        if (fileIndex > 0)
+                knightScore -= v[knightByFile_0 + fileIndex - 1];
+        if (fileIndex < 7)
+                knightScore += v[knightByFile_0 + fileIndex];
+
+        if (rankIndex > 0)
+                knightScore -= v[knightByRank_0 + rankIndex - 1];
+        if (rankIndex < 7)
+                knightScore += v[knightByRank_0 + rankIndex];
+
+        // TODO: relation to both kings
+        // TODO: strong squares
+
+        return knightScore;
 }
 
 /*----------------------------------------------------------------------+

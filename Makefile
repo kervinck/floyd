@@ -10,6 +10,12 @@ module:
 test:
 	python Tools/searchtest.py
 
+todo:
+	find . -type f -size -1M -print0 | xargs -0 grep -i todo
+
+pst:
+	python Tools/getPst.py
+
 tune:
 	bzcat Data/ccrl-shuffled-3M.epd.bz2 | head -1000000 | python Tools/tune.py vector.json
 

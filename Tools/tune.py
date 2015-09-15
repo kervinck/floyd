@@ -148,16 +148,7 @@ def tuneSingle(coef, tests, initialValue, initialResidual, initialScores):
                         streak += 1
 
                         # Determine if the result is an improvement
-                        isBetter = False
-                        if nextResidual < bestResidual:
-                                isBetter = True
-                        if nextResidual == bestResidual:
-                                if abs(nextValue) < abs(bestValue):
-                                        isBetter = True
-                                if nextValue == -bestValue and nextValue > 0:
-                                        isBetter = True
-
-                        if isBetter:
+                        if (nextResidual, abs(nextValue)) < (bestResidual, abs(bestValue)):
                                 bestValue, bestResidual, bestScores = nextValue, nextResidual, nextScores
                                 print 'best'
                         else:

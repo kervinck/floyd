@@ -163,7 +163,6 @@ def tuneSingle(coef, tests, initialValue, initialResidual, initialScores):
                         fast = streak >= nrSteps
                 else:
                         if min(bestValue - minValue, maxValue - bestValue) < window / 8:
-                                print 'widening'
                                 window *= 1.5 # Slight increase window at edge of range
 
         # Update vector

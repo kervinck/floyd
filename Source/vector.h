@@ -31,6 +31,10 @@
         X(tempo, 0),
         X(winBonus, 3500),
 
+        X(castleK, 0),
+        X(castleQ, 0),
+        X(castleKQ, 0),
+
         X(queenValue, 9000),
         X(rookValue, 5000),
         X(bishopValue, 3300),

@@ -81,6 +81,8 @@ static int evaluateKnight(const int v[vectorLen], int fileIndex, int rankIndex);
 
 static int evaluateRook(const int v[vectorLen], int fileIndex, int rankIndex);
 
+static int evaluateCastleFlags(const int v[vectorLen], int kSideFlag, int qSideFlag);
+
 /*----------------------------------------------------------------------+
  |      evaluate                                                        |
  +----------------------------------------------------------------------*/
@@ -307,6 +309,18 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
         }
 
         /*--------------------------------------------------------------+
+         |      Kings                                                   |
+         +--------------------------------------------------------------*/
+
+        e.kings[white] += evaluateCastleFlags(v,
+                self->castleFlags & castleFlagWhiteKside,
+                self->castleFlags & castleFlagWhiteQside);
+
+        e.kings[black] += evaluateCastleFlags(v,
+                self->castleFlags & castleFlagBlackKside,
+                self->castleFlags & castleFlagBlackQside);
+
+        /*--------------------------------------------------------------+
          |      Draw rate prediction ("draw")                           |
          +--------------------------------------------------------------*/
 
@@ -394,7 +408,6 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
                 wiloScore += self->eloDiff * v[eloDiff] / 10;
         else
                 wiloScore -= self->eloDiff * v[eloDiff] / 10;
-
         /*--------------------------------------------------------------+
          |      Special endgames                                        |
          +--------------------------------------------------------------*/
@@ -630,6 +643,21 @@ static int evaluateRook(const int v[vectorLen], int fileIndex, int rankIndex)
         // TODO: strong squares
 
         return rookScore;
+}
+
+/*----------------------------------------------------------------------+
+ |      evaluateKing                                                    |
+ +----------------------------------------------------------------------*/
+
+static int evaluateCastleFlags(const int v[vectorLen], int kSideFlag, int qSideFlag)
+{
+        if (kSideFlag && qSideFlag)
+                return v[castleKQ];
+        if (kSideFlag)
+                return v[castleK];
+        if (qSideFlag)
+                return v[castleQ];
+        return 0;
 }
 
 /*----------------------------------------------------------------------+

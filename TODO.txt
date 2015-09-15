@@ -1,23 +1,13 @@
 
-|Todo| Expand board control. Include mobility [evaluate]
+|Todo| King safety [evaluate]
 
 |Todo| Scale passers with material [evaluate]
 
-|Todo| Cleanup pawn code [qa]
+|Todo| Expand board control. Include mobility [evaluate]
 
 |Todo| Add white/black testing [qa,evaluate]
 
 |Todo| Add left/right testing [qa,evaluate]
-
-|Todo| D dependency on W/L [concept,drawmodel]
-
-Ref: http://talkchess.com/forum/viewtopic.php?p=639668#639668
-
----
-You cannot require that d is independent of w since you may also want symmetry in w and l and 
-cov(w,d)=cov(l,d)=0 
-contradicts d+w+l=1.
----
 
 |Todo| Terminology: coefficient or parameter [qa]
 

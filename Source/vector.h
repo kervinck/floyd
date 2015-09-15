@@ -157,20 +157,20 @@
          */
 
         P(rookByFile_0, -55), // "fileA"
-        P(rookByFile_1, -57),
+        P(rookByFile_1, -58),
         P(rookByFile_2, -34),
         P(rookByFile_3, -6),
         P(rookByFile_4, 17),
         P(rookByFile_5, 32),
         P(rookByFile_6, 85), // "-fileH"
 
-        P(rookByRank_0, -90), // "rank1"
-        P(rookByRank_1, -262),
+        P(rookByRank_0, -97), // "rank1"
+        P(rookByRank_1, -266),
         P(rookByRank_2, -407),
         P(rookByRank_3, -447),
-        P(rookByRank_4, -345),
-        P(rookByRank_5, -212),
-        P(rookByRank_6, -57), // "-rank8"
+        P(rookByRank_4, -369),
+        P(rookByRank_5, -230),
+        P(rookByRank_6, -73), // "-rank8"
 
 #if 0
         P(attackForceQueen, 0),  P(attackForceQueenX, 0),

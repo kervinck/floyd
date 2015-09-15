@@ -1,4 +1,6 @@
 
+|Todo| Redefine pawnValue<N> as value of N pawns
+
 |Todo| Preserve parameter order in vector.json [tuning]
 
 |Todo| King safety [evaluate]

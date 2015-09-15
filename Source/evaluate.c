@@ -79,6 +79,8 @@ static int evaluatePawn(const int v[vectorLen],
 
 static int evaluateKnight(const int v[vectorLen], int fileIndex, int rankIndex);
 
+static int evaluateRook(const int v[vectorLen], int fileIndex, int rankIndex);
+
 /*----------------------------------------------------------------------+
  |      evaluate                                                        |
  +----------------------------------------------------------------------*/
@@ -144,6 +146,7 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
                 case whiteRook:
                 case blackRook:
                         e.nrRooks[side]++;
+                        e.rooks[side] += evaluateRook(v, fileIndex, rankIndex);
                         break;
 
                 case whiteBishop:
@@ -595,6 +598,38 @@ static int evaluateKnight(const int v[vectorLen], int fileIndex, int rankIndex)
         // TODO: strong squares
 
         return knightScore;
+}
+
+/*----------------------------------------------------------------------+
+ |      evaluateRook                                                    |
+ +----------------------------------------------------------------------*/
+
+static int evaluateRook(const int v[vectorLen], int fileIndex, int rankIndex)
+{
+        int rookScore = 0;
+
+        /*
+         *  File and rank dependent scoring (7+7=14 degrees of freedom)
+         */
+
+        if (fileIndex > 0)
+                rookScore -= v[rookByFile_0 + fileIndex - 1];
+        if (fileIndex < 7)
+                rookScore += v[rookByFile_0 + fileIndex];
+
+        if (rankIndex > 0)
+                rookScore -= v[rookByRank_0 + rankIndex - 1];
+        if (rankIndex < 7)
+                rookScore += v[rookByRank_0 + rankIndex];
+
+        // TODO: doubling
+        // TODO: open files
+        // TODO: supporting/blocking passers
+        // TODO: attacking backward pawns
+        // TODO: relation to both kings
+        // TODO: strong squares
+
+        return rookScore;
 }
 
 /*----------------------------------------------------------------------+

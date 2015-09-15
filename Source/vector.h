@@ -148,6 +148,26 @@
         X(knightByRank_5, 0),
         X(knightByRank_6, 0), // "-rank8"
 
+        /*
+         *  Rooks
+         */
+
+        X(rookByFile_0, 0), // "fileA"
+        X(rookByFile_1, 0),
+        X(rookByFile_2, 0),
+        X(rookByFile_3, 0),
+        X(rookByFile_4, 0),
+        X(rookByFile_5, 0),
+        X(rookByFile_6, 0), // "-fileH"
+
+        X(rookByRank_0, 0), // "rank1"
+        X(rookByRank_1, 0),
+        X(rookByRank_2, 0),
+        X(rookByRank_3, 0),
+        X(rookByRank_4, 0),
+        X(rookByRank_5, 0),
+        X(rookByRank_6, 0), // "-rank8"
+
 #if 0
         X(attackForceQueen, 0),  X(attackForceQueenX, 0),
         X(attackForceRook, 0),   X(attackForceRookX, 0),

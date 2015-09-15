@@ -74,7 +74,7 @@ def printPasserTable():
         print
 
 
-for pieceName in ['knight', 'pawn']:
+for pieceName in ['rook', 'knight', 'pawn']:
         getPst(pieceName)
 
 printPasserTable()

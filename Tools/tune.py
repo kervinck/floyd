@@ -120,7 +120,8 @@ def tuneSingle(coef, tests, initialValue, initialResidual, initialScores):
         while not exhausted:
 
                 # Center the window around the current best value
-                minValue, maxValue = bestValue - window/2, bestValue + window/2
+                center = bestValue
+                minValue, maxValue = center - window/2, center + window/2
                 stepSize = window / (nrSteps - 1)
 
                 # Walk through the range in equal steps. Always complete all steps
@@ -155,13 +156,15 @@ def tuneSingle(coef, tests, initialValue, initialResidual, initialScores):
                                 print # newline
 
                 # Shrink the window if the best value is near the center
-                if abs(bestValue - (maxValue + minValue)/2) <= window/4:
+                if abs(bestValue - center) < window / 4:
                         if bestValue != initialValue:
-                                break # Early termination, go to next parameter
+                                break # Early termination (go to next parameter)
                         window /= 2
                         fast = streak >= nrSteps
                 else:
-                        window *= 1.5 # Slight increase and continue
+                        if min(bestValue - minValue, maxValue - bestValue) < window / 8:
+                                print 'widening'
+                                window *= 1.5 # Slight increase window at edge of range
 
         # Update vector
         engine.setCoefficient(coef, bestValue)

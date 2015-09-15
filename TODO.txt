@@ -1,4 +1,6 @@
 
+|Todo| Preserve parameter order in vector.json [tuning]
+
 |Todo| King safety [evaluate]
 
 |Todo| Scale passers with material [evaluate]

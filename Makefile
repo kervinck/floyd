@@ -23,10 +23,14 @@ tune:
 ftune:
 	bzcat Data/ccrl-shuffled-3M.epd.bz2 | head -100000 | python Tools/tune.py fvector.json
 
+update: clean
+	python Tools/updateDefaults.py vector.json < Source/vector.h > vector.h.tmp
+	[ -s vector.h.tmp ] && mv vector.h.tmp Source/vector.h
+
 install:
 	python setup.py install --user
 
 clean:
-	python setup.py clean
+	python setup.py clean --all
 
 # vi: noexpandtab

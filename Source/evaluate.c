@@ -37,9 +37,9 @@
 #define isKingFlankFile(file) (((file) ^ fileD) >> 2)
 
 enum vector {
-        #define X(id,value) id
+        #define P(id, value) id
         #include "vector.h"
-        #undef X
+        #undef P
 };
 
 /*----------------------------------------------------------------------+
@@ -47,18 +47,18 @@ enum vector {
  +----------------------------------------------------------------------*/
 
 const char * const vectorLabels[] = {
-        #define X(id,value) #id
+        #define P(id, value) #id
         #include "vector.h"
-        #undef X
+        #undef P
 };
 
 const int vectorLen = arrayLen(vectorLabels);
 
 // TODO: should become default and const
 int globalVector[] = {
-        #define X(id,value) [id] = (value)
+        #define P(id, value) [id] = (value)
         #include "vector.h"
-        #undef X
+        #undef P
 };
 
 /*----------------------------------------------------------------------+

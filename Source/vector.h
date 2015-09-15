@@ -87,6 +87,7 @@
          *   - The sum of coefficients is 0: no overdetermination
          *   - Each parameter has a small scope: no dependency chaining issues
          *   - Suitable for direct use: no preprocessing needed prior to evaluate
+         *  (Note that this is different from "tuning the differences between files")
          */
 
         X(pawnByFile_0, 0), // "fileA"

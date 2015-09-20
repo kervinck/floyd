@@ -1,5 +1,5 @@
 
-|Todo| Redefine pawnValue<N> as value of N pawns
+|Todo| Redefine pawnValue<N> as value of N pawns [tune]
 
 |Todo| Preserve parameter order in vector.json [tuning]
 
@@ -30,4 +30,24 @@ Observe variation of vector and residual
 
 Tune with 10 different subsets of ccrl @ 100k
 Observe variation of vector and residual 
+
+|Todo| Get residuals of some existing evaluations for comevaluate [evaluate]
+
+ - Crafty 24.1
+ - Stockfish 6
+ - Fruit 2.1
+ - Junior 2011
+ - Hiarcs 14
+ - Shredder 12
+ - Komodo x
+ - Gnuchess 5.07
+ - Rookie 3.8
+ - Rybka 2.3.2a
+
+|Todo| Consider gradient descent [tune]
+
+|Todo| Test tuner on Rosenbrock function [tune]
+
+https://en.wikipedia.org/wiki/Rosenbrock_function
+
 

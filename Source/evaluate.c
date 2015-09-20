@@ -204,46 +204,51 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
 
                 e.material[side] =
                         e.nrQueens[side] * (
-                               + v[queenValue]
-                               + v[queenAndQueen]   * (e.nrQueens[side] - 1)
-                               + v[queenAndRook]    * e.nrRooks[side]
-                               + v[queenAndBishop]  * e.nrBishops[side]
-                               + v[queenAndKnight]  * e.nrKnights[side]
-                               + v[queenAndPawn_1]  * e.nrPawns[side]
-                               + v[queenAndPawn_2]  * e.nrPawns[side] * e.nrPawns[side] /8
-                               + v[queenVsRook]     * e.nrRooks[xside]
-                               + v[queenVsBishop]   * e.nrBishops[xside]
-                               + v[queenVsKnight]   * e.nrKnights[xside]
-                               + v[queenVsPawn_1]   * e.nrPawns[xside]
-                               + v[queenVsPawn_2]   * e.nrPawns[xside] * e.nrPawns[xside] /8
-                        ) + e.nrRooks[side] * (
-                               + v[rookValue]
-                               + v[rookAndRook]     * (e.nrRooks[side] - 1)
-                               + v[rookAndBishop]   * e.nrBishops[side]
-                               + v[rookAndKnight]   * e.nrKnights[side]
-                               + v[rookAndPawn_1]   * e.nrPawns[side]
-                               + v[rookAndPawn_2]   * e.nrPawns[side] * e.nrPawns[side] /8
-                               + v[rookVsBishop]    * e.nrBishops[xside]
-                               + v[rookVsKnight]    * e.nrKnights[xside]
-                               + v[rookVsPawn_1]    * e.nrPawns[xside]
-                               + v[rookVsPawn_2]    * e.nrPawns[xside] * e.nrPawns[xside] /8
-                        ) + e.nrBishops[side] * (
-                               + v[bishopValue]
-                               + v[bishopAndBishop] * (e.nrBishops[side] - 1)
-                               + v[bishopAndKnight] * e.nrKnights[side]
-                               + v[bishopAndPawn_1] * e.nrPawns[side]
-                               + v[bishopAndPawn_2] * e.nrPawns[side] * e.nrPawns[side] /8
-                               + v[bishopVsKnight]  * e.nrKnights[xside]
-                               + v[bishopVsPawn_1]  * e.nrPawns[xside]
-                               + v[bishopVsPawn_2]  * e.nrPawns[xside] * e.nrPawns[xside] /8
-                        ) + e.nrKnights[side] * (
-                               + v[knightValue]
-                               + v[knightAndKnight] * (e.nrKnights[side] - 1)
-                               + v[knightAndPawn_1] * e.nrPawns[side]
-                               + v[knightAndPawn_2] * e.nrPawns[side] * e.nrPawns[side] /8
-                               + v[knightVsPawn_1]  * e.nrPawns[xside]
-                               + v[knightVsPawn_2]  * e.nrPawns[xside] * e.nrPawns[xside] /8
-                        );
+                                + v[queenValue]
+                                + v[queenAndQueen]  * (e.nrQueens[side] - 1)
+                                + v[queenAndPawn_1] * e.nrPawns[side]
+                                + v[queenAndPawn_2] * e.nrPawns[side] * e.nrPawns[side] / 8
+                                + v[queenVsPawn_1]  * e.nrPawns[xside]
+                                + v[queenVsPawn_2]  * e.nrPawns[xside] * e.nrPawns[xside] / 8)
+
+                        + v[queenAndRook]   * min(e.nrQueens[side], e.nrRooks[side])
+                        + v[queenAndBishop] * min(e.nrQueens[side], e.nrBishops[side])
+                        + v[queenAndKnight] * min(e.nrQueens[side], e.nrKnights[side])
+                        + v[queenVsRook]    * min(e.nrQueens[side], e.nrRooks[xside])
+                        + v[queenVsBishop]  * min(e.nrQueens[side], e.nrBishops[xside])
+                        + v[queenVsKnight]  * min(e.nrQueens[side], e.nrKnights[xside])
+
+                        + e.nrRooks[side] * (
+                                + v[rookValue]
+                                + v[rookAndRook]   * (e.nrRooks[side] - 1)
+                                + v[rookAndPawn_1] * e.nrPawns[side]
+                                + v[rookAndPawn_2] * e.nrPawns[side] * e.nrPawns[side] / 8
+                                + v[rookVsPawn_1]  * e.nrPawns[xside]
+                                + v[rookVsPawn_2]  * e.nrPawns[xside] * e.nrPawns[xside] / 8)
+
+                        + v[rookAndBishop] * min(e.nrRooks[side], e.nrBishops[side])
+                        + v[rookAndKnight] * min(e.nrRooks[side], e.nrKnights[side])
+                        + v[rookVsBishop]  * min(e.nrRooks[side], e.nrBishops[xside])
+                        + v[rookVsKnight]  * min(e.nrRooks[side], e.nrKnights[xside])
+
+                        + e.nrBishops[side] * (
+                                + v[bishopValue]
+                                + v[bishopAndBishop] * (e.nrBishops[side] - 1)
+                                + v[bishopAndPawn_1] * e.nrPawns[side]
+                                + v[bishopAndPawn_2] * e.nrPawns[side] * e.nrPawns[side] / 8
+                                + v[bishopVsPawn_1]  * e.nrPawns[xside]
+                                + v[bishopVsPawn_2]  * e.nrPawns[xside] * e.nrPawns[xside] / 8)
+
+                        + v[bishopAndKnight] * min(e.nrBishops[side], e.nrKnights[side])
+                        + v[bishopVsKnight]  * min(e.nrBishops[side], e.nrKnights[xside])
+
+                        + e.nrKnights[side] * (
+                                + v[knightValue]
+                                + v[knightAndKnight] * (e.nrKnights[side] - 1)
+                                + v[knightAndPawn_1] * e.nrPawns[side]
+                                + v[knightAndPawn_2] * e.nrPawns[side] * e.nrPawns[side] / 8
+                                + v[knightVsPawn_1]  * e.nrPawns[xside]
+                                + v[knightVsPawn_2]  * e.nrPawns[xside] * e.nrPawns[xside] / 8);
 
                 for (int i=0; i<e.nrPawns[side]; i++)
                         e.material[side] += v[pawnValue1+i];
@@ -421,19 +426,19 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
         int nrEffectivePieces = nrKings + nrQueens + nrRooks + nrEffectiveBishops + nrKnights + nrPawns;
 
         if (nrEffectivePieces == 2)
-                wiloScore = 0;
+                wiloScore = 0; // KK
 
         if (nrEffectivePieces == 3) {
                 if (e.nrQueens[side] + e.nrRooks[side] > 0)
-                        wiloScore += v[winBonus];
+                        wiloScore += v[winBonus]; // KQK, KRK
 
                 if (e.nrQueens[xside] + e.nrRooks[xside] > 0)
-                        wiloScore -= v[winBonus];
+                        wiloScore -= v[winBonus]; // KKQ, KKR
 
                 if (nrBishops + nrKnights > 0)
-                        wiloScore = 0;
+                        wiloScore = 0; // KBK, KNK (and KB+K of like-bishops)
 
-                if (nrPawns > 0) {
+                if (nrPawns > 0) { // KPK
                         int egtSide, wKing, wPawn, bKing;
 
                         if (e.nrPawns[white] == 1) {
@@ -456,6 +461,16 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
                 }
         }
 
+#if 0
+        if (nrEffectivePieces == 4) {
+                if (e.nrKnights[xside] == 2)
+                        wiloScore = 0; // KKNN, draw if lone king is to move
+
+                if (nrEffectiveBishops(side) == 1 && e.nrKnights[xside] == 1)
+                        wiloScore = 0; // KBKN, draw if bishop side is to move
+        }
+#endif
+
         /*--------------------------------------------------------------+
          |      Total                                                   |
          +--------------------------------------------------------------*/
@@ -470,6 +485,9 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
 
         static const double Ci = 4.0 / M_LN10;
         e.score = round(Ci * logit(e.P) * 1e+3);
+
+        //printf("%s wilo %d Wp %.3f draw %d D %.1f P %.3f score %d\n",
+                //__func__, e.wiloScore, Wp, e.drawScore, D, e.P, e.score);
 
         /*--------------------------------------------------------------+
          |      Return                                                  |

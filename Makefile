@@ -18,10 +18,10 @@ tables:
 	python Tools/printTables.py vector.json
 
 tune:
-	bzcat Data/ccrl-shuffled-3M.epd.bz2 | head -1000000 | python Tools/tune.py vector.json
+	bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/tune.py -s 2 vector.json
 
 ftune:
-	bzcat Data/ccrl-shuffled-3M.epd.bz2 | head -100000 | python Tools/tune.py fvector.json
+	bzcat Data/ccrl-shuffled-3M.epd.bz2 | head -500000 | python Tools/tune.py -s 2 -m 100000 fvector.json
 
 update: clean
 	python Tools/updateDefaults.py vector.json < Source/vector.h > vector.h.tmp

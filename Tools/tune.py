@@ -11,6 +11,20 @@ import math
 import sys
 
 #-----------------------------------------------------------------------
+#       options
+#-----------------------------------------------------------------------
+
+cpu = 0
+
+depth = 0
+
+nrSteps = 6  # 1.....2.....3..X..4.....5.....6
+nrSteps = 4  # 1.........2....X....3.........4
+#nrSteps = 2 # 1..............X..............2
+
+maxActive = float('+Inf') # "dirty mode"
+
+#-----------------------------------------------------------------------
 #       readTestsFromEpd
 #-----------------------------------------------------------------------
 
@@ -56,18 +70,18 @@ def getVector():
 #       evaluateVector
 #-----------------------------------------------------------------------
 
-def evaluateVector(tests, passive, fast):
+def evaluateVector(tests, passive, useCache):
         """
-        tests: list of (fen, result) tuples
-        passive: (in/out) dict of positions whose score hasn't moved yet
-        fast: flag to indicate fast mode must be used
+        tests    : list of (fen, result) tuples
+        passive  : (in/out) dict of positions whose score has stayed constant
+        useCache : flag to indicate when cached values can be used
         """
 
         sumSquaredErrors = 0.0
         scores = []
         for pos, target in tests:
-                if not fast or pos not in passive:
-                        score, pv = engine.search(pos, 0) # slow
+                if not useCache or pos not in passive:
+                        score, pv = engine.search(pos, depth) # slow
                         if pos in passive and score != passive[pos]:
                                 del passive[pos]
                 else:
@@ -93,27 +107,20 @@ def scoreToP(score):
 def tuneSingle(coef, tests, initialValue, initialResidual, initialScores):
         """Tune a single coefficient using robust a form of hill-climbing"""
 
-        print 'evaluate id %s value %d residual %.9f' % (names[coef], initialValue, initialResidual)
+        print 'evaluate id %s residual %.9f value %d' % (names[coef], initialResidual, initialValue)
 
         cache = { initialValue: initialResidual } # value -> residual
 
         bestValue, bestResidual, bestScores = initialValue, initialResidual, initialScores
 
-        # Initial window scales magnitude of initial value
-        sigmoid = 1.0 / (1.0 + math.exp(-initialValue * 1e-3))
-        slope = sigmoid * (1.0 - sigmoid)
-        window = 0.02 / max(slope, 0.01) * 1e3
+        # Initial window scales with the magnitude of the initial value
+        window = calcWindow(initialValue)
 
-        # Even is good as it increases the density around bestValue (1 ... 2 ... 3 .X. 4 ... 5 ... 6)
-        # Using 6 steps gives 2 in the middle and 2 on the sides, so on each side
-        # of bestValue at least two probes must be worse before breaking out.
-        nrSteps = 6
-
-        # For switching to fast mode
+        # For switching to quick mode
         positions = [item[0] for item in tests]
         passive = dict(zip(positions, bestScores))
         lastActive, streak = None, 0
-        fast = False
+        quick, dirty = False, False
 
         # Loop until an improvement is found or the search is exhausted
         exhausted = False
@@ -133,12 +140,12 @@ def tuneSingle(coef, tests, initialValue, initialResidual, initialScores):
                         exhausted = False
 
                         engine.setCoefficient(coef, nextValue)
-                        nextResidual, nextScores = evaluateVector(tests, passive, fast)
+                        nextResidual, nextScores = evaluateVector(tests, passive, quick or dirty)
                         cache[nextValue] = nextResidual
 
                         active = len(positions) - len(passive)
                         print 'evaluate id %s residual %.9f' % (names[coef], nextResidual),
-                        if not fast:
+                        if not quick and not dirty:
                                 print 'active %d' % active,
                         print 'value %d' % nextValue,
 
@@ -160,15 +167,27 @@ def tuneSingle(coef, tests, initialValue, initialResidual, initialScores):
                         if bestValue != initialValue:
                                 break # Early termination (go to next parameter)
                         window /= 2
-                        fast = streak >= nrSteps
+                        quick = streak >= nrSteps
                 else:
                         if min(bestValue - minValue, maxValue - bestValue) < window / 8:
-                                window *= 1.5 # Slight increase window at edge of range
+                                window *= 1.25 # Slight increase when at the edge
+
+                dirty = lastActive >= maxActive
 
         # Update vector
         engine.setCoefficient(coef, bestValue)
 
         return bestValue, bestResidual, bestScores, active
+
+#-----------------------------------------------------------------------
+#       calcWindow
+#-----------------------------------------------------------------------
+
+def calcWindow(value):
+        sigmoid = 1.0 / (1.0 + math.exp(-value * 1e-3))
+        slope = sigmoid * (1.0 - sigmoid)
+        window = 0.02 / max(slope, 0.01) * 1e3 # clip when below 1% (queens, rooks)
+        return window
 
 #-----------------------------------------------------------------------
 #       writeVector
@@ -201,9 +220,30 @@ if __name__ == '__main__':
 
         argi = 1
 
-        if len(sys.argv) >= argi and sys.argv[argi] == '-n':
-                cpu = int(sys.argv[argi+1])
-                argi += 2
+        while len(sys.argv) >= argi and sys.argv[argi][0] == '-':
+
+                if sys.argv[argi] == '-n':
+                        cpu = int(sys.argv[argi+1])
+                        argi += 2
+                        continue
+
+                if sys.argv[argi] == '-d':
+                        depth = int(sys.argv[argi+1])
+                        argi += 2
+                        continue
+
+                if sys.argv[argi] == '-s':
+                        nrSteps = int(sys.argv[argi+1])
+                        argi += 2
+                        continue
+
+                if sys.argv[argi] == '-m':
+                        maxActive = int(sys.argv[argi+1])
+                        argi += 2
+                        continue
+
+                print 'No such option:', sys.argv[argi]
+                sys.exit(1)
 
         # Read vector from file, if any
         filename = sys.argv[argi]
@@ -226,12 +266,12 @@ if __name__ == '__main__':
         # -- Step 2: Read positions from stdin
 
         tests = readTestsFromEpd(sys.stdin)
-        print 'positions count %d' % len(tests)
 
         # -- Step 3: Prepare. Calculate initial scores and residual
 
         bestResidual, bestScores = evaluateVector(tests, {}, False)
-        print 'vector filename %s residual %.9f' % (repr(filename), bestResidual)
+
+        print 'vector filename %s residual %.9f positions %d depth %d' % (repr(filename), bestResidual, len(tests), depth)
         print
 
         # -- Step 4: Tune all, half the set and repeat tuning until no more halving
@@ -270,7 +310,7 @@ if __name__ == '__main__':
 
         # -- Step 5: Report result and exit
 
-        print 'vector filename %s residual %.9f' % (repr(filename), bestResidual)
+        print 'vector filename %s residual %.9f positions %d depth %d' % (repr(filename), bestResidual, len(tests), depth)
         print
 
         sys.exit(exitValue)

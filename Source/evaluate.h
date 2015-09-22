@@ -102,5 +102,5 @@ extern const char * const vectorLabels[];
  *  Functions
  */
 
-int evaluate(Board_t self, int const v[], struct evaluation *Cc);
+int evaluate(Board_t self);
 

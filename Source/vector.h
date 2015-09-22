@@ -136,41 +136,101 @@
          *  Knights
          */
 
-        P(knightByFile_0, -106), // "fileA"
+        P(knightByFile_0, -106), // fileA
         P(knightByFile_1, -157),
         P(knightByFile_2, -171),
         P(knightByFile_3, -118),
         P(knightByFile_4, -74),
         P(knightByFile_5, -11),
-        P(knightByFile_6, 23), // "-fileH"
+        P(knightByFile_6, 23), // -fileH
 
-        P(knightByRank_0, -76), // "rank1"
+        P(knightByRank_0, -76), // rank1
         P(knightByRank_1, -138),
         P(knightByRank_2, -156),
         P(knightByRank_3, -86),
         P(knightByRank_4, 50),
         P(knightByRank_5, 198),
-        P(knightByRank_6, 255), // "-rank8"
+        P(knightByRank_6, 255), // -rank8
+
+        /*
+         *  Bishops
+         */
+
+        P(bishopOnLong_0, 0),
+        P(bishopOnLong_1, 0),
+
+        P(bishopByFile_0, 0), // fileA
+        P(bishopByFile_1, 0),
+        P(bishopByFile_2, 0),
+        P(bishopByFile_3, 0),
+        P(bishopByFile_4, 0),
+        P(bishopByFile_5, 0),
+        P(bishopByFile_6, 0), // -fileH
+
+        P(bishopByRank_0, 0), // rank1
+        P(bishopByRank_1, 0),
+        P(bishopByRank_2, 0),
+        P(bishopByRank_3, 0),
+        P(bishopByRank_4, 0),
+        P(bishopByRank_5, 0),
+        P(bishopByRank_6, 0), // -rank8
 
         /*
          *  Rooks
          */
 
-        P(rookByFile_0, -71), // "fileA"
+        P(rookByFile_0, -71), // fileA
         P(rookByFile_1, -78),
         P(rookByFile_2, -51),
         P(rookByFile_3, -11),
         P(rookByFile_4, 20),
         P(rookByFile_5, 37),
-        P(rookByFile_6, 93), // "-fileH"
+        P(rookByFile_6, 93), // -fileH
 
-        P(rookByRank_0, -129), // "rank1"
+        P(rookByRank_0, -129), // rank1
         P(rookByRank_1, -318),
         P(rookByRank_2, -481),
         P(rookByRank_3, -529),
         P(rookByRank_4, -431),
         P(rookByRank_5, -262),
-        P(rookByRank_6, -103), // "-rank8"
+        P(rookByRank_6, -103), // -rank8
+
+        /*
+         *  Queens
+         */
+
+        P(queenByFile_0, 0), // fileA
+        P(queenByFile_1, 0),
+        P(queenByFile_2, 0),
+        P(queenByFile_3, 0),
+        P(queenByFile_4, 0),
+        P(queenByFile_5, 0),
+        P(queenByFile_6, 0), // -fileH
+
+        P(queenByRank_0, 0), // rank1
+        P(queenByRank_1, 0),
+        P(queenByRank_2, 0),
+        P(queenByRank_3, 0),
+        P(queenByRank_4, 0),
+        P(queenByRank_5, 0),
+        P(queenByRank_6, 0), // -rank8
+
+        /*
+         *  Kings
+         */
+
+        P(kingByFile_0, 0), // fileD
+        P(kingByFile_1, 0),
+        P(kingByFile_2, 0), // -fileH
+
+        P(kingByRank_0, 0), // rank1
+        P(kingByRank_1, 0),
+        P(kingByRank_2, 0),
+        P(kingByRank_3, 0),
+        P(kingByRank_4, 0),
+        P(kingByRank_5, 0),
+        P(kingByRank_6, 0), // -rank8
+
 
 #if 0
         P(attackForceQueen, 0),  P(attackForceQueenX, 0),

@@ -78,8 +78,10 @@ static int evaluatePawn(const int v[vectorLen],
                         int king, int xking);
 
 static int evaluateKnight(const int v[vectorLen], int fileIndex, int rankIndex);
-
+static int evaluateBishop(const int v[vectorLen], int fileIndex, int rankIndex);
 static int evaluateRook(const int v[vectorLen], int fileIndex, int rankIndex);
+static int evaluateQueen(const int v[vectorLen], int fileIndex, int rankIndex);
+static int evaluateKing(const int v[vectorLen], int fileIndex, int rankIndex);
 
 static int evaluateCastleFlags(const int v[vectorLen], int kSideFlag, int qSideFlag);
 
@@ -119,29 +121,38 @@ int evaluate(Board_t self)
                 int file = file(square);
                 int rank = rank(square);
 
-                /*
-                 *  `fileIndex' and `rankIndex' are relative to
-                 *  the applicible corner of reference
-                 */
-                int fileIndex = file ^ fileA;
-                int rankIndex = rank;
-                if (side == white)
-                        rankIndex ^= rank1;
-                else
-                        rankIndex ^= rank8;
+                // `fileIndex' and `rankIndex' are relative to the own king
+                int fileIndex, rankIndex;
 
-                // abstract "even" or "odd" square color
+                // TODO: we should be able to write 'self->side[side].king' here
+                int king = (side == white)
+                        ? self->whiteSide.king
+                        : self->blackSide.king;
+
+                if (isKingFlankFile(file(king)))
+                        fileIndex = file ^ fileA;
+                else
+                        fileIndex = file ^ fileH;
+
+                if (side == white)
+                        rankIndex = rank ^ rank1;
+                else
+                        rankIndex = rank ^ rank8;
+
+                // "even" or "odd" square color
                 int squareColor = (file ^ rank) & 1;
 
                 switch (piece) {
                 case whiteKing:
                 case blackKing:
                         e.nrKings[side]++;
+                        e.kings[side] += evaluateKing(v, fileIndex, rankIndex);
                         break;
 
                 case whiteQueen:
                 case blackQueen:
                         e.nrQueens[side]++;
+                        e.queens[side] += evaluateQueen(v, fileIndex, rankIndex);
                         break;
 
                 case whiteRook:
@@ -154,6 +165,7 @@ int evaluate(Board_t self)
                 case blackBishop:
                         e.nrBishops[side]++;
                         e.nrBishopsX[side] += squareColor;
+                        e.bishops[side] += evaluateBishop(v, fileIndex, rankIndex);
                         break;
 
                 case whiteKnight:
@@ -614,7 +626,6 @@ static int evaluateKnight(const int v[vectorLen], int fileIndex, int rankIndex)
                 knightScore -= v[knightByFile_0 + fileIndex - 1];
         if (fileIndex < 7)
                 knightScore += v[knightByFile_0 + fileIndex];
-
         if (rankIndex > 0)
                 knightScore -= v[knightByRank_0 + rankIndex - 1];
         if (rankIndex < 7)
@@ -624,6 +635,40 @@ static int evaluateKnight(const int v[vectorLen], int fileIndex, int rankIndex)
         // TODO: strong squares
 
         return knightScore;
+}
+
+/*----------------------------------------------------------------------+
+ |      evaluateBishop                                                  |
+ +----------------------------------------------------------------------*/
+
+static int evaluateBishop(const int v[vectorLen], int fileIndex, int rankIndex)
+{
+        int bishopScore = 0;
+
+        // TODO: on long diagonal
+        if (rankIndex == fileIndex)
+                bishopScore += v[bishopOnLong_0 + rankIndex];
+        if (rankIndex + fileIndex == 7)
+                bishopScore += v[bishopOnLong_1 + rankIndex];
+
+        /*
+         *  File and rank dependent scoring (7+7=14 degrees of freedom)
+         */
+
+        if (fileIndex > 0)
+                bishopScore -= v[bishopByFile_0 + fileIndex - 1];
+        if (fileIndex < 7)
+                bishopScore += v[bishopByFile_0 + fileIndex];
+        if (rankIndex > 0)
+                bishopScore -= v[bishopByRank_0 + rankIndex - 1];
+        if (rankIndex < 7)
+                bishopScore += v[bishopByRank_0 + rankIndex];
+
+
+        // TODO: relation to both kings
+        // TODO: strong squares
+
+        return bishopScore;
 }
 
 /*----------------------------------------------------------------------+
@@ -642,7 +687,6 @@ static int evaluateRook(const int v[vectorLen], int fileIndex, int rankIndex)
                 rookScore -= v[rookByFile_0 + fileIndex - 1];
         if (fileIndex < 7)
                 rookScore += v[rookByFile_0 + fileIndex];
-
         if (rankIndex > 0)
                 rookScore -= v[rookByRank_0 + rankIndex - 1];
         if (rankIndex < 7)
@@ -659,8 +703,57 @@ static int evaluateRook(const int v[vectorLen], int fileIndex, int rankIndex)
 }
 
 /*----------------------------------------------------------------------+
+ |      evaluateQueen                                                   |
+ +----------------------------------------------------------------------*/
+
+static int evaluateQueen(const int v[vectorLen], int fileIndex, int rankIndex)
+{
+        int queenScore = 0;
+
+        /*
+         *  File and rank dependent scoring (7+7=14 degrees of freedom)
+         */
+
+        if (fileIndex > 0)
+                queenScore -= v[queenByFile_0 + fileIndex - 1];
+        if (fileIndex < 7)
+                queenScore += v[queenByFile_0 + fileIndex];
+        if (rankIndex > 0)
+                queenScore -= v[queenByRank_0 + rankIndex - 1];
+        if (rankIndex < 7)
+                queenScore += v[queenByRank_0 + rankIndex];
+
+        // TODO: attacking backward pawns
+        // TODO: relation to both kings
+        // TODO: strong squares
+
+        return queenScore;
+}
+
+/*----------------------------------------------------------------------+
  |      evaluateKing                                                    |
  +----------------------------------------------------------------------*/
+
+static int evaluateKing(const int v[vectorLen], int fileIndex, int rankIndex)
+{
+        int kingScore = 0;
+
+        /*
+         *  File and rank dependent scoring (3+7=10 degrees of freedom)
+         */
+
+        assert(fileIndex >= 4);
+        if (fileIndex > 4)
+                kingScore -= v[kingByFile_0 + fileIndex - 4 - 1];
+        if (fileIndex < 7)
+                kingScore += v[kingByFile_0 + fileIndex - 4];
+        if (rankIndex > 0)
+                kingScore -= v[kingByRank_0 + rankIndex - 1];
+        if (rankIndex < 7)
+                kingScore += v[kingByRank_0 + rankIndex];
+
+        return kingScore;
+}
 
 static int evaluateCastleFlags(const int v[vectorLen], int kSideFlag, int qSideFlag)
 {

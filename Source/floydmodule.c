@@ -82,7 +82,7 @@ floydmodule_evaluate(PyObject *self, PyObject *args)
         if (len <= 0)
                 return PyErr_Format(PyExc_ValueError, "Invalid FEN (%s)", fen);
 
-        int score = evaluate(&board, NULL, NULL);
+        int score = evaluate(&board);
 
         return PyFloat_FromDouble(score / 1000.0);
 }

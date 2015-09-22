@@ -87,13 +87,12 @@ static int evaluateCastleFlags(const int v[vectorLen], int kSideFlag, int qSideF
  |      evaluate                                                        |
  +----------------------------------------------------------------------*/
 
-int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
+int evaluate(Board_t self)
 {
         struct evaluation e;
         memset(&e, 0, sizeof e);
 
-        if (v == null)
-                v = globalVector;
+        const int *v = globalVector;
 
         /*--------------------------------------------------------------+
          |      Feature extraction                                      |
@@ -492,10 +491,6 @@ int evaluate(Board_t self, const int v[vectorLen], struct evaluation *Cc)
         /*--------------------------------------------------------------+
          |      Return                                                  |
          +--------------------------------------------------------------*/
-
-        // Keep copy of the calculation if so requested
-        if (Cc != null)
-                *Cc = e;
 
         return e.score;
 }

@@ -50,6 +50,7 @@ static int scout(Board_t self, int depth, int alpha);
 static int qSearch(Board_t self, int alpha);
 static int exchange(Board_t self, int move);
 static int filterAndSort(Board_t self, int moveList[maxMoves], int nrMoves, int moveFilter);
+static int filterLegalMoves(Board_t self, int moveList[maxMoves], int nrMoves);
 
 /*----------------------------------------------------------------------+
  |      rootSearch                                                      |
@@ -85,19 +86,23 @@ static int ttWrite(Board_t self, int depth, int alpha, int beta, int score)
  |      pvSearch                                                        |
  +----------------------------------------------------------------------*/
 
+// TODO: repetitions
 // TODO: pv creation
 // TODO: pv following
-// TODO: internal deepening
+// TODO: repetitions
 // TODO: ttable
 // TODO: killers
+// TODO: internal deepening
+// TODO: reductions
 static int pvSearch(Board_t self, int depth, int alpha, int beta)
 {
+        //self->nodeCount++;
         int check = inCheck(self);
         int moveFilter = minInt;
         int bestScore = minInt;
 
         if (depth == 0 && !check) {
-                bestScore = evaluate(self, null, null);
+                bestScore = evaluate(self);
                 if (bestScore >= beta)
                         return ttWrite(self, depth, alpha, beta, bestScore);
                 moveFilter = 0;
@@ -106,21 +111,11 @@ static int pvSearch(Board_t self, int depth, int alpha, int beta)
         int moveList[maxMoves];
         int nrMoves = generateMoves(self, moveList);
         nrMoves = filterAndSort(self, moveList, nrMoves, moveFilter);
-
-        // It is easiest to work with legal moves in PVS
-        int j = 0;
-        for (int i=0; i<nrMoves; i++) {
-                makeMove(self, moveList[i]);
-                if (wasLegalMove(self))
-                        moveList[j++] = moveList[i];
-                undoMove(self);
-        }
-        nrMoves = j;
-
-        int newDepth = max(0, depth - 1 + check);
+        nrMoves = filterLegalMoves(self, moveList, nrMoves); // easier for PVS
 
         if (nrMoves > 0) {
                 makeMove(self, moveList[0]);
+                int newDepth = max(0, depth - 1 + check);
                 int newAlpha = max(alpha, bestScore);
                 int score = -pvSearch(self, newDepth, -beta, -newAlpha);
                 bestScore = max(bestScore, score);
@@ -129,6 +124,7 @@ static int pvSearch(Board_t self, int depth, int alpha, int beta)
 
         for (int i=1; i<nrMoves && bestScore<beta; i++) {
                 makeMove(self, moveList[i]);
+                int newDepth = max(0, depth - 1 + check);
                 int newAlpha = max(alpha, bestScore);
                 int score = -scout(self, newDepth, -newAlpha-1);
                 if (score > bestScore) {
@@ -148,15 +144,20 @@ static int pvSearch(Board_t self, int depth, int alpha, int beta)
  |      scout                                                           |
  +----------------------------------------------------------------------*/
 
+// TODO: repetitions
 // TODO: ttable
 // TODO: killers
 // TODO: null move
 // TODO: internal deepening
+// TODO: futility
+// TODO: reductions
+// TODO: abort
 static int scout(Board_t self, int depth, int alpha)
 {
         if (depth == 0)
                 return qSearch(self, alpha);
 
+        //self->nodeCount++;
         int check = inCheck(self);
         int bestScore = minInt;
 
@@ -184,11 +185,13 @@ static int scout(Board_t self, int depth, int alpha)
  |      qSearch                                                         |
  +----------------------------------------------------------------------*/
 
+// TODO: repetitions
 // TODO: ttable
 static int qSearch(Board_t self, int alpha)
 {
+        //self->nodeCount++;
         int check = inCheck(self);
-        int bestScore = check ? minInt : evaluate(self, null, null);
+        int bestScore = check ? minInt : evaluate(self);
 
         if (bestScore > alpha)
                 return ttWrite(self, 0, alpha, alpha+1, bestScore);
@@ -239,31 +242,46 @@ static int exchange(Board_t self, int move)
  |      filterAndSort                                                   |
  +----------------------------------------------------------------------*/
 
-// For qsort
+// Comparator for qsort: descending order of prescore
 static int compareMoves(const void *ap, const void *bp)
 {
-        int a = ((const intPair *)ap)->v[0];
-        int b = ((const intPair *)bp)->v[0];
+        int a = *(const int*)ap;
+        int b = *(const int*)bp;
         return (a < b) - (a > b);
 }
 
 // TODO: recognize safe checks
 static int filterAndSort(Board_t self, int moveList[maxMoves], int nrMoves, int moveFilter)
 {
-        intPair sortList[maxMoves];
-
         int n = 0;
         for (int i=0; i<nrMoves; i++) {
                 int moveScore = exchange(self, moveList[i]);
                 if (moveScore >= moveFilter)
-                        sortList[n++] = (intPair) {{ moveScore, moveList[i] }};
+                        moveList[n++] = (moveScore << 16) + (moveList[i] & 0xffff);
         }
 
-        qsort(sortList, n, sizeof(sortList[0]), compareMoves);
+        qsort(moveList, n, sizeof(moveList[0]), compareMoves);
 
         for (int i=0; i<n; i++)
-                moveList[i] = sortList[i].v[1];
+                moveList[i] &= 0xffff;
+
         return n;
+}
+
+/*----------------------------------------------------------------------+
+ |      filterLegalMoves                                                |
+ +----------------------------------------------------------------------*/
+
+static int filterLegalMoves(Board_t self, int moveList[maxMoves], int nrMoves)
+{
+        int j = 0;
+        for (int i=0; i<nrMoves; i++) {
+                makeMove(self, moveList[i]);
+                if (wasLegalMove(self))
+                        moveList[j++] = moveList[i];
+                undoMove(self);
+        }
+        return j;
 }
 
 /*----------------------------------------------------------------------+

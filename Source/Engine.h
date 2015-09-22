@@ -46,7 +46,7 @@ struct engine {
         intList pv;
 
         long milliSeconds;
-        long long nodeCounter;
+        long long nodeCount;
 };
 
 /*----------------------------------------------------------------------+

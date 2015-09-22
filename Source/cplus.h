@@ -1,17 +1,20 @@
 
 /*----------------------------------------------------------------------+
  |                                                                      |
- |      cplus.h                                                         |
+ |      cplus.h - a loose collection of small C extensions              |
  |                                                                      |
  +----------------------------------------------------------------------*/
+
+// Safe definition of statement-like macros
+#define _Statement(...) do{ __VA_ARGS__ }while(0)
 
 #define arrayLen(a) (sizeof(a) / sizeof((a)[0]))
 
 #define max(a, b) ((a) >= (b) ? (a) : (b))
 #define min(a, b) ((a) <= (b) ? (a) : (b))
 
-#define setMax(a, b) do{ if ((a) < (b)) { (a) = (b); } }while(0)
-#define setMin(a, b) do{ if ((a) > (b)) { (a) = (b); } }while(0)
+#define setMax(a, b) _Statement( if ((a) < (b)) (a) = (b); )
+#define setMin(a, b) _Statement( if ((a) > (b)) (a) = (b); )
 
 #define null      ((void*) 0)
 #define constNull ((const void*) 0)
@@ -36,15 +39,14 @@ typedef struct xError *err_t;
 
 #define OK ((err_t) 0)
 
-#define check(err) do{\
-        if ((err) != OK) {\
-                goto cleanup;\
-        }\
-}while(0)
+#define check(err) _Statement(\
+        if ((err) != OK)      \
+                goto cleanup; \
+)
 
 err_t err_free(err_t err);
 
-#define xRaise(msg) do{\
+#define xRaise(msg) _Statement(\
         static struct xError _static_err = {\
                 .format = (msg),\
                 .file = __FILE__,\
@@ -54,13 +56,12 @@ err_t err_free(err_t err);
         };\
         err = &_static_err;\
         goto cleanup;\
-}while(0)
+)
 
-#define xAssert(cond) do{\
-        if (!(cond)) {\
+#define xAssert(cond) _Statement(\
+        if (!(cond))\
                 xRaise("Assertion (" #cond ") failed");\
-        }\
-}while(0)
+)
 
 /*----------------------------------------------------------------------+
  |      Pairs / Tuples                                                  |
@@ -97,7 +98,7 @@ typedef List(unsigned long long) unsignedLongLongList;
 
 #define initialListSize (128)
 
-#define pushList(list, value) do{\
+#define pushList(list, value) _Statement(\
         if ((list).len >= (list).maxLen) {\
                 /* Avoid GCC warning "dereferencing type-punned pointer\
                    will break strict-aliasing rules" */\
@@ -113,18 +114,18 @@ typedef List(unsigned long long) unsignedLongLongList;
                 (list).v = _v;\
         }\
         (list).v[(list).len++] = (value);\
-}while(0)
+)
 
 #define popList(list) ((list).v[--(list).len])
 
-#define freeList(list) do{\
+#define freeList(list) _Statement(\
         if ((list).v) {           \
                 free((list).v);   \
                 (list).v = null;  \
                 (list).len = 0;   \
                 (list).maxLen = 0;\
         }\
-}while(0)
+)
 
 err_t list_ensure_len(void **v, int *maxLen, int minLen, int unit, int newLen);
 

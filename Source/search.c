@@ -243,7 +243,7 @@ static int exchange(Board_t self, int move)
 static int compareMoves(const void *ap, const void *bp)
 {
         int a = ((const intPair *)ap)->v[0];
-        int b = ((const intPair *)bp)->v[1];
+        int b = ((const intPair *)bp)->v[0];
         return (a < b) - (a > b);
 }
 

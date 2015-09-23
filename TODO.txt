@@ -3,6 +3,10 @@
 
 |Todo| Preserve parameter order in vector.json [tuning]
 
+|Todo| Multicore support [speed]
+
+|Todo| Measure nps for reference [qa]
+
 |Todo| King safety [evaluate]
 
 |Todo| Scale passers with material [evaluate]
@@ -21,7 +25,12 @@ Ref: http://www.top-5000.nl/authors/rebel/chess840.htm
 
 |Todo| Check Stockfish evaluation features [evaluate]
 
-|Todo| Check Fruit/Rybka evaluation features [evaluate]
+|Todo| Check "Fruit/Rybka" evaluation features [evaluate]
+
+Go through eval_comp forwards and backwards again and
+take many things.
+
+|Todo| LittleChessEvaluationCompendium.pdf [evaluate]
 
 |Todo| Measure repeatibility of tuner [verification,tune]
 
@@ -31,7 +40,7 @@ Observe variation of vector and residual
 Tune with 10 different subsets of ccrl @ 100k
 Observe variation of vector and residual 
 
-|Todo| Get residuals of some existing evaluations for comevaluate [evaluate]
+|Todo| Get residuals of some existing evaluations for comparison [evaluate]
 
  - Crafty 24.1
  - Stockfish 6
@@ -39,10 +48,11 @@ Observe variation of vector and residual
  - Junior 2011
  - Hiarcs 14
  - Shredder 12
- - Komodo x
- - Gnuchess 5.07
+ - Komodo x?
+ - Gnucheese
  - Rookie 3.8
  - Rybka 2.3.2a
+ - Giraffe
 
 |Todo| Consider gradient descent [tune]
 

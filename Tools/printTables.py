@@ -6,21 +6,25 @@ import sys
 with open(sys.argv[1], 'r') as fp:
         vector = json.load(fp)
 
-def getPst(pieceName):
+def getPst(piece):
 
         # Build file coefficients
         files, a = [], 0
         for i in range(7):
-                key = '%sByFile_%d' % (pieceName, i)
-                b = vector[key]
-                files.append(b - a)
-                a = b
+                key = '%sByFile_%d' % (piece, i)
+                if key in vector:
+                        b = vector[key]
+                        files.append(b - a)
+                        a = b
         files.append(-a)
+
+        if piece == 'king':
+                files = list(reversed(files)) + files
 
         # Build rank coefficients
         ranks, a = [], 0
         for i in range(7):
-                key = '%sByRank_%d' % (pieceName, i)
+                key = '%sByRank_%d' % (piece, i)
                 if key not in vector:
                         break # for pawns
                 b = vector[key]
@@ -32,17 +36,25 @@ def getPst(pieceName):
                 ranks = [None] + ranks + [None]
 
         # Print table
-        print 'Table:', pieceName
+        print 'Table:', piece
         print 'Files:', files
         print 'Ranks:', ranks
-        for rank in reversed(range(8)):
-                rankValue = ranks[rank]
+        if piece == 'bishop':
+                print 'Diagonals:', [vector['bishopOnLong_0'], vector['bishopOnLong_1']]
+        print 'Value:', [vector[key] for key in vector if '%sValue' % piece in key]
+        for rankIndex in reversed(range(8)):
+                rankValue = ranks[rankIndex]
                 if rankValue is None:
                         continue
-                print ' %s ' % (rank+1),
-                for file in range(8):
-                        fileValue = files[file]
-                        print '%5d' % (fileValue + rankValue),
+                print ' %s ' % (rankIndex + 1),
+                for fileIndex in range(8):
+                        fileValue = files[fileIndex]
+                        diagonalValue = 0
+                        if piece == 'bishop' and fileIndex - rankIndex == 0:
+                                diagonalValue += vector['bishopOnLong_0']
+                        if piece == 'bishop' and fileIndex + rankIndex == 7:
+                                diagonalValue += vector['bishopOnLong_1']
+                        print '%5d' % (fileValue + rankValue + diagonalValue),
                 print
         print ' '*7,
         print (' '*5).join([chr(ord('a')+i) for i in range(8)]) # a b c ...
@@ -74,7 +86,7 @@ def printPasserTable():
         print
 
 
-for pieceName in ['rook', 'knight', 'pawn']:
-        getPst(pieceName)
+for piece in ['king', 'queen', 'rook', 'bishop', 'knight', 'pawn']:
+        getPst(piece)
 
 printPasserTable()

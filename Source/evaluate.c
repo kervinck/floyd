@@ -645,8 +645,7 @@ static int evaluateBishop(const int v[vectorLen], int fileIndex, int rankIndex)
 {
         int bishopScore = 0;
 
-        // TODO: on long diagonal
-        if (rankIndex == fileIndex)
+        if (rankIndex - fileIndex == 0)
                 bishopScore += v[bishopOnLong_0 + rankIndex];
         if (rankIndex + fileIndex == 7)
                 bishopScore += v[bishopOnLong_1 + rankIndex];
@@ -663,7 +662,6 @@ static int evaluateBishop(const int v[vectorLen], int fileIndex, int rankIndex)
                 bishopScore -= v[bishopByRank_0 + rankIndex - 1];
         if (rankIndex < 7)
                 bishopScore += v[bishopByRank_0 + rankIndex];
-
 
         // TODO: relation to both kings
         // TODO: strong squares

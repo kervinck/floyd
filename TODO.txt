@@ -1,7 +1,15 @@
 
+|Todo| Plotting in matplotlib
+
+ - Parameter graphs (tune.dir)
+ - Heatmaps of location scoring
+
 |Todo| Redefine pawnValue<N> as value of N pawns [tune]
 
 |Todo| Preserve parameter order in vector.json [tuning]
+
+|Todo| Before breaking out the tune loop, do a quadratic fit on the
+       nearest 3 points and probe the bottom [tune]
 
 |Todo| Multicore support [speed]
 
@@ -59,5 +67,4 @@ Observe variation of vector and residual
 |Todo| Test tuner on Rosenbrock function [tune]
 
 https://en.wikipedia.org/wiki/Rosenbrock_function
-
 

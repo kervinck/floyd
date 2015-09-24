@@ -14,8 +14,11 @@ todo:
 	find . -type f -size -1M -print0 | xargs -0 grep -i todo
 
 # Dump resulting evaluation tables for easy inspection
-tables:
-	python Tools/printTables.py vector.json
+tables: tables.png
+	[ `uname -s` = 'Darwin' ] && open tables.png
+
+tables.png: vector.json
+	python Tools/plotTables.py vector.json
 
 tune:
 	bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/tune.py -s 2 vector.json

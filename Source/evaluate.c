@@ -646,9 +646,9 @@ static int evaluateBishop(const int v[vectorLen], int fileIndex, int rankIndex)
         int bishopScore = 0;
 
         if (rankIndex - fileIndex == 0)
-                bishopScore += v[bishopOnLong_0 + rankIndex];
+                bishopScore += v[bishopOnLong_0];
         if (rankIndex + fileIndex == 7)
-                bishopScore += v[bishopOnLong_1 + rankIndex];
+                bishopScore += v[bishopOnLong_1];
 
         /*
          *  File and rank dependent scoring (7+7=14 degrees of freedom)

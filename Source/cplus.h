@@ -8,6 +8,9 @@
 // Safe definition of statement-like macros
 #define _Statement(...) do{ __VA_ARGS__ }while(0)
 
+#define quote(arg) #arg
+#define quote2(arg) quote(arg)
+
 #define arrayLen(a) (sizeof(a) / sizeof((a)[0]))
 
 #define max(a, b) ((a) >= (b) ? (a) : (b))

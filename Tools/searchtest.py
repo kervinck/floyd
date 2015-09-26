@@ -23,5 +23,5 @@ for pos, depth in [
         ('2b1r3/5pbk/1R4pp/p2P4/4q3/4BN1P/P2Q1KP1/8 w - -', 0),
 ]:
         print pos, depth, floyd.evaluate(pos)
-        print floyd.search(pos, depth)
+        print floyd.search(pos, depth, info='uci')
         print

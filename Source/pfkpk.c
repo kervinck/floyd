@@ -3,12 +3,14 @@
  *  pfkpk.c -- KPK tester
  */
 
+// C standard
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
-#include "Board.h" // to get geometry
+// Other modules
+#include "Board.h"
 #include "kpk.h"
 
 struct {

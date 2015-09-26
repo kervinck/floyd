@@ -38,18 +38,18 @@
  |      Includes                                                        |
  +----------------------------------------------------------------------*/
 
-// Standard includes
+// C standard
 #include <ctype.h>
 #include <stdbool.h>
 #include <string.h>
 
-// Generic C extensions
+// C extension
 #include "cplus.h"
 
-// Own include
+// Own interface
 #include "Board.h"
 
-// Other module includes
+// Other modules
 #include "polyglot.h"
 
 /*----------------------------------------------------------------------+

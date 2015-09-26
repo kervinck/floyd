@@ -81,7 +81,7 @@ def evaluateVector(tests, passive, useCache):
         scores = []
         for pos, target in tests:
                 if not useCache or pos not in passive:
-                        score, pv = engine.search(pos, depth) # slow
+                        score, move = engine.search(pos, depth) # slow
                         if pos in passive and score != passive[pos]:
                                 del passive[pos]
                 else:

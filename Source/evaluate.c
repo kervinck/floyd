@@ -9,23 +9,22 @@
  |      Includes                                                        |
  +----------------------------------------------------------------------*/
 
-#define _XOPEN_SOURCE
-
-// C standard includes
+// C standard
 #include <assert.h>
+#define _XOPEN_SOURCE
 #include <math.h>
 #include <stdbool.h>
 #include <string.h>
 
-// Generic C extensions
+// C extension
 #include "cplus.h"
 
-// Other includes
-#include "Board.h"
-#include "kpk.h"
-
 // Own interface
+#include "Board.h"
 #include "evaluate.h"
+
+// Other modules
+#include "kpk.h"
 
 /*----------------------------------------------------------------------+
  |      Definitions                                                     |

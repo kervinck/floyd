@@ -38,11 +38,13 @@
  |      Includes                                                        |
  +----------------------------------------------------------------------*/
 
-#include <stdbool.h> // For Board.h
+// C standard
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "Board.h" // Get project's geometry
+// Own interface
+#include "Board.h"
 #include "kpk.h"
 
 /*----------------------------------------------------------------------+

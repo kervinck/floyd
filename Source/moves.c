@@ -38,19 +38,19 @@
  |      Includes                                                        |
  +----------------------------------------------------------------------*/
 
-// Standard includes
+// C standard
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
 
-// Generic C extensions
+// C extension
 #include "cplus.h"
 
-// Own include
+// Own interface
 #include "Board.h"
 
-// Other module includes
+// Other modules
 #include "polyglot.h"
 
 /*----------------------------------------------------------------------+
@@ -731,7 +731,6 @@ bool isPromotion(Board_t self, int from, int to)
 bool isLegalMove(Board_t self, int move)
 {
         makeMove(self, move);
-        updateSideInfo(self);
         bool isLegal = wasLegalMove(self);
         undoMove(self);
         return isLegal;

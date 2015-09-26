@@ -9,20 +9,26 @@
  |      Includes                                                        |
  +----------------------------------------------------------------------*/
 
-// C standard includes
+// C standard
 #include <assert.h>
 #include <math.h>
+#include <setjmp.h>
+#include <signal.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
-// C extension include
+// System
+#include <unistd.h>
+
+// C extension
 #include "cplus.h"
 
+// Own interface
 #include "Board.h"
-
 #include "Engine.h"
 
+// Other modules
 #include "evaluate.h"
 
 /*----------------------------------------------------------------------+
@@ -60,22 +66,45 @@ static void moveToFront(int moveList[], int nrMoves, int move);
  |      rootSearch                                                      |
  +----------------------------------------------------------------------*/
 
-void rootSearch(Engine_t self, int maxDepth, searchInfo_fn *infoFunction, void *infoData)
-        // TODO: remove maxDepth, or add maxTime, maxNodes, etc
+static int globalSignal; // TODO: not thread-local, not very nice for a library
+
+static void catchSignal(int signal)
 {
-        bool stop = false;
+        globalSignal = signal;
+}
 
-        self->nodeCount = 0;
+// TODO: aspiration search
+void rootSearch(Engine_t self, int depth, double movetime, searchInfo_fn *infoFunction, void *infoData)
+{
         double startTime = xclock();
+        self->nodeCount = 0;
+        self->rootPlyNumber = board(self)->plyNumber;
 
-        // TODO: aspiration search
-        for (int depth=0; depth<=maxDepth && !stop; depth++) {
-                self->score = pvSearch(self, depth, -maxInt, maxInt, 0);
-                self->depth = depth;
+        jmp_buf env;
+        self->setjmp_env = &env;
+        globalSignal = 0;
+        sig_t oldHandler = signal(SIGALRM, catchSignal);
+        alarm(ceil(movetime));
+        if (setjmp(env) == 0) {
+                // start search
+                bool stop = false;
+                for (int iteration=0; iteration<=depth && !stop; iteration++) {
+                        self->depth = iteration;
+                        self->score = pvSearch(self, iteration, -maxInt, maxInt, 0);
+                        self->seconds = xclock() - startTime;
+                        if (self->pv.len > 0)
+                                self->bestMove = self->pv.v[0];
+                        if (infoFunction != null)
+                                stop = infoFunction(infoData);
+                }
+        } else {
+                // search aborted
                 self->seconds = xclock() - startTime;
+                self->pv.len = (self->pv.len > 0) && (self->pv.v[0] != self->bestMove);
                 if (infoFunction != null)
-                        stop = infoFunction(infoData);
+                        (void) infoFunction(infoData);
         }
+        signal(SIGALRM, oldHandler);
 }
 
 /*----------------------------------------------------------------------+
@@ -90,13 +119,19 @@ static int ttWrite(void *self, int depth, int alpha, int beta, int score)
 }
 
 /*----------------------------------------------------------------------+
- |      endScore                                                        |
+ |      endScore / drawScore                                            |
  +----------------------------------------------------------------------*/
 
 // TODO: move to evaluate.h
 static inline int endScore(Engine_t self, bool check)
 {
-        return check ? -32000 + board(self)->plyNumber : 0;
+        int rootDistance = board(self)->plyNumber - self->rootPlyNumber;
+        return check ? -32000 + rootDistance : 0;
+}
+
+static inline int drawScore(Engine_t self)
+{
+        return 0;
 }
 
 /*----------------------------------------------------------------------+
@@ -111,8 +146,8 @@ static inline int endScore(Engine_t self, bool check)
 static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
 {
         self->nodeCount++;
-        //if (repetition(board(self)))
-                //return drawScore(self);
+        if (repetition(board(self)))
+                return drawScore(self);
         int check = inCheck(board(self));
         int moveFilter = minInt;
         int bestScore = minInt;
@@ -146,7 +181,7 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                 if (score > bestScore)
                         bestScore = score;
                 else
-                        self->pv.v[pvIndex] = 0; // quiescence
+                        self->pv.len = pvIndex;
                 undoMove(board(self));
         }
 
@@ -159,13 +194,12 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                 int score = -scout(self, newDepth, -newAlpha - 1);
                 if (score > bestScore) {
                         int pvLen = self->pv.len;
-                        pushList(self->pv, 0); // separator in case of abort
+                        pushList(self->pv, moveList[i]);
                         int researchDepth = max(0, depth - 1 + check);
                         score = -pvSearch(self, researchDepth, -beta, -newAlpha, pvLen + 1);
                         if (score > bestScore) {
                                 bestScore = score;
-                                self->pv.v[pvIndex] = moveList[i];
-                                for (int j=1; pvLen+j<self->pv.len; j++)
+                                for (int j=0; pvLen+j<self->pv.len; j++)
                                         self->pv.v[pvIndex+j] = self->pv.v[pvLen+j];
                                 self->pv.len -= pvLen - pvIndex;
                         } else
@@ -174,11 +208,9 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                 undoMove(board(self));
         }
 
-        if (pvIndex < self->pv.len && self->pv.v[pvIndex] == 0)
-                self->pv.len = pvIndex; // trim (TODO: also needed after abort)
-
         if (bestScore == minInt)
                 bestScore = endScore(self, check);
+
 cleanup:
         return ttWrite(self, depth, alpha, beta, bestScore);
 }
@@ -198,10 +230,13 @@ cleanup:
 static int scout(Engine_t self, int depth, int alpha)
 {
         self->nodeCount++;
-        //if (repetition(board(self)))
-                //return drawScore(self);
+        if (repetition(board(self)))
+                return drawScore(self);
         if (depth == 0)
                 return qSearch(self, alpha);
+
+        if (globalSignal)
+                longjmp(*(jmp_buf *)self->setjmp_env, 1);
 
         int check = inCheck(board(self));
         int bestScore = minInt;

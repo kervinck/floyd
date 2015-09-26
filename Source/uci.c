@@ -1,13 +1,44 @@
 
+/*----------------------------------------------------------------------+
+ |                                                                      |
+ |      uci.c                                                           |
+ |                                                                      |
+ +----------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------+
+ |      Includes                                                        |
+ +----------------------------------------------------------------------*/
+
+// C standard
+#include <assert.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
 
+// C extension
 #include "cplus.h"
 
+// Own interface
 #include "Board.h"
 #include "Engine.h"
+#include "uci.h"
+
+/*----------------------------------------------------------------------+
+ |      Definitions                                                     |
+ +----------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------+
+ |      Data                                                            |
+ +----------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------+
+ |      Functions                                                       |
+ +----------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------+
+ |      uciInfo                                                         |
+ +----------------------------------------------------------------------*/
 
 bool uciInfo(void *uciInfoData)
 {
@@ -29,15 +60,16 @@ bool uciInfo(void *uciInfoData)
                 self->nodeCount,
                 (self->seconds > 0.0) ? self->nodeCount / self->seconds : 0.0);
 
-        int i;
-        for (i=0; i<self->pv.len; i++) {
+        for (int i=0; i<self->pv.len; i++) {
                 char moveString[maxMoveSize];
                 int move = self->pv.v[i];
+                assert(move != 0);
                 moveToUci(board(self), moveString, move);
                 printf("%s %s", (i == 0) ? " pv" : "", moveString);
-                makeMove(board(self), move);
+                makeMove(board(self), move); // TODO: uci notation shouldn't need this
         }
-        while (i-- > 0)
+
+        for (int i=0; i<self->pv.len; i++)
                 undoMove(board(self));
 
         putchar('\n');
@@ -47,4 +79,8 @@ bool uciInfo(void *uciInfoData)
 
         return false;
 }
+
+/*----------------------------------------------------------------------+
+ |                                                                      |
+ +----------------------------------------------------------------------*/
 

@@ -1,24 +1,10 @@
 
-|Todo| Enable test before install [build]
-
-|Todo| Preserve parameter order in vector.json [tuning]
+|Todo| Redefine pawnValue<N> as value of N pawns [material]
 
 |Todo| Plotting in matplotlib
 
  - Parameter graphs (tune.dir)
  - Heatmaps of location scoring
-
-|Todo| Left-right location parameters [pst]
-
-|Todo| Redefine pawnValue<N> as value of N pawns [material]
-
-|Todo| Multicore support for tuning [speed]
-
-|Todo| King safety [evaluate]
-
-|Todo| Verify search with WAC [search]
-
-Target to score over 250/300 at 1s/position
 
 |Todo| Add UCI front-end [uci]
 
@@ -27,6 +13,16 @@ Target to score over 250/300 at 1s/position
 Cutechess-cli
 
 ------------------------------------------------------------------------
+
+|Todo| Enable test before install [build]
+
+|Todo| Preserve parameter order in vector.json [tuning]
+
+|Todo| Multicore support for tuning [speed]
+
+|Todo| King safety [evaluate]
+
+|Todo| Left-right location parameters [pst]
 
 |Todo| Before breaking out the tune loop, do a quadratic fit on the
        nearest 3 points and probe the bottom [tune]

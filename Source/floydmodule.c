@@ -38,19 +38,19 @@
  |      Includes                                                        |
  +----------------------------------------------------------------------*/
 
-// Python include (must come first)
+// Python API (must come first)
 #include "Python.h"
 
-// Standard C includes
+// Standard C
 #include <stdbool.h>
 
-// Generic C extensions
+// C extension
 #include "cplus.h"
 
-// Other module includes
+// Other modules
 #include "Board.h"
-#include "evaluate.h"
 #include "Engine.h"
+#include "evaluate.h"
 #include "uci.h"
 
 /*----------------------------------------------------------------------+
@@ -58,8 +58,7 @@
  +----------------------------------------------------------------------*/
 
 // Module docstring
-PyDoc_STRVAR(floyd_doc,
-        "Chess engine study.");
+PyDoc_STRVAR(floyd_doc, "Chess engine study");
 
 /*----------------------------------------------------------------------+
  |      evaluate(...)                                                   |
@@ -75,7 +74,7 @@ floydmodule_evaluate(PyObject *self, PyObject *args)
         char *fen;
 
         if (!PyArg_ParseTuple(args, "s", &fen))
-                return NULL;
+                return null;
 
         struct board board;
         int len = setupBoard(&board, fen);
@@ -106,7 +105,7 @@ floydmodule_setCoefficient(PyObject *self, PyObject *args)
         int coef, newValue;
 
         if (!PyArg_ParseTuple(args, "ii", &coef, &newValue))
-                return NULL;
+                return null;
 
         if (coef < 0 || coef >= vectorLen)
                 return PyErr_Format(PyExc_IndexError, "coef %d out of range", coef);
@@ -116,16 +115,16 @@ floydmodule_setCoefficient(PyObject *self, PyObject *args)
 
         PyObject *result = PyTuple_New(2);
         if (!result)
-                return NULL;
+                return null;
 
         if (PyTuple_SetItem(result, 0, PyInt_FromLong(oldValue))) {
                 Py_DECREF(result);
-                return NULL;
+                return null;
         }
 
         if (PyTuple_SetItem(result, 1, PyString_FromString(vectorLabels[coef]))) {
                 Py_DECREF(result);
-                return NULL;
+                return null;
         }
 
         return result;
@@ -136,17 +135,26 @@ floydmodule_setCoefficient(PyObject *self, PyObject *args)
  +----------------------------------------------------------------------*/
 
 PyDoc_STRVAR(search_doc,
-        "search(fen, depth) -> score, pv\n"
+        "search(fen, depth=" quote2(maxDepth) ", movetime=0.0, info=None) -> score, move\n"
+        "Valid options for `info' are:\n"
+        "       None    : No info\n"
+        "       'uci'   : Write UCI info lines to stdout\n"
+//      "       'xboard': Write XBoard info lines to stdout\n"
 );
 
 static PyObject *
-floydmodule_search(PyObject *self, PyObject *args)
+floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
 {
         char *fen;
-        int depth;
+        int depth = maxDepth;
+        double movetime = 0.0;
+        char *info = null;
 
-        if (!PyArg_ParseTuple(args, "si", &fen, &depth))
-                return NULL;
+        static char *keywordList[] = { "fen", "depth", "movetime", "info", null };
+
+        if (!PyArg_ParseTupleAndKeywords(args, keywords, "s|idz:search", keywordList,
+                &fen, &depth, &movetime, &info))
+                return null;
 
         struct engine engine;
         memset(&engine, 0, sizeof engine);
@@ -157,51 +165,49 @@ floydmodule_search(PyObject *self, PyObject *args)
 
         engine.board.eloDiff = atoi(fen + len);
 
-        rootSearch(&engine, depth, uciInfo, &engine);
+        if (depth < 0 || depth > maxDepth)
+                return PyErr_Format(PyExc_ValueError, "Invalid depth (%d)", depth);
+
+        if (movetime < 0.0)
+                return PyErr_Format(PyExc_ValueError, "Invalid movetime (%g)", movetime);
+
+        searchInfo_fn *infoFunction = null;
+        void *infoData = &engine;
+        if (info != null) {
+                if (!strcmp(info, "uci"))
+                        infoFunction = uciInfo;
+                else
+                        return PyErr_Format(PyExc_ValueError, "Invalid info type (%s)", info);
+        }
+
+        rootSearch(&engine, depth, movetime, infoFunction, infoData);
 
         PyObject *result = PyTuple_New(2);
         if (!result)
-                return NULL;
+                return null;
 
         if (PyTuple_SetItem(result, 0, PyFloat_FromDouble(engine.score / 1000.0))) {
                 Py_DECREF(result);
-                return NULL;
+                return null;
         }
 
-        int pvLen = 0;
-        while (pvLen < engine.pv.len && engine.pv.v[pvLen] != 0)
-                pvLen++;
-
-        PyObject *list = PyList_New(pvLen);
-        if (!list) {
-                Py_DECREF(result);
-                return NULL;
-        }
-
-        for (int i=0; i<pvLen; i++) {
-                int move = engine.pv.v[i];
-
+        PyObject *bestMove;
+        if (engine.bestMove != 0) {
                 char moveString[maxMoveSize];
-                moveToUci(&engine.board, moveString, move);
-
-                if (PyList_SetItem(list, i, PyString_FromString(moveString))) {
-                        Py_DECREF(list);
-                        Py_DECREF(result);
-                        return NULL;
-                }
-                makeMove(&engine.board, move);
+                moveToUci(&engine.board, moveString, engine.bestMove);
+                bestMove = PyString_FromString(moveString);
+        } else {
+                bestMove = Py_None;
+                Py_INCREF(Py_None);
         }
 
-        for (int i=0; i<pvLen; i++)
-                undoMove(&engine.board);
-
-        if (PyTuple_SetItem(result, 1, list)) {
-                Py_DECREF(list);
+        if (PyTuple_SetItem(result, 1, bestMove)) {
+                Py_DECREF(bestMove);
                 Py_DECREF(result);
-                return NULL;
+                return null;
         }
 
-        freeList(engine.pv); // TODO: make Engine a Python class
+        freeList(engine.pv);
 
         return result;
 }
@@ -211,10 +217,10 @@ floydmodule_search(PyObject *self, PyObject *args)
  +----------------------------------------------------------------------*/
 
 static PyMethodDef floydMethods[] = {
-	{ "evaluate", floydmodule_evaluate,           METH_VARARGS,               evaluate_doc },
-	{ "setCoefficient", floydmodule_setCoefficient, METH_VARARGS,             setCoefficient_doc },
-	{ "search",   floydmodule_search,             METH_VARARGS,               search_doc },
-	{ NULL, }
+	{ "evaluate",       floydmodule_evaluate,            METH_VARARGS,               evaluate_doc },
+	{ "setCoefficient", floydmodule_setCoefficient,      METH_VARARGS,               setCoefficient_doc },
+	{ "search",         (PyCFunction)floydmodule_search, METH_VARARGS|METH_KEYWORDS, search_doc },
+	{ null, }
 };
 
 /*----------------------------------------------------------------------+
@@ -228,7 +234,7 @@ initfloyd(void)
 
         // Create the module and add the functions
         module = Py_InitModule3("floyd", floydMethods, floyd_doc);
-        if (module == NULL)
+        if (module == null)
                 return;
 
         // Add startPosition as a string constant

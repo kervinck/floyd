@@ -9,6 +9,8 @@
  |      Definitions                                                     |
  +----------------------------------------------------------------------*/
 
+#define maxDepth 120
+
 typedef struct engine *Engine_t;
 
 /*
@@ -42,14 +44,19 @@ struct engine {
 
         struct ttable tt;
 
+        int rootPlyNumber;
+
         // last search result
         struct {
                 int score;
                 int depth;
+                int bestMove;
                 intList pv;
                 double seconds;
                 long long nodeCount;
         };
+
+        void *setjmp_env;
 };
 
 /*
@@ -67,7 +74,7 @@ struct engine {
 // callback interface for handling of search progress
 typedef bool searchInfo_fn(void *infoData);
 
-void rootSearch(Engine_t self, int maxDepth, searchInfo_fn *infoFunction, void *infoData);
+void rootSearch(Engine_t self, int depth, double movetime, searchInfo_fn *infoFunction, void *infoData);
 
 /*----------------------------------------------------------------------+
  |                                                                      |

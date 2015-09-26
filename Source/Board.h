@@ -96,9 +96,6 @@ struct board {
         int *movePtr; // For in move generation
 };
 
-#define wasLegalMove(board)\
-        ((board)->side->attacks[(board)->xside->king] == 0)
-
 /*
  *  Chess pieces
  */
@@ -169,6 +166,14 @@ extern const char startpos[];
 int setupBoard(Board_t self, const char *fen);
 
 /*
+ *  Update attack tables and king locations. To be used after
+ *  setupBoard or makeMove. Used by generateMoves, inCheck.
+ *  Can be invalidated by moveToStandardAlgebraic,
+ *  getCheckMark, isLegalMove, normalizeEnPassantStatus.
+ */
+void updateSideInfo(Board_t self);
+
+/*
  *  Convert the current position to FEN
  */
 void boardToFen(Board_t self, char *fen);
@@ -187,6 +192,15 @@ int generateMoves(Board_t self, int moveList[maxMoves]);
  *  Make the move on the board
  */
 void makeMove(Board_t self, int move);
+
+/*
+ *  Check if last pseudo move was indeed legal
+ */
+static inline bool wasLegalMove(Board_t self)
+{
+        updateSideInfo(self);
+        return self->side->attacks[self->xside->king] == 0;
+}
 
 /*
  *  Retract the last move and restore the previous position
@@ -226,14 +240,6 @@ const char *getCheckMark(Board_t self);
  */
 extern int parseMove(Board_t self, const char *line, int xmoves[maxMoves], int xlen, int *move);
 
-/*
- *  Update attack tables and king locations. To be used after
- *  setupBoard or makeMove. Used by generateMoves, inCheck.
- *  Can be invalidated by moveToStandardAlgebraic,
- *  getCheckMark, isLegalMove, normalizeEnPassantStatus.
- */
-void updateSideInfo(Board_t self);
-
 // Clear the ep flag if there are not legal moves
 extern void normalizeEnPassantStatus(Board_t self);
 
@@ -245,6 +251,11 @@ extern bool isLegalMove(Board_t self, int move);
 
 // Is the move a pawn promotion?
 extern bool isPromotion(Board_t self, int from, int to);
+
+static inline bool repetition(Board_t self)
+{
+        return false; // TODO: dummy
+}
 
 /*----------------------------------------------------------------------+
  |                                                                      |

@@ -51,7 +51,7 @@
 #include "Board.h"
 #include "evaluate.h"
 #include "Engine.h"
-#include "stringCopy.h"
+#include "uci.h"
 
 /*----------------------------------------------------------------------+
  |      Module                                                          |
@@ -148,56 +148,60 @@ floydmodule_search(PyObject *self, PyObject *args)
         if (!PyArg_ParseTuple(args, "si", &fen, &depth))
                 return NULL;
 
-        struct board board;
-        int len = setupBoard(&board, fen);
+        struct engine engine;
+        memset(&engine, 0, sizeof engine);
+
+        int len = setupBoard(&engine.board, fen);
         if (len <= 0)
                 return PyErr_Format(PyExc_ValueError, "Invalid FEN (%s)", fen);
 
-        board.eloDiff = atoi(fen + len);
+        engine.board.eloDiff = atoi(fen + len);
 
-        intList pv = emptyList;
-        int pvLen = 0;
-        while (pv.v[pvLen]) pvLen++;
-
-        int score = rootSearch(&board, depth, null, null);
+        rootSearch(&engine, depth, uciInfo, &engine);
 
         PyObject *result = PyTuple_New(2);
-        if (!result) {
-                freeList(pv);
+        if (!result)
+                return NULL;
+
+        if (PyTuple_SetItem(result, 0, PyFloat_FromDouble(engine.score / 1000.0))) {
+                Py_DECREF(result);
                 return NULL;
         }
 
-        if (PyTuple_SetItem(result, 0, PyFloat_FromDouble(score / 1000.0))) {
-                Py_DECREF(result);
-                freeList(pv);
-                return NULL;
-        }
+        int pvLen = 0;
+        while (pvLen < engine.pv.len && engine.pv.v[pvLen] != 0)
+                pvLen++;
 
         PyObject *list = PyList_New(pvLen);
         if (!list) {
                 Py_DECREF(result);
-                freeList(pv);
                 return NULL;
         }
 
         for (int i=0; i<pvLen; i++) {
-                // TODO: make a moveString in required notation
-                if (PyList_SetItem(list, i, PyInt_FromLong(pv.v[i]))) {
+                int move = engine.pv.v[i];
+
+                char moveString[maxMoveSize];
+                moveToUci(&engine.board, moveString, move);
+
+                if (PyList_SetItem(list, i, PyString_FromString(moveString))) {
                         Py_DECREF(list);
                         Py_DECREF(result);
-                        freeList(pv);
                         return NULL;
                 }
+                makeMove(&engine.board, move);
         }
+
+        for (int i=0; i<pvLen; i++)
+                undoMove(&engine.board);
 
         if (PyTuple_SetItem(result, 1, list)) {
                 Py_DECREF(list);
                 Py_DECREF(result);
-                freeList(pv);
                 return NULL;
         }
 
-        freeList(pv);
+        freeList(engine.pv); // TODO: make Engine a Python class
 
         return result;
 }

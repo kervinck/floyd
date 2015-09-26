@@ -1,4 +1,4 @@
-CFLAGS=-std=c99 -pedantic -Wall -O3
+CFLAGS=-std=c11 -pedantic -Wall -O3
 
 all: module
 
@@ -10,6 +10,9 @@ module:
 test:
 	python Tools/searchtest.py
 
+wac:
+	python Tools/wactest.py < Data/wacnew.epd
+
 todo:
 	find . -type f -size -1M -print0 | xargs -0 grep -i todo
 
@@ -17,7 +20,7 @@ todo:
 tables: tables.png
 	[ `uname -s` = 'Darwin' ] && open tables.png
 
-tables.png: vector.json
+tables.png: Tools/plotTables.py vector.json
 	python Tools/plotTables.py vector.json
 
 tune:

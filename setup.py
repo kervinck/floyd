@@ -10,9 +10,9 @@ module1 = Extension(
                 'Source/evaluate.c',
                 'Source/kpk.c',
                 'Source/search.c',
-                'Source/cplus.c',
-                'Source/stringCopy.c' ],
-        extra_compile_args = ['-O3', '-std=c99', '-Wall', '-pedantic'],
+                'Source/uci.c',
+                'Source/cplus.c' ],
+        extra_compile_args = ['-O3', '-std=c11', '-Wall', '-pedantic'],
         undef_macros = ['NDEBUG']
 )
 

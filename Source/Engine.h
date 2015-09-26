@@ -29,6 +29,8 @@ struct ttable {
         struct ttSlot *slots;
         size_t allocSize;
         size_t mask;
+        int searchCount;
+        uint64_t baseHash;
 };
 
 /*
@@ -41,22 +43,31 @@ struct engine {
         struct ttable tt;
 
         // last search result
-        int score;
-        int depth;
-        intList pv;
-
-        long milliSeconds;
-        long long nodeCount;
+        struct {
+                int score;
+                int depth;
+                intList pv;
+                double seconds;
+                long long nodeCount;
+        };
 };
+
+/*
+ *  Workaround to hide some of the ugliness, at least until ISO C supports
+ *  seamless access to members of the base struct (ref. `-fms-extensions'
+ *  or `kenc'). Note that this is a noop (just a type conversion) because
+ *  `board' is the first element of `struct engine'.
+ */
+#define board(engine) (&(engine)->board)
 
 /*----------------------------------------------------------------------+
  |      Functions                                                       |
  +----------------------------------------------------------------------*/
 
-// callback interface for handling search progress
-typedef bool searchInfo_fn(void *infoData, int depth, long long nodes, int score);
+// callback interface for handling of search progress
+typedef bool searchInfo_fn(void *infoData);
 
-int rootSearch(Board_t self, int depth, searchInfo_fn *infoFunction, void *infoData);
+void rootSearch(Engine_t self, int maxDepth, searchInfo_fn *infoFunction, void *infoData);
 
 /*----------------------------------------------------------------------+
  |                                                                      |

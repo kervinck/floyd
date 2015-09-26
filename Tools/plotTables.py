@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
 import json
+import math
+import matplotlib.pyplot as pyplot
 import numpy as np
-import matplotlib.pyplot as plt
 import sys
 
 with open(sys.argv[1], 'r') as fp:
@@ -100,9 +101,9 @@ def plotMap(ax, evaluate, xKing, title, scale=300):
         X = np.linspace(0, nrFiles, nrFiles + 1) + minFile
         Y = np.linspace(0, nrRanks, nrRanks + 1) + minRank
         if scale is None: # passers...
-                ax.pcolor(X, Y, matrix, cmap=plt.cm.coolwarm)
+                ax.pcolor(X, Y, matrix, cmap=pyplot.cm.coolwarm)
         else:
-                ax.pcolor(X, Y, matrix, cmap=plt.cm.RdYlGn, vmin=-scale, vmax=scale)
+                ax.pcolor(X, Y, matrix, cmap=pyplot.cm.RdYlGn, vmin=-scale, vmax=scale)
         ax.axis([0, 8, 0, 8])
 
         ax.plot(2 if xKing else 6, 7.75, 'o', color='black')
@@ -127,29 +128,34 @@ def plotMap(ax, evaluate, xKing, title, scale=300):
                             verticalalignment='center')
 
 if __name__ == '__main__':
-        plt.rcParams.update({'font.size': 8})
+        pyplot.rcParams.update({'font.size': 8})
 
-        fig, axes = plt.subplots(3, 4)
+        fig, axes = pyplot.subplots(3, 4)
         fig.set_size_inches(16, 12)
 
-        pawnValue = sum([vector['pawnValue%d' % n] for n in range(1, 9)]) / 8.0
+        pawnValues = [vector['pawnValue' + n] for n in list('4567')] # approximate middlegame values
+        pawnValue = float(sum(pawnValues)) / len(pawnValues)
+
+        nominal = 1000 * math.log(10) / 4.0
+        nominal = pawnValue
+
         knightValue = vector['knightValue']
         bishopValue = vector['bishopValue']
         rookValue =   vector['rookValue']
         queenValue =  vector['queenValue']
 
-        plotMap(axes[0][0], pawn,   True,  'Pawns (%d)' % pawnValue)
+        plotMap(axes[0][0], pawn,   True,  'Pawns (%.2f)' % (pawnValue / nominal))
         plotMap(axes[0][1], pawn,   False, 'Pawns')
-        plotMap(axes[0][2], knight, True,  'Knights (%.2fp)' % (knightValue / pawnValue))
+        plotMap(axes[0][2], knight, True,  'Knights (%.2f)' % (knightValue / nominal))
         plotMap(axes[0][3], knight, False, 'Knights')
-        plotMap(axes[1][0], bishop, True,  'Bishops (%.2fp)' % (bishopValue / pawnValue))
+        plotMap(axes[1][0], bishop, True,  'Bishops (%.2f)' % (bishopValue / nominal))
         plotMap(axes[1][1], bishop, False, 'Bishops')
-        plotMap(axes[1][2], rook,   True,  'Rooks (%.2fp)' % (rookValue / pawnValue))
+        plotMap(axes[1][2], rook,   True,  'Rooks (%.2f)' % (rookValue / nominal))
         plotMap(axes[1][3], rook,   False, 'Rooks')
-        plotMap(axes[2][0], queen,  True,  'Queens (%.2fp)' % (queenValue / pawnValue))
+        plotMap(axes[2][0], queen,  True,  'Queens (%.2f)' % (queenValue / nominal))
         plotMap(axes[2][1], queen,  False, 'Queens')
         plotMap(axes[2][2], king,   None,  'King')
         plotMap(axes[2][3], passer, False, 'Passers', scale=None)
 
-        plt.savefig('tables.png', bbox_inches='tight')
+        pyplot.savefig('tables.png', bbox_inches='tight')
 

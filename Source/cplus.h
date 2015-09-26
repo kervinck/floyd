@@ -129,6 +129,9 @@ typedef List(unsigned long long) unsignedLongLongList;
 
 err_t list_ensure_len(void **v, int *maxLen, int minLen, int unit, int newLen);
 
+double xclock(void);
+char *stringCopy(char *s, const char *t);
+
 /*----------------------------------------------------------------------+
  |      Main support                                                    |
  +----------------------------------------------------------------------*/

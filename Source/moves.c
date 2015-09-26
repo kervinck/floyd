@@ -44,12 +44,14 @@
 #include <stddef.h>
 #include <string.h>
 
+// Generic C extensions
+#include "cplus.h"
+
 // Own include
 #include "Board.h"
 
 // Other module includes
 #include "polyglot.h"
-#include "stringCopy.h"
 
 /*----------------------------------------------------------------------+
  |      Definitions                                                     |

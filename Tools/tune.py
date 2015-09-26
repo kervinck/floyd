@@ -24,6 +24,8 @@ nrSteps = 4  # 1.........2....X....3.........4
 
 maxActive = float('+Inf') # "dirty mode"
 
+quit = False
+
 #-----------------------------------------------------------------------
 #       readTestsFromEpd
 #-----------------------------------------------------------------------
@@ -211,11 +213,16 @@ if __name__ == '__main__':
         # -- Step 1: Parse command line arguments
 
         if len(sys.argv) == 1:
-                print 'Usage: python tune.py [ -n <cpu> ] <vector> [ <parameter> ... ]'
-                print 'Arguments:'
-                print '    cpu            - (not implemented)'
+                print 'Usage: python tune.py [options] <vector> [ <parameter> ... ]'
+                print 'Options:'
                 print '    vector         - JSON file to tune (input/output)'
                 print '    parameter ...  - names of parameter(s) to tune (empty means all)'
+                print 'Arguments:'
+                print '    -n <cpu>       - (not implemented)'
+                print '    -d <depth>     - search depth per position (default 0)'
+                print '    -s <steps>     - probe steps before window shrink (default 2)'
+                print '    -m <count>     - active positions before short-cut evaluation (default +Inf)'
+                print '    -q             - print the current residual and quit'
                 sys.exit(0)
 
         argi = 1
@@ -240,6 +247,11 @@ if __name__ == '__main__':
                 if sys.argv[argi] == '-m':
                         maxActive = int(sys.argv[argi+1])
                         argi += 2
+                        continue
+
+                if sys.argv[argi] == '-q':
+                        quit = True
+                        argi += 1
                         continue
 
                 print 'No such option:', sys.argv[argi]
@@ -273,6 +285,9 @@ if __name__ == '__main__':
 
         print 'vector filename %s residual %.9f positions %d depth %d' % (repr(filename), bestResidual, len(tests), depth)
         print
+
+        if quit:
+                sys.exit(0)
 
         # -- Step 4: Tune all, half the set and repeat tuning until no more halving
 

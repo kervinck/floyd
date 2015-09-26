@@ -41,7 +41,7 @@
 // Python API (must come first)
 #include "Python.h"
 
-// Standard C
+// C standard
 #include <stdbool.h>
 
 // C extension

@@ -39,8 +39,8 @@
         P(rookValue, 3711),
         P(bishopValue, 2216),
         P(knightValue, 1954),
-        P(pawnValue1, 1005), P(pawnValue2, 698), P(pawnValue3, 661), P(pawnValue4, 652),
-        P(pawnValue5, 653), P(pawnValue6, 669), P(pawnValue7, 661), P(pawnValue8, 759),
+        P(pawnValue1, 1005), P(pawnValue2, 1703), P(pawnValue3, 2364), P(pawnValue4, 3016),
+        P(pawnValue5, 3669), P(pawnValue6, 4338), P(pawnValue7, 4999), P(pawnValue8, 5758),
 
         P(queenAndQueen, -1077),
         P(queenAndRook, -907),

@@ -260,8 +260,8 @@ int evaluate(Board_t self)
                                 + v[knightVsPawn_1]  * e.nrPawns[xside]
                                 + v[knightVsPawn_2]  * e.nrPawns[xside] * e.nrPawns[xside] / 8);
 
-                for (int i=0; i<e.nrPawns[side]; i++)
-                        e.material[side] += v[pawnValue1+i];
+                if (e.nrPawns[side] > 0)
+                        e.material[side] += v[pawnValue1 + e.nrPawns[side] - 1];
         }
 
         /*--------------------------------------------------------------+

@@ -133,8 +133,7 @@ if __name__ == '__main__':
         fig, axes = pyplot.subplots(3, 4)
         fig.set_size_inches(16, 12)
 
-        pawnValues = [vector['pawnValue' + n] for n in list('4567')] # approximate middlegame values
-        pawnValue = float(sum(pawnValues)) / len(pawnValues)
+        pawnValue = (vector['pawnValue7'] - vector['pawnValue3']) / 4 # approximate middlegame values
 
         nominal = 1000 * math.log(10) / 4.0
         nominal = pawnValue

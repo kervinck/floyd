@@ -1,6 +1,4 @@
 
-|Todo| Redefine pawnValue<N> as value of N pawns [material]
-
 |Todo| Plotting in matplotlib
 
  - Parameter graphs (tune.dir)

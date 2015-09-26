@@ -213,11 +213,11 @@ if __name__ == '__main__':
         # -- Step 1: Parse command line arguments
 
         if len(sys.argv) == 1:
-                print 'Usage: python tune.py [options] <vector> [ <parameter> ... ]'
-                print 'Options:'
+                print 'Usage: python tune.py [ <option> ... ] <vector> [ <parameter> ... ]'
+                print 'Arguments:'
                 print '    vector         - JSON file to tune (input/output)'
                 print '    parameter ...  - names of parameter(s) to tune (empty means all)'
-                print 'Arguments:'
+                print 'Options:'
                 print '    -n <cpu>       - (not implemented)'
                 print '    -d <depth>     - search depth per position (default 0)'
                 print '    -s <steps>     - probe steps before window shrink (default 2)'

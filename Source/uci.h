@@ -1,0 +1,3 @@
+
+bool uciInfo(void *uciInfoData);
+

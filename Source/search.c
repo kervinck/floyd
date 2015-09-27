@@ -10,7 +10,6 @@
  +----------------------------------------------------------------------*/
 
 // C standard
-#include <assert.h>
 #include <math.h>
 #include <setjmp.h>
 #include <signal.h>
@@ -170,10 +169,9 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
         // Search the first move with open alpha-beta window
         if (nrMoves > 0) {
                 if (pvIndex < self->pv.len)
-                        moveToFront(moveList, nrMoves, self->pv.v[pvIndex]); // follow pv
+                        moveToFront(moveList, nrMoves, self->pv.v[pvIndex]); // follow the pv
                 else
                         pushList(self->pv, moveList[0]);
-                assert(pvIndex < self->pv.len && self->pv.v[pvIndex] != 0);
                 makeMove(board(self), moveList[0]);
                 int newDepth = max(0, depth - 1 + check);
                 int newAlpha = max(alpha, bestScore);
@@ -181,7 +179,7 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                 if (score > bestScore)
                         bestScore = score;
                 else
-                        self->pv.len = pvIndex;
+                        self->pv.len = pvIndex; // quiescence
                 undoMove(board(self));
         }
 
@@ -297,7 +295,7 @@ static int qSearch(Engine_t self, int alpha)
 }
 
 /*----------------------------------------------------------------------+
- |      exchange (SEE)                                                  |
+ |      exchange (not really "SEE" yet)                                 |
  +----------------------------------------------------------------------*/
 
 static int exchange(Board_t self, int move)

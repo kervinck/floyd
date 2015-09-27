@@ -423,6 +423,7 @@ int evaluate(Board_t self)
                 wiloScore += self->eloDiff * v[eloDiff] / 10;
         else
                 wiloScore -= self->eloDiff * v[eloDiff] / 10;
+
         /*--------------------------------------------------------------+
          |      Special endgames                                        |
          +--------------------------------------------------------------*/

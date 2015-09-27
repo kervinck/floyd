@@ -23,7 +23,6 @@ tables: tables.png
 tables.png: Tools/plotTables.py vector.json
 	python Tools/plotTables.py vector.json
 
-
 residual:
 	bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/tune.py -q vector.json
 

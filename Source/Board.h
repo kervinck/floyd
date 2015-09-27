@@ -38,7 +38,7 @@
  |      Definitions                                                     |
  +----------------------------------------------------------------------*/
 
-#include "geometry-a1a2.h"
+#include "geometry.h"
 
 static const int rankStep = rank2 - rank1;
 static const int fileStep = fileB - fileA;
@@ -134,6 +134,8 @@ enum castleFlag {
  *  12          special flag (castling, promotion, en passant capture, double pawn push)
  *  13-14       promotion: Q=0, R=1, B=2, N=3
  */
+
+#define boardBits  6
 
 #define move(from, to)          (((from) << boardBits) | (to))
 enum moveFlags {

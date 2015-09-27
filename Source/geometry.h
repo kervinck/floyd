@@ -22,5 +22,3 @@ enum square {
         boardSize
 };
 
-enum { boardBits = 6 };
-

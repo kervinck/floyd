@@ -100,6 +100,8 @@ void rootSearch(Engine_t self, int depth, double movetime,
                 // catch abort
                 self->seconds = xclock() - startTime;
                 self->pv.len = (self->pv.len > 0) && (self->pv.v[0] != self->bestMove);
+                if (self->pv.len > 0)
+                        self->bestMove = self->pv.v[0];
                 if (infoFunction != null)
                         (void) infoFunction(infoData);
         }

@@ -1,4 +1,10 @@
 
+|Todo| Reject pawns on last rank
+
+- also update chessmoves module for this
+
+|Todo| Some mates are wrong or missed
+
 |Todo| Add UCI front-end [uci]
 
 Try in C

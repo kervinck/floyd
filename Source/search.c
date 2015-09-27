@@ -93,17 +93,17 @@ void rootSearch(Engine_t self, int depth, double movetime,
                         self->seconds = xclock() - startTime;
                         if (self->pv.len > 0)
                                 self->bestMove = self->pv.v[0];
-                        if (infoFunction != null)
-                                stop = infoFunction(infoData);
+                        stop = infoFunction(infoData) || self->score + iteration >= 31998;
                 }
         } else {
                 // catch abort
                 self->seconds = xclock() - startTime;
+                while (board(self)->plyNumber > self->rootPlyNumber)
+                        undoMove(board(self));
                 self->pv.len = (self->pv.len > 0) && (self->pv.v[0] != self->bestMove);
                 if (self->pv.len > 0)
                         self->bestMove = self->pv.v[0];
-                if (infoFunction != null)
-                        (void) infoFunction(infoData);
+                (void) infoFunction(infoData);
         }
 
         // Deactivate timer
@@ -207,7 +207,7 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                                         self->pv.v[pvIndex+j] = self->pv.v[pvLen+j];
                                 self->pv.len -= pvLen - pvIndex;
                         } else
-                                abort();
+                                abort(); // should not happen in a "pure" search
                                 //self->pv.len = pvLen; // research failed
                 }
                 undoMove(board(self));
@@ -234,16 +234,12 @@ cleanup:
 static int scout(Engine_t self, int depth, int alpha)
 {
         self->nodeCount++;
-
         if (repetition(board(self)))
                 return drawScore(self);
-
         if (depth == 0)
                 return qSearch(self, alpha);
-
         if (globalSignal)
                 longjmp(self->abortEnv, globalSignal); // abort
-
         int check = inCheck(board(self));
         int bestScore = minInt;
 
@@ -272,7 +268,6 @@ static int scout(Engine_t self, int depth, int alpha)
  |      qSearch                                                         |
  +----------------------------------------------------------------------*/
 
-// TODO: repetitions
 // TODO: ttable
 static int qSearch(Engine_t self, int alpha)
 {
@@ -379,7 +374,7 @@ static void moveToFront(int moveList[], int nrMoves, int move)
         for (int i=0; i<nrMoves; i++) {
                 if (moveList[i] != move)
                         continue;
-                memmove(&moveList[0], &moveList[1], i * sizeof(moveList[0]));
+                memmove(&moveList[1], &moveList[0], i * sizeof(moveList[0]));
                 moveList[0] = move;
                 return;
         }

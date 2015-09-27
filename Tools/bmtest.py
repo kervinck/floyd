@@ -3,7 +3,7 @@ import chessmoves
 import floyd as engine
 import sys
 
-def parseEPD(rawLine):
+def parseEpd(rawLine):
 
         # 4-field FEN
         line = rawLine.strip().split(' ', 4)
@@ -19,19 +19,21 @@ def parseEPD(rawLine):
 nrPassed = 0
 nrTests = 0
 
+movetime = float(sys.argv[1])
+
 for rawLine in sys.stdin:
         print rawLine,
         nrTests += 1
-        pos, operations = parseEPD(rawLine)
-        score, move = engine.search(pos, movetime=1.0, info='uci')
+        pos, operations = parseEpd(rawLine)
+        score, move = engine.search(pos, movetime=movetime, info='uci')
         print 'bestmove', move
         expected = [chessmoves.move(pos, bm, notation='uci')[0] for bm in operations['bm'].split()]
-        print operations['id'],
+        print 'result',
         if move in expected:
                 print 'OK',
                 nrPassed += 1
         else:
                 print 'FAILED',
-        print '%d/%d' % (nrPassed, nrTests)
+        print 'passed %d total %d' % (nrPassed, nrTests)
         print
 

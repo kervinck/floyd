@@ -7,11 +7,15 @@ module:
 	python setup.py build
 
 # TODO: allow testing before install
+
 test:
 	python Tools/searchtest.py
 
 wac:
-	python Tools/wactest.py < Data/wacnew.epd
+	python Tools/bmtest.py 1 < Data/wacnew.epd
+
+mate:
+	python Tools/bmtest.py 100 < Data/mate.epd
 
 todo:
 	find . -type f -size -1M -print0 | xargs -0 grep -i todo
@@ -32,7 +36,7 @@ tune:
 ftune:
 	bzcat Data/ccrl-shuffled-3M.epd.bz2 | head -500000 | python Tools/tune.py -s 2 -m 100000 fvector.json
 
-update: clean
+update: clean tables.png
 	python Tools/updateDefaults.py vector.json < Source/vector.h > vector.h.tmp
 	[ -s vector.h.tmp ] && mv vector.h.tmp Source/vector.h
 

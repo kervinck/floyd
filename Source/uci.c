@@ -12,6 +12,7 @@
 // C standard
 #include <assert.h>
 #include <math.h>
+#include <setjmp.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>

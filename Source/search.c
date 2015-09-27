@@ -48,6 +48,8 @@ static const int pieceValue[] = {
 
 static const int promotionValue[] = { 9, 5, 3, 3 };
 
+static int globalSignal; // TODO: not thread-local, not very nice for a library
+
 /*----------------------------------------------------------------------+
  |      Functions                                                       |
  +----------------------------------------------------------------------*/
@@ -65,26 +67,24 @@ static void moveToFront(int moveList[], int nrMoves, int move);
  |      rootSearch                                                      |
  +----------------------------------------------------------------------*/
 
-static int globalSignal; // TODO: not thread-local, not very nice for a library
-
 static void catchSignal(int signal)
 {
         globalSignal = signal;
 }
 
 // TODO: aspiration search
-void rootSearch(Engine_t self, int depth, double movetime, searchInfo_fn *infoFunction, void *infoData)
+void rootSearch(Engine_t self, int depth, double movetime,
+        searchInfo_fn *infoFunction, void *infoData)
 {
         double startTime = xclock();
         self->nodeCount = 0;
         self->rootPlyNumber = board(self)->plyNumber;
 
-        jmp_buf env;
-        self->setjmp_env = &env;
-        globalSignal = 0;
+        // Set timer
         sig_t oldHandler = signal(SIGALRM, catchSignal);
         alarm(ceil(movetime));
-        if (setjmp(env) == 0) {
+
+        if (setjmp(self->abortEnv) == 0) {
                 // start search
                 bool stop = false;
                 for (int iteration=0; iteration<=depth && !stop; iteration++) {
@@ -97,13 +97,17 @@ void rootSearch(Engine_t self, int depth, double movetime, searchInfo_fn *infoFu
                                 stop = infoFunction(infoData);
                 }
         } else {
-                // search aborted
+                // catch abort
                 self->seconds = xclock() - startTime;
                 self->pv.len = (self->pv.len > 0) && (self->pv.v[0] != self->bestMove);
                 if (infoFunction != null)
                         (void) infoFunction(infoData);
         }
+
+        // Deactivate timer
         signal(SIGALRM, oldHandler);
+        globalSignal = 0;
+        alarm(0);
 }
 
 /*----------------------------------------------------------------------+
@@ -150,7 +154,7 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
         int check = inCheck(board(self));
         int moveFilter = minInt;
         int bestScore = minInt;
-        err_t err = OK;
+        err_t err = OK; // TODO: remove
 
         if (depth == 0 && !check) {
                 bestScore = evaluate(board(self));
@@ -201,7 +205,8 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                                         self->pv.v[pvIndex+j] = self->pv.v[pvLen+j];
                                 self->pv.len -= pvLen - pvIndex;
                         } else
-                                self->pv.len = pvLen; // research failed
+                                abort();
+                                //self->pv.len = pvLen; // research failed
                 }
                 undoMove(board(self));
         }
@@ -224,17 +229,18 @@ cleanup:
 // TODO: internal deepening
 // TODO: futility
 // TODO: reductions
-// TODO: abort
 static int scout(Engine_t self, int depth, int alpha)
 {
         self->nodeCount++;
+
         if (repetition(board(self)))
                 return drawScore(self);
+
         if (depth == 0)
                 return qSearch(self, alpha);
 
         if (globalSignal)
-                longjmp(*(jmp_buf *)self->setjmp_env, 1);
+                longjmp(self->abortEnv, globalSignal); // abort
 
         int check = inCheck(board(self));
         int bestScore = minInt;

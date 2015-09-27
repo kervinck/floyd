@@ -56,12 +56,12 @@ struct engine {
                 long long nodeCount;
         };
 
-        void *setjmp_env;
+        jmp_buf abortEnv;
 };
 
 /*
  *  Workaround to hide some of the ugliness, at least until ISO C supports
- *  seamless access to members of the base struct (ref. `-fms-extensions'
+ *  seamless access to members of the base struct (like `-fms-extensions'
  *  or `kenc'). Note that this is a noop (just a type conversion) because
  *  `board' is the first element of `struct engine'.
  */

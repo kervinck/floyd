@@ -47,7 +47,7 @@ void uciMain(Engine_t engine)
                 if (sscanf(line, " %15s %n", command, &n) != 1)
                         continue;
 
-                if (!strcmp(command, "uci")) {
+                if (strcmp(command, "uci") == 0) {
                         printf("id name Floyd " quote2(floydVersion) "\n"
                                "id author Marcel van Kervinck\n"
                                "option name Hash type spin default 0 min 0 max 0\n"
@@ -58,18 +58,18 @@ void uciMain(Engine_t engine)
                         continue;
                 }
 
-                if (!strcmp(command, "isready")) {
+                if (strcmp(command, "isready") == 0) {
                         printf("readyok\n");
                         continue;
                 }
 
-                if (!strcmp(command, "setoption"))
+                if (strcmp(command, "setoption") == 0)
                         continue;
 
-                if (!strcmp(command, "ucinewgame"))
+                if (strcmp(command, "ucinewgame") == 0)
                         continue;
 
-                if (!strcmp(command, "position")) {
+                if (strcmp(command, "position") == 0) {
                         char dummy;
                         int m = 0;
 
@@ -116,7 +116,7 @@ void uciMain(Engine_t engine)
                         continue;
                 }
 
-                if (!strcmp(command, "go")) {
+                if (strcmp(command, "go") == 0) {
                         int depth = maxDepth;
                         double movetime = 1.0;
                         rootSearch(engine, depth, movetime, uciInfo, engine);
@@ -126,7 +126,10 @@ void uciMain(Engine_t engine)
                         continue;
                 }
 
-                if (!strcmp(command, "quit"))
+                if (strcmp(command, "stop") == 0)
+                        continue;
+
+                if (strcmp(command, "quit") == 0)
                         break;
 
                 printf("info string No such command (%s)\n", command);

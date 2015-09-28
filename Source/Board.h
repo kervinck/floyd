@@ -91,7 +91,7 @@ struct board {
         /*
          *  Move undo administration
          */
-        signed char undoStack[256];
+        signed char undoStack[2048];
         int undoLen;
         int *movePtr; // For in move generation
 };

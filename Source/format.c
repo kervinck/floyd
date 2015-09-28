@@ -182,6 +182,12 @@ extern int setupBoard(Board_t self, const char *fen)
                         ix++;
         }
 
+        // Eat move number and halfmove clock. TODO: process this properly
+        while (isspace(fen[ix])) ix++;
+        while (isdigit(fen[ix])) ix++;
+        while (isspace(fen[ix])) ix++;
+        while (isdigit(fen[ix])) ix++;
+
         self->sideInfoPlyNumber = -1; // side info is invalid now
 
         // Reset the undo stack

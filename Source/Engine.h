@@ -48,6 +48,7 @@ struct engine {
 
         // last search result
         struct {
+                uint64_t lastSearched;
                 int score;
                 int depth;
                 int bestMove;

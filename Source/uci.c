@@ -27,6 +27,9 @@
 #include "Engine.h"
 #include "uci.h"
 
+// Other modules
+#include "evaluate.h"
+
 /*----------------------------------------------------------------------+
  |      Functions                                                       |
  +----------------------------------------------------------------------*/
@@ -35,7 +38,7 @@
  |      uciMain                                                         |
  +----------------------------------------------------------------------*/
 
-void uciMain(Engine_t engine)
+void uciMain(Engine_t self)
 {
         char *line = null;
         int size = 0;
@@ -74,11 +77,11 @@ void uciMain(Engine_t engine)
                         int m = 0;
 
                         if (sscanf(line + n, "startpos%c%n", &dummy, &m) == 1 && isspace(dummy)) {
-                                setupBoard(board(engine), startpos);
+                                setupBoard(board(self), startpos);
                         }
                         else if (sscanf(line + n, "fen %c%n", &dummy, &m) == 1) {
                                 n += m;
-                                m = setupBoard(board(engine), line + n);
+                                m = setupBoard(board(self), line + n);
                         }
 
                         if (m == 0) {
@@ -93,9 +96,9 @@ void uciMain(Engine_t engine)
 
                         while (sscanf(line + n, " %c", &dummy) == 1) { // game moves after 'moves'
                                 int moves[maxMoves];
-                                int nrMoves = generateMoves(board(engine), moves);
+                                int nrMoves = generateMoves(board(self), moves);
                                 int move;
-                                m = parseMove(board(engine), line + n, moves, nrMoves, &move);
+                                m = parseMove(board(self), line + n, moves, nrMoves, &move);
                                 switch (m) {
                                 case 0:
                                         printf("info string Invalid move syntax\n");
@@ -107,7 +110,7 @@ void uciMain(Engine_t engine)
                                         printf("info string Ambiguous move\n");
                                         break;
                                 default:
-                                        makeMove(board(engine), move);
+                                        makeMove(board(self), move);
                                         n += m;
                                         continue; // next move
                                 }
@@ -116,12 +119,18 @@ void uciMain(Engine_t engine)
                         continue;
                 }
 
+                if (strcmp(command, "eval") == 0) { // not standard UCI
+                        int score = evaluate(board(self));
+                        printf("info score cp %.0f\n", round(score / 10.0));
+                        continue;
+                }
+
                 if (strcmp(command, "go") == 0) {
                         int depth = maxDepth;
                         double movetime = 1.0;
-                        rootSearch(engine, depth, movetime, uciInfo, engine);
+                        rootSearch(self, depth, movetime, uciInfo, self);
                         char moveString[maxMoveSize];
-                        moveToUci(board(engine), moveString, engine->bestMove);
+                        moveToUci(board(self), moveString, self->bestMove);
                         printf("bestmove %s\n", moveString);
                         continue;
                 }
@@ -154,7 +163,7 @@ bool uciInfo(void *uciInfoData)
         if (self->pv.len > 0 || self->depth == 0) {
                 char scoreString[16];
                 if (abs(self->score < 31000))
-                        sprintf(scoreString, "cp %d", (int) round(self->score / 10.0));
+                        sprintf(scoreString, "cp %.0f", round(self->score / 10.0));
                 else
                         sprintf(scoreString, "mate %d",
                                 ((self->score < 0) ? 32000 + self->score : 32000 - self->score + 1) / 2);

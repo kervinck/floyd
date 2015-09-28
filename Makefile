@@ -1,10 +1,16 @@
-CFLAGS=-std=c11 -pedantic -Wall -O3
+CFLAGS=-std=c11 -pedantic -Wall -O3 -DfloydVersion=1.0a
 
-all: module
+all: module floyd
 
-# python module
+# as python module
 module:
 	python setup.py build
+
+SOURCES=cplus.c evaluate.c floyd.c format.c kpk.c moves.c polyglot.c search.c uci.c
+
+# as uci engine
+floyd: $(addprefix Source/, $(SOURCES)) $(wildcard Source/*.h)
+	gcc $(CFLAGS) -o $@ $(addprefix Source/, $(SOURCES))
 
 # TODO: allow testing before install
 test:

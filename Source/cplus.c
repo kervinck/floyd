@@ -38,8 +38,10 @@
  |      Includes                                                        |
  +----------------------------------------------------------------------*/
 
+#include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "cplus.h"
 
@@ -155,6 +157,57 @@ char *stringCopy(char *s, const char *t)
                 t++;
         }
         return s; // give pointer to terminating zero for easy concatenation
+}
+
+/*----------------------------------------------------------------------+
+ |      readline                                                        |
+ +----------------------------------------------------------------------*/
+
+int readLine(void *fp, char **pLine, int *pSize)
+{
+        char *line = *pLine;
+        int size = *pSize;
+        int len = 0;
+
+        for (;;) {
+                /*
+                 *  Ensure there is enough space for the next character and a terminator
+                 */
+                if (len + 1 >= size) {
+                        int newsize = (size > 0) ? (2 * size) : 128;
+                        char *newline = realloc(line, newsize);
+
+                        if (newline == NULL) {
+                                fprintf(stderr, "*** Error: %s\n", strerror(errno));
+                                exit(EXIT_FAILURE);
+                        }
+
+                        line = newline;
+                        size = newsize;
+                }
+
+                /*
+                 *  Process next character from file
+                 */
+                int c = getc(fp);
+                if (c == EOF) {
+                        if (ferror(fp)) {
+                                fprintf(stderr, "*** Error: %s\n", strerror(errno));
+                                exit(EXIT_FAILURE);
+                        } else {
+                                break;
+                        }
+                }
+                line[len++] = c;
+
+                if (c == '\n') break; // End of line found
+        }
+
+        line[len] = '\0';
+        *pLine = line;
+        *pSize = size;
+
+        return len;
 }
 
 /*----------------------------------------------------------------------+

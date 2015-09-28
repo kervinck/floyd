@@ -80,6 +80,11 @@ void rootSearch(Engine_t self, int depth, double movetime,
         self->nodeCount = 0;
         self->rootPlyNumber = board(self)->plyNumber;
 
+        if (hash64(board(self)) != self->lastSearched) {
+                self->lastSearched = hash64(board(self));
+                self->pv.len = 0;
+        }
+
         // Set timer
         sig_t oldHandler = signal(SIGALRM, catchSignal);
         alarm(ceil(movetime));

@@ -20,7 +20,7 @@ wac:
 	python Tools/bmtest.py 1 < Data/wacnew.epd
 
 mate:
-	python Tools/bmtest.py 100 < Data/mate.epd
+	python Tools/bmtest.py 10 < Data/mate.epd
 
 todo:
 	find . -type f -size -1M -print0 | xargs -0 grep -i todo

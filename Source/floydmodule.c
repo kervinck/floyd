@@ -153,7 +153,7 @@ static PyObject *
 floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
 {
         char *fen;
-        int depth = 9;//maxDepth;
+        int depth = maxDepth;
         double movetime = 0.0;
         char *info = null;
 

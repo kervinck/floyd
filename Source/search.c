@@ -150,8 +150,9 @@ static inline int drawScore(Engine_t self)
 
 // TODO: repetitions
 // TODO: ttable
-// TODO: killers
 // TODO: internal deepening
+// TODO: single-reply extensions
+// TODO: killers
 // TODO: reductions
 static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
 {

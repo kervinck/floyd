@@ -144,19 +144,21 @@ bool uciInfo(void *uciInfoData)
 {
         Engine_t self = uciInfoData;
 
-        int milliSeconds = round(self->seconds * 1e3);
+        long milliSeconds = round(self->seconds * 1e3);
 
-        char scoreString[16];
-        if (abs(self->score < 31000))
-                sprintf(scoreString, "cp %d", (int) round(self->score / 10.0));
-        else
-                sprintf(scoreString, "mate %d",
-                        ((self->score < 0) ? 32000 + self->score : 32000 - self->score + 1) / 2);
+        printf("info time %ld depth %d", milliSeconds, self->depth);
 
-        printf("info time %d depth %d score %s nodes %lld nps %.f",
-                milliSeconds,
-                self->depth,
-                scoreString,
+        if (self->pv.len > 0 || self->depth == 0) {
+                char scoreString[16];
+                if (abs(self->score < 31000))
+                        sprintf(scoreString, "cp %d", (int) round(self->score / 10.0));
+                else
+                        sprintf(scoreString, "mate %d",
+                                ((self->score < 0) ? 32000 + self->score : 32000 - self->score + 1) / 2);
+                printf(" score %s", scoreString);
+        }
+
+        printf(" nodes %lld nps %.f",
                 self->nodeCount,
                 (self->seconds > 0.0) ? self->nodeCount / self->seconds : 0.0);
 

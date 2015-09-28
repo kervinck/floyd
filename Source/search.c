@@ -10,6 +10,7 @@
  +----------------------------------------------------------------------*/
 
 // C standard
+#include <assert.h>
 #include <math.h>
 #include <setjmp.h>
 #include <signal.h>
@@ -48,7 +49,7 @@ static const int pieceValue[] = {
 
 static const int promotionValue[] = { 9, 5, 3, 3 };
 
-static int globalSignal; // TODO: not thread-local, not very nice for a library
+static Engine_t globalEngine; // TODO: remove global & all timing decisions & signals from search.c
 
 /*----------------------------------------------------------------------+
  |      Functions                                                       |
@@ -58,6 +59,7 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex);
 static int scout(Engine_t self, int depth, int alpha);
 static int qSearch(Engine_t self, int alpha);
 
+static int updateBestAndPonderMove(Engine_t self);
 static int exchange(Board_t self, int move);
 static int filterAndSort(Board_t self, int moveList[], int nrMoves, int moveFilter);
 static int filterLegalMoves(Board_t self, int moveList[], int nrMoves);
@@ -69,11 +71,14 @@ static void moveToFront(int moveList[], int nrMoves, int move);
 
 static void catchSignal(int signal)
 {
-        globalSignal = signal;
+        globalEngine->stopFlag = true;
 }
 
 // TODO: aspiration search
-void rootSearch(Engine_t self, int depth, double movetime,
+void rootSearch(Engine_t self,
+        int depth,
+        double targetTime,
+        double alarmTime,
         searchInfo_fn *infoFunction, void *infoData)
 {
         double startTime = xclock();
@@ -83,11 +88,13 @@ void rootSearch(Engine_t self, int depth, double movetime,
         if (hash64(board(self)) != self->lastSearched) {
                 self->lastSearched = hash64(board(self));
                 self->pv.len = 0;
+                self->bestMove = self->ponderMove = 0;
         }
 
-        // Set timer
+        // Set alarm
+        globalEngine = self;
         sig_t oldHandler = signal(SIGALRM, catchSignal);
-        alarm(ceil(movetime));
+        alarm(ceil(alarmTime));
 
         if (setjmp(self->abortEnv) == 0) {
                 // start search
@@ -96,24 +103,23 @@ void rootSearch(Engine_t self, int depth, double movetime,
                         self->depth = iteration;
                         self->score = pvSearch(self, iteration, -maxInt, maxInt, 0);
                         self->seconds = xclock() - startTime;
-                        if (self->pv.len > 0)
-                                self->bestMove = self->pv.v[0];
-                        stop = infoFunction(infoData) || self->score + iteration >= 31998;
+                        updateBestAndPonderMove(self);
+                        stop = infoFunction(infoData)
+                            || self->score + iteration >= 31998
+                            || (targetTime > 0.0 && self->seconds >= 0.5 * targetTime);
                 }
         } else {
                 // catch abort
                 self->seconds = xclock() - startTime;
                 while (board(self)->plyNumber > self->rootPlyNumber)
                         undoMove(board(self));
-                self->pv.len = (self->pv.len > 0) && (self->pv.v[0] != self->bestMove);
-                if (self->pv.len > 0)
-                        self->bestMove = self->pv.v[0];
+                int pvCut = updateBestAndPonderMove(self);
+                self->pv.len = min(self->pv.len, pvCut);
                 (void) infoFunction(infoData);
         }
 
-        // Deactivate timer
+        // Clear alarm
         signal(SIGALRM, oldHandler);
-        globalSignal = 0;
         alarm(0);
 }
 
@@ -244,8 +250,8 @@ static int scout(Engine_t self, int depth, int alpha)
                 return drawScore(self);
         if (depth == 0)
                 return qSearch(self, alpha);
-        if (globalSignal)
-                longjmp(self->abortEnv, globalSignal); // abort
+        if (self->stopFlag && self->bestMove)
+                longjmp(self->abortEnv, 1); // abort
         int check = inCheck(board(self));
         int bestScore = minInt;
 
@@ -301,6 +307,23 @@ static int qSearch(Engine_t self, int alpha)
                 bestScore = endScore(self, check);
 
         return ttWrite(self, 0, alpha, alpha+1, bestScore);
+}
+
+/*----------------------------------------------------------------------+
+ |      updateBestAndPonderMove                                         |
+ +----------------------------------------------------------------------*/
+
+static int updateBestAndPonderMove(Engine_t self)
+{
+        if (self->pv.len >= 1 && self->pv.v[0] != self->bestMove)
+                self->ponderMove = 0;
+        if (self->pv.len >= 2)
+                self->ponderMove = self->pv.v[1];
+        if (self->pv.len >= 1)
+                self->bestMove = self->pv.v[0];
+
+        assert(self->bestMove || !self->ponderMove);
+        return !self->bestMove + !self->ponderMove;
 }
 
 /*----------------------------------------------------------------------+

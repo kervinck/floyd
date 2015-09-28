@@ -187,7 +187,7 @@ floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
                         return PyErr_Format(PyExc_ValueError, "Invalid info type (%s)", info);
         }
 
-        rootSearch(&engine, depth, movetime, infoFunction, infoData);
+        rootSearch(&engine, depth, 0.0, movetime, infoFunction, infoData);
 
         PyObject *result = PyTuple_New(2);
         if (!result)

@@ -182,7 +182,7 @@ floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
         void *infoData = &engine;
         if (info != null) {
                 if (!strcmp(info, "uci"))
-                        infoFunction = uciInfo;
+                        infoFunction = uciSearchInfo;
                 else
                         return PyErr_Format(PyExc_ValueError, "Invalid info type (%s)", info);
         }

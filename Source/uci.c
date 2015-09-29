@@ -46,10 +46,70 @@ struct searchArgs {
         double alarmTime;
         searchInfo_fn *infoFunction;
         void *infoData;
-
         bool ponder;
         bool infinite;
 };
+
+/*----------------------------------------------------------------------+
+ |      Data                                                            |
+ +----------------------------------------------------------------------*/
+
+#define X "\n"
+
+static const char helpMessage[] =
+ "This engine uses the Universal Chess Interface (UCI) protocol."
+X"See http://download.shredderchess.com/div/uci.zip for details."
+X
+X"Supported UCI commands are:"
+X"  uci"
+X"        Confirm UCI mode, show engine details and options."
+X"  debug [ on | off ]"
+X"        Enable/disable debug mode and show its status."
+X"  setoption name <optionName> [ value <optionValue> ]"
+X"        Set option. The new value becomes active with the next `isready'."
+X"  isready"
+X"        Activate any changed options and reply 'isready' when done."
+X"  ucinewgame"
+X"        A new game has started (ignored)."
+X"  position [ startpos | fen <fenField> ... ] [ moves <move> ... ]"
+X"        Setup the position on the internal board and play out the sequence"
+X"        of moves. In debug mode also show the resulting FEN and board."
+X"  go [ <option> ... ]"
+X"        Start searching from the current position within the constraints"
+X"        given by the options, or until the `stop' command is received."
+X"        Always show a final result using `bestmove'. (But: see `infinite')"
+X"        Command options are:"
+X"          searchmoves <move> ...  Only search these moves"
+X"          ponder                  Start search in ponder mode" // TODO: not implemented
+X"          wtime <millis>          Time remaining on White's clock"
+X"          btime <millis>          Time remaining on Black's clock"
+X"          winc <millis>           White's increment after each move"
+X"          binc <millis>           Black's increment after each move"
+X"          movestogo <nrMoves>     Moves to go until next time control"
+X"          depth <ply>             Search no deeper than <ply> halfmoves"
+X"          nodes <nrNodes>         Search no more than <nrNodes> nodes" // TODO: not implemented
+X"          mate <nrMoves>          Search for a mate in <nrMoves> moves" // TODO: not implemented
+X"          movetime <millis>       Search no longer than this time"
+X"          infinite                Postpone `bestmove' result until `stop'"
+X"  ponderhit"
+X"        Opponent has played the ponder move. Continue searching in own time."
+X"  stop"
+X"        Stop any search. In `infinite' mode also show the `bestmove' result."
+X"  quit"
+X"        Terminate engine."
+X
+X"Extra commands:"
+X"  help"
+X"        Show this list of commands."
+X"  eval"
+X"        Show evaluation."
+X"  bench"
+X"        Run a standardized speed test." // TODO: not implemented
+X"  moves [ depth <n> ]"
+X"        Run a move generation test." // TODO: not implemented
+X
+X"Unknown commands and options are silently ignored, except in debug mode."
+X;
 
 /*----------------------------------------------------------------------+
  |      Functions                                                       |
@@ -98,11 +158,11 @@ void uciMain(Engine_t self)
                                "id author Marcel van Kervinck\n"
                                "option name Hash type spin default 0 min 0 max 0\n"
                                "option name Clear Hash type button\n"
-                               "option name Threads type spin default 1 min 1 max 1\n"
-                               "option name Ponder type check default false\n"
-                               "option name MultiPV type spin default 1 min 1 max 1\n"
-                               "option name UCI_Chess960 type check default false\n"
-                               "option name Contempt type spin default 0 min -100 max 100\n"
+                               //"option name Threads type spin default 1 min 1 max 1\n"
+                               //"option name Ponder type check default false\n"
+                               //"option name MultiPV type spin default 1 min 1 max 1\n"
+                               //"option name UCI_Chess960 type check default false\n"
+                               //"option name Contempt type spin default 0 min -100 max 100\n"
                                "uciok\n");
                         continue;
                 }
@@ -114,13 +174,13 @@ void uciMain(Engine_t self)
                         continue;
                 }
 
+                if (strcmp(command, "setoption") == 0)
+                        continue;
+
                 if (strcmp(command, "isready") == 0) {
                         printf("readyok\n");
                         continue;
                 }
-
-                if (strcmp(command, "setoption") == 0)
-                        continue;
 
                 if (strcmp(command, "ucinewgame") == 0)
                         continue;
@@ -166,12 +226,6 @@ void uciMain(Engine_t self)
                         continue;
                 }
 
-                if (strcmp(command, "eval") == 0) { // not UCI but useful
-                        int score = evaluate(board(self));
-                        printf("info score cp %.0f string intern %+d\n", round(score / 10.0), score);
-                        continue;
-                }
-
                 if (strcmp(command, "go") == 0) {
                         searchThread = stopSearch(searchThread, &args);
 
@@ -180,9 +234,8 @@ void uciMain(Engine_t self)
                                 .depth = maxDepth,
                                 .targetTime = 0.0,
                                 .alarmTime = 0.0,
-                                .infoFunction = uciInfo,
+                                .infoFunction = uciSearchInfo,
                                 .infoData = self,
-
                                 .ponder = false,
                                 .infinite = false,
                         };
@@ -192,7 +245,7 @@ void uciMain(Engine_t self)
                         long btime = 0;
                         long inc = 0;
                         long binc = 0;
-                        int movestogo = 25;
+                        int movestogo = 25; // TODO: migrate game timing logic out of uci.c
                         long long nodes = maxLongLong;
                         int mate = 0; // TODO: not implemented
                         long movetime = 0;
@@ -208,7 +261,6 @@ void uciMain(Engine_t self)
                                                 if (debug && m == -1) printf("info string Illegal move\n");
                                                 if (debug && m == -2) printf("info string Ambiguous move\n");
                                         }
-
                                 if ((sscanf(line+n, "ponder%c     %n", &dummy,    &m) == 1 && isspace(dummy) && (args.ponder = true))
                                  ||  sscanf(line+n, "wtime %ld    %n", &time,     &m) == 1
                                  ||  sscanf(line+n, "btime %ld    %n", &btime,    &m) == 1
@@ -240,9 +292,6 @@ void uciMain(Engine_t self)
                         continue;
                 }
 
-                if (strcmp(command, "ponderhit") == 0) // TODO: implement ponder
-                        continue;
-
                 if (strcmp(command, "stop") == 0) {
                         searchThread = stopSearch(searchThread, &args);
                         if (args.infinite)
@@ -250,8 +299,26 @@ void uciMain(Engine_t self)
                         continue;
                 }
 
+                if (strcmp(command, "ponderhit") == 0) // TODO: implement ponder
+                        continue;
+
                 if (strcmp(command, "quit") == 0)
                         break;
+
+                /*
+                 *  Extra commands
+                 */
+
+                if (strcmp(command, "help") == 0) {
+                        fputs(helpMessage, stdout);
+                        continue;
+                }
+
+                if (strcmp(command, "eval") == 0) {
+                        int score = evaluate(board(self));
+                        printf("info score cp %.0f string intern %+d\n", round(score / 10.0), score);
+                        continue;
+                }
 
                 if (debug)
                         printf("info string No such command (%s)\n", command);
@@ -285,10 +352,10 @@ static double target(Engine_t self, double time, double inc, int movestogo)
 }
 
 /*----------------------------------------------------------------------+
- |      uciInfo                                                         |
+ |      uciSearchInfo                                                   |
  +----------------------------------------------------------------------*/
 
-bool uciInfo(void *uciInfoData)
+bool uciSearchInfo(void *uciInfoData)
 {
         Engine_t self = uciInfoData;
 

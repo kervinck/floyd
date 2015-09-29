@@ -1,4 +1,4 @@
-CFLAGS=-std=c11 -pedantic -Wall -O3 -DfloydVersion=1.0a
+CFLAGS=-std=c11 -pedantic -Wall -O3 -DfloydVersion=1.0x
 
 all: module floyd
 

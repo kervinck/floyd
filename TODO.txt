@@ -1,7 +1,13 @@
 
-|Todo| Repetition detection [search]
+|Todo| Move generator test
 
-|Todo| Some mates are wrong or missed
+moves 5 (includes divide, no time info)
+
+|Todo| Add speed benchmark [qa]
+
+bench
+
+|Todo| Repetition detection [search]
 
 |Todo| Add UCI front-end [uci]
 
@@ -12,8 +18,6 @@ Try in C
 Cutechess-cli
 
 ------------------------------------------------------------------------
-
-|Todo| Add speed benchmark [qa]
 
 For example using SF standard positions
 

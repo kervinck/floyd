@@ -1,11 +1,12 @@
 
 /*
+ *  Zobrist-Polyglot hash constants
  *  Reference: http://hardy.uhasselt.be/Toga/book_format.html
  */
 
-#include "polyglot.h"
+#include "zobrist.h"
 
-const unsigned long long RandomPiece[] = {
+const unsigned long long zobristPiece[] = {
  0x9d39247e33776d41ULL, 0x2af7398005aaa5c7ULL, 0x44db015024623547ULL, 0x9c15f73e62a76ae2ULL,
  0x75834465489c0c89ULL, 0x3290ac3a203001bfULL, 0x0fbbad1f61042279ULL, 0xe83a908ff2fb60caULL,
  0x0d7e765d58755c10ULL, 0x1a083822ceafe02dULL, 0x9605d5f0e25ec3b0ULL, 0xd021ff5cd13a2ed5ULL,
@@ -200,16 +201,16 @@ const unsigned long long RandomPiece[] = {
  0x5fa7867caf35e149ULL, 0x56986e2ef3ed091bULL, 0x917f1dd5f8886c61ULL, 0xd20d8c88c8ffe65fULL,
 };
 
-const unsigned long long RandomCastle[] = {
+const unsigned long long zobristCastle[] = {
  0x31d71dce64b2c310ULL, 0xf165b587df898190ULL, 0xa57e6339dd2cf3a0ULL, 0x1ef6e6dbb1961ec9ULL,
 };
 
-const unsigned long long RandomEnPassant[] = {
+const unsigned long long zobristEnPassant[] = {
  0x70cc73d90bc26e24ULL, 0xe21a6b35df0c3ad7ULL, 0x003a93d8b2806962ULL, 0x1c99ded33cb890a1ULL,
  0xcf3145de0add4289ULL, 0xd0e4427a5514fb72ULL, 0x77c621cc9fb3a483ULL, 0x67a34dac4356550bULL,
 };
 
-const unsigned long long RandomTurn[] = {
+const unsigned long long zobristTurn[] = {
  0xf8d626aaaf278509ULL,
 };
 

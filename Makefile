@@ -6,7 +6,7 @@ all: module floyd
 module:
 	python setup.py build
 
-SOURCES=cplus.c evaluate.c floyd.c format.c kpk.c moves.c polyglot.c search.c uci.c
+SOURCES=cplus.c evaluate.c floydmain.c format.c kpk.c moves.c parse.c search.c uci.c zobrist.c
 
 # as uci engine
 floyd: $(addprefix Source/, $(SOURCES)) $(wildcard Source/*.h)

@@ -51,7 +51,7 @@
 #include "Board.h"
 
 // Other modules
-#include "polyglot.h"
+#include "zobrist.h"
 
 /*----------------------------------------------------------------------+
  |      Definitions                                                     |
@@ -687,14 +687,14 @@ unsigned long long hash64(Board_t self)
                 int square = square(file, rank);
                 int piece = self->squares[square];
                 if (piece == empty) continue;
-                key ^= RandomPiece[offsets[piece] + i];
+                key ^= zobristPiece[offsets[piece] + i];
         }
 
         // castle
-        if (self->castleFlags & castleFlagWhiteKside) key ^= RandomCastle[0];
-        if (self->castleFlags & castleFlagWhiteQside) key ^= RandomCastle[1];
-        if (self->castleFlags & castleFlagBlackKside) key ^= RandomCastle[2];
-        if (self->castleFlags & castleFlagBlackQside) key ^= RandomCastle[3];
+        if (self->castleFlags & castleFlagWhiteKside) key ^= zobristCastle[0];
+        if (self->castleFlags & castleFlagWhiteQside) key ^= zobristCastle[1];
+        if (self->castleFlags & castleFlagBlackKside) key ^= zobristCastle[2];
+        if (self->castleFlags & castleFlagBlackQside) key ^= zobristCastle[3];
 
         static const int files[] = {
                 [fileA] = 0, [fileB] = 1, [fileC] = 2, [fileD] = 3,
@@ -705,11 +705,11 @@ unsigned long long hash64(Board_t self)
         normalizeEnPassantStatus(self);
         int ep = self->enPassantPawn;
         if (ep != 0) {
-                key ^= RandomEnPassant[files[file(ep)]];
+                key ^= zobristEnPassant[files[file(ep)]];
         }
 
         // turn
-        if (sideToMove(self) == white) key ^= RandomTurn[0];
+        if (sideToMove(self) == white) key ^= zobristTurn[0];
 
         return key;
 }

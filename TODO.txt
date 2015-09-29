@@ -1,4 +1,8 @@
 
+|Todo| Repetition detection [search]
+
+|Todo| Some mates are wrong or missed
+
 |Todo| Add UCI front-end [uci]
 
 Try in C
@@ -82,4 +86,8 @@ Observe variation of vector and residual
 https://en.wikipedia.org/wiki/Rosenbrock_function
 
 |Todo| Parameter graphs (tune.dir)
+
+|Todo| Reject pawns on last rank
+
+- also update chessmoves module for this
 

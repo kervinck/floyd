@@ -74,7 +74,7 @@ struct board {
 
         signed char castleFlags;
         signed char enPassantPawn;
-        //signed char lastZeroing; // TODO: change to halfmoveClock
+        signed char halfmoveClock; // TODO: update this field
 
         int plyNumber; // holds both side to move and full move number
 
@@ -91,7 +91,7 @@ struct board {
         /*
          *  Move undo administration
          */
-        signed char undoStack[256];
+        signed char undoStack[2048];
         int undoLen;
         int *movePtr; // For in move generation
 };

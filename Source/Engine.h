@@ -46,11 +46,17 @@ struct engine {
 
         int rootPlyNumber;
 
+        intList searchMoves; // root moves to search, empty means all
+
+        volatile bool stopFlag;
+
         // last search result
         struct {
+                uint64_t lastSearched;
                 int score;
                 int depth;
                 int bestMove;
+                int ponderMove;
                 intList pv;
                 double seconds;
                 long long nodeCount;
@@ -74,7 +80,9 @@ struct engine {
 // callback interface for handling of search progress
 typedef bool searchInfo_fn(void *infoData);
 
-void rootSearch(Engine_t self, int depth, double movetime, searchInfo_fn *infoFunction, void *infoData);
+void rootSearch(Engine_t self, int depth, double targetTime, double alarmTime, searchInfo_fn *infoFunction, void *infoData);
+
+void abortSearch(Engine_t self);
 
 /*----------------------------------------------------------------------+
  |                                                                      |

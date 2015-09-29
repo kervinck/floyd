@@ -25,6 +25,12 @@
 #define maxInt ((int)(~0U >> 1))
 #define minInt (-maxInt - 1)
 
+#define maxLong ((long)(~0UL >> 1))
+#define minLong (-maxLong - 1L)
+
+#define maxLongLong ((long long)(~0ULL >> 1))
+#define minLongLong (-maxLongLong - 1LL)
+
 /*----------------------------------------------------------------------+
  |      Exceptions                                                      |
  +----------------------------------------------------------------------*/
@@ -134,6 +140,7 @@ err_t list_ensure_len(void **v, int *maxLen, int minLen, int unit, int newLen);
 
 double xclock(void);
 char *stringCopy(char *s, const char *t);
+int readLine(void *fp, char **pLine, int *pSize);
 
 /*----------------------------------------------------------------------+
  |      Main support                                                    |

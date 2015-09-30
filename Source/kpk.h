@@ -5,14 +5,6 @@
  |                                                                      |
  +----------------------------------------------------------------------*/
 
-/*
- *  Use an externally defined board geometry to avoid conversions
- *  from the caller's own square indexing. All 8 orientations are
- *  supported by changing this header file. As a demonstration of
- *  this, geometry-h8g8.h is provided.
- */
-//#include "geometry-a1a2.h"
-
 /*----------------------------------------------------------------------+
  |      Functions                                                       |
  +----------------------------------------------------------------------*/

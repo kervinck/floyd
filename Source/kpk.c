@@ -39,12 +39,11 @@
  +----------------------------------------------------------------------*/
 
 // C standard
-#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 
 // Own interface
-#include "Board.h"
+#include "geometry.h"
 #include "kpk.h"
 
 /*----------------------------------------------------------------------+
@@ -74,7 +73,9 @@ enum { N = a2-a1, S = -N, E = b1-a1, W = -E }; // Derived geometry
                     | allW(allS(set)) | allS(set) | allE(allS(set)))
 
 #define arrayLen(a) (sizeof(a) / sizeof((a)[0]))
-//enum { white, black };
+enum { white, black };
+
+#define kpIndex(wKing,wPawn) (((wKing) << 5) + (file(wPawn) << 3) + rank(wPawn))
 #define wKingSquare(ix) ((ix)>>5)
 #define wPawnSquare(ix) square(((ix)>>3)&3, (ix)&7)
 
@@ -94,11 +95,11 @@ int kpkProbe(int side, int wKing, int wPawn, int bKing)
         if (!kpkTable[0][1]) kpkGenerate();
 
         if (file(wPawn) >= 4) {
-                wKing = square(7 - file(wKing), rank(wKing));
-                wPawn = square(7 - file(wPawn), rank(wPawn));
-                bKing = square(7 - file(bKing), rank(bKing));
+                wKing ^= square(7, 0);
+                wPawn ^= square(7, 0);
+                bKing ^= square(7, 0);
         }
-        int ix = (wKing << 5) + (file(wPawn) << 3) + rank(wPawn);
+        int ix = kpIndex(wKing, wPawn);
         int bit = (kpkTable[side][ix] >> bKing) & 1;
         return (side == white) ? bit : -bit;
 }
@@ -135,15 +136,15 @@ int kpkGenerate(void)
                         uint64_t won = 0;
                         for (int i=0; i<arrayLen(kingSteps); i++) {
                                 int to = wKing + kingSteps[i];
-                                int jx = ix + (kingSteps[i] << 5);
+                                int jx = ix + kpIndex(kingSteps[i], 0);
                                 if (dist(wKing, to & 63) == 1 && to != wPawn)
                                         won |= kpkTable[black][jx] & ~allKing(bit(to));
                         }
                         // White pawn moves
                         if (wPawn+N != wKing) {
-                                won |= kpkTable[black][ix+rank2-rank1] & ~bit(wPawn+N);
+                                won |= kpkTable[black][ix+kpIndex(0,N)] & ~bit(wPawn+N);
                                 if (rank(wPawn) == rank2 && wPawn+N+N != wKing)
-                                        won |= kpkTable[black][ix+rank4-rank2]
+                                        won |= kpkTable[black][ix+kpIndex(0,N+N)]
                                             & ~bit(wPawn+N) & ~bit(wPawn+N+N);
                         }
                         kpkTable[white][ix] = won & ~bit(wPawn);

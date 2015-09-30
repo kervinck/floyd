@@ -2,13 +2,13 @@ CFLAGS=-std=c11 -pedantic -Wall -O3 -DfloydVersion=1.0x
 
 all: module floyd
 
-# as python module
+# As Python module
 module:
 	python setup.py build
 
 SOURCES=cplus.c evaluate.c floydmain.c format.c kpk.c moves.c parse.c search.c uci.c zobrist.c
 
-# as uci engine
+# As UCI engine
 floyd: $(addprefix Source/, $(SOURCES)) $(wildcard Source/*.h)
 	gcc $(CFLAGS) -o $@ $(addprefix Source/, $(SOURCES))
 
@@ -22,8 +22,8 @@ wac:
 mate:
 	python Tools/bmtest.py 10 < Data/mate.epd
 
-todo:
-	find . -type f -size -1M -print0 | xargs -0 grep -i todo
+todo: # xtodo
+	find . -not -path './.git/*' -type f -size -1M -print0 | xargs -0 grep -i todo | grep -v xtodo
 
 # Dump resulting evaluation tables for easy inspection
 tables: tables.png

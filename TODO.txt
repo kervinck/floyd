@@ -1,25 +1,42 @@
 
-|Todo| Move generator test
-
-moves 5 (includes divide, no time info)
-
-|Todo| Add speed benchmark [qa]
-
-bench
+|Todo| Incremental hash key [board]
 
 |Todo| Repetition detection [search]
 
-|Todo| Add UCI front-end [uci]
+|Todo| Transposition table [search]
 
-Try in C
+- Fixed size, move only
 
-|Todo| Estimate initial elo
+|Todo| Internal deepening [search]
 
-Cutechess-cli
+|Todo| Estimate initial elo [qa]
+
+Cutechess-cli or xboard
 
 ------------------------------------------------------------------------
 
+|Todo| Score, bounds, age, depth [ttable]
+
+|Todo| Fast clear [ttable]
+
+|Todo| Adjustable size [ttable]
+
+|Todo| Null-move [search]
+
+|Todo| Estimate elo [qa]
+
+------------------------------------------------------------------------
+
+|Todo| Pondering [uci]
+
+|Todo| Move generator test [qa]
+
+moves 5 (includes divide, no time info)
+
+|Todo| Speed benchmark [qa]
+
 For example using SF standard positions
+Measure nps for reference
 
 |Todo| Enable test before install [build]
 
@@ -29,14 +46,12 @@ For example using SF standard positions
 
 |Todo| King safety [evaluate]
 
-|Todo| Left-right location parameters [pst]
+|Todo| Left-right location parameters [evaluate]
 
 |Todo| Before breaking out the tune loop, do a quadratic fit on the
        nearest 3 points and probe the bottom [tune]
 
-|Todo| Experiment: tune each bishop square [pst]
-
-|Todo| Measure nps for reference [qa]
+|Todo| Experiment: tune each bishop square [evaluate]
 
 |Todo| Scale passers with material [evaluate]
 
@@ -89,9 +104,14 @@ Observe variation of vector and residual
 
 https://en.wikipedia.org/wiki/Rosenbrock_function
 
-|Todo| Parameter graphs (tune.dir)
+|Todo| Parameter graphs (tune.dir) [tune]
 
-|Todo| Reject pawns on last rank
+|Todo| Reject illegal positions [usability]
+
+- pawns on rank 1 and 8
+- not one king per side
+- too many pawns or promoted pieces
+- side to move attacks other king
 
 - also update chessmoves module for this
 

@@ -105,7 +105,7 @@ X"  eval"
 X"        Show evaluation."
 X"  bench"
 X"        Run a standardized speed test." // TODO: not implemented
-X"  moves [ depth <n> ]"
+X"  moves [ depth <ply> ]"
 X"        Run a move generation test." // TODO: not implemented
 X
 X"Unknown commands and options are silently ignored, except in debug mode."

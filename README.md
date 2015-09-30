@@ -6,6 +6,9 @@ Floyd study engine
 Python interface
 ----------------
 ```
+>>> import floyd
+>>> help(floyd)
+
 NAME
     floyd - Chess engine study
 
@@ -26,6 +29,16 @@ FUNCTIONS
 Command interface
 -----------------
 ```
+$ make
+$ ./floyd 
+
+Floyd Chess Program - Version 1.0x
+Copyright (C)1998-2015 by Marcel van Kervinck
+All rights reserved
+
+Type "help" for more information, or "quit" to leave.
+
+help
 This engine uses the Universal Chess Interface (UCI) protocol.
 See http://download.shredderchess.com/div/uci.zip for details.
 
@@ -86,7 +99,7 @@ Hierarchy for source modules is as follows:
 
 ```
  floydmain.c                            main() for a stand-alone program
- floymodule.c                           Python interface to search and evaluate
+ floydmodule.c                          Python interface to search and evaluate
   +--- uci.h
   |     `--- uci.c                      UCI driver
   +--- Engine.h
@@ -98,9 +111,10 @@ Hierarchy for source modules is as follows:
   +--- Board.h
   |     +--- format.c                   Conversion to FEN and UCI/SAN
   |     +--- parse.c                    Conversion from FEN and UCI/SAN
-  |     `--- moves.c                    Move generation, make and undo
-  |           `--- zobrist.h
-  |                 `--- zobrish.c      Zobrist-Polyglot hash constants
+  |     +--- moves.c                    Move generation, make and undo
+  |     |     `--- zobrist.h
+  |     |           `--- zobrish.c      Zobrist-Polyglot hash constants
+  |     `--- geometry.h                 Definition of board layout
   `--- cplus.h
         `--- cplus.c                    A loose collection of utility functions
 ```

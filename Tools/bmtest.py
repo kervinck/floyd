@@ -10,9 +10,10 @@ def parseEpd(rawLine):
         pos = ' '.join(line[0:4])
 
         # EPD fields
-        operations = [op for op in line[4].split(';') if len(op) > 0]
-        operations = [op.strip().split(' ', 1) for op in operations]
-        operations = dict(operations)
+        operations = {'bm': '', 'am': ''}
+        fields = [op for op in line[4].split(';') if len(op) > 0]
+        fields = [op.strip().split(' ', 1) for op in fields]
+        operations.update(dict(fields))
 
         return pos, operations
 
@@ -25,11 +26,13 @@ for rawLine in sys.stdin:
         print rawLine,
         nrTests += 1
         pos, operations = parseEpd(rawLine)
+        bm = [chessmoves.move(pos, bm, notation='uci')[0] for bm in operations['bm'].split()] # best move
+        am = [chessmoves.move(pos, am, notation='uci')[0] for am in operations['am'].split()] # avoid move
         score, move = engine.search(pos, movetime=movetime, info='uci')
         print 'bestmove', move
-        expected = [chessmoves.move(pos, bm, notation='uci')[0] for bm in operations['bm'].split()]
         print 'test',
-        if move in expected:
+        if (len(bm) == 0 or move in bm) and\
+           (len(am) == 0 or move not in am):
                 print 'result OK',
                 nrPassed += 1
         else:

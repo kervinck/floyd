@@ -16,11 +16,14 @@ floyd: $(addprefix Source/, $(SOURCES)) $(wildcard Source/*.h)
 test:
 	python Tools/searchtest.py
 
-wac:
-	python Tools/bmtest.py 1 < Data/wacnew.epd
+easy wac:
+	python Tools/bmtest.py 1 < Data/$@.epd
 
-mate:
-	python Tools/bmtest.py 10 < Data/mate.epd
+hard draw nodraw mate:
+	python Tools/bmtest.py 10 < Data/$@.epd
+
+nolot:
+	python Tools/bmtest.py 1000 < Data/$@.epd
 
 todo: # xtodo
 	find . -not -path './.git/*' -type f -size -1M -print0 | xargs -0 grep -i todo | grep -v xtodo
@@ -50,5 +53,6 @@ install:
 
 clean:
 	python setup.py clean --all
+	rm -f floyd
 
 # vi: noexpandtab

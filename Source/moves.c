@@ -42,6 +42,7 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 // C extension
@@ -84,6 +85,7 @@ enum {
 // Off-board offsets for use in the undo stack
 #define offsetof_castleFlags   offsetof(struct board, castleFlags)
 #define offsetof_enPassantPawn offsetof(struct board, enPassantPawn)
+#define offsetof_halfmoveClock offsetof(struct board, halfmoveClock)
 
 /*----------------------------------------------------------------------+
  |      Data                                                            |
@@ -178,6 +180,9 @@ static const unsigned char knightDirections[] = {
 /*----------------------------------------------------------------------+
  |      Functions                                                       |
  +----------------------------------------------------------------------*/
+
+static uint64_t hashCastleFlags(int flags);
+static uint64_t hashEnPassant(int square);
 
 /*----------------------------------------------------------------------+
  |      generateMoves                                                   |
@@ -390,7 +395,7 @@ extern int generateMoves(Board_t self, int moveList[maxMoves])
         }
 
         /*
-         *  Generate en-passant captures
+         *  Generate en passant captures
          */
         if (self->enPassantPawn) {
                 static const int steps[] = { stepN, stepS };
@@ -416,6 +421,10 @@ extern int generateMoves(Board_t self, int moveList[maxMoves])
 
 extern void undoMove(Board_t self)
 {
+        self->halfmoveClock--;
+        self->plyNumber--;
+        self->hash = popList(self->hashHistory);
+
         assert(self->undoLen > 0);
         signed char *bytes = (signed char *)self;
         int len = self->undoLen;
@@ -425,38 +434,56 @@ extern void undoMove(Board_t self)
                 bytes[offset] = self->undoStack[--len];
         }
         self->undoLen = len;
-        self->plyNumber--;
 
         if (self->plyNumber < self->sideInfoPlyNumber)
-                self->sideInfoPlyNumber = -1; // side info is invalid
+                self->sideInfoPlyNumber = -1; // side info is invalid now
 }
 
 extern void makeMove(Board_t self, int move)
 {
         signed char *sp = &self->undoStack[self->undoLen];
 
-        #define push(offset, value) do{                         \
-                *sp++ = (value);                                \
-                *sp++ = (offset);                               \
-        }while(0)
+        //char moveString[maxMoveSize];
+        //moveToLongAlgebraic(self, moveString, move);
+        //puts(moveString);
 
-        #define makeSimpleMove(from, to) do{                    \
-                push(to, self->squares[to]);                    \
-                push(from, self->squares[from]);                \
-                self->squares[to] = self->squares[from];        \
-                self->squares[from] = empty;                    \
-        }while(0)
+        #define push(offset, value) _Statement(                         \
+                *sp++ = (value);                                        \
+                *sp++ = (offset);                                       \
+        )
+
+        #define pg(s) (((s >> 3) | (s << 3)) & 63) // TODO: find a more elegant way
+
+        #define makeSimpleMove(from, to) _Statement(                    \
+                int _piece = self->squares[from];                       \
+                int _victim = self->squares[to];                        \
+                                                                        \
+                /* Update the undo stack */                             \
+                push(from, _piece);                                     \
+                push(to, _victim);                                      \
+                                                                        \
+                /* Make the simple move */                              \
+                self->squares[to] = _piece;                             \
+                self->squares[from] = empty;                            \
+                                                                        \
+                /* Update the incremental hash */                       \
+                self->hash ^= zobristPiece[_piece][pg(from)]            \
+                            ^ zobristPiece[_piece][pg(to)]              \
+                            ^ zobristPiece[_victim][pg(to)];            \
+        )
 
         *sp++ = -1; // sentinel
 
-        // Always clear en-passant info
+        pushList(self->hashHistory, self->hash);
+
+        // Always clear en passant info first
         if (self->enPassantPawn) {
                 push(offsetof_enPassantPawn, self->enPassantPawn);
+                self->hash ^= hashEnPassant(self->enPassantPawn);
                 self->enPassantPawn = 0;
         }
 
-        int to = to(move);
-        int from = from(move);
+        int to = to(move), from = from(move);
 
         // Handle specials first
         if (move & specialMoveFlag) {
@@ -470,32 +497,40 @@ extern void makeMove(Board_t self, int move)
                         break;
 
                 case rank7:
-                        if (self->squares[from] == blackPawn) { // Set en-passant flag
+                        if (self->squares[from] == blackPawn) { // Set en passant flag
                                 push(offsetof_enPassantPawn, 0);
                                 self->enPassantPawn = to;
+                                self->hash ^= hashEnPassant(to);
                         } else {
-                                // White promotes
-                                push(from, self->squares[from]);
-                                self->squares[from] = whiteQueen + (move >> promotionBits);
+                                push(from, self->squares[from]); // White promotes
+                                int promoPiece = whiteQueen + (move >> promotionBits);
+                                self->squares[from] = promoPiece;
+                                self->hash ^= zobristPiece[whitePawn][pg(from)]
+                                            ^ zobristPiece[promoPiece][pg(from)];
                         }
                         break;
 
-                case rank5: // White captures en-passant
-                case rank4: // Black captures en-passant
+                case rank5: // White captures en passant
+                case rank4: // Black captures en passant
                         ;
                         int square = square(file(to), rank(from));
-                        push(square, self->squares[square]);
+                        int victim = self->squares[square];
+                        push(square, victim);
                         self->squares[square] = empty;
+                        self->hash ^= zobristPiece[victim][pg(square)];
                         break;
 
                 case rank2:
-                        if (self->squares[from] == whitePawn) { // Set en-passant flag
+                        if (self->squares[from] == whitePawn) { // Set en passant flag
                                 push(offsetof_enPassantPawn, 0);
                                 self->enPassantPawn = to;
+                                self->hash ^= hashEnPassant(to);
                         } else {
-                                // Black promotes
-                                push(from, self->squares[from]);
-                                self->squares[from] = blackQueen + (move >> promotionBits);
+                                push(from, self->squares[from]); // Black promotes
+                                int promoPiece = blackQueen + (move >> promotionBits);
+                                self->squares[from] = promoPiece;
+                                self->hash ^= zobristPiece[blackPawn][pg(from)]
+                                            ^ zobristPiece[promoPiece][pg(from)];
                         }
                         break;
 
@@ -513,26 +548,31 @@ extern void makeMove(Board_t self, int move)
         }
 
         self->plyNumber++;
+        self->hash ^= zobristTurn[0];
 
-#if 0 // lastZeroing
         if (self->squares[to] != empty
          || self->squares[from] == whitePawn
-         || self->squares[from] == blackPawn
-        ) {
-                push(offsetof_lastZeroing, self->lastZeroing);
-                self->lastZeroing = self->plyNumber;
-        }
-#endif
+         || self->squares[from] == blackPawn) {
+                push(offsetof_halfmoveClock, self->halfmoveClock);
+                self->halfmoveClock = 0;
+        } else
+                self->halfmoveClock++;
+        assert(self->halfmoveClock >= 0);
 
         makeSimpleMove(from, to);
 
-        int flagsToClear = castleFlagsClear[from] | castleFlagsClear[to];
-        if (self->castleFlags & flagsToClear) {
+        int flagsToClear = (castleFlagsClear[from] | castleFlagsClear[to]) & self->castleFlags;
+        if (flagsToClear) {
                 push(offsetof_castleFlags, self->castleFlags);
-                self->castleFlags &= ~flagsToClear;
+                self->castleFlags ^= flagsToClear;
+                self->hash ^= hashCastleFlags(flagsToClear);
         }
 
         self->undoLen = sp - self->undoStack;
+
+        // Finalize en passant (only safe after self->undoLen update)
+        if (self->enPassantPawn)
+                normalizeEnPassantStatus(self);
 }
 
 /*----------------------------------------------------------------------+
@@ -664,52 +704,48 @@ extern void updateSideInfo(Board_t self)
 }
 
 /*----------------------------------------------------------------------+
- |      hash64                                                          |
+ |      hash                                                            |
  +----------------------------------------------------------------------*/
 
-unsigned long long hash64(Board_t self)
+// Helper for hashing a combination of castling flags
+static uint64_t hashCastleFlags(int flags)
 {
-        unsigned long long key = 0ULL;
+        uint64_t key = 0;
+        if (flags & castleFlagWhiteKside) key ^= zobristCastle[0];
+        if (flags & castleFlagWhiteQside) key ^= zobristCastle[1];
+        if (flags & castleFlagBlackKside) key ^= zobristCastle[2];
+        if (flags & castleFlagBlackQside) key ^= zobristCastle[3];
+        return key;
+}
 
-        static const int offsets[] = {
-                [blackPawn]   = 0 * 64, [whitePawn]   = 1 * 64,
-                [blackKnight] = 2 * 64, [whiteKnight] = 3 * 64,
-                [blackBishop] = 4 * 64, [whiteBishop] = 5 * 64,
-                [blackRook]   = 6 * 64, [whiteRook]   = 7 * 64,
-                [blackQueen]  = 8 * 64, [whiteQueen]  = 9 * 64,
-                [blackKing]   = 10 * 64, [whiteKing]  = 11 * 64,
-        };
+static uint64_t hashEnPassant(int square)
+{
+        return square ? zobristEnPassant[file(square)^fileA] : 0;
+}
 
-        // piece
-        for (int i=0; i<64; i++) {
-                int file = i & 7;
-                int rank = i >> 3;
-                int square = square(file, rank);
+// Calculate Zobrist hash using Polyglot's definition
+uint64_t hash(Board_t self)
+{
+        uint64_t key = 0;
+
+        // Pieces (mind Polyglot's own square indexing)
+        for (int pSquare=0; pSquare<64; pSquare++) {
+                int pFile = pSquare & 7;
+                int pRank = pSquare >> 3;
+                int square = square(pFile ^ fileA, pRank ^ rank1);
                 int piece = self->squares[square];
-                if (piece == empty) continue;
-                key ^= zobristPiece[offsets[piece] + i];
+                key ^= zobristPiece[piece][pSquare];
         }
 
-        // castle
-        if (self->castleFlags & castleFlagWhiteKside) key ^= zobristCastle[0];
-        if (self->castleFlags & castleFlagWhiteQside) key ^= zobristCastle[1];
-        if (self->castleFlags & castleFlagBlackKside) key ^= zobristCastle[2];
-        if (self->castleFlags & castleFlagBlackQside) key ^= zobristCastle[3];
+        // Castling
+        key ^= hashCastleFlags(self->castleFlags);
 
-        static const int files[] = {
-                [fileA] = 0, [fileB] = 1, [fileC] = 2, [fileD] = 3,
-                [fileE] = 4, [fileF] = 5, [fileG] = 6, [fileH] = 7,
-        };
+        // En passant
+        key ^= hashEnPassant(self->enPassantPawn);
 
-        // enpassant
-        normalizeEnPassantStatus(self);
-        int ep = self->enPassantPawn;
-        if (ep != 0) {
-                key ^= zobristEnPassant[files[file(ep)]];
-        }
-
-        // turn
-        if (sideToMove(self) == white) key ^= zobristTurn[0];
+        // Turn
+        if (sideToMove(self) == white)
+                key ^= zobristTurn[0];
 
         return key;
 }
@@ -753,29 +789,25 @@ int inCheck(Board_t self)
 void normalizeEnPassantStatus(Board_t self)
 {
         int square = self->enPassantPawn;
-        if (!square) return;
+        if (!square)
+                return;
 
-        if (sideToMove(self) == white) {
-                if (file(square) != fileA && self->squares[square+stepW] == whitePawn) {
-                        int move = specialMove(square + stepW, square + stepN);
-                        if (isLegalMove(self, move)) return;
-                }
-                if (file(square) != fileH && self->squares[square+stepE] == whitePawn) {
-                        int move = specialMove(square + stepE, square + stepN);
-                        if (isLegalMove(self, move)) return;
-                }
-        } else {
-                if (file(square) != fileA && self->squares[square+stepW] == blackPawn) {
-                        int move = specialMove(square + stepW, square + stepS);
-                        if (isLegalMove(self, move)) return;
-                }
-                if (file(square) != fileH && self->squares[square+stepE] == blackPawn) {
-                        int move = specialMove(square + stepE, square + stepS);
-                        if (isLegalMove(self, move)) return;
-                }
+        int pawn = (sideToMove(self) == white) ? whitePawn : blackPawn;
+        int step = (sideToMove(self) == white) ? stepN : stepS;
+
+        if (file(square) != fileA && self->squares[square+stepW] == pawn) {
+                int move = specialMove(square + stepW, square + step);
+                if (isLegalMove(self, move))
+                        return;
+        }
+        if (file(square) != fileH && self->squares[square+stepE] == pawn) {
+                int move = specialMove(square + stepE, square + step);
+                if (isLegalMove(self, move))
+                        return;
         }
 
-        self->enPassantPawn = 0; // Clear en passant flag if there is no such legal capture
+        self->hash ^= hashEnPassant(square);
+        self->enPassantPawn = 0;
 }
 
 /*----------------------------------------------------------------------+

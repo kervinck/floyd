@@ -135,7 +135,6 @@ void uciMain(Engine_t self)
         char *line = null;
         int size = 0;
         bool debug = false;
-        err_t err = OK;
 
         // Prepare threading
         pthread_t searchThread = null;
@@ -324,7 +323,6 @@ void uciMain(Engine_t self)
                         printf("info string No such command (%s)\n", command);
         }
 
-cleanup:
         searchThread = stopSearch(searchThread, &args);
 
         free(line);
@@ -471,6 +469,7 @@ static pthread_t stopSearch(pthread_t searchThread, struct searchArgs *args)
  |      systemFailure                                                   |
  +----------------------------------------------------------------------*/
 
+// TODO: move to cplus.c
 static void systemFailure(const char *function, int r)
 {
         fprintf(stderr, "*** System error: %s failed (%s)\n", function, strerror(r));

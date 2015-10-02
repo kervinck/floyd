@@ -1,7 +1,8 @@
 
-|Todo| Incremental hash key [board]
+|Todo| Investigate reason of failed researches [bug]
 
-|Todo| Repetition detection [search]
+Should not happen in a pure search. Wrong fail soft?
+Only happened after implementing repetition()
 
 |Todo| Transposition table [search]
 

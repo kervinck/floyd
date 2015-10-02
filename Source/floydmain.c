@@ -28,6 +28,7 @@ int main(void)
         uciMain(&engine);
 
         // TODO: move this to a destructor
+        freeList(engine.board.hashHistory);
         freeList(engine.searchMoves);
         freeList(engine.pv);
 

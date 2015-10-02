@@ -28,12 +28,12 @@ for rawLine in sys.stdin:
         score, move = engine.search(pos, movetime=movetime, info='uci')
         print 'bestmove', move
         expected = [chessmoves.move(pos, bm, notation='uci')[0] for bm in operations['bm'].split()]
-        print 'result',
+        print 'test',
         if move in expected:
-                print 'OK',
+                print 'result OK',
                 nrPassed += 1
         else:
-                print 'FAILED',
+                print 'result FAILED',
         print 'passed %d total %d' % (nrPassed, nrTests)
         print
 

@@ -214,6 +214,9 @@ floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
                 return null;
         }
 
+        // TODO: move this to a destructor
+        freeList(engine.board.hashHistory);
+        freeList(engine.searchMoves);
         freeList(engine.pv);
 
         return result;

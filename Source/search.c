@@ -15,6 +15,7 @@
 #include <setjmp.h>
 #include <signal.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -64,6 +65,7 @@ static int exchange(Board_t self, int move);
 static int filterAndSort(Board_t self, int moveList[], int nrMoves, int moveFilter);
 static int filterLegalMoves(Board_t self, int moveList[], int nrMoves);
 static void moveToFront(int moveList[], int nrMoves, int move);
+static bool repetition(Engine_t self);
 
 /*----------------------------------------------------------------------+
  |      rootSearch                                                      |
@@ -85,8 +87,9 @@ void rootSearch(Engine_t self,
         self->nodeCount = 0;
         self->rootPlyNumber = board(self)->plyNumber;
 
-        if (hash64(board(self)) != self->lastSearched) {
-                self->lastSearched = hash64(board(self));
+        assert(board(self)->hash == hash(board(self)));
+        if (hash(board(self)) != self->lastSearched) {
+                self->lastSearched = hash(board(self));
                 self->pv.len = 0;
                 self->bestMove = self->ponderMove = 0;
         }
@@ -96,8 +99,7 @@ void rootSearch(Engine_t self,
         sig_t oldHandler = signal(SIGALRM, catchSignal);
         alarm(ceil(alarmTime));
 
-        if (setjmp(self->abortEnv) == 0) {
-                // start search
+        if (setjmp(self->abortEnv) == 0) { // try search
                 bool stop = false;
                 for (int iteration=0; iteration<=depth && !stop; iteration++) {
                         self->depth = iteration;
@@ -108,8 +110,7 @@ void rootSearch(Engine_t self,
                             || self->score + iteration >= 31998
                             || (targetTime > 0.0 && self->seconds >= 0.5 * targetTime);
                 }
-        } else {
-                // catch abort
+        } else { // except abort
                 self->seconds = xclock() - startTime;
                 while (board(self)->plyNumber > self->rootPlyNumber)
                         undoMove(board(self));
@@ -147,14 +148,13 @@ static inline int endScore(Engine_t self, bool check)
 
 static inline int drawScore(Engine_t self)
 {
-        return 0;
+        return 0; // TODO: heuristic draws
 }
 
 /*----------------------------------------------------------------------+
  |      pvSearch                                                        |
  +----------------------------------------------------------------------*/
 
-// TODO: repetitions
 // TODO: ttable
 // TODO: internal deepening
 // TODO: single-reply extensions
@@ -163,12 +163,11 @@ static inline int drawScore(Engine_t self)
 static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
 {
         self->nodeCount++;
-        if (repetition(board(self)))
+        if (repetition(self))
                 return drawScore(self);
         int check = inCheck(board(self));
         int moveFilter = minInt;
         int bestScore = minInt;
-        err_t err = OK; // TODO: remove
 
         if (depth == 0 && !check) {
                 bestScore = evaluate(board(self));
@@ -218,9 +217,10 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                                 for (int j=0; pvLen+j<self->pv.len; j++)
                                         self->pv.v[pvIndex+j] = self->pv.v[pvLen+j];
                                 self->pv.len -= pvLen - pvIndex;
-                        } else
-                                abort(); // should not happen in a "pure" search
-                                //self->pv.len = pvLen; // research failed
+                        } else {
+                                puts("info string research failed");
+                                self->pv.len = pvLen; // research failed
+                        }
                 }
                 undoMove(board(self));
         }
@@ -228,7 +228,6 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
         if (bestScore == minInt)
                 bestScore = endScore(self, check);
 
-cleanup:
         return ttWrite(self, depth, alpha, beta, bestScore);
 }
 
@@ -236,7 +235,6 @@ cleanup:
  |      scout                                                           |
  +----------------------------------------------------------------------*/
 
-// TODO: repetitions
 // TODO: ttable
 // TODO: killers
 // TODO: null move
@@ -246,12 +244,12 @@ cleanup:
 static int scout(Engine_t self, int depth, int alpha)
 {
         self->nodeCount++;
-        if (repetition(board(self)))
+        if (repetition(self))
                 return drawScore(self);
         if (depth == 0)
                 return qSearch(self, alpha);
         if (self->stopFlag && self->bestMove)
-                longjmp(self->abortEnv, 1); // abort
+                longjmp(self->abortEnv, 1); // raise abort
         int check = inCheck(board(self));
         int bestScore = minInt;
 
@@ -319,11 +317,11 @@ static int updateBestAndPonderMove(Engine_t self)
                 self->ponderMove = 0;
         if (self->pv.len >= 2)
                 self->ponderMove = self->pv.v[1];
+
         if (self->pv.len >= 1)
                 self->bestMove = self->pv.v[0];
 
-        assert(self->bestMove || !self->ponderMove);
-        return !self->bestMove + !self->ponderMove;
+        return !self->bestMove + !self->ponderMove; // 0, 1 or 2 halfmoves
 }
 
 /*----------------------------------------------------------------------+
@@ -407,6 +405,32 @@ static void moveToFront(int moveList[], int nrMoves, int move)
                 moveList[0] = move;
                 return;
         }
+}
+
+/*----------------------------------------------------------------------+
+ |      repetition                                                      |
+ +----------------------------------------------------------------------*/
+
+// Search for a simple repetition upto root, or for threefold before root
+static bool repetition(Engine_t self)
+{
+        Board_t board = board(self);
+        if (board->halfmoveClock < 4)
+                return false;
+        int ix = board->hashHistory.len;
+        int lastZeroing = max(0, ix - board->halfmoveClock);
+        int searchRoot = ix - (board->plyNumber - self->rootPlyNumber);
+        int count = 1;
+        ix -= 4;
+        assert(lastZeroing >= 0);
+        while (ix >= lastZeroing) {
+                assert(ix >= 0);
+                if (board(self)->hashHistory.v[ix] == board->hash)
+                        if (++count >= 3 || ix >= searchRoot)
+                                return true;
+                ix -= 2;
+        }
+        return false;
 }
 
 /*----------------------------------------------------------------------+

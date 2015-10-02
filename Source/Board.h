@@ -74,9 +74,12 @@ struct board {
 
         signed char castleFlags;
         signed char enPassantPawn;
-        signed char halfmoveClock; // TODO: update this field
+        signed char halfmoveClock;
 
         int plyNumber; // holds both side to move and full move number
+
+        uint64_t hash;
+        uint64List hashHistory;
 
         int eloDiff;
 
@@ -183,7 +186,7 @@ void boardToFen(Board_t self, char *fen);
 /*
  *  Compute a 64-bit hash for the current position using Polyglot-Zobrist hashing
  */
-unsigned long long hash64(Board_t self);
+uint64_t hash(Board_t self);
 
 /*
  *  Generate all pseudo-legal moves for the position and return the move count
@@ -253,11 +256,6 @@ extern bool isLegalMove(Board_t self, int move);
 
 // Is the move a pawn promotion?
 extern bool isPromotion(Board_t self, int from, int to);
-
-static inline bool repetition(Board_t self)
-{
-        return false; // TODO: dummy
-}
 
 /*----------------------------------------------------------------------+
  |                                                                      |

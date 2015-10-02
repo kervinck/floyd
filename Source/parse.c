@@ -41,6 +41,7 @@
 // C standard
 #include <ctype.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <string.h>
 
 // C extension
@@ -187,6 +188,12 @@ extern int setupBoard(Board_t self, const char *fen)
 
         // Reset the undo stack
         self->undoLen = 0;
+
+        // Initialize hash and its history
+        self->hash = hash(self);
+        self->hashHistory.len = 0;
+
+        normalizeEnPassantStatus(self); // Only safe after update of hash
 
         return ix;
 }

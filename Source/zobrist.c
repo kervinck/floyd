@@ -4,9 +4,19 @@
  *  Reference: http://hardy.uhasselt.be/Toga/book_format.html
  */
 
+// C standard
+#include <stdbool.h>
+#include <stdint.h>
+
+// C extension
+#include "cplus.h"
+
+// Own interface
+#include "Board.h"
 #include "zobrist.h"
 
-const unsigned long long zobristPiece[] = {
+const uint64_t zobristPiece[][64] = {
+[blackPawn] = {
  0x9d39247e33776d41ULL, 0x2af7398005aaa5c7ULL, 0x44db015024623547ULL, 0x9c15f73e62a76ae2ULL,
  0x75834465489c0c89ULL, 0x3290ac3a203001bfULL, 0x0fbbad1f61042279ULL, 0xe83a908ff2fb60caULL,
  0x0d7e765d58755c10ULL, 0x1a083822ceafe02dULL, 0x9605d5f0e25ec3b0ULL, 0xd021ff5cd13a2ed5ULL,
@@ -23,6 +33,8 @@ const unsigned long long zobristPiece[] = {
  0x11d505d4c351bd7fULL, 0x6568fca92c76a243ULL, 0x4de0b0f40f32a7b8ULL, 0x96d693460cc37e5dULL,
  0x42e240cb63689f2fULL, 0x6d2bdcdae2919661ULL, 0x42880b0236e4d951ULL, 0x5f0f4a5898171bb6ULL,
  0x39f890f579f92f88ULL, 0x93c5b5f47356388bULL, 0x63dc359d8d231b78ULL, 0xec16ca8aea98ad76ULL,
+},
+[whitePawn] = {
  0x5355f900c2a82dc7ULL, 0x07fb9f855a997142ULL, 0x5093417aa8a7ed5eULL, 0x7bcbc38da25a7f3cULL,
  0x19fc8a768cf4b6d4ULL, 0x637a7780decfc0d9ULL, 0x8249a47aee0e41f7ULL, 0x79ad695501e7d1e8ULL,
  0x14acbaf4777d5776ULL, 0xf145b6beccdea195ULL, 0xdabf2ac8201752fcULL, 0x24c3c94df9c8d3f6ULL,
@@ -39,6 +51,8 @@ const unsigned long long zobristPiece[] = {
  0xcf464cec899a2f8aULL, 0xf538639ce705b824ULL, 0x3c79a0ff5580ef7fULL, 0xede6c87f8477609dULL,
  0x799e81f05bc93f31ULL, 0x86536b8cf3428a8cULL, 0x97d7374c60087b73ULL, 0xa246637cff328532ULL,
  0x043fcae60cc0eba0ULL, 0x920e449535dd359eULL, 0x70eb093b15b290ccULL, 0x73a1921916591cbdULL,
+},
+[blackKnight] = {
  0x56436c9fe1a1aa8dULL, 0xefac4b70633b8f81ULL, 0xbb215798d45df7afULL, 0x45f20042f24f1768ULL,
  0x930f80f4e8eb7462ULL, 0xff6712ffcfd75ea1ULL, 0xae623fd67468aa70ULL, 0xdd2c5bc84bc8d8fcULL,
  0x7eed120d54cf2dd9ULL, 0x22fe545401165f1cULL, 0xc91800e98fb99929ULL, 0x808bd68e6ac10365ULL,
@@ -55,6 +69,8 @@ const unsigned long long zobristPiece[] = {
  0x4850e73e03eb6064ULL, 0xcfc447f1e53c8e1bULL, 0xb05ca3f564268d99ULL, 0x9ae182c8bc9474e8ULL,
  0xa4fc4bd4fc5558caULL, 0xe755178d58fc4e76ULL, 0x69b97db1a4c03dfeULL, 0xf9b5b7c4acc67c96ULL,
  0xfc6a82d64b8655fbULL, 0x9c684cb6c4d24417ULL, 0x8ec97d2917456ed0ULL, 0x6703df9d2924e97eULL,
+},
+[whiteKnight] = {
  0xc547f57e42a7444eULL, 0x78e37644e7cad29eULL, 0xfe9a44e9362f05faULL, 0x08bd35cc38336615ULL,
  0x9315e5eb3a129aceULL, 0x94061b871e04df75ULL, 0xdf1d9f9d784ba010ULL, 0x3bba57b68871b59dULL,
  0xd2b7adeeded1f73fULL, 0xf7a255d83bc373f8ULL, 0xd7f4f2448c0ceb81ULL, 0xd95be88cd210ffa7ULL,
@@ -71,6 +87,8 @@ const unsigned long long zobristPiece[] = {
  0x506e6744cd974924ULL, 0xb0183db56ffc6a79ULL, 0x0ed9b915c66ed37eULL, 0x5e11e86d5873d484ULL,
  0xf678647e3519ac6eULL, 0x1b85d488d0f20cc5ULL, 0xdab9fe6525d89021ULL, 0x0d151d86adb73615ULL,
  0xa865a54edcc0f019ULL, 0x93c42566aef98ffbULL, 0x99e7afeabe000731ULL, 0x48cbff086ddf285aULL,
+},
+[blackBishop] = {
  0x7f9b6af1ebf78bafULL, 0x58627e1a149bba21ULL, 0x2cd16e2abd791e33ULL, 0xd363eff5f0977996ULL,
  0x0ce2a38c344a6eedULL, 0x1a804aadb9cfa741ULL, 0x907f30421d78c5deULL, 0x501f65edb3034d07ULL,
  0x37624ae5a48fa6e9ULL, 0x957baf61700cff4eULL, 0x3a6c27934e31188aULL, 0xd49503536abca345ULL,
@@ -87,6 +105,8 @@ const unsigned long long zobristPiece[] = {
  0x693501d628297551ULL, 0xc62c58f97dd949bfULL, 0xcd454f8f19c5126aULL, 0xbbe83f4ecc2bdecbULL,
  0xdc842b7e2819e230ULL, 0xba89142e007503b8ULL, 0xa3bc941d0a5061cbULL, 0xe9f6760e32cd8021ULL,
  0x09c7e552bc76492fULL, 0x852f54934da55cc9ULL, 0x8107fccf064fcf56ULL, 0x098954d51fff6580ULL,
+},
+[whiteBishop] = {
  0x23b70edb1955c4bfULL, 0xc330de426430f69dULL, 0x4715ed43e8a45c0aULL, 0xa8d7e4dab780a08dULL,
  0x0572b974f03ce0bbULL, 0xb57d2e985e1419c7ULL, 0xe8d9ecbe2cf3d73fULL, 0x2fe4b17170e59750ULL,
  0x11317ba87905e790ULL, 0x7fbf21ec8a1f45ecULL, 0x1725cabfcb045b00ULL, 0x964e915cd5e2b207ULL,
@@ -103,6 +123,8 @@ const unsigned long long zobristPiece[] = {
  0x7b3f0195fc6f290fULL, 0x12153635b2c0cf57ULL, 0x7f5126dbba5e0ca7ULL, 0x7a76956c3eafb413ULL,
  0x3d5774a11d31ab39ULL, 0x8a1b083821f40cb4ULL, 0x7b4a38e32537df62ULL, 0x950113646d1d6e03ULL,
  0x4da8979a0041e8a9ULL, 0x3bc36e078f7515d7ULL, 0x5d0a12f27ad310d1ULL, 0x7f9d1a2e1ebe1327ULL,
+},
+[blackRook] = {
  0xda3a361b1c5157b1ULL, 0xdcdd7d20903d0c25ULL, 0x36833336d068f707ULL, 0xce68341f79893389ULL,
  0xab9090168dd05f34ULL, 0x43954b3252dc25e5ULL, 0xb438c2b67f98e5e9ULL, 0x10dcd78e3851a492ULL,
  0xdbc27ab5447822bfULL, 0x9b3cdb65f82ca382ULL, 0xb67b7896167b4c84ULL, 0xbfced1b0048eac50ULL,
@@ -119,6 +141,8 @@ const unsigned long long zobristPiece[] = {
  0x764dbeae7fa4f3a6ULL, 0x1e99b96e70a9be8bULL, 0x2c5e9deb57ef4743ULL, 0x3a938fee32d29981ULL,
  0x26e6db8ffdf5adfeULL, 0x469356c504ec9f9dULL, 0xc8763c5b08d1908cULL, 0x3f6c6af859d80055ULL,
  0x7f7cc39420a3a545ULL, 0x9bfb227ebdf4c5ceULL, 0x89039d79d6fc5c5cULL, 0x8fe88b57305e2ab6ULL,
+},
+[whiteRook] = {
  0xa09e8c8c35ab96deULL, 0xfa7e393983325753ULL, 0xd6b6d0ecc617c699ULL, 0xdfea21ea9e7557e3ULL,
  0xb67c1fa481680af8ULL, 0xca1e3785a9e724e5ULL, 0x1cfc8bed0d681639ULL, 0xd18d8549d140caeaULL,
  0x4ed0fe7e9dc91335ULL, 0xe4dbf0634473f5d2ULL, 0x1761f93a44d5aefeULL, 0x53898e4c3910da55ULL,
@@ -135,6 +159,8 @@ const unsigned long long zobristPiece[] = {
  0x14a195640116f336ULL, 0x7c0828dd624ec390ULL, 0xd74bbe77e6116ac7ULL, 0x804456af10f5fb53ULL,
  0xebe9ea2adf4321c7ULL, 0x03219a39ee587a30ULL, 0x49787fef17af9924ULL, 0xa1e9300cd8520548ULL,
  0x5b45e522e4b1b4efULL, 0xb49c3b3995091a36ULL, 0xd4490ad526f14431ULL, 0x12a8f216af9418c2ULL,
+},
+[blackQueen] = {
  0x001f837cc7350524ULL, 0x1877b51e57a764d5ULL, 0xa2853b80f17f58eeULL, 0x993e1de72d36d310ULL,
  0xb3598080ce64a656ULL, 0x252f59cf0d9f04bbULL, 0xd23c8e176d113600ULL, 0x1bda0492e7e4586eULL,
  0x21e0bd5026c619bfULL, 0x3b097adaf088f94eULL, 0x8d14dedb30be846eULL, 0xf95cffa23af5f6f4ULL,
@@ -151,6 +177,8 @@ const unsigned long long zobristPiece[] = {
  0xfd080d236da814baULL, 0x8c90fd9b083f4558ULL, 0x106f72fe81e2c590ULL, 0x7976033a39f7d952ULL,
  0xa4ec0132764ca04bULL, 0x733ea705fae4fa77ULL, 0xb4d8f77bc3e56167ULL, 0x9e21f4f903b33fd9ULL,
  0x9d765e419fb69f6dULL, 0xd30c088ba61ea5efULL, 0x5d94337fbfaf7f5bULL, 0x1a4e4822eb4d7a59ULL,
+},
+[whiteQueen] = {
  0x6ffe73e81b637fb3ULL, 0xddf957bc36d8b9caULL, 0x64d0e29eea8838b3ULL, 0x08dd9bdfd96b9f63ULL,
  0x087e79e5a57d1d13ULL, 0xe328e230e3e2b3fbULL, 0x1c2559e30f0946beULL, 0x720bf5f26f4d2eaaULL,
  0xb0774d261cc609dbULL, 0x443f64ec5a371195ULL, 0x4112cf68649a260eULL, 0xd813f2fab7f5c5caULL,
@@ -167,6 +195,8 @@ const unsigned long long zobristPiece[] = {
  0xfb4a3d794a9a80d2ULL, 0x3550c2321fd6109cULL, 0x371f77e76bb8417eULL, 0x6bfa9aae5ec05779ULL,
  0xcd04f3ff001a4778ULL, 0xe3273522064480caULL, 0x9f91508bffcfc14aULL, 0x049a7f41061a9e60ULL,
  0xfcb6be43a9f2fe9bULL, 0x08de8a1c7797da9bULL, 0x8f9887e6078735a1ULL, 0xb5b4071dbfc73a66ULL,
+},
+[blackKing] = {
  0x230e343dfba08d33ULL, 0x43ed7f5a0fae657dULL, 0x3a88a0fbbcb05c63ULL, 0x21874b8b4d2dbc4fULL,
  0x1bdea12e35f6a8c9ULL, 0x53c065c6c8e63528ULL, 0xe34a1d250e7a8d6bULL, 0xd6b04d3b7651dd7eULL,
  0x5e90277e7cb39e2dULL, 0x2c046f22062dc67dULL, 0xb10bb459132d0a26ULL, 0x3fa9ddfb67e2f199ULL,
@@ -183,6 +213,8 @@ const unsigned long long zobristPiece[] = {
  0xc7f6aa2de59aea61ULL, 0x352787baa0d7c22fULL, 0x9853eab63b5e0b35ULL, 0xabbdcdd7ed5c0860ULL,
  0xcf05daf5ac8d77b0ULL, 0x49cad48cebf4a71eULL, 0x7a4c10ec2158c4a6ULL, 0xd9e92aa246bf719eULL,
  0x13ae978d09fe5557ULL, 0x730499af921549ffULL, 0x4e4b705b92903ba4ULL, 0xff577222c14f0a3aULL,
+},
+[whiteKing] = {
  0x55b6344cf97aafaeULL, 0xb862225b055b6960ULL, 0xcac09afbddd2cdb4ULL, 0xdaf8e9829fe96b5fULL,
  0xb5fdfc5d3132c498ULL, 0x310cb380db6f7503ULL, 0xe87fbb46217a360eULL, 0x2102ae466ebb1148ULL,
  0xf8549e1a3aa5e00dULL, 0x07a69afdcc42261aULL, 0xc4c118bfe78feaaeULL, 0xf9f4892ed96bd438ULL,
@@ -199,18 +231,18 @@ const unsigned long long zobristPiece[] = {
  0x0c335248857fa9e7ULL, 0x0a9c32d5eae45305ULL, 0xe6c42178c4bbb92eULL, 0x71f1ce2490d20b07ULL,
  0xf1bcc3d275afe51aULL, 0xe728e8c83c334074ULL, 0x96fbf83a12884624ULL, 0x81a1549fd6573da5ULL,
  0x5fa7867caf35e149ULL, 0x56986e2ef3ed091bULL, 0x917f1dd5f8886c61ULL, 0xd20d8c88c8ffe65fULL,
-};
+}};
 
-const unsigned long long zobristCastle[] = {
+const uint64_t zobristCastle[] = {
  0x31d71dce64b2c310ULL, 0xf165b587df898190ULL, 0xa57e6339dd2cf3a0ULL, 0x1ef6e6dbb1961ec9ULL,
 };
 
-const unsigned long long zobristEnPassant[] = {
+const uint64_t zobristEnPassant[] = {
  0x70cc73d90bc26e24ULL, 0xe21a6b35df0c3ad7ULL, 0x003a93d8b2806962ULL, 0x1c99ded33cb890a1ULL,
  0xcf3145de0add4289ULL, 0xd0e4427a5514fb72ULL, 0x77c621cc9fb3a483ULL, 0x67a34dac4356550bULL,
 };
 
-const unsigned long long zobristTurn[] = {
+const uint64_t zobristTurn[] = {
  0xf8d626aaaf278509ULL,
 };
 

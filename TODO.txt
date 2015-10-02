@@ -1,9 +1,4 @@
 
-|Todo| Investigate reason of failed researches [bug]
-
-Should not happen in a pure search. Wrong fail soft?
-Only happened after implementing repetition()
-
 |Todo| Transposition table [search]
 
 - Fixed size, move only

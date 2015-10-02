@@ -217,10 +217,9 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                                 for (int j=0; pvLen+j<self->pv.len; j++)
                                         self->pv.v[pvIndex+j] = self->pv.v[pvLen+j];
                                 self->pv.len -= pvLen - pvIndex;
-                        } else {
-                                puts("info string research failed");
-                                self->pv.len = pvLen; // research failed
-                        }
+                        } else
+                                abort(); // should not happen in a "pure" search
+                                //self->pv.len = pvLen; // research failed
                 }
                 undoMove(board(self));
         }
@@ -281,6 +280,8 @@ static int scout(Engine_t self, int depth, int alpha)
 // TODO: ttable
 static int qSearch(Engine_t self, int alpha)
 {
+        if (repetition(self)) // TODO: to support "pure" search only. retire when not needed anymore
+                return drawScore(self);
         int check = inCheck(board(self));
         int bestScore = check ? minInt : evaluate(board(self));
 
@@ -421,15 +422,10 @@ static bool repetition(Engine_t self)
         int lastZeroing = max(0, ix - board->halfmoveClock);
         int searchRoot = ix - (board->plyNumber - self->rootPlyNumber);
         int count = 1;
-        ix -= 4;
-        assert(lastZeroing >= 0);
-        while (ix >= lastZeroing) {
-                assert(ix >= 0);
+        for (ix=ix-4; ix>=lastZeroing; ix-=2)
                 if (board(self)->hashHistory.v[ix] == board->hash)
                         if (++count >= 3 || ix >= searchRoot)
                                 return true;
-                ix -= 2;
-        }
         return false;
 }
 

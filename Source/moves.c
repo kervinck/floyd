@@ -452,8 +452,6 @@ extern void makeMove(Board_t self, int move)
                 *sp++ = (offset);                                       \
         )
 
-        #define pg(s) (((s >> 3) | (s << 3)) & 63) // TODO: find a more elegant way
-
         #define makeSimpleMove(from, to) _Statement(                    \
                 int _piece = self->squares[from];                       \
                 int _victim = self->squares[to];                        \
@@ -467,9 +465,9 @@ extern void makeMove(Board_t self, int move)
                 self->squares[from] = empty;                            \
                                                                         \
                 /* Update the incremental hash */                       \
-                self->hash ^= zobristPiece[_piece][pg(from)]            \
-                            ^ zobristPiece[_piece][pg(to)]              \
-                            ^ zobristPiece[_victim][pg(to)];            \
+                self->hash ^= zobristPiece[_piece][from]                \
+                            ^ zobristPiece[_piece][to]                  \
+                            ^ zobristPiece[_victim][to];                \
         )
 
         *sp++ = -1; // sentinel
@@ -505,8 +503,8 @@ extern void makeMove(Board_t self, int move)
                                 push(from, self->squares[from]); // White promotes
                                 int promoPiece = whiteQueen + (move >> promotionBits);
                                 self->squares[from] = promoPiece;
-                                self->hash ^= zobristPiece[whitePawn][pg(from)]
-                                            ^ zobristPiece[promoPiece][pg(from)];
+                                self->hash ^= zobristPiece[whitePawn][from]
+                                            ^ zobristPiece[promoPiece][from];
                         }
                         break;
 
@@ -517,7 +515,7 @@ extern void makeMove(Board_t self, int move)
                         int victim = self->squares[square];
                         push(square, victim);
                         self->squares[square] = empty;
-                        self->hash ^= zobristPiece[victim][pg(square)];
+                        self->hash ^= zobristPiece[victim][square];
                         break;
 
                 case rank2:
@@ -529,8 +527,8 @@ extern void makeMove(Board_t self, int move)
                                 push(from, self->squares[from]); // Black promotes
                                 int promoPiece = blackQueen + (move >> promotionBits);
                                 self->squares[from] = promoPiece;
-                                self->hash ^= zobristPiece[blackPawn][pg(from)]
-                                            ^ zobristPiece[promoPiece][pg(from)];
+                                self->hash ^= zobristPiece[blackPawn][from]
+                                            ^ zobristPiece[promoPiece][from];
                         }
                         break;
 
@@ -728,14 +726,9 @@ uint64_t hash(Board_t self)
 {
         uint64_t key = 0;
 
-        // Pieces (mind Polyglot's own square indexing)
-        for (int pSquare=0; pSquare<64; pSquare++) {
-                int pFile = pSquare & 7;
-                int pRank = pSquare >> 3;
-                int square = square(pFile ^ fileA, pRank ^ rank1);
-                int piece = self->squares[square];
-                key ^= zobristPiece[piece][pSquare];
-        }
+        // Pieces
+        for (int square=0; square<boardSize; square++)
+                key ^= zobristPiece[self->squares[square]][square];
 
         // Castling
         key ^= hashCastleFlags(self->castleFlags);

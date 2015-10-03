@@ -93,6 +93,7 @@ void rootSearch(Engine_t self,
                 self->pv.len = 0;
                 self->bestMove = self->ponderMove = 0;
         }
+        self->tt.now++;
 
         // Set alarm
         globalEngine = self;
@@ -177,17 +178,19 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                 if (pvIndex < self->pv.len)
                         moveToFront(moveList, nrMoves, self->pv.v[pvIndex]); // follow the pv
                 else
-                        pushList(self->pv, moveList[0]);
+                        pushList(self->pv, moveList[0]); // expand the pv
                 makeMove(board(self), moveList[0]);
                 int newDepth = max(0, depth - 1 + check);
                 int newAlpha = max(alpha, bestScore);
                 int score = -pvSearch(self, newDepth, -beta, -newAlpha, pvIndex + 1);
-                if (score > bestScore)
+                if (score > bestScore) {
                         bestScore = score;
-                else
+                        slot.move = moveList[0];
+                } else
                         self->pv.len = pvIndex; // quiescence
                 undoMove(board(self));
-        }
+        } else
+                self->pv.len = pvIndex;
 
         // Search the others with zero window and reductions, research if needed
         int reduction = 0;
@@ -203,12 +206,12 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                         score = -pvSearch(self, researchDepth, -beta, -newAlpha, pvLen + 1);
                         if (score > bestScore) {
                                 bestScore = score;
+                                slot.move = moveList[i];
                                 for (int j=0; pvLen+j<self->pv.len; j++)
                                         self->pv.v[pvIndex+j] = self->pv.v[pvLen+j];
                                 self->pv.len -= pvLen - pvIndex;
                         } else
-                                abort(); // should not happen in a "pure" search
-                                //self->pv.len = pvLen; // research failed
+                                self->pv.len = pvLen; // research failed, it happens
                 }
                 undoMove(board(self));
         }
@@ -244,6 +247,8 @@ static int scout(Engine_t self, int depth, int alpha)
         int moveList[maxMoves];
         int nrMoves = generateMoves(board(self), moveList);
         nrMoves = filterAndSort(board(self), moveList, nrMoves, minInt);
+        if (slot.move)
+                moveToFront(moveList, nrMoves, slot.move);
 
         int reduction = 0;
         for (int i=0; i<nrMoves && bestScore<=alpha; i++) {
@@ -252,6 +257,8 @@ static int scout(Engine_t self, int depth, int alpha)
                         int newDepth = max(0, depth - 1 + check - reduction);
                         int score = -scout(self, newDepth, -(alpha+1));
                         bestScore = max(bestScore, score);
+                        if (score > alpha)
+                                slot.move = moveList[i];
                 }
                 undoMove(board(self));
         }
@@ -268,8 +275,6 @@ static int scout(Engine_t self, int depth, int alpha)
 
 static int qSearch(Engine_t self, int alpha)
 {
-        if (repetition(self)) // TODO: to support "pure" search only. retire when not needed anymore
-                return drawScore(self);
         int check = inCheck(board(self));
         int bestScore = check ? minInt : evaluate(board(self));
         struct ttSlot slot = ttRead(self);
@@ -280,6 +285,8 @@ static int qSearch(Engine_t self, int alpha)
         int moveList[maxMoves];
         int nrMoves = generateMoves(board(self), moveList);
         nrMoves = filterAndSort(board(self), moveList, nrMoves, check ? minInt : 0);
+        if (slot.move)
+                moveToFront(moveList, nrMoves, slot.move);
 
         for (int i=0; i<nrMoves && bestScore<=alpha; i++) {
                 makeMove(board(self), moveList[i]);
@@ -287,6 +294,8 @@ static int qSearch(Engine_t self, int alpha)
                         self->nodeCount++;
                         int score = -qSearch(self, -(alpha+1));
                         bestScore = max(bestScore, score);
+                        if (score > alpha)
+                                slot.move = moveList[i];
                 }
                 undoMove(board(self));
         }
@@ -348,7 +357,6 @@ static int compareMoves(const void *ap, const void *bp)
         return (a < b) - (a > b);
 }
 
-// TODO: recognize safe checks
 static int filterAndSort(Board_t self, int moveList[], int nrMoves, int moveFilter)
 {
         int n = 0;

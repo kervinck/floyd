@@ -53,6 +53,7 @@ struct searchArgs {
 struct options {
         long Hash;
         bool Ponder;
+        bool ClearHash;
 };
 
 /*----------------------------------------------------------------------+
@@ -113,7 +114,7 @@ X"        Run a standardized speed test." // TODO: not implemented
 X"  moves [ depth <ply> ]"
 X"        Run a move generation test." // TODO: not implemented
 X
-X"Unknown commands and options are silently ignored, except in debug mode."
+X"Unknown commands and options are silently ignored, except in debug mode." // TODO: not always true yet
 X;
 
 /*----------------------------------------------------------------------+
@@ -162,7 +163,7 @@ void uciMain(Engine_t self)
                 if (strcmp(command, "uci") == 0) {
                         printf("id name Floyd " quote2(floydVersion) "\n"
                                "id author Marcel van Kervinck\n"
-                               "option name Hash type spin default %ld min 0 max 0\n"
+                               "option name Hash type spin default %ld min 0\n"
                                "option name Clear Hash type button\n"
                                //"option name Threads type spin default 1 min 1 max 1\n"
                                //"option name Ponder type check default false\n" // Keep commented out for now
@@ -184,14 +185,20 @@ void uciMain(Engine_t self)
 
                 if (strcmp(command, "setoption") == 0) {
                         sscanf(line+n, "name Hash value %ld", &newOptions.Hash);
-                        if (sscanf(line+n, "name Ponder value true%c",  &dummy) == 1 && isspace(dummy)) newOptions.Ponder = true;
-                        if (sscanf(line+n, "name Ponder value false%c", &dummy) == 1 && isspace(dummy)) newOptions.Ponder = false;
+                        if (sscanf(line+n, "name Ponder value true%c",  &dummy) == 1 && isspace(dummy))
+                                newOptions.Ponder = true;
+                        if (sscanf(line+n, "name Ponder value false%c", &dummy) == 1 && isspace(dummy))
+                                newOptions.Ponder = false;
+                        if (sscanf(line+n, "name Clear Hash%c", &dummy) == 1 && isspace(dummy))
+                                newOptions.ClearHash = !options.ClearHash;
                         continue;
                 }
 
                 if (strcmp(command, "isready") == 0) {
                         if (options.Hash != newOptions.Hash)
                                 ttSetSize(self, newOptions.Hash * 1024 * 1024);
+                        if (options.ClearHash != newOptions.ClearHash)
+                                ttClearFast(self);
                         options = newOptions;
                         printf("readyok\n");
                         continue;
@@ -390,6 +397,9 @@ bool uciSearchInfo(void *uciInfoData)
         printf(" nodes %lld nps %.f",
                 self->nodeCount,
                 (self->seconds > 0.0) ? self->nodeCount / self->seconds : 0.0);
+
+        double ttLoad = ttCalcLoad(self);
+        printf(" hashfull %d", (int) round(ttLoad * 1000.0));
 
         for (int i=0; i<self->pv.len; i++) {
                 char moveString[maxMoveSize];

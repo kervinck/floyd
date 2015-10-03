@@ -1,10 +1,4 @@
 
-|Todo| Replace hard-coded instances of 30000, 31000, 32000 etc with symbols [qa]
-
-|Todo| Transposition table [search]
-
-- Fixed size, move only
-
 |Todo| Internal deepening [search]
 
 |Todo| Estimate initial elo [qa]
@@ -13,15 +7,13 @@ Cutechess-cli or xboard
 
 ------------------------------------------------------------------------
 
+|Todo| Replace hard-coded instances of 30000, 31000, 32000 etc with symbols [qa]
+
 |Todo| Try MVA/LVA instead of fake-SEE
 
 |Todo| Scale passers with material [evaluate]
 
-|Todo| Score, bounds, age, depth [ttable]
-
-|Todo| Fast clear [ttable]
-
-|Todo| Adjustable size [ttable]
+|Todo| Use ttable score [ttable]
 
 |Todo| Null-move [search]
 
@@ -119,3 +111,6 @@ https://en.wikipedia.org/wiki/Rosenbrock_function
 
 - also update chessmoves module for this
 
+|Todo| Export version string to Python [python]
+
+|Todo| In debugging mode give moves also in SAN for readability

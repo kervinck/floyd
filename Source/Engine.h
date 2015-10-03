@@ -21,7 +21,7 @@ typedef struct Engine *Engine_t;
 #define ttDateBits 12
 
 struct ttSlot {
-        uint64_t hash;
+        uint64_t key;
         union {
                 struct {
                         short move;
@@ -30,10 +30,10 @@ struct ttSlot {
                         unsigned date           : ttDateBits;
                         unsigned isUpperBound   : 1;
                         unsigned isLowerBound   : 1;
-                        unsigned isHardBound    : 1; // Absolute result, regardless of depth
+                        unsigned isHardBound    : 1; // Game theoretical result, regardless of depth
                         unsigned isWinLossScore : 1; // DTZ or mate
                 };
-                uint64_t value; // For lockless hashing
+                uint64_t data; // For lockless hashing
         };
 };
 
@@ -106,7 +106,7 @@ void abortSearch(Engine_t self);
 void ttSetSize(Engine_t self, size_t size);
 int ttWrite(Engine_t self, struct ttSlot slot, int depth, int score, int alpha, int beta);
 struct ttSlot ttRead(Engine_t self);
-void ttFastClear(Engine_t self);
+void ttClearFast(Engine_t self);
 double ttCalcLoad(Engine_t self);
 
 /*----------------------------------------------------------------------+

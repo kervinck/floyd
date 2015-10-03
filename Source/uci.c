@@ -52,6 +52,7 @@ struct searchArgs {
 
 struct options {
         long Hash;
+        bool Ponder;
 };
 
 /*----------------------------------------------------------------------+
@@ -138,6 +139,7 @@ void uciMain(Engine_t self)
         bool debug = false;
         struct options options =  {
                 .Hash = 0,
+                .Ponder = false,
         };
         struct options newOptions = options;
 
@@ -152,7 +154,7 @@ void uciMain(Engine_t self)
                 char dummy;
 
                 if (debug)
-                        printf("info string input: %s", line);
+                        printf("info string input %s", line);
 
                 if (sscanf(line, " %15s %n", command, &n) != 1)
                         continue;
@@ -163,7 +165,7 @@ void uciMain(Engine_t self)
                                "option name Hash type spin default %ld min 0 max 0\n"
                                "option name Clear Hash type button\n"
                                //"option name Threads type spin default 1 min 1 max 1\n"
-                               //"option name Ponder type check default false\n"
+                               //"option name Ponder type check default false\n" // Keep commented out for now
                                //"option name MultiPV type spin default 1 min 1 max 1\n"
                                //"option name UCI_Chess960 type check default false\n"
                                //"option name Contempt type spin default 0 min -100 max 100\n"
@@ -182,6 +184,8 @@ void uciMain(Engine_t self)
 
                 if (strcmp(command, "setoption") == 0) {
                         sscanf(line+n, "name Hash value %ld", &newOptions.Hash);
+                        if (sscanf(line+n, "name Ponder value true%c",  &dummy) == 1 && isspace(dummy)) newOptions.Ponder = true;
+                        if (sscanf(line+n, "name Ponder value false%c", &dummy) == 1 && isspace(dummy)) newOptions.Ponder = false;
                         continue;
                 }
 
@@ -413,17 +417,19 @@ bool uciSearchInfo(void *uciInfoData)
 
 static void uciBestMove(Engine_t self)
 {
-        char bestMoveString[maxMoveSize];
-        if (self->bestMove)
-                moveToUci(board(self), bestMoveString, self->bestMove);
-        else
-                strcpy(bestMoveString, "0000"); // When in doubt, do as Shredder
-        if (self->ponderMove) {
-                char ponderMoveString[maxMoveSize];
-                moveToUci(board(self), ponderMoveString, self->ponderMove);
-                printf("bestmove %s ponder %s\n", bestMoveString, ponderMoveString);
+        char moveString[maxMoveSize];
+
+        if (self->bestMove) {
+                moveToUci(board(self), moveString, self->bestMove);
+                printf("bestmove %s", moveString);
         } else
-                printf("bestmove %s\n", bestMoveString);
+                printf("bestmove 0000"); // When in doubt, do as Shredder
+
+        if (self->ponderMove) {
+                moveToUci(board(self), moveString, self->ponderMove);
+                printf(" ponder %s", moveString);
+        }
+        putchar('\n');
 }
 
 /*----------------------------------------------------------------------+

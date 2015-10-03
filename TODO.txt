@@ -1,4 +1,6 @@
 
+|Todo| Replace hard-coded instances of 30000, 31000, 32000 etc with symbols [qa]
+
 |Todo| Transposition table [search]
 
 - Fixed size, move only
@@ -11,6 +13,10 @@ Cutechess-cli or xboard
 
 ------------------------------------------------------------------------
 
+|Todo| Try MVA/LVA instead of fake-SEE
+
+|Todo| Scale passers with material [evaluate]
+
 |Todo| Score, bounds, age, depth [ttable]
 
 |Todo| Fast clear [ttable]
@@ -22,6 +28,10 @@ Cutechess-cli or xboard
 |Todo| Estimate elo [qa]
 
 ------------------------------------------------------------------------
+
+|Todo| Move ordering based on delta eval [search]
+
+Then also cache evaluation in ttable
 
 |Todo| Pondering [uci]
 
@@ -48,8 +58,6 @@ Measure nps for reference
        nearest 3 points and probe the bottom [tune]
 
 |Todo| Experiment: tune each bishop square [evaluate]
-
-|Todo| Scale passers with material [evaluate]
 
 |Todo| Expand board control. Include mobility [evaluate]
 

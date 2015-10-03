@@ -107,7 +107,7 @@ void rootSearch(Engine_t self,
                         self->seconds = xclock() - startTime;
                         updateBestAndPonderMove(self);
                         stop = infoFunction(infoData)
-                            || self->score + iteration >= 31998
+                            || self->score + iteration + 2 >= 32000
                             || (targetTime > 0.0 && self->seconds >= 0.5 * targetTime);
                 }
         } else { // except abort
@@ -122,17 +122,6 @@ void rootSearch(Engine_t self,
         // Clear alarm
         signal(SIGALRM, oldHandler);
         alarm(0);
-}
-
-/*----------------------------------------------------------------------+
- |      ttWrite                                                         |
- +----------------------------------------------------------------------*/
-
-// TODO: move to ttable.c
-static int ttWrite(void *self, int depth, int alpha, int beta, int score)
-{
-        // DUMMY
-        return score;
 }
 
 /*----------------------------------------------------------------------+
@@ -155,7 +144,6 @@ static inline int drawScore(Engine_t self)
  |      pvSearch                                                        |
  +----------------------------------------------------------------------*/
 
-// TODO: ttable
 // TODO: internal deepening
 // TODO: single-reply extensions
 // TODO: killers
@@ -168,12 +156,13 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
         int check = inCheck(board(self));
         int moveFilter = minInt;
         int bestScore = minInt;
+        struct ttSlot slot = ttRead(self);
 
         if (depth == 0 && !check) {
                 bestScore = evaluate(board(self));
                 if (bestScore >= beta) {
                         self->pv.len = pvIndex;
-                        return ttWrite(self, depth, alpha, beta, bestScore);
+                        return ttWrite(self, slot, 0, bestScore, alpha, beta);
                 }
                 moveFilter = 0;
         }
@@ -227,14 +216,13 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
         if (bestScore == minInt)
                 bestScore = endScore(self, check);
 
-        return ttWrite(self, depth, alpha, beta, bestScore);
+        return ttWrite(self, slot, depth, bestScore, alpha, beta);
 }
 
 /*----------------------------------------------------------------------+
  |      scout                                                           |
  +----------------------------------------------------------------------*/
 
-// TODO: ttable
 // TODO: killers
 // TODO: null move
 // TODO: internal deepening
@@ -247,10 +235,11 @@ static int scout(Engine_t self, int depth, int alpha)
                 return drawScore(self);
         if (depth == 0)
                 return qSearch(self, alpha);
-        if (self->stopFlag && self->bestMove)
+        if (self->stopFlag)
                 longjmp(self->abortEnv, 1); // raise abort
         int check = inCheck(board(self));
         int bestScore = minInt;
+        struct ttSlot slot = ttRead(self);
 
         int moveList[maxMoves];
         int nrMoves = generateMoves(board(self), moveList);
@@ -270,23 +259,23 @@ static int scout(Engine_t self, int depth, int alpha)
         if (bestScore == minInt)
                 bestScore = endScore(self, check);
 
-        return ttWrite(self, depth, alpha, alpha+1, bestScore);
+        return ttWrite(self, slot, depth, bestScore, alpha, alpha+1);
 }
 
 /*----------------------------------------------------------------------+
  |      qSearch                                                         |
  +----------------------------------------------------------------------*/
 
-// TODO: ttable
 static int qSearch(Engine_t self, int alpha)
 {
         if (repetition(self)) // TODO: to support "pure" search only. retire when not needed anymore
                 return drawScore(self);
         int check = inCheck(board(self));
         int bestScore = check ? minInt : evaluate(board(self));
+        struct ttSlot slot = ttRead(self);
 
         if (bestScore > alpha)
-                return ttWrite(self, 0, alpha, alpha+1, bestScore);
+                return ttWrite(self, slot, 0, bestScore, alpha, alpha+1);
 
         int moveList[maxMoves];
         int nrMoves = generateMoves(board(self), moveList);
@@ -305,7 +294,7 @@ static int qSearch(Engine_t self, int alpha)
         if (bestScore == minInt)
                 bestScore = endScore(self, check);
 
-        return ttWrite(self, 0, alpha, alpha+1, bestScore);
+        return ttWrite(self, slot, 0, bestScore, alpha, alpha+1);
 }
 
 /*----------------------------------------------------------------------+

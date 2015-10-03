@@ -50,6 +50,10 @@ struct searchArgs {
         bool infinite;
 };
 
+struct options {
+        long Hash;
+};
+
 /*----------------------------------------------------------------------+
  |      Data                                                            |
  +----------------------------------------------------------------------*/
@@ -123,9 +127,6 @@ static pthread_t stopSearch(pthread_t searchThread, struct searchArgs *args);
 
 static void uciBestMove(Engine_t self);
 
-static void systemFailure(const char *function, int r);
-
-
 /*----------------------------------------------------------------------+
  |      uciMain                                                         |
  +----------------------------------------------------------------------*/
@@ -135,6 +136,10 @@ void uciMain(Engine_t self)
         char *line = null;
         int size = 0;
         bool debug = false;
+        struct options options =  {
+                .Hash = 0,
+        };
+        struct options newOptions = options;
 
         // Prepare threading
         pthread_t searchThread = null;
@@ -155,14 +160,16 @@ void uciMain(Engine_t self)
                 if (strcmp(command, "uci") == 0) {
                         printf("id name Floyd " quote2(floydVersion) "\n"
                                "id author Marcel van Kervinck\n"
-                               "option name Hash type spin default 0 min 0 max 0\n"
+                               "option name Hash type spin default %ld min 0 max 0\n"
                                "option name Clear Hash type button\n"
                                //"option name Threads type spin default 1 min 1 max 1\n"
                                //"option name Ponder type check default false\n"
                                //"option name MultiPV type spin default 1 min 1 max 1\n"
                                //"option name UCI_Chess960 type check default false\n"
                                //"option name Contempt type spin default 0 min -100 max 100\n"
-                               "uciok\n");
+                               "uciok\n",
+                                options.Hash
+                                );
                         continue;
                 }
 
@@ -173,10 +180,15 @@ void uciMain(Engine_t self)
                         continue;
                 }
 
-                if (strcmp(command, "setoption") == 0)
+                if (strcmp(command, "setoption") == 0) {
+                        sscanf(line+n, "name Hash value %ld", &newOptions.Hash);
                         continue;
+                }
 
                 if (strcmp(command, "isready") == 0) {
+                        if (options.Hash != newOptions.Hash)
+                                ttSetSize(self, newOptions.Hash * 1024 * 1024);
+                        options = newOptions;
                         printf("readyok\n");
                         continue;
                 }
@@ -359,7 +371,7 @@ bool uciSearchInfo(void *uciInfoData)
 
         long milliSeconds = round(self->seconds / ms);
 
-        printf("info time %ld depth %d", milliSeconds, self->depth);
+        printf("info time %ld", milliSeconds);
 
         if (self->pv.len > 0 || self->depth == 0) {
                 char scoreString[16];
@@ -368,7 +380,7 @@ bool uciSearchInfo(void *uciInfoData)
                 else
                         sprintf(scoreString, "mate %d",
                                 ((self->score < 0) ? 32000 + self->score : 32000 - self->score + 1) / 2);
-                printf(" score %s", scoreString);
+                printf(" depth %d score %s", self->depth, scoreString);
         }
 
         printf(" nodes %lld nps %.f",
@@ -463,17 +475,6 @@ static pthread_t stopSearch(pthread_t searchThread, struct searchArgs *args)
                 systemFailure("pthread_join", r);
 
         return null;
-}
-
-/*----------------------------------------------------------------------+
- |      systemFailure                                                   |
- +----------------------------------------------------------------------*/
-
-// TODO: move to cplus.c
-static void systemFailure(const char *function, int r)
-{
-        fprintf(stderr, "*** System error: %s failed (%s)\n", function, strerror(r));
-        exit(EXIT_FAILURE);
 }
 
 /*----------------------------------------------------------------------+

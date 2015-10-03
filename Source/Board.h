@@ -43,7 +43,7 @@
 static const int rankStep = rank2 - rank1;
 static const int fileStep = fileB - fileA;
 
-typedef struct board *Board_t;
+typedef struct Board *Board_t;
 
 struct side {
         unsigned char attacks[boardSize];
@@ -69,9 +69,8 @@ enum {
 #define maxMoveSize sizeof("a7-a8=N+")
 #define maxFenSize 128
 
-struct board {
+struct Board {
         signed char squares[boardSize];
-
         signed char castleFlags;
         signed char enPassantPawn;
         signed char halfmoveClock;

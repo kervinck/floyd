@@ -1,4 +1,4 @@
-CFLAGS=-std=c11 -pedantic -Wall -O3 -DfloydVersion=1.0x
+CFLAGS=-std=c11 -pedantic -Wall -O3 -DfloydVersion=0.1a
 
 all: module floyd
 
@@ -6,14 +6,13 @@ all: module floyd
 module:
 	python setup.py build
 
-SOURCES=cplus.c evaluate.c floydmain.c format.c kpk.c moves.c parse.c search.c uci.c zobrist.c
-
 # As UCI engine
+SOURCES=cplus.c evaluate.c floydmain.c format.c kpk.c moves.c parse.c search.c ttable.c uci.c zobrist.c
 floyd: $(addprefix Source/, $(SOURCES)) $(wildcard Source/*.h)
 	gcc $(CFLAGS) -o $@ $(addprefix Source/, $(SOURCES))
 
 # TODO: allow testing before install
-test:
+test: install
 	python Tools/searchtest.py
 
 easy wac:

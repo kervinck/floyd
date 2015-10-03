@@ -11,6 +11,7 @@ floydModule = Extension(
                 'Source/kpk.c',
                 'Source/parse.c',
                 'Source/search.c',
+                'Source/ttable.c',
                 'Source/uci.c',
                 'Source/zobrist.c' ],
         extra_compile_args = ['-O3', '-std=c11', '-Wall', '-pedantic'],
@@ -19,7 +20,7 @@ floydModule = Extension(
 
 setup(
         name         = 'floyd',
-        version      = '1.0x',
+        version      = '0.1a',
         description  = 'Chess engine study',
         author       = 'Marcel van Kervinck',
         author_email = 'marcelk@bitpit.net',

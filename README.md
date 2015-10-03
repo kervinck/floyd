@@ -103,7 +103,8 @@ Hierarchy for source modules is as follows:
   +--- uci.h
   |     `--- uci.c                      UCI driver
   +--- Engine.h
-  |     +--- search.c                   PVS, scout, qsearch, "SEE"
+  |     +--- search.c                   PVS, scout, quiescence search, "SEE"
+  |     +--- ttable.c                   Transposition table
   |     `--- evaluate.c                 Position evaluation
   |           +--- vector.h             Evaluation features and weights
   |           `--- kpk.h                In-memory bitbase for King+Pawn vs King

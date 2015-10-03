@@ -77,7 +77,7 @@ floydmodule_evaluate(PyObject *self, PyObject *args)
         if (!PyArg_ParseTuple(args, "s", &fen))
                 return null;
 
-        struct board board;
+        struct Board board;
         int len = setupBoard(&board, fen);
         if (len <= 0)
                 return PyErr_Format(PyExc_ValueError, "Invalid FEN (%s)", fen);
@@ -163,8 +163,9 @@ floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
                 &fen, &depth, &movetime, &info))
                 return null;
 
-        struct engine engine;
+        struct Engine engine;
         memset(&engine, 0, sizeof engine);
+        ttSetSize(&engine, 0);
 
         int len = setupBoard(&engine.board, fen);
         if (len <= 0)
@@ -218,6 +219,7 @@ floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
         freeList(engine.board.hashHistory);
         freeList(engine.searchMoves);
         freeList(engine.pv);
+        free(engine.tt.slots);
 
         return result;
 }
@@ -240,16 +242,8 @@ static PyMethodDef floydMethods[] = {
 PyMODINIT_FUNC
 initfloyd(void)
 {
-	PyObject *module;
-
         // Create the module and add the functions
-        module = Py_InitModule3("floyd", floydMethods, floyd_doc);
-        if (module == null)
-                return;
-
-        // Add startPosition as a string constant
-        if (PyModule_AddStringConstant(module, "startPosition", startpos))
-                return;
+	Py_InitModule3("floyd", floydMethods, floyd_doc);
 }
 
 /*----------------------------------------------------------------------+

@@ -12,8 +12,7 @@
 
 #include "uci.h"
 
-static struct engine engine;
-
+static struct Engine engine;
 
 int main(void)
 {
@@ -24,6 +23,7 @@ int main(void)
                "Type \"help\" for more information, or \"quit\" to leave.\n\n");
 
         setupBoard(&engine.board, startpos); // be nice and allow `go' without `position'
+        ttSetSize(&engine, 0);
 
         uciMain(&engine);
 
@@ -31,6 +31,7 @@ int main(void)
         freeList(engine.board.hashHistory);
         freeList(engine.searchMoves);
         freeList(engine.pv);
+        free(engine.tt.slots);
 
         return 0;
 }

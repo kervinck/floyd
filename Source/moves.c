@@ -83,9 +83,9 @@ enum {
 };
 
 // Off-board offsets for use in the undo stack
-#define offsetof_castleFlags   offsetof(struct board, castleFlags)
-#define offsetof_enPassantPawn offsetof(struct board, enPassantPawn)
-#define offsetof_halfmoveClock offsetof(struct board, halfmoveClock)
+#define offsetof_castleFlags   offsetof(struct Board, castleFlags)
+#define offsetof_enPassantPawn offsetof(struct Board, enPassantPawn)
+#define offsetof_halfmoveClock offsetof(struct Board, halfmoveClock)
 
 /*----------------------------------------------------------------------+
  |      Data                                                            |

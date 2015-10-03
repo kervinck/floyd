@@ -31,6 +31,8 @@
 #define maxLongLong ((long long)(~0ULL >> 1))
 #define minLongLong (-maxLongLong - 1LL)
 
+#define ones(n) (~(~0ULL << (n)))
+
 /*----------------------------------------------------------------------+
  |      Exceptions                                                      |
  +----------------------------------------------------------------------*/
@@ -163,6 +165,7 @@ int readLine(void *fp, char **pLine, int *pSize);
 
 int xExitMain(err_t err);
 void xAbort(err_t err);
+void systemFailure(const char *function, int r);
 
 /*----------------------------------------------------------------------+
  |                                                                      |

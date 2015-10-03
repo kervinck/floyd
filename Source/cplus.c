@@ -89,6 +89,12 @@ void xAbort(err_t err)
         abort();
 }
 
+void systemFailure(const char *function, int r)
+{
+        fprintf(stderr, "*** System error: %s failed (%s)\n", function, strerror(r));
+        abort();
+}
+
 /*----------------------------------------------------------------------+
  |      Lists                                                           |
  +----------------------------------------------------------------------*/

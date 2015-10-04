@@ -91,6 +91,7 @@ void rootSearch(Engine_t self,
         if (hash(board(self)) != self->lastSearched) {
                 self->lastSearched = hash(board(self));
                 self->pv.len = 0;
+                updateBestAndPonderMove(self);
                 self->bestMove = self->ponderMove = 0;
                 self->tt.now = (self->tt.now + 1) & ones(ttDateBits);
         }
@@ -130,10 +131,10 @@ void rootSearch(Engine_t self,
  +----------------------------------------------------------------------*/
 
 // TODO: move to evaluate.h
-static inline int endScore(Engine_t self, bool check)
+static inline int endScore(Engine_t self, bool inCheck)
 {
         int rootDistance = board(self)->plyNumber - self->rootPlyNumber;
-        return check ? -32000 + rootDistance : 0;
+        return inCheck ? -32000 + rootDistance : 0;
 }
 
 static inline int drawScore(Engine_t self)
@@ -152,19 +153,21 @@ static inline int drawScore(Engine_t self)
 static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
 {
         self->nodeCount++;
-        if (repetition(self))
-                return drawScore(self);
-        int check = inCheck(board(self));
-        int moveFilter = minInt;
-        int bestScore = minInt;
+        bool inRoot = pvIndex == 0;
+        if (repetition(self) && !inRoot)
+                return (self->pv.len = pvIndex), drawScore(self);
 
         struct ttSlot slot = ttRead(self);
-        if (slot.depth >= depth || slot.isHardBound)
+        if (!inRoot && (slot.depth >= depth || slot.isHardBound))
                 if ((slot.isUpperBound && slot.score <= alpha)
                  || (slot.isLowerBound && slot.score >= beta)
                  || (slot.isLowerBound && slot.score > alpha
                   && slot.isUpperBound && slot.score < beta))
-                        return slot.score;
+                        return (self->pv.len = pvIndex), slot.score;
+
+        int check = inCheck(board(self));
+        int moveFilter = minInt;
+        int bestScore = minInt;
 
         if (depth == 0 && !check) {
                 bestScore = evaluate(board(self));
@@ -199,7 +202,7 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                         self->pv.len = pvIndex; // quiescence
                 undoMove(board(self));
         } else
-                self->pv.len = pvIndex;
+                self->pv.len = pvIndex; // game end or leaf node
 
         // Search the others with zero window and reductions, research if needed
         int reduction = 0;
@@ -243,12 +246,9 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
 static int scout(Engine_t self, int depth, int alpha)
 {
         self->nodeCount++;
-        if (repetition(self))
-                return drawScore(self);
-        if (depth == 0)
-                return qSearch(self, alpha);
-        if (self->stopFlag)
-                longjmp(self->abortEnv, 1); // raise abort
+        if (repetition(self)) return drawScore(self);
+        if (depth == 0)       return qSearch(self, alpha);
+        if (self->stopFlag)   longjmp(self->abortEnv, 1); // raise abort
 
         struct ttSlot slot = ttRead(self);
         if (slot.depth >= depth || slot.isHardBound)
@@ -328,6 +328,7 @@ static int qSearch(Engine_t self, int alpha)
  |      updateBestAndPonderMove                                         |
  +----------------------------------------------------------------------*/
 
+// Safe update from a possibly aborted PV
 static int updateBestAndPonderMove(Engine_t self)
 {
         if (self->pv.len >= 1 && self->pv.v[0] != self->bestMove)

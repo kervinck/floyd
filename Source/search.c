@@ -93,7 +93,7 @@ void rootSearch(Engine_t self,
                 self->pv.len = 0;
                 self->bestMove = self->ponderMove = 0;
         }
-        self->tt.now++;
+        self->tt.now = (self->tt.now + 1) & ones(ttDateBits);
 
         // Set alarm
         globalEngine = self;

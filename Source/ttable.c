@@ -106,7 +106,7 @@ int ttWrite(Engine_t self, struct ttSlot slot, int depth, int score, int alpha, 
 
         slot.score = score;
         slot.depth = depth;
-        slot.date = self->tt.now & ones(ttDateBits);
+        slot.date = self->tt.now;
         slot.isUpperBound = score <= alpha;
         slot.isLowerBound = score >= beta;
         slot.isHardBound = false;
@@ -204,10 +204,9 @@ double ttCalcLoad(Engine_t self)
 {
         int n = 0;
         int m = min(10000, self->tt.mask + bucketLen);
-        int now = self->tt.now & ones(ttDateBits);
 
         for (int i=0; i<m; i++)
-                if (self->tt.slots[i].date == now)
+                if (self->tt.slots[i].date == self->tt.now)
                         n++;
         return (double) n / (double) m;
 }

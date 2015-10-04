@@ -23,7 +23,7 @@ int main(void)
                "Type \"help\" for more information, or \"quit\" to leave.\n\n");
 
         setupBoard(&engine.board, startpos); // be nice and allow `go' without `position'
-        ttSetSize(&engine, 0);
+        ttSetSize(&engine, 64*1024*1024);
 
         uciMain(&engine);
 

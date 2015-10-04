@@ -139,7 +139,7 @@ void uciMain(Engine_t self)
         int size = 0;
         bool debug = false;
         struct options options =  {
-                .Hash = 0,
+                .Hash = 64,
                 .Ponder = false,
         };
         struct options newOptions = options;

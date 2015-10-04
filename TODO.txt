@@ -1,4 +1,9 @@
 
+|Todo| 'make mate' fails [bug]
+
+k2Kb2R/2rQnQN1/8/BqQbQqQn/8/1BbQqQN1/8/2QrQq1R w - - acn 4289; acs 0; bm Bxd5+ Qf7xd5+; ce 32760; dm 4; pv Bxd5+ Nc6+ Qcxc6+ Qb7 Qxb7+ Rxb7 Qxb7#;
+Assertion failed: (slot.score >= -32000), function ttWrite, file Source/ttable.c, line 140.
+
 |Todo| Internal deepening [search]
 
 |Todo| Estimate initial elo [qa]

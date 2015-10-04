@@ -1,4 +1,12 @@
 
+|Todo| Residual degradation
+
+Now:
+vector filename 'vector.json' residual 0.331991650 positions 3000000 depth 0
+
+Was:
+vector filename vector.json residual 0.322688640 positions 3000000 depth 0
+
 |Todo| 'make mate' fails [bug]
 
 k2Kb2R/2rQnQN1/8/BqQbQqQn/8/1BbQqQN1/8/2QrQq1R w - - acn 4289; acs 0; bm Bxd5+ Qf7xd5+; ce 32760; dm 4; pv Bxd5+ Nc6+ Qcxc6+ Qb7 Qxb7+ Rxb7 Qxb7#;

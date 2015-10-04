@@ -195,6 +195,8 @@ extern int setupBoard(Board_t self, const char *fen)
 
         normalizeEnPassantStatus(self); // Only safe after update of hash
 
+        self->eloDiff = 0;
+
         return ix;
 }
 

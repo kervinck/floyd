@@ -30,7 +30,7 @@ struct ttSlot {
                         unsigned date           : ttDateBits;
                         unsigned isUpperBound   : 1;
                         unsigned isLowerBound   : 1;
-                        unsigned isHardBound    : 1; // Game theoretical result, regardless of depth
+                        unsigned isHardBound    : 1; // Game theoretical value, can ignore depth
                         unsigned isWinLossScore : 1; // DTZ or mate
                 };
                 uint64_t data; // For lockless hashing

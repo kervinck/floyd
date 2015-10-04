@@ -1,4 +1,8 @@
 
+|Todo| Use scores from ttRead [ttable]
+
+Verify by checking krk.epd
+
 |Todo| Internal deepening [search]
 
 |Todo| Estimate initial elo [qa]
@@ -114,3 +118,8 @@ https://en.wikipedia.org/wiki/Rosenbrock_function
 |Todo| Export version string to Python [python]
 
 |Todo| In debugging mode give moves also in SAN for readability
+
+|Todo| Replace alarm() timer with something with better granularity [search]
+
+|Todo| Compile for windows [os,win]
+

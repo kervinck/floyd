@@ -18,7 +18,7 @@ test: install
 easy wac:
 	python Tools/bmtest.py 1 < Data/$@.epd
 
-hard draw nodraw mate:
+hard draw nodraw mate krk5:
 	python Tools/bmtest.py 10 < Data/$@.epd
 
 nolot:

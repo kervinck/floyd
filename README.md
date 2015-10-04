@@ -23,7 +23,7 @@ FUNCTIONS
                'uci'   : Write UCI info lines to stdout
     
     setCoefficient(...)
-        setCoefficient(coef, newValue) -> oldValue
+        setCoefficient(coef, newValue) -> (oldValue, name)
 ```
 
 Command interface

@@ -217,9 +217,8 @@ double ttCalcLoad(Engine_t self)
  +----------------------------------------------------------------------*/
 
 /*
- *  Instead of going through the whole memory to invalidate all entries,
- *  modify the hash function to the same effect. (This only has an effect
- *  on the interface between search and ttable, not in Board.)
+ *  Instead of going through the whole memory to invalidate all entries, update
+ *  the hash modifier, used before writing to the table, to the same effect.
  */
 void ttClearFast(Engine_t self)
 {

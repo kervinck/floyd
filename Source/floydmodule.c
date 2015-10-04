@@ -95,7 +95,7 @@ floydmodule_evaluate(PyObject *self, PyObject *args)
 // TODO: create coef name list
 
 PyDoc_STRVAR(setCoefficient_doc,
-        "setCoefficient(coef, newValue) -> oldValue\n"
+        "setCoefficient(coef, newValue) -> (oldValue, name)\n"
         "\n"
         "!!! EXPERIMENTAL !!!\n"
 );

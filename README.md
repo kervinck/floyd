@@ -23,7 +23,7 @@ FUNCTIONS
                'uci'   : Write UCI info lines to stdout
     
     setCoefficient(...)
-        setCoefficient(coef, newValue) -> (oldValue, name)
+        setCoefficient(coef, newValue) -> oldValue, name
 ```
 
 Command interface
@@ -32,7 +32,7 @@ Command interface
 $ make
 $ ./floyd 
 
-Floyd Chess Program - Version 1.0x
+Floyd Chess Program - Version 0.1a
 Copyright (C)1998-2015 by Marcel van Kervinck
 All rights reserved
 

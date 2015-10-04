@@ -17,8 +17,6 @@ Cutechess-cli or xboard
 
 |Todo| Scale passers with material [evaluate]
 
-|Todo| Use ttable score [ttable]
-
 |Todo| Null-move [search]
 
 |Todo| Estimate elo [qa]
@@ -122,4 +120,8 @@ https://en.wikipedia.org/wiki/Rosenbrock_function
 |Todo| Replace alarm() timer with something with better granularity [search]
 
 |Todo| Compile for windows [os,win]
+
+|Todo| Accept a lambda as value to `info' in search() [python]
+
+As a callback interface with the search info data
 

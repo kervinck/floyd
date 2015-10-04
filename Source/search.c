@@ -163,7 +163,7 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                 bestScore = evaluate(board(self));
                 if (bestScore >= beta) {
                         self->pv.len = pvIndex;
-                        return ttWrite(self, slot, 0, bestScore, alpha, beta);
+                        return ttWrite(self, slot, depth, bestScore, alpha, beta);
                 }
                 moveFilter = 0;
         }
@@ -172,6 +172,8 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
         int nrMoves = generateMoves(board(self), moveList);
         nrMoves = filterAndSort(board(self), moveList, nrMoves, moveFilter);
         nrMoves = filterLegalMoves(board(self), moveList, nrMoves); // easier for PVS
+        if (slot.move)
+                moveToFront(moveList, nrMoves, slot.move);
 
         // Search the first move with open alpha-beta window
         if (nrMoves > 0) {
@@ -226,9 +228,9 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
  |      scout                                                           |
  +----------------------------------------------------------------------*/
 
+// TODO: internal deepening
 // TODO: killers
 // TODO: null move
-// TODO: internal deepening
 // TODO: futility
 // TODO: reductions
 static int scout(Engine_t self, int depth, int alpha)

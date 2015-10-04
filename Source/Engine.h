@@ -18,7 +18,7 @@ typedef struct Engine *Engine_t;
 #define ttDepthBits 8
 #define ttDateBits 12
 
-#define maxDepth ones(ttDepthBits)
+#define maxDepth 120
 
 enum {
         minMate = -32000, minEval = -29999, minDtz  = -31000,

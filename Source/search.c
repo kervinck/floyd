@@ -92,8 +92,8 @@ void rootSearch(Engine_t self,
                 self->lastSearched = hash(board(self));
                 self->pv.len = 0;
                 self->bestMove = self->ponderMove = 0;
+                self->tt.now = (self->tt.now + 1) & ones(ttDateBits);
         }
-        self->tt.now = (self->tt.now + 1) & ones(ttDateBits);
 
         // Set alarm
         globalEngine = self;
@@ -157,7 +157,14 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
         int check = inCheck(board(self));
         int moveFilter = minInt;
         int bestScore = minInt;
+
         struct ttSlot slot = ttRead(self);
+        if (slot.depth >= depth || slot.isHardBound)
+                if ((slot.isUpperBound && slot.score <= alpha)
+                 || (slot.isLowerBound && slot.score >= beta)
+                 || (slot.isLowerBound && slot.score > alpha
+                  && slot.isUpperBound && slot.score < beta))
+                        return slot.score;
 
         if (depth == 0 && !check) {
                 bestScore = evaluate(board(self));
@@ -242,9 +249,15 @@ static int scout(Engine_t self, int depth, int alpha)
                 return qSearch(self, alpha);
         if (self->stopFlag)
                 longjmp(self->abortEnv, 1); // raise abort
+
+        struct ttSlot slot = ttRead(self);
+        if (slot.depth >= depth || slot.isHardBound)
+                if ((slot.isUpperBound && slot.score <= alpha)
+                 || (slot.isLowerBound && slot.score > alpha))
+                        return slot.score;
+
         int check = inCheck(board(self));
         int bestScore = minInt;
-        struct ttSlot slot = ttRead(self);
 
         int moveList[maxMoves];
         int nrMoves = generateMoves(board(self), moveList);
@@ -277,10 +290,13 @@ static int scout(Engine_t self, int depth, int alpha)
 
 static int qSearch(Engine_t self, int alpha)
 {
+        struct ttSlot slot = ttRead(self);
+        if ((slot.isUpperBound && slot.score <= alpha)
+         || (slot.isLowerBound && slot.score > alpha))
+                return slot.score;
+
         int check = inCheck(board(self));
         int bestScore = check ? minInt : evaluate(board(self));
-        struct ttSlot slot = ttRead(self);
-
         if (bestScore > alpha)
                 return ttWrite(self, slot, 0, bestScore, alpha, alpha+1);
 

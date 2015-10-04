@@ -37,27 +37,24 @@ struct ttSlot {
         };
 };
 
-struct ttable {
-        struct ttSlot *slots;
-        size_t size;
-        size_t mask;
-        unsigned int now;
-        uint64_t baseHash; // For fast clearing
-};
-
 /*
  *  Chess engine
  */
 struct Engine {
         struct Board board;
 
-        struct ttable tt;
-
         int rootPlyNumber;
-
         intList searchMoves; // root moves to search, empty means all
-
         volatile bool stopFlag;
+
+        // transposition table
+        struct {
+                struct ttSlot *slots;
+                size_t size;
+                size_t mask;
+                unsigned int now;  // incremented when root changes
+                uint64_t baseHash; // For fast clearing
+        } tt;
 
         // last search result
         struct {
@@ -71,7 +68,7 @@ struct Engine {
                 long long nodeCount;
         };
 
-        jmp_buf abortEnv;
+        jmp_buf abortEnv; // TODO: would be nice not to expose the jmp_buf type
 };
 
 /*

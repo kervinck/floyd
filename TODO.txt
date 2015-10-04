@@ -1,8 +1,4 @@
 
-|Todo| Use scores from ttRead [ttable]
-
-Verify by checking krk.epd
-
 |Todo| Internal deepening [search]
 
 |Todo| Estimate initial elo [qa]

@@ -15,10 +15,10 @@ floyd: $(addprefix Source/, $(SOURCES)) $(wildcard Source/*.h)
 test: install
 	python Tools/searchtest.py
 
-easy wac:
+easy wac krk5:
 	python Tools/bmtest.py 1 < Data/$@.epd
 
-hard draw nodraw mate krk5:
+hard draw nodraw mate:
 	python Tools/bmtest.py 10 < Data/$@.epd
 
 nolot:

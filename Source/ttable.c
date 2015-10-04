@@ -116,28 +116,28 @@ int ttWrite(Engine_t self, struct ttSlot slot, int depth, int score, int alpha, 
          *  Apply corrections for DTZ and mate scores
          */
 
-        if (score >= 30000) {
-                if (score > 30000) {
+        if (score > maxEval) {
+                if (score > maxEval + 1) {
                         /*
                          *  Don't store DTZ values when halfmoveClock is 0, because such
                          *  entries wreck progress later in the game (after zeroing).
                          */
-                        if (board(self)->halfmoveClock == 0 && score <= 31000)
+                        if (board(self)->halfmoveClock == 0 && score <= maxDtz)
                                 return score;
                         slot.score += board(self)->plyNumber - self->rootPlyNumber;
                         slot.isWinLossScore = 1;
-                        assert(slot.score < 32000);
+                        assert(slot.score < maxMate); // maxMate not in chess
                 }
                 slot.isHardBound = slot.isLowerBound;
         }
 
-        if (score <= -30000) {
-                if (score < -30000) {
-                        if (board(self)->halfmoveClock == 0 && score >= -31000)
+        if (score < minEval) {
+                if (score < minEval - 1) {
+                        if (board(self)->halfmoveClock == 0 && score >= minDtz)
                                 return score;
                         slot.score -= board(self)->plyNumber - self->rootPlyNumber;
                         slot.isWinLossScore = 1;
-                        assert(slot.score >= -32000);
+                        assert(slot.score >= minMate);
                 }
                 slot.isHardBound = slot.isUpperBound;
         }

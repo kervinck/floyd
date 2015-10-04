@@ -389,12 +389,12 @@ bool uciSearchInfo(void *uciInfoData)
 
         if (self->pv.len > 0 || self->depth == 0) {
                 char scoreString[16];
-                if (abs(self->score) < 31000)
+                if (abs(self->score) < maxDtz)
                         sprintf(scoreString, "cp %.0f", round(self->score / 10.0));
                 else
                         sprintf(scoreString, "mate %d",
-                                (self->score < 0) ? -(32000 + self->score    ) / 2
-                                                  :  (32000 - self->score + 1) / 2);
+                                (self->score < 0) ? (minMate - self->score    ) / 2
+                                                  : (maxMate - self->score + 1) / 2);
                 printf(" depth %d score %s", self->depth, scoreString);
         }
 

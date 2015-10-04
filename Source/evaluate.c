@@ -13,6 +13,7 @@
 #include <assert.h>
 #define _XOPEN_SOURCE
 #include <math.h>
+#include <setjmp.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
@@ -22,6 +23,7 @@
 
 // Own interface
 #include "Board.h"
+#include "Engine.h"
 #include "evaluate.h"
 
 // Other modules
@@ -497,6 +499,9 @@ int evaluate(Board_t self)
 
         static const double Ci = 4.0 / M_LN10;
         e.score = round(Ci * logit(e.P) * 1e+3);
+
+        e.score = min(e.score,  maxEval);
+        e.score = max(e.score, -maxEval);
 
         //printf("%s wilo %d Wp %.3f draw %d D %.1f P %.3f score %d\n",
                 //__func__, e.wiloScore, Wp, e.drawScore, D, e.P, e.score);

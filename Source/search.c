@@ -108,7 +108,7 @@ void rootSearch(Engine_t self,
                         self->seconds = xclock() - startTime;
                         updateBestAndPonderMove(self);
                         stop = infoFunction(infoData)
-                            || (self->score + iteration + 2 >= 32000 && iteration > 0)
+                            || (self->score + iteration + 2 >= maxMate && iteration > 0)
                             || (targetTime > 0.0 && self->seconds >= 0.5 * targetTime);
                 }
         } else { // except abort
@@ -133,7 +133,7 @@ void rootSearch(Engine_t self,
 static inline int endScore(Engine_t self, bool inCheck)
 {
         int rootDistance = board(self)->plyNumber - self->rootPlyNumber;
-        return inCheck ? -32000 + rootDistance : 0;
+        return inCheck ? minMate + rootDistance : 0;
 }
 
 static inline int drawScore(Engine_t self)

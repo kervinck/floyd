@@ -9,8 +9,6 @@
  |      Definitions                                                     |
  +----------------------------------------------------------------------*/
 
-#define maxDepth 120
-
 typedef struct Engine *Engine_t;
 
 /*
@@ -19,6 +17,13 @@ typedef struct Engine *Engine_t;
 
 #define ttDepthBits 8
 #define ttDateBits 12
+
+#define maxDepth ones(ttDepthBits)
+
+enum {
+        minMate = -32000, minEval = -29999, minDtz  = -31000,
+        maxMate =  32000, maxEval =  29999, maxDtz  =  31000,
+};
 
 struct ttSlot {
         uint64_t key;

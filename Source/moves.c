@@ -447,12 +447,12 @@ extern void makeMove(Board_t self, int move)
         //moveToLongAlgebraic(self, moveString, move);
         //puts(moveString);
 
-        #define push(offset, value) _Statement(                         \
+        #define push(offset, value) Statement(                          \
                 *sp++ = (value);                                        \
                 *sp++ = (offset);                                       \
         )
 
-        #define makeSimpleMove(from, to) _Statement(                    \
+        #define makeSimpleMove(from, to) Statement(                     \
                 int _piece = self->squares[from];                       \
                 int _victim = self->squares[to];                        \
                                                                         \

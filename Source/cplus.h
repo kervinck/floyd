@@ -5,8 +5,37 @@
  |                                                                      |
  +----------------------------------------------------------------------*/
 
+/*
+ *  Copyright (C) 2015, Marcel van Kervinck
+ *  All rights reserved
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright
+ *  notice, this list of conditions and the following disclaimer.
+ *
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *  notice, this list of conditions and the following disclaimer in the
+ *  documentation and/or other materials provided with the distribution.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *  COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
+ */
+
 // Safe definition of statement-like macros
-#define _Statement(...) do{ __VA_ARGS__ }while(0)
+#define Statement(...) do{ __VA_ARGS__ }while(0)
 
 #define quote(arg) #arg
 #define quote2(arg) quote(arg)
@@ -16,8 +45,8 @@
 #define max(a, b) ((a) >= (b) ? (a) : (b))
 #define min(a, b) ((a) <= (b) ? (a) : (b))
 
-#define setMax(a, b) _Statement( if ((a) < (b)) (a) = (b); )
-#define setMin(a, b) _Statement( if ((a) > (b)) (a) = (b); )
+#define setMax(a, b) Statement( if ((a) < (b)) (a) = (b); )
+#define setMin(a, b) Statement( if ((a) > (b)) (a) = (b); )
 
 #define null      ((void*) 0)
 #define constNull ((const void*) 0)
@@ -50,14 +79,14 @@ typedef struct xError *err_t;
 
 #define OK ((err_t) 0)
 
-#define check(err) _Statement(\
+#define check(err) Statement(\
         if ((err) != OK)      \
                 goto cleanup; \
 )
 
 err_t err_free(err_t err);
 
-#define xRaise(msg) _Statement(\
+#define xRaise(msg) Statement(\
         static struct xError _static_err = {\
                 .format = (msg),\
                 .file = __FILE__,\
@@ -69,7 +98,7 @@ err_t err_free(err_t err);
         goto cleanup;\
 )
 
-#define xAssert(cond) _Statement(\
+#define xAssert(cond) Statement(\
         if (!(cond))\
                 xRaise("Assertion (" #cond ") failed");\
 )
@@ -110,7 +139,7 @@ typedef List(uint64_t)      uint64List;
 #define initialListSize (128)
 
 // TODO: remove this one?
-#define errPushList(list, value) _Statement(\
+#define errPushList(list, value) Statement(\
         if ((list).len >= (list).maxLen) {\
                 /* Avoid GCC warning "dereferencing type-punned pointer\
                    will break strict-aliasing rules" */\
@@ -126,7 +155,7 @@ typedef List(uint64_t)      uint64List;
         }\
         (list).v[(list).len++] = (value); )
 
-#define pushList(list, value) _Statement(\
+#define pushList(list, value) Statement(\
         if ((list).len >= (list).maxLen) {\
                 /* Avoid GCC warning "dereferencing type-punned pointer\
                    will break strict-aliasing rules" */\
@@ -145,7 +174,7 @@ typedef List(uint64_t)      uint64List;
 
 #define popList(list) ((list).v[--(list).len])
 
-#define freeList(list) _Statement(      \
+#define freeList(list) Statement(       \
         if ((list).v) {                 \
                 free((list).v);         \
                 (list).v = null;        \

@@ -165,7 +165,7 @@ floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
 
         struct Engine engine;
         memset(&engine, 0, sizeof engine);
-        ttSetSize(&engine, 16*1024*1024);
+        ttSetSize(&engine, 4*1024*1024); // TODO: remove when we have a proper engine object
 
         int len = setupBoard(&engine.board, fen);
         if (len <= 0)

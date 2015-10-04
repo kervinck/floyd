@@ -37,8 +37,6 @@
  |      Definitions                                                     |
  +----------------------------------------------------------------------*/
 
-#define ms (1e-3)
-
 struct searchArgs {
         Engine_t self;
         int depth;
@@ -55,6 +53,9 @@ struct options {
         bool Ponder;
         bool ClearHash;
 };
+
+#define ms (1e-3)
+#define MiB (1ULL << 20)
 
 /*----------------------------------------------------------------------+
  |      Data                                                            |
@@ -139,10 +140,12 @@ void uciMain(Engine_t self)
         int size = 0;
         bool debug = false;
         struct options options =  {
-                .Hash = 64,
+                .Hash = 256, // CCRL standard
                 .Ponder = false,
         };
         struct options newOptions = options;
+
+        ttSetSize(self, options.Hash * MiB);
 
         // Prepare threading
         pthread_t searchThread = null;
@@ -196,7 +199,7 @@ void uciMain(Engine_t self)
 
                 if (strcmp(command, "isready") == 0) {
                         if (options.Hash != newOptions.Hash)
-                                ttSetSize(self, newOptions.Hash * 1024 * 1024);
+                                ttSetSize(self, newOptions.Hash * MiB);
                         if (options.ClearHash != newOptions.ClearHash)
                                 ttClearFast(self);
                         options = newOptions;
@@ -235,7 +238,7 @@ void uciMain(Engine_t self)
                         if (debug) { // dump FEN and board
                                 char fen[maxFenSize];
                                 boardToFen(board(self), fen);
-                                printf("info string %s", fen);
+                                printf("info string fen %s", fen);
                                 for (int ix=0, next='/', rank=8; next!=' '; next=fen[ix++])
                                         if (next == '/')
                                                 printf("\ninfo string %d", rank--);
@@ -386,11 +389,12 @@ bool uciSearchInfo(void *uciInfoData)
 
         if (self->pv.len > 0 || self->depth == 0) {
                 char scoreString[16];
-                if (abs(self->score < 31000))
+                if (abs(self->score) < 31000)
                         sprintf(scoreString, "cp %.0f", round(self->score / 10.0));
                 else
                         sprintf(scoreString, "mate %d",
-                                ((self->score < 0) ? 32000 + self->score : 32000 - self->score + 1) / 2);
+                                (self->score < 0) ? -(32000 + self->score    ) / 2
+                                                  :  (32000 - self->score + 1) / 2);
                 printf(" depth %d score %s", self->depth, scoreString);
         }
 

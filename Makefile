@@ -15,7 +15,7 @@ floyd: $(addprefix Source/, $(SOURCES)) $(wildcard Source/*.h)
 test: install
 	python Tools/searchtest.py
 
-easy wac krk5:
+easy wac krk5 tt:
 	python Tools/bmtest.py 1 < Data/$@.epd
 
 hard draw nodraw mate:

@@ -5,6 +5,35 @@
  |                                                                      |
  +----------------------------------------------------------------------*/
 
+/*
+ *  Copyright (C) 2015, Marcel van Kervinck
+ *  All rights reserved
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright
+ *  notice, this list of conditions and the following disclaimer.
+ *
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *  notice, this list of conditions and the following disclaimer in the
+ *  documentation and/or other materials provided with the distribution.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *  COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
+ */
+
 /*----------------------------------------------------------------------+
  |      Includes                                                        |
  +----------------------------------------------------------------------*/
@@ -57,7 +86,7 @@ static Engine_t globalEngine; // TODO: remove global & all timing decisions & si
  +----------------------------------------------------------------------*/
 
 static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex);
-static int scout(Engine_t self, int depth, int alpha);
+static int scout(Engine_t self, int depth, int alpha, int nodeType);
 static int qSearch(Engine_t self, int alpha);
 
 static int updateBestAndPonderMove(Engine_t self);
@@ -208,7 +237,7 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                 makeMove(board(self), moveList[i]);
                 int newDepth = max(0, depth - 1 + check - reduction);
                 int newAlpha = max(alpha, bestScore);
-                int score = -scout(self, newDepth, -newAlpha - 1);
+                int score = -scout(self, newDepth, -newAlpha - 1, 1);
                 if (score > bestScore) {
                         int pvLen = self->pv.len;
                         pushList(self->pv, moveList[i]);
@@ -236,12 +265,15 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
  |      scout                                                           |
  +----------------------------------------------------------------------*/
 
+#define isCutNode(nodeType) (( nodeType) & 1)
+#define isAllNode(nodeType) ((~nodeType) & 1)
+
 // TODO: internal deepening
 // TODO: futility
 // TODO: reductions
 // TODO: killers
 // TODO: null move
-static int scout(Engine_t self, int depth, int alpha)
+static int scout(Engine_t self, int depth, int alpha, int nodeType)
 {
         self->nodeCount++;
         if (repetition(self)) return drawScore(self);
@@ -249,6 +281,13 @@ static int scout(Engine_t self, int depth, int alpha)
         if (self->stopFlag)   longjmp(self->abortEnv, 1); // raise abort
 
         struct ttSlot slot = ttRead(self);
+
+        // Internal iterative deepening
+        if (depth >= 3 && isCutNode(nodeType) && !slot.move) {
+                scout(self, depth - 2, alpha, nodeType);
+                slot = ttRead(self);
+        }
+
         if (slot.depth >= depth || slot.isHardBound)
                 if ((slot.isUpperBound && slot.score <= alpha)
                  || (slot.isLowerBound && slot.score > alpha))
@@ -267,7 +306,7 @@ static int scout(Engine_t self, int depth, int alpha)
                 makeMove(board(self), moveList[i]);
                 if (wasLegalMove(board(self))) {
                         int newDepth = max(0, depth - 1 + check - reduction);
-                        int score = -scout(self, newDepth, -(alpha+1));
+                        int score = -scout(self, newDepth, -(alpha + 1), nodeType + 1);
                         bestScore = max(bestScore, score);
                         if (score > alpha)
                                 slot.move = moveList[i];

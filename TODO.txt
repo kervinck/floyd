@@ -15,8 +15,6 @@ Cutechess-cli or xboard
 
 ------------------------------------------------------------------------
 
-|Todo| Try MVA/LVA instead of fake-SEE
-
 |Todo| Scale passers with material [evaluate]
 
 |Todo| Null-move [search]
@@ -25,9 +23,11 @@ Cutechess-cli or xboard
 
 ------------------------------------------------------------------------
 
-|Todo| Move ordering based on delta eval [search]
+|Todo| Canary / high-water mark on undo stack [qa]
 
-Then also cache evaluation in ttable
+At least when debugging is compiled in
+
+|Todo| Try MVA/LVA instead of fake-SEE
 
 |Todo| Pondering [uci]
 
@@ -126,4 +126,9 @@ https://en.wikipedia.org/wiki/Rosenbrock_function
 |Todo| Accept a lambda as value to `info' in search() [python]
 
 As a callback interface with the search info data
+
+|Todo| Move ordering based on delta eval [search]
+
+Then also cache evaluation in ttable
+
 

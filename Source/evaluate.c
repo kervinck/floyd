@@ -42,7 +42,6 @@
 #include <assert.h>
 #define _XOPEN_SOURCE
 #include <math.h>
-#include <setjmp.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>

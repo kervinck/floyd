@@ -29,7 +29,6 @@
  */
 
 #include <stdbool.h>
-#include <setjmp.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>

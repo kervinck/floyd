@@ -42,11 +42,6 @@ At least when debugging is compiled in
 
 moves 5 (includes divide, no time info)
 
-|Todo| Speed benchmark [qa]
-
-For example using SF standard positions
-Measure nps for reference
-
 |Todo| Enable test before install [build]
 
 |Todo| Preserve parameter order in vector.json [tuning]
@@ -138,4 +133,12 @@ As a callback interface with the search info data
 
 Then also cache evaluation in ttable
 
+|Todo| Execute command line arguments as uci command [main,usability]
+
+floyd [ <uciCommand> <uciOption> ... ]
+
+eg.
+floyd go depth 8
+floyd help
+floyd bench
 

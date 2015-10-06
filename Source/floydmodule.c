@@ -42,7 +42,6 @@
 #include "Python.h"
 
 // C standard
-#include <setjmp.h>
 #include <stdbool.h>
 
 // C extension

@@ -116,15 +116,15 @@ X"        given by the options, or until the `stop' command is received."
 X"        Always show a final result using `bestmove'. (But: see `infinite')"
 X"        Command options are:"
 X"          searchmoves <move> ...  Only search these moves"
-X"          ponder                  Start search in ponder mode" // TODO: not implemented
+X"          ponder                  Start search in ponder mode // TODO: not implemented"
 X"          wtime <millis>          Time remaining on White's clock"
 X"          btime <millis>          Time remaining on Black's clock"
 X"          winc <millis>           White's increment after each move"
 X"          binc <millis>           Black's increment after each move"
 X"          movestogo <nrMoves>     Moves to go until next time control"
 X"          depth <ply>             Search no deeper than <ply> halfmoves"
-X"          nodes <nrNodes>         Search no more than <nrNodes> nodes" // TODO: not implemented
-X"          mate <nrMoves>          Search for a mate in <nrMoves> moves" // TODO: not implemented
+X"          nodes <nrNodes>         Search no more than <nrNodes> nodes // TODO: not implemented"
+X"          mate <nrMoves>          Search for a mate in <nrMoves> moves // TODO: not implemented"
 X"          movetime <millis>       Search no longer than this time"
 X"          infinite                Postpone `bestmove' result until `stop'"
 X"  ponderhit"
@@ -139,12 +139,12 @@ X"  help"
 X"        Show this list of commands."
 X"  eval"
 X"        Show evaluation."
-X"  bench"
-X"        Run a standardized speed test." // TODO: not implemented
-X"  moves [ depth <ply> ]"
-X"        Run a move generation test." // TODO: not implemented
+X"  bench [ movetime <millis> ]"
+X"        Speed test using 40 standard positions. Default `movetime' is 1000."
+X"  moves [ depth <ply> ] // TODO: not implemented"
+X"        Move generation test. Default `depth' is 1."
 X
-X"Unknown commands and options are silently ignored, except in debug mode." // TODO: not always true yet
+X"Unknown commands and options are silently ignored, except in debug mode. // TODO: not always true yet"
 X;
 
 /*----------------------------------------------------------------------+
@@ -158,6 +158,8 @@ static pthread_t startSearch(struct searchArgs *args);
 static pthread_t stopSearch(pthread_t searchThread, struct searchArgs *args);
 
 static void uciBestMove(Engine_t self);
+
+static searchInfo_fn benchInfoFunction;
 
 /*----------------------------------------------------------------------+
  |      uciMain                                                         |
@@ -374,6 +376,14 @@ void uciMain(Engine_t self)
                         continue;
                 }
 
+                if (strcmp(command, "bench") == 0) {
+                        long movetime = 1000;
+                        sscanf(line+n, "movetime %ld", &movetime);
+                        double nps = uciBenchmark(self, movetime * ms, benchInfoFunction, self);
+                        printf("result nps %.f\n", nps);
+                        continue;
+                }
+
                 if (debug)
                         printf("info string No such command (%s)\n", command);
         }
@@ -382,6 +392,16 @@ void uciMain(Engine_t self)
 
         free(line);
         line = null;
+}
+
+static
+bool benchInfoFunction(void *infoData)
+{
+        Engine_t engine = infoData;
+        char fen[maxFenSize];
+        boardToFen(&engine->board, fen);
+        printf("info fen %s time %.f nodes %lld\n", fen, engine->seconds / ms, engine->nodeCount);
+        return false;
 }
 
 /*----------------------------------------------------------------------+
@@ -413,7 +433,6 @@ bool uciSearchInfo(void *uciInfoData)
         Engine_t self = uciInfoData;
 
         long milliSeconds = round(self->seconds / ms);
-
         printf("info time %ld", milliSeconds);
 
         if (self->pv.len > 0 || self->depth == 0) {
@@ -447,11 +466,10 @@ bool uciSearchInfo(void *uciInfoData)
                 undoMove(board(self));
 
         putchar('\n');
-
-        if (milliSeconds >= 100)
+        if (self->seconds >= 0.1)
                 fflush(stdout);
 
-        return false;
+        return false; // don't abort
 }
 
 /*----------------------------------------------------------------------+

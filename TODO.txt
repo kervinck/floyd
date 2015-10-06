@@ -1,5 +1,12 @@
 
+|Todo| Delay 256MB allocation until 'isready'. [uci]
+
+But do something safe if isready is skipped.
+Eg. Also check in 'go' or 'rootSearch' if there is a table.
+
 |Todo| Internal deepening [search]
+
++27 -53 -20 (-92 elo)
 
 |Todo| Residual degradation
 

@@ -42,8 +42,13 @@
 
 #define arrayLen(a) (sizeof(a) / sizeof((a)[0]))
 
+#if !defined(max)
 #define max(a, b) ((a) >= (b) ? (a) : (b))
+#endif
+
+#if !defined(min)
 #define min(a, b) ((a) <= (b) ? (a) : (b))
+#endif
 
 #define setMax(a, b) Statement( if ((a) < (b)) (a) = (b); )
 #define setMin(a, b) Statement( if ((a) > (b)) (a) = (b); )
@@ -200,38 +205,31 @@ void systemFailure(const char *function, int r);
  |      Threads and alarms                                              |
  +----------------------------------------------------------------------*/
 
+// Use a dummy struct* instead of void* to provide some static type checking
+typedef struct threadHandle *xThread_t;
+
 // Definitions
 
-typedef void thread_fn(void *alarmData);
+typedef void thread_fn(void *data);
+
+struct threadClosure {
+        thread_fn *function;
+        void *data;
+};
 
 struct alarm {
-        double alarmTime;
-        thread_fn *alarmFunction;
-        void *alarmData;
+        thread_fn *function;
+        void *data;
+        double time;
 };
-
-struct thread {
-        thread_fn *threadFunction;
-        void *threadData;
-};
-
-typedef struct thread_handle *xthread_t;
 
 // Functions
 
-xthread_t setAlarm(struct alarm *alarm);
-void clearAlarm(xthread_t alarm);
+xThread_t setAlarm(struct alarm *alarm);
+void clearAlarm(xThread_t alarm);
 
-xthread_t createThread(struct thread *thread);
-void joinThread(xthread_t thread);
-
-/*----------------------------------------------------------------------+
- |      Platform checks                                                 |
- +----------------------------------------------------------------------*/
-
-#if defined(__unix__) || defined(__APPLE__)
- #define POSIX
-#endif
+xThread_t createThread(struct threadClosure *thread);
+void joinThread(xThread_t thread);
 
 /*----------------------------------------------------------------------+
  |                                                                      |

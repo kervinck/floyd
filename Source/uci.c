@@ -151,8 +151,8 @@ X;
 // Calculate target time (or alarm time) for thinking on game clock
 static double target(Engine_t self, double time, double inc, int movestogo);
 
-static xthread_t startSearch(struct searchArgs *args, struct thread *thread);
-static xthread_t stopSearch(Engine_t self, xthread_t searchThread);
+static xThread_t startSearch(struct searchArgs *args, struct threadClosure *thread);
+static xThread_t stopSearch(Engine_t self, xThread_t searchThread);
 
 static void uciBestMove(Engine_t self);
 
@@ -176,8 +176,8 @@ void uciMain(Engine_t self)
         ttSetSize(self, options.Hash * MiB);
 
         // Prepare threading
-        struct thread thread; // TODO: !!! having this here is still ugly !!!
-        xthread_t searchThread = null;
+        struct threadClosure thread; // TODO: !!! having this here is still ugly !!!
+        xThread_t searchThread = null;
         struct searchArgs args;
 
         // Process commands from stdin
@@ -505,10 +505,10 @@ static void uciBestMove(Engine_t self)
 
 static thread_fn searchThreadEntry;
 
-static xthread_t startSearch(struct searchArgs *args, struct thread *thread)
+static xThread_t startSearch(struct searchArgs *args, struct threadClosure *thread)
 {
-        thread->threadFunction = searchThreadEntry;
-        thread->threadData = args;
+        thread->function = searchThreadEntry;
+        thread->data = args;
         args->self->stopFlag = false;
         return createThread(thread);
 }
@@ -533,12 +533,12 @@ static void searchThreadEntry(void *argsPointer)
  |      stopSearch                                                      |
  +----------------------------------------------------------------------*/
 
-static xthread_t stopSearch(Engine_t self, xthread_t searchThread)
+static xThread_t stopSearch(Engine_t self, xThread_t searchThread)
 {
-        if (searchThread == null)
-                return null;
-        self->stopFlag = true;
-        joinThread(searchThread);
+        if (searchThread != null) {
+                self->stopFlag = true;
+                joinThread(searchThread);
+        }
         return null;
 }
 

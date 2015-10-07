@@ -1,0 +1,170 @@
+Some notes on style
+-------------------
+
+
+            Capitalized                           No period
+            v                                     v
+- a = 1; // Comments when following code on a line
+           ^
+           One space here
+
+- /*
+   *  Comments when spanning multiple lines
+   *
+   *  Usually not mixed with code. Indented to the code level.
+   */
+
+- /*
+   *  Blah
+   *..<-- Two spaces here, not one
+   */
+
+- Sections and functions are separated with exactly these banners:
+
+/*----------------------------------------------------------------------+
+ |      Text starts here                                                |
+ +----------------------------------------------------------------------*/
+        ^                                                               ^
+        this is column 8                                this is column 72
+
+- helper functions very specific to a big function go under the same banner
+- other helper functions go the the end
+- functions are written in the order of typical use
+
+- use enums for defining groups of constants, not #defines
+#defines should thus mainly be for macros with arguments
+But: an enum just to make a single constant is silly.
+
+- Code is normally no more than 80 chars wide, while extensions to 100 wide are
+  fully acceptable. Above 100, consider to wrap the lines. Above 120 this
+  is mandatory. (Github code viewing shows 121 BTW)
+
+- weUseCamelCase, not names_with_underscores
+- first letter in lower case for local names
+- first letter in upper case for "class" names
+- short names for locals
+- Avoid abreviations, except very common things when they are used a lot
+  in generat (not only in this program) suchs as: 'int', 'nr', 'len',
+  'json', 'ptr'. But 'device', not 'dev', square', not 'sq', 'from' not 'fr'
+- printSanMove, not printSANMove, but "stepNE" for "stepNorthEast" is ok
+- Name variables
+- Avoid Yoda naming: stopSearch, and not searchStop
+- Avoid Smurf naming to fake namespaces in C. Instead, keep the project small.
+- Names refer to a value, not the variable holding it. nodeCount or nodes, not nodeCounter
+  Reason: the value is of application interest, the variable is just building material.
+
+- Variables as much as possible in most local scope, and at or near first use.
+- Declare and initialize at the same time when possible
+- Don't reuse variables for different things.
+
+- ClassName_t for structures that form the main classes in the code
+- Pass them as first parameter to functions that operate on them, and
+  call the parameter 'self', like Python.
+_ foo_t can only refer to small types that fit in registers. So
+  ClassName_t is either a pointer, or it is a small value type. In the
+  latter case, it must be constant (for example, a time representation,
+  chess move, such things).
+- POSIX also claims to reserves these _t names. Don't be afraid of POSIX.
+
+- Exception: Use underscores when refering to system interfaces is ok
+  Example: compare_strcmp() and not compareStrCmp()
+- In general: obey external names and conventions. Don't map to internal
+  only to morph the style.
+
+- Use same naming convention for preprocessor names
+  I don't care anymore that you can't immediately see if some
+  invocation is macro or a function. ALL_THOSE_CAPS_EVERYWHERE_ARE_UGLY
+  and that is more important.
+
+- use do{ ... }while() for statement macros. Better, use the Statement() macro
+  from cplus.h for this
+
+- indentation is 8 spaces
+- don't be afraid to use extra spaces to line up items
+- no spaces at the end of a line
+
+- Use real spaces everywhere, not tabs
+  I was hardcore on tabs for 2 decades (it works as long as you use the
+  from the start of line only, regardless the tab setting. and the files
+  are smaller!), but I mellowed. I forgot the reason why.
+
+- Don't include other headers from include files
+  Instead, document what an include files needs (in a "synopsis" section),
+  and require the user to include that. It makes you think more carefully
+  about the interfaces
+- Therefore #ifdef INLCUDE_H will not be needed.
+
+Sections are in this order
+        Name (big banner)
+        (copyright goes under here)
+        Includes
+                // C standard
+                // System
+                // C extension
+                // Own interface
+                   (Including own synopsis)
+                // Other modules
+        Definitions
+        Data
+        Functions
+                // Forward delcarations
+        (One banner per main function)
+        Function 1
+        Function 2
+        Function 3
+        (empty banner)
+
+Header files:
+        Name (big banner)
+        Synopsis
+        Definitions
+        Data
+        Functions
+        (empty banner)
+
+Maintain no change history in the sources.
+Use comments to explain the current situation. Not to explain changes.
+Use meaningfull commit messages in git.
+Avoid combining cleanup commits with other commits.
+
+- spaces around operators: y = count * n + i
+  but y = a*x*x + b*x + c is fine when the variable names are such short
+  I would still use
+      y = (a * depth * depth) + (b * depth) + c
+- no parens for return
+- but no spaces in array index expressions (a[i+1]) or for-statements.
+- parenthesis when mixing logic with either arithmetic or predicates
+- Precedence of * / % vs + - is common knowledge
+- Don't expect precedence to be known. Don't mix && with ||, or | ^ &
+- When accepting a pointer to an output buffer, communicate the expected
+  minimum size in the function declaration
+        moveToUci(char moveString[16], int move);
+
+- Explicit is better than implicit
+- But avoid casting: Use implicit casts to and from void* where C allows.
+  Same for ints.
+
+- Use int as much as possible. Except a calculation needs more bits
+- Assume ints are at least 32 bits. Time goes forwards, not backwards
+- Assume longs long is enough for the platform to hold number of objects
+  or object sizes you will need..
+- Don't assume char is either signed or unsigned, because both occur
+        - Use char for text
+        - Use signed char or unsigned char for bytes
+        - char is a different type from both unsigned char and signed char
+
+- Use unsigned types only for modolo arithmetic or manipulating bits 
+- Don't use unsigned types if you think that a variable can't be negative.
+  Still use signed types in that case.
+
+- parenthesis around the conditional in the ternary operator
+        (a == b) ? x : y
+
+- Naming:
+  - Use 'size' of size in bytes (in case of strings, including 0)
+  - Use 'len' for number of abstract elements (in case of strings, excluding 0)
+  So 'len' is a count at the data abstraction level, and 'size' is
+  at the lower implementation level.
+
+- rules can be broken and nobody gets hurt
+

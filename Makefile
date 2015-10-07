@@ -45,23 +45,23 @@ todo: # xtodo
 	@find . -not -path './.git/*' -type f -size -1M -print0 | xargs -0 grep -i todo | grep -v xtodo
 
 # Dump resulting evaluation tables for easy inspection
-tables: tables.png
-	[ `uname -s` = 'Darwin' ] && open tables.png
+tables: Tuning/tables.png
+	[ `uname -s` = 'Darwin' ] && open Tuning/tables.png
 
-tables.png: Tools/plotTables.py vector.json
-	python Tools/plotTables.py vector.json
+Tuning/tables.png: Tools/plotTables.py Tuning/vector.json
+	python Tools/plotTables.py Tuning/vector.json
 
 residual:
-	bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/tune.py -q vector.json
+	bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/tune.py -q Tuning/vector.json
 
 tune:
-	bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/tune.py -s 2 vector.json
+	bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/tune.py -s 2 Tuning/vector.json
 
 ftune:
 	bzcat Data/ccrl-shuffled-3M.epd.bz2 | head -500000 | python Tools/tune.py -s 2 -m 100000 fvector.json
 
-update: clean tables.png
-	python Tools/updateDefaults.py vector.json < Source/vector.h > vector.h.tmp
+update: clean Tuning/tables.png
+	python Tools/updateDefaults.py Tuning/vector.json < Source/vector.h > vector.h.tmp
 	[ -s vector.h.tmp ] && mv vector.h.tmp Source/vector.h
 
 install:

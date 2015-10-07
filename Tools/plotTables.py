@@ -153,5 +153,5 @@ if __name__ == '__main__':
         plotMap(axes[2][2], king,   None,  'King')
         plotMap(axes[2][3], passer, False, 'Passers', scale=None)
 
-        pyplot.savefig('tables.png', bbox_inches='tight')
+        pyplot.savefig('Tuning/tables.png', bbox_inches='tight')
 

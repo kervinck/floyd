@@ -41,7 +41,6 @@
 // C standard
 #include <assert.h>
 #include <errno.h>
-#include <setjmp.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>

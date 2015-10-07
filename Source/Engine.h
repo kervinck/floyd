@@ -102,7 +102,7 @@ struct Engine {
                 long long nodeCount;
         };
 
-        jmp_buf abortEnv; // TODO: would be nice not to expose the jmp_buf type
+        void *abortTarget;
 };
 
 /*

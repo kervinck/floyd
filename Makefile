@@ -17,7 +17,7 @@ module:
 	python setup.py build
 
 # As native UCI engine
-SOURCES=cplus.c evaluate.c floydmain.c format.c kpk.c moves.c parse.c search.c ttable.c uci.c zobrist.c
+SOURCES=bench.c cplus.c evaluate.c floydmain.c format.c kpk.c moves.c parse.c search.c ttable.c uci.c zobrist.c
 floyd: $(addprefix Source/, $(SOURCES)) $(wildcard Source/*.h)
 	$(CC) $(CFLAGS) -o $@ $(addprefix Source/, $(SOURCES))
 
@@ -29,17 +29,20 @@ $(win32_exe): $(addprefix Source/, $(SOURCES)) $(wildcard Source/*.h)
 test: install
 	python Tools/searchtest.py
 
-easy wac krk5 tt:
+# 1 seconds tests
+easy wac krk5 tt eg ece3:
 	python Tools/bmtest.py 1 < Data/$@.epd
 
-hard draw nodraw mate:
+# 10 seconds tests
+hard draw nodraw mate bk:
 	python Tools/bmtest.py 10 < Data/$@.epd
 
+# 1000 seconds tests
 nolot:
 	python Tools/bmtest.py 1000 < Data/$@.epd
 
 todo: # xtodo
-	find . -not -path './.git/*' -type f -size -1M -print0 | xargs -0 grep -i todo | grep -v xtodo
+	@find . -not -path './.git/*' -type f -size -1M -print0 | xargs -0 grep -i todo | grep -v xtodo
 
 # Dump resulting evaluation tables for easy inspection
 tables: tables.png

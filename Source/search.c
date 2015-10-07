@@ -127,7 +127,11 @@ void rootSearch(Engine_t self,
         };
         xthread_t alarmHandle = setAlarm(alarmTime > 0.0 ? &alarm : null);
 
-        if (setjmp(self->abortEnv) == 0) { // try search
+        // Prepare abort possibility
+        jmp_buf here;
+        self->abortTarget = &here;
+
+        if (setjmp(here) == 0) { // try search
                 bool stop = false;
                 for (int iteration=0; iteration<=depth && !stop; iteration++) {
                         self->depth = iteration;
@@ -135,8 +139,8 @@ void rootSearch(Engine_t self,
                         self->seconds = xclock() - startTime;
                         updateBestAndPonderMove(self);
                         stop = infoFunction(infoData)
-                            || (self->score + iteration + 2 >= maxMate && iteration > 0)
-                            || (targetTime > 0.0 && self->seconds >= 0.5 * targetTime);
+                            || (self->score + iteration + 2 >= maxMate && iteration > 0) // TODO: remove
+                            || (targetTime > 0.0 && self->seconds >= 0.5 * targetTime); // TODO: remove
                 }
         } else { // except abort
                 self->seconds = xclock() - startTime;
@@ -274,7 +278,7 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
         self->nodeCount++;
         if (repetition(self)) return drawScore(self);
         if (depth == 0)       return qSearch(self, alpha);
-        if (self->stopFlag)   longjmp(self->abortEnv, 1); // raise abort
+        if (self->stopFlag)   longjmp(self->abortTarget, 1); // raise abort
 
         struct ttSlot slot = ttRead(self);
 

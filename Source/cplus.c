@@ -46,18 +46,17 @@
 #include <string.h>
 #include <time.h>
 
-#include "cplus.h"
-
 #if defined(_WIN32)
  #include <windows.h>
  #include <process.h>
  #include <sys/timeb.h>
-#endif
-
-#if defined(POSIX)
+#elif defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))
  #include <pthread.h>
  #include <unistd.h>
+ #define POSIX
 #endif
+
+#include "cplus.h"
 
 /*----------------------------------------------------------------------+
  |      Exceptions                                                      |
@@ -246,39 +245,33 @@ int readLine(void *fpPointer, char **pLine, int *pSize)
 }
 
 /*----------------------------------------------------------------------+
- |                                                                      |
+ |      Windows implementation of threads and alarms                    |
  +----------------------------------------------------------------------*/
-
 #if defined(_WIN32)
 
 static unsigned int __stdcall alarmThreadEntry(void *argsPointer)
 {
         struct alarm *args = argsPointer;
-        DWORD millis = ceil(args->alarmTime * 1e3);
+        DWORD millis = ceil(args->time * 1e3);
         Sleep(millis);
-        args->alarmFunction(args->alarmData);
+        args->function(args->data);
         return 0;
 }
 
-xthread_t setAlarm(struct alarm *alarm)
-{
-        if (!alarm)
-                return null;
-
-        HANDLE threadHandle = (HANDLE)_beginthreadex(
-                null,
-                0,
-                alarmThreadEntry,
-                (void*)alarm,
-                0,
-                null);
-        return (xthread_t)threadHandle;
-}
-
-void clearAlarm(xthread_t alarm)
+xThread_t setAlarm(struct alarm *alarm)
 {
         if (alarm) {
-                HANDLE threadHandle = (HANDLE)alarm;
+                HANDLE threadHandle = (HANDLE) _beginthreadex(
+                        null, 0, alarmThreadEntry, (void*) alarm, 0, null);
+                return (xThread_t) threadHandle;
+        }
+                return null;
+}
+
+void clearAlarm(xThread_t alarm)
+{
+        if (alarm) {
+                HANDLE threadHandle = (HANDLE) alarm;
                 TerminateThread(threadHandle, 0);
                 WaitForSingleObject(threadHandle, INFINITE);
                 CloseHandle(threadHandle);
@@ -287,59 +280,54 @@ void clearAlarm(xthread_t alarm)
 
 static unsigned int __stdcall threadEntry(void *argsPointer)
 {
-        struct thread *args = argsPointer;
-        args->threadFunction(args->threadData);
+        struct threadClosure *args = argsPointer;
+        args->function(args->data);
         return 0;
 }
 
-xthread_t createThread(struct thread *thread)
+xThread_t createThread(struct threadClosure *thread)
 {
-        HANDLE threadHandle = (HANDLE)_beginthreadex(
-                null,
-                0,
-                threadEntry,
-                thread,
-                0,
-                null);
+        HANDLE threadHandle = (HANDLE) _beginthreadex(
+                null, 0, threadEntry, thread, 0, null);
         return threadHandle;
 }
 
-void joinThread(xthread_t thread)
+void joinThread(xThread_t thread)
 {
-        HANDLE threadHandle = (HANDLE)thread;
-
+        HANDLE threadHandle = (HANDLE) thread;
         WaitForSingleObject(threadHandle, INFINITE);
         CloseHandle(threadHandle);
 }
-
 #endif
 
+/*----------------------------------------------------------------------+
+ |      POSIX implementation of threads and alarms                      |
+ +----------------------------------------------------------------------*/
 #if defined(POSIX)
 
 static void *alarmThreadEntry(void *argsPointer)
 {
         struct alarm *args = argsPointer;
-        int r = usleep((useconds_t) (args->alarmTime * 1e6));
+        int r = usleep((useconds_t) (args->time * 1e6));
         if (r != 0)
                 systemFailure("usleep", r);
-        args->alarmFunction(args->alarmData);
+        args->function(args->data);
         return null;
 }
 
-xthread_t setAlarm(struct alarm *alarm)
+xThread_t setAlarm(struct alarm *alarm)
 {
-        if (!alarm)
+        if (alarm) {
+                pthread_t threadHandle;
+                int r = pthread_create(&threadHandle, null, alarmThreadEntry, alarm);
+                if (r != 0)
+                        systemFailure("pthread_create", r);
+                return (xThread_t) threadHandle;
+        }
                 return null;
-
-        pthread_t threadHandle;
-        int r = pthread_create(&threadHandle, null, alarmThreadEntry, alarm);
-        if (r != 0)
-                systemFailure("pthread_create", r);
-
-        return (xthread_t) threadHandle;
 }
 
-void clearAlarm(xthread_t alarm)
+void clearAlarm(xThread_t alarm)
 {
         if (alarm) {
                 pthread_t threadHandle = (pthread_t) alarm;
@@ -351,28 +339,27 @@ void clearAlarm(xthread_t alarm)
 
 static void *threadEntry(void *argsPointer)
 {
-        struct thread *args = argsPointer;
-        args->threadFunction(args->threadData);
+        struct threadClosure *args = argsPointer;
+        args->function(args->data);
         return null;
 }
 
-xthread_t createThread(struct thread *thread)
+xThread_t createThread(struct threadClosure *thread)
 {
         pthread_t threadHandle;
         int r = pthread_create(&threadHandle, null, threadEntry, thread);
         if (r != 0)
                 systemFailure("pthread_create", r);
-        return (xthread_t) threadHandle;
+        return (xThread_t) threadHandle;
 }
 
-void joinThread(xthread_t thread)
+void joinThread(xThread_t thread)
 {
         pthread_t threadHandle = (pthread_t) thread;
         int r = pthread_join(threadHandle, null);
         if (r != 0)
                 systemFailure("pthread_join", r);
 }
-
 #endif
 
 /*----------------------------------------------------------------------+

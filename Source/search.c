@@ -121,11 +121,11 @@ void rootSearch(Engine_t self,
         }
 
         struct alarm alarm = (struct alarm) {
-                .alarmTime = alarmTime,
-                .alarmFunction = stopSearch,
-                .alarmData = self,
+                .function = stopSearch,
+                .data = self,
+                .time = alarmTime,
         };
-        xthread_t alarmHandle = setAlarm(alarmTime > 0.0 ? &alarm : null);
+        xThread_t alarmHandle = setAlarm(alarmTime > 0.0 ? &alarm : null);
 
         // Prepare abort possibility
         jmp_buf here;

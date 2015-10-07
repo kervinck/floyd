@@ -1,24 +1,14 @@
 
+|Todo| Don't use sleep and kill for the alarm thread [win32,posix]
+
 |Todo| clock is cpu time, not actual time [posix]
 
-|Todo| Granularity of win32 clock too low? [win32]
-
 |Todo| Warning about %I64d not being ISO compliant [win32]
-
-------------------------------------------------------------------------
-
-|Todo| Win64 version [win64]
-
-------------------------------------------------------------------------
 
 |Todo| Delay 256MB allocation until 'isready'. [uci]
 
 But do something safe if isready is skipped.
 Eg. Also check in 'go' or 'rootSearch' if there is a table.
-
-|Todo| Internal deepening [search]
-
-+27 -53 -20 (-92 elo)
 
 |Todo| Estimate initial elo [qa]
 
@@ -26,13 +16,13 @@ Cutechess-cli or xboard
 
 ------------------------------------------------------------------------
 
+|Todo| Granularity of win32 clock too low? [win32]
+
 |Todo| Scale passers with material [evaluate]
 
 |Todo| Null-move [search]
 
 |Todo| Estimate elo [qa]
-
-------------------------------------------------------------------------
 
 |Todo| Canary / high-water mark on undo stack [qa]
 
@@ -127,8 +117,6 @@ https://en.wikipedia.org/wiki/Rosenbrock_function
 
 |Todo| Replace alarm() timer with something with better granularity [search]
 
-|Todo| Compile for windows [os,win]
-
 |Todo| Accept a lambda as value to `info' in search() [python]
 
 As a callback interface with the search info data
@@ -145,4 +133,6 @@ eg.
 floyd go depth 8
 floyd help
 floyd bench
+
+|Todo| Win64 version [win64]
 

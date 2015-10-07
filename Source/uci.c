@@ -45,14 +45,12 @@
 #include <setjmp.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
 // C extension
 #include "cplus.h"
-
-// System
-#include <pthread.h>
 
 // Own interface
 #include "Board.h"
@@ -154,8 +152,8 @@ X;
 // Calculate target time (or alarm time) for thinking on game clock
 static double target(Engine_t self, double time, double inc, int movestogo);
 
-static pthread_t startSearch(struct searchArgs *args);
-static pthread_t stopSearch(pthread_t searchThread, struct searchArgs *args);
+static xthread_t startSearch(struct searchArgs *args, struct thread *thread);
+static xthread_t stopSearch(Engine_t self, xthread_t searchThread);
 
 static void uciBestMove(Engine_t self);
 
@@ -177,7 +175,8 @@ void uciMain(Engine_t self)
         ttSetSize(self, options.Hash * MiB);
 
         // Prepare threading
-        pthread_t searchThread = null;
+        struct thread thread; // TODO: !!! having this here is still ugly !!!
+        xthread_t searchThread = null;
         struct searchArgs args;
 
         // Process commands from stdin
@@ -240,7 +239,7 @@ void uciMain(Engine_t self)
                         continue;
 
                 if (strcmp(command, "position") == 0) {
-                        searchThread = stopSearch(searchThread, &args);
+                        searchThread = stopSearch(self, searchThread);
 
                         if (sscanf(line+n, "startpos%c %n", &dummy, &m) == 1 && isspace(dummy))
                                 setupBoard(board(self), startpos);
@@ -281,7 +280,7 @@ void uciMain(Engine_t self)
                 }
 
                 if (strcmp(command, "go") == 0) {
-                        searchThread = stopSearch(searchThread, &args);
+                        searchThread = stopSearch(self, searchThread);
 
                         args = (struct searchArgs) {
                                 .self = self,
@@ -322,7 +321,11 @@ void uciMain(Engine_t self)
                                  ||  sscanf(line+n, "binc %ld     %n", &binc,     &m) == 1
                                  ||  sscanf(line+n, "movestogo %d %n", &movestogo, &m) == 1
                                  ||  sscanf(line+n, "depth %d     %n", &args.depth, &m) == 1
+#if defined(_WIN32)
+                                 ||  sscanf(line+n, "nodes %I64d  %n", &nodes,    &m) == 1
+#else
                                  ||  sscanf(line+n, "nodes %lld   %n", &nodes,    &m) == 1
+#endif
                                  ||  sscanf(line+n, "mate %d      %n", &mate,     &m) == 1
                                  ||  sscanf(line+n, "movetime %ld %n", &movetime, &m) == 1
                                  || (sscanf(line+n, "infinite%c   %n", &dummy,    &m) == 1 && isspace(dummy) && (args.infinite = true))
@@ -342,12 +345,12 @@ void uciMain(Engine_t self)
 
                         printf("info string targetTime %.3f alarmTime %.3f\n", args.targetTime, args.alarmTime); // TODO: remove once branching factor is ~2
 
-                        searchThread = startSearch(&args);
+                        searchThread = startSearch(&args, &thread);
                         continue;
                 }
 
                 if (strcmp(command, "stop") == 0) {
-                        searchThread = stopSearch(searchThread, &args);
+                        searchThread = stopSearch(self, searchThread);
                         if (args.infinite)
                                 uciBestMove(self);
                         continue;
@@ -378,7 +381,7 @@ void uciMain(Engine_t self)
                         printf("info string No such command (%s)\n", command);
         }
 
-        searchThread = stopSearch(searchThread, &args);
+        searchThread = stopSearch(self, searchThread);
 
         free(line);
         line = null;
@@ -427,7 +430,11 @@ bool uciSearchInfo(void *uciInfoData)
                 printf(" depth %d score %s", self->depth, scoreString);
         }
 
+#if defined(_WIN32)
+        printf(" nodes %I64d nps %.f",
+#else
         printf(" nodes %lld nps %.f",
+#endif
                 self->nodeCount,
                 (self->seconds > 0.0) ? self->nodeCount / self->seconds : 0.0);
 
@@ -479,8 +486,18 @@ static void uciBestMove(Engine_t self)
  |      startSearch                                                     |
  +----------------------------------------------------------------------*/
 
+static thread_fn searchThreadEntry;
+
+static xthread_t startSearch(struct searchArgs *args, struct thread *thread)
+{
+        thread->threadFunction = searchThreadEntry;
+        thread->threadData = args;
+        args->self->stopFlag = false;
+        return createThread(thread);
+}
+
 // Helper for startSearch
-static void *searchThreadEntry(void *argsPointer)
+static void searchThreadEntry(void *argsPointer)
 {
         struct searchArgs *args = argsPointer;
 
@@ -493,36 +510,18 @@ static void *searchThreadEntry(void *argsPointer)
                 uciBestMove(args->self);
                 fflush(stdout);
         }
-        return null;
-}
-
-static pthread_t startSearch(struct searchArgs *args)
-{
-        args->self->stopFlag = false;
-
-        pthread_t searchThread;
-        int r = pthread_create(&searchThread, null, searchThreadEntry, args);
-        if (r != 0)
-                systemFailure("pthread_create", r);
-
-        return searchThread;
 }
 
 /*----------------------------------------------------------------------+
  |      stopSearch                                                      |
  +----------------------------------------------------------------------*/
 
-static pthread_t stopSearch(pthread_t searchThread, struct searchArgs *args)
+static xthread_t stopSearch(Engine_t self, xthread_t searchThread)
 {
         if (searchThread == null)
                 return null;
-
-        args->self->stopFlag = true;
-
-        int r = pthread_join(searchThread, null);
-        if (r != 0)
-                systemFailure("pthread_join", r);
-
+        self->stopFlag = true;
+        joinThread(searchThread);
         return null;
 }
 

@@ -197,6 +197,43 @@ void xAbort(err_t err);
 void systemFailure(const char *function, int r);
 
 /*----------------------------------------------------------------------+
+ |      Threads and alarms                                              |
+ +----------------------------------------------------------------------*/
+
+// Definitions
+
+typedef void thread_fn(void *alarmData);
+
+struct alarm {
+        double alarmTime;
+        thread_fn *alarmFunction;
+        void *alarmData;
+};
+
+struct thread {
+        thread_fn *threadFunction;
+        void *threadData;
+};
+
+typedef struct thread_handle *xthread_t;
+
+// Functions
+
+xthread_t setAlarm(struct alarm *alarm);
+void clearAlarm(xthread_t alarm);
+
+xthread_t createThread(struct thread *thread);
+void joinThread(xthread_t thread);
+
+/*----------------------------------------------------------------------+
+ |      Platform checks                                                 |
+ +----------------------------------------------------------------------*/
+
+#if defined(__unix__) || defined(__APPLE__)
+ #define POSIX
+#endif
+
+/*----------------------------------------------------------------------+
  |                                                                      |
  +----------------------------------------------------------------------*/
 

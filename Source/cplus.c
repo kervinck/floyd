@@ -39,11 +39,25 @@
  +----------------------------------------------------------------------*/
 
 #include <errno.h>
+#include <math.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #include "cplus.h"
+
+#if defined(_WIN32)
+ #include <windows.h>
+ #include <process.h>
+ #include <sys/timeb.h>
+#endif
+
+#if defined(POSIX)
+ #include <pthread.h>
+ #include <unistd.h>
+#endif
 
 /*----------------------------------------------------------------------+
  |      Exceptions                                                      |
@@ -141,10 +155,17 @@ cleanup:
  +----------------------------------------------------------------------*/
 
 /*
- *  Get CPU clock in seconds
+ *  Get clock in seconds
  */
 double xclock(void)
 {
+#if defined(WIN32)
+        struct _timeb t;
+        _ftime(&t);
+        return t.time + t.millitm * 1e-3;
+#endif
+#if defined(POSIX)
+        // TODO: why are we using the CPU time and not wall time...
         struct rusage ru;
 
         int r = getrusage(RUSAGE_SELF, &ru);
@@ -156,6 +177,7 @@ double xclock(void)
                 (ru.ru_utime.tv_sec  + ru.ru_stime.tv_sec);
 
         return clock;
+#endif
 }
 
 /*----------------------------------------------------------------------+
@@ -175,8 +197,9 @@ char *stringCopy(char *s, const char *t)
  |      readline                                                        |
  +----------------------------------------------------------------------*/
 
-int readLine(void *fp, char **pLine, int *pSize)
+int readLine(void *fpPointer, char **pLine, int *pSize)
 {
+        FILE *fp = fpPointer;
         char *line = *pLine;
         int size = *pSize;
         int len = 0;
@@ -221,6 +244,136 @@ int readLine(void *fp, char **pLine, int *pSize)
 
         return len;
 }
+
+/*----------------------------------------------------------------------+
+ |                                                                      |
+ +----------------------------------------------------------------------*/
+
+#if defined(_WIN32)
+
+static unsigned int __stdcall alarmThreadEntry(void *argsPointer)
+{
+        struct alarm *args = argsPointer;
+        DWORD millis = ceil(args->alarmTime * 1e3);
+        Sleep(millis);
+        args->alarmFunction(args->alarmData);
+        return 0;
+}
+
+xthread_t setAlarm(struct alarm *alarm)
+{
+        if (!alarm)
+                return null;
+
+        HANDLE threadHandle = (HANDLE)_beginthreadex(
+                null,
+                0,
+                alarmThreadEntry,
+                (void*)alarm,
+                0,
+                null);
+        return (xthread_t)threadHandle;
+}
+
+void clearAlarm(xthread_t alarm)
+{
+        if (alarm) {
+                HANDLE threadHandle = (HANDLE)alarm;
+                TerminateThread(threadHandle, 0);
+                WaitForSingleObject(threadHandle, INFINITE);
+                CloseHandle(threadHandle);
+        }
+}
+
+static unsigned int __stdcall threadEntry(void *argsPointer)
+{
+        struct thread *args = argsPointer;
+        args->threadFunction(args->threadData);
+        return 0;
+}
+
+xthread_t createThread(struct thread *thread)
+{
+        HANDLE threadHandle = (HANDLE)_beginthreadex(
+                null,
+                0,
+                threadEntry,
+                thread,
+                0,
+                null);
+        return threadHandle;
+}
+
+void joinThread(xthread_t thread)
+{
+        HANDLE threadHandle = (HANDLE)thread;
+
+        WaitForSingleObject(threadHandle, INFINITE);
+        CloseHandle(threadHandle);
+}
+
+#endif
+
+#if defined(POSIX)
+
+static void *alarmThreadEntry(void *argsPointer)
+{
+        struct alarm *args = argsPointer;
+        int r = usleep((useconds_t) (args->alarmTime * 1e6));
+        if (r != 0)
+                systemFailure("usleep", r);
+        args->alarmFunction(args->alarmData);
+        return null;
+}
+
+xthread_t setAlarm(struct alarm *alarm)
+{
+        if (!alarm)
+                return null;
+
+        pthread_t threadHandle;
+        int r = pthread_create(&threadHandle, null, alarmThreadEntry, alarm);
+        if (r != 0)
+                systemFailure("pthread_create", r);
+
+        return (xthread_t) threadHandle;
+}
+
+void clearAlarm(xthread_t alarm)
+{
+        if (alarm) {
+                pthread_t threadHandle = (pthread_t) alarm;
+                int r = pthread_join(threadHandle, null);
+                if (r != 0)
+                        systemFailure("pthread_join", r);
+        }
+}
+
+static void *threadEntry(void *argsPointer)
+{
+        struct thread *args = argsPointer;
+        args->threadFunction(args->threadData);
+        return null;
+}
+
+xthread_t createThread(struct thread *thread)
+{
+        pthread_t threadHandle;
+        int r = pthread_create(&threadHandle, null, threadEntry, thread);
+        if (r != 0)
+                systemFailure("pthread_create", r);
+        return (xthread_t) threadHandle;
+}
+
+void joinThread(xthread_t thread)
+{
+        pthread_t threadHandle = (pthread_t) thread;
+        int r = pthread_join(threadHandle, null);
+        if (r != 0)
+                systemFailure("pthread_join", r);
+}
+
+#endif
 
 /*----------------------------------------------------------------------+
  |                                                                      |

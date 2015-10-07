@@ -1,4 +1,15 @@
 
+|Todo| clock is cpu time, not actual time [posix]
+
+|Todo| Granularity of win32 clock too low? [win32]
+
+|Todo| Warning about %I64d not being ISO compliant [win32]
+
+------------------------------------------------------------------------
+
+|Todo| Win64 version [win64]
+
+------------------------------------------------------------------------
 |Todo| Internal deepening [search]
 
 |Todo| Residual degradation

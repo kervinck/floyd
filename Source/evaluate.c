@@ -42,6 +42,7 @@
 #include <assert.h>
 #define _XOPEN_SOURCE
 #include <math.h>
+
 #include <setjmp.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -61,6 +62,10 @@
 /*----------------------------------------------------------------------+
  |      Definitions                                                     |
  +----------------------------------------------------------------------*/
+
+#ifndef M_LN10
+#define M_LN10 2.30258509299404568401799145468436421 // log(10)
+#endif
 
 #define other(side) ((side) ^ 1)
 #define flip(fileOrRank) ((fileOrRank) ^ 7)
@@ -103,8 +108,8 @@ static double logit(double p);
 static int squareOf(Board_t self, int piece);
 
 static int evaluatePawn(const int v[vectorLen],
-                        const int minRank[][2],
-                        const int maxRank[][2],
+                              int minRank[10][2],
+                              int maxRank[10][2],
                         int fileIndex, int side,
                         int king, int xking);
 
@@ -547,8 +552,8 @@ int evaluate(Board_t self)
  +----------------------------------------------------------------------*/
 
 static int evaluatePawn(const int v[vectorLen],
-                        const int maxPawnFromRank1[][2],
-                        const int maxPawnFromRank8[][2],
+                     /*const*/int maxPawnFromRank1[][2], // TODO: why does MinGW complain about const here?
+                     /*const*/int maxPawnFromRank8[][2], // TODO: why does MinGW complain about const here?
                         int fileIndex,
                         int side,
                         int king, int xking)

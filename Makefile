@@ -1,15 +1,29 @@
-CFLAGS=-std=c11 -pedantic -Wall -O3 -DfloydVersion=0.1a
+floydVersion:=0.1a
+
+CFLAGS:=-std=c11 -pedantic -Wall -O3 -DfloydVersion=$(floydVersion)
+
+# Cross-compiler for windows
+# Installed from gcc-4.8.0-qt-4.8.4-for-mingw32.dmg
+xcc_win32:=/usr/local/gcc-4.8.0-qt-4.8.4-for-mingw32/win32-gcc/bin/i586-mingw32-gcc
 
 all: module floyd
+win: $(win32_exe)
+
+win32_exe:=floyd$(floydVersion).w32.exe
+win: $(win32_exe)
 
 # As Python module
 module:
 	python setup.py build
 
-# As UCI engine
+# As native UCI engine
 SOURCES=cplus.c evaluate.c floydmain.c format.c kpk.c moves.c parse.c search.c ttable.c uci.c zobrist.c
 floyd: $(addprefix Source/, $(SOURCES)) $(wildcard Source/*.h)
-	gcc $(CFLAGS) -o $@ $(addprefix Source/, $(SOURCES))
+	$(CC) $(CFLAGS) -o $@ $(addprefix Source/, $(SOURCES))
+
+# As Win32 UCI engine
+$(win32_exe): $(addprefix Source/, $(SOURCES)) $(wildcard Source/*.h)
+	$(xcc_win32) $(CFLAGS) -o $@ $(addprefix Source/, $(SOURCES))
 
 # TODO: allow testing before install
 test: install
@@ -52,6 +66,6 @@ install:
 
 clean:
 	python setup.py clean --all
-	rm -f floyd
+	rm -f floyd $(win32_exe)
 
 # vi: noexpandtab

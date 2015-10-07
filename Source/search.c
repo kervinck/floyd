@@ -42,14 +42,10 @@
 #include <assert.h>
 #include <math.h>
 #include <setjmp.h>
-#include <signal.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-
-// System
-#include <unistd.h>
 
 // C extension
 #include "cplus.h"
@@ -79,8 +75,6 @@ static const int pieceValue[] = {
 
 static const int promotionValue[] = { 9, 5, 3, 3 };
 
-static Engine_t globalEngine; // TODO: remove global & all timing decisions & signals from search.c
-
 /*----------------------------------------------------------------------+
  |      Functions                                                       |
  +----------------------------------------------------------------------*/
@@ -100,11 +94,13 @@ static bool repetition(Engine_t self);
  |      rootSearch                                                      |
  +----------------------------------------------------------------------*/
 
-static void catchSignal(int signal)
+static void stopSearch(void *data)
 {
-        globalEngine->stopFlag = true;
+        Engine_t self = data;
+        self->stopFlag = true;
 }
 
+// TODO: all timing decisions from search.c
 // TODO: aspiration search
 void rootSearch(Engine_t self,
         int depth,
@@ -124,10 +120,12 @@ void rootSearch(Engine_t self,
                 self->tt.now = (self->tt.now + 1) & ones(ttDateBits);
         }
 
-        // Set alarm
-        globalEngine = self;
-        sig_t oldHandler = signal(SIGALRM, catchSignal);
-        alarm(ceil(alarmTime));
+        struct alarm alarm = (struct alarm) {
+                .alarmTime = alarmTime,
+                .alarmFunction = stopSearch,
+                .alarmData = self,
+        };
+        xthread_t alarmHandle = setAlarm(alarmTime > 0.0 ? &alarm : null);
 
         if (setjmp(self->abortEnv) == 0) { // try search
                 bool stop = false;
@@ -149,9 +147,7 @@ void rootSearch(Engine_t self,
                 (void) infoFunction(infoData);
         }
 
-        // Clear alarm
-        signal(SIGALRM, oldHandler);
-        alarm(0);
+        clearAlarm(alarmHandle);
 }
 
 /*----------------------------------------------------------------------+

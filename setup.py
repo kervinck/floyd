@@ -3,6 +3,7 @@ from distutils.core import setup, Extension
 floydModule = Extension(
         'floyd',
         sources = [
+                'Source/bench.c',
                 'Source/cplus.c',
                 'Source/evaluate.c',
                 'Source/floydmodule.c',

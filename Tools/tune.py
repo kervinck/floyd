@@ -45,7 +45,7 @@ def readTestsFromEpd(input):
                 if line[6] == 'white' and line[8] == 'black':
                         whiteElo = int(line[7].rstrip(';'))
                         blackElo = int(line[9].rstrip(';'))
-                        pos = '%s %d' % (pos, whiteElo - blackElo)
+                        pos = '%s 0 1 %d' % (pos, whiteElo - blackElo)
                 tests.append((pos, target[result] if line[1] == 'w' else 1.0 - target[result]))
 
         return tests

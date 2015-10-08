@@ -192,7 +192,7 @@ void uciMain(Engine_t self)
                         continue;
 
                 if (strcmp(command, "uci") == 0) {
-                        printf("id name Floyd " quote2(floydVersion) "\n"
+                        printf("id name Floyd "quote2(floydVersion)"\n"
                                "id author Marcel van Kervinck\n"
                                "option name Hash type spin default %ld min 0\n"
                                "option name Clear Hash type button\n"

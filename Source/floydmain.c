@@ -44,7 +44,7 @@ static struct Engine engine;
 
 int main(void)
 {
-        printf("\nFloyd Chess Program - Version " quote2(floydVersion) "\n"
+        printf("\nFloyd Chess Program - Version "quote2(floydVersion)"\n"
                "Copyright (C)1998-2015 by Marcel van Kervinck\n"
                "All rights reserved\n"
                "\n"

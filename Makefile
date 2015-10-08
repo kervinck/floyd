@@ -1,4 +1,5 @@
-floydVersion:=0.1a
+
+floydVersion:=$(shell python Tools/getVersion.py versions.json Source/*)
 
 CFLAGS:=-std=c11 -pedantic -Wall -O3 -DfloydVersion=$(floydVersion)
 
@@ -17,13 +18,15 @@ module:
 	python setup.py build
 
 # As native UCI engine
-SOURCES=bench.c cplus.c evaluate.c floydmain.c format.c kpk.c moves.c parse.c search.c ttable.c uci.c zobrist.c
-floyd: $(addprefix Source/, $(SOURCES)) $(wildcard Source/*.h)
-	$(CC) $(CFLAGS) -o $@ $(addprefix Source/, $(SOURCES))
+sources=bench.c cplus.c evaluate.c floydmain.c format.c kpk.c moves.c parse.c search.c ttable.c uci.c zobrist.c
+floyd: $(addprefix Source/, $(sources)) $(wildcard Source/*.h) versions.json
+	@echo "Version: $(floydVersion)"
+	$(CC) $(CFLAGS) -o $@ $(addprefix Source/, $(sources))
 
 # As Win32 UCI engine
-$(win32_exe): $(addprefix Source/, $(SOURCES)) $(wildcard Source/*.h)
-	$(xcc_win32) $(CFLAGS) -o $@ $(addprefix Source/, $(SOURCES))
+$(win32_exe): $(addprefix Source/, $(sources)) $(wildcard Source/*.h) versions.json
+	@echo "Version: $(floydVersion)"
+	$(xcc_win32) $(CFLAGS) -o $@ $(addprefix Source/, $(sources))
 
 # TODO: allow testing before install
 test: install

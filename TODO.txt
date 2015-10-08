@@ -1,7 +1,5 @@
 
-|Todo| Don't use sleep and kill for the alarm thread [win32,posix]
-
-|Todo| clock is cpu time, not actual time [posix]
+|Todo| Don't use sleep and terminate for the alarm thread [win32]
 
 |Todo| Warning about %I64d not being ISO compliant [win32]
 

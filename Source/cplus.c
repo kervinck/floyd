@@ -40,6 +40,7 @@
 
 #include <errno.h>
 #include <math.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -52,6 +53,7 @@
  #include <sys/timeb.h>
 #elif defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))
  #include <pthread.h>
+ #include <sys/time.h>
  #include <unistd.h>
  #define POSIX
 #endif
@@ -79,7 +81,7 @@ err_t err_free(err_t err)
  |      Main support                                                    |
  +----------------------------------------------------------------------*/
 
-int xExitMain(err_t err)
+int errExitMain(err_t err)
 {
         if (err == OK) {
                 return 0;
@@ -96,13 +98,13 @@ int xExitMain(err_t err)
         }
 }
 
-void xAbort(err_t err)
+void errAbort(err_t err)
 {
-        (void) xExitMain(err);
+        (void) errExitMain(err);
         abort();
 }
 
-void systemFailure(const char *function, int r)
+void xAbort(int r, const char *function)
 {
         fprintf(stderr, "*** System error: %s failed (%s)\n", function, strerror(r));
         abort();
@@ -168,7 +170,7 @@ double xclock(void)
         struct rusage ru;
 
         int r = getrusage(RUSAGE_SELF, &ru);
-        if (r != 0)
+        if (r)
                 return -1.0;
 
         double clock =
@@ -249,46 +251,35 @@ int readLine(void *fpPointer, char **pLine, int *pSize)
  +----------------------------------------------------------------------*/
 #if defined(_WIN32)
 
-static unsigned int __stdcall alarmThreadEntry(void *argsPointer)
+/*
+ *  Threads
+ */
+
+struct threadClosure {
+        thread_fn *function;
+        void *data;
+};
+
+static unsigned int __stdcall threadStart(void *args)
 {
-        struct alarm *args = argsPointer;
-        DWORD millis = ceil(args->time * 1e3);
-        Sleep(millis);
-        args->function(args->data);
+        struct threadClosure closure = *(struct threadClosure*)args;
+        free(args);
+        closure.function(closure.data);
         return 0;
 }
 
-xThread_t setAlarm(struct alarm *alarm)
+xThread_t createThread(thread_fn *function, void *data)
 {
-        if (alarm) {
-                HANDLE threadHandle = (HANDLE) _beginthreadex(
-                        null, 0, alarmThreadEntry, (void*) alarm, 0, null);
-                return (xThread_t) threadHandle;
-        }
-                return null;
-}
+        // We can't pass these on the stack due to the race-condition
+        struct threadClosure *closure = malloc(sizeof(closure));
+        if (!closure)
+                xAbort(errno, "malloc");
+        closure->function = function;
+        closure->data = data;
 
-void clearAlarm(xThread_t alarm)
-{
-        if (alarm) {
-                HANDLE threadHandle = (HANDLE) alarm;
-                TerminateThread(threadHandle, 0);
-                WaitForSingleObject(threadHandle, INFINITE);
-                CloseHandle(threadHandle);
-        }
-}
-
-static unsigned int __stdcall threadEntry(void *argsPointer)
-{
-        struct threadClosure *args = argsPointer;
-        args->function(args->data);
-        return 0;
-}
-
-xThread_t createThread(struct threadClosure *thread)
-{
         HANDLE threadHandle = (HANDLE) _beginthreadex(
-                null, 0, threadEntry, thread, 0, null);
+                null, 0, threadStart, closure, 0, null);
+
         return threadHandle;
 }
 
@@ -298,6 +289,49 @@ void joinThread(xThread_t thread)
         WaitForSingleObject(threadHandle, INFINITE);
         CloseHandle(threadHandle);
 }
+
+/*
+ *  Alarms
+ */
+
+struct alarmHandle {
+        double delay;
+        thread_fn *function;
+        void *data;
+        HANDLE thread;
+};
+
+static unsigned int __stdcall alarmThreadStart(void *argsPointer)
+{
+        struct alarmHandle *args = argsPointer;
+        DWORD millis = ceil(args->delay * 1e3);
+        Sleep(millis);
+        args->function(args->data);
+        return 0;
+}
+
+xAlarm_t setAlarm(double delay, thread_fn *function, void *data)
+{
+        struct alarmHandle *alarm = malloc(sizeof(*alarm));
+        if (!alarm) xAbort(errno, "malloc");
+
+        alarm->delay = delay;
+        alarm->function = function;
+        alarm->data = data;
+
+        alarm->thread = (HANDLE) _beginthreadex(
+                null, 0, alarmThreadStart, alarm, 0, null);
+
+        return alarm;
+}
+
+void clearAlarm(xAlarm_t alarm)
+{
+        TerminateThread(alarm->thread, 0);
+        WaitForSingleObject(alarm->thread, INFINITE);
+        CloseHandle(alarm->thread);
+        free(alarm);
+}
 #endif
 
 /*----------------------------------------------------------------------+
@@ -305,51 +339,36 @@ void joinThread(xThread_t thread)
  +----------------------------------------------------------------------*/
 #if defined(POSIX)
 
-static void *alarmThreadEntry(void *argsPointer)
+/*
+ *  Threads
+ */
+
+struct threadClosure {
+        thread_fn *function;
+        void *data;
+};
+
+static void *threadStart(void *args)
 {
-        struct alarm *args = argsPointer;
-        int r = usleep((useconds_t) (args->time * 1e6));
-        if (r != 0)
-                systemFailure("usleep", r);
-        args->function(args->data);
+        struct threadClosure closure = *(struct threadClosure*)args;
+        free(args);
+        closure.function(closure.data);
         return null;
 }
 
-xThread_t setAlarm(struct alarm *alarm)
+xThread_t createThread(thread_fn *function, void *data)
 {
-        if (alarm) {
-                pthread_t threadHandle;
-                int r = pthread_create(&threadHandle, null, alarmThreadEntry, alarm);
-                if (r != 0)
-                        systemFailure("pthread_create", r);
-                return (xThread_t) threadHandle;
-        }
-                return null;
-}
+        // We can't pass these on the stack due to the race-condition
+        struct threadClosure *closure = malloc(sizeof(closure));
+        if (!closure)
+                xAbort(errno, "malloc");
+        closure->function = function;
+        closure->data = data;
 
-void clearAlarm(xThread_t alarm)
-{
-        if (alarm) {
-                pthread_t threadHandle = (pthread_t) alarm;
-                int r = pthread_join(threadHandle, null);
-                if (r != 0)
-                        systemFailure("pthread_join", r);
-        }
-}
-
-static void *threadEntry(void *argsPointer)
-{
-        struct threadClosure *args = argsPointer;
-        args->function(args->data);
-        return null;
-}
-
-xThread_t createThread(struct threadClosure *thread)
-{
         pthread_t threadHandle;
-        int r = pthread_create(&threadHandle, null, threadEntry, thread);
-        if (r != 0)
-                systemFailure("pthread_create", r);
+        int r = pthread_create(&threadHandle, null, threadStart, closure);
+        cAbort(r, "pthread_create");
+
         return (xThread_t) threadHandle;
 }
 
@@ -357,8 +376,110 @@ void joinThread(xThread_t thread)
 {
         pthread_t threadHandle = (pthread_t) thread;
         int r = pthread_join(threadHandle, null);
-        if (r != 0)
-                systemFailure("pthread_join", r);
+        cAbort(r, "pthread_join");
+}
+
+/*
+ *  Alarms
+ */
+
+struct alarmHandle {
+        pthread_mutex_t mutex;
+        pthread_cond_t cond;
+        struct timespec abstime;
+        bool abort;
+        thread_fn *function;
+        void *data;
+        pthread_t thread;
+};
+
+static void *alarmThreadStart(void *args)
+{
+        struct alarmHandle *alarm = args;
+        int r;
+
+        r = pthread_mutex_lock(&alarm->mutex);
+        cAbort(r, "pthread_mutex_lock");
+
+        while (!alarm->abort) {
+                r = pthread_cond_timedwait(&alarm->cond, &alarm->mutex, &alarm->abstime);
+                if (r == ETIMEDOUT)
+                        break;
+                cAbort(r, "pthread_cond_timedwait");
+        }
+
+        r = pthread_mutex_unlock(&alarm->mutex);
+        cAbort(r, "pthread_mutex_unlock");
+
+        if (!alarm->abort)
+                alarm->function(alarm->data);
+
+        return null;
+}
+
+xAlarm_t setAlarm(double delay, thread_fn *function, void *data)
+{
+        struct alarmHandle *alarm = malloc(sizeof(*alarm));
+        if (!alarm) xAbort(errno, "malloc");
+
+        int r = pthread_mutex_init(&alarm->mutex, null);
+        cAbort(r, "pthread_mutex_init");
+
+        r = pthread_cond_init(&alarm->cond, null);
+        cAbort(r, "pthread_cond_init");
+
+        struct timeval now;
+        r = gettimeofday(&now, null); // Mac doesn't have clock_gettime
+        cAbort(r, "gettimeofday");
+
+        const long giga = 1e9;
+        long nsec = now.tv_usec * 1000 + (long) round(fmod(delay, 1.0) * giga);
+        long sec = now.tv_sec + (long) delay;
+        alarm->abstime.tv_nsec = nsec % giga;
+        alarm->abstime.tv_sec = sec + (nsec / giga);
+
+        alarm->abort = false;
+
+        alarm->function = function;
+        alarm->data = data;
+
+        r = pthread_create(&alarm->thread, null, alarmThreadStart, alarm);
+        cAbort(r, "pthread_create");
+
+        return alarm;
+}
+
+void clearAlarm(xAlarm_t alarm)
+{
+        /*
+         *  Stop alarm thread if it is still waiting
+         */
+
+        int r = pthread_mutex_lock(&alarm->mutex);
+        cAbort(r, "pthread_mutex_lock");
+
+        alarm->abort = true;
+
+        r = pthread_cond_signal(&alarm->cond);
+        cAbort(r, "pthread_cond_signal");
+
+        r = pthread_mutex_unlock(&alarm->mutex);
+        cAbort(r, "pthread_mutex_unlock");
+
+        /*
+         *  Free resources
+         */
+
+        r = pthread_join(alarm->thread, null);
+        cAbort(r, "pthread_join");
+
+        r = pthread_mutex_destroy(&alarm->mutex);
+        cAbort(r, "pthread_mutex_destroy");
+
+        r = pthread_cond_destroy(&alarm->cond);
+        cAbort(r, "pthread_cond_destroy");
+
+        free(alarm);
 }
 #endif
 

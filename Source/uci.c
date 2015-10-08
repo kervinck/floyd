@@ -151,7 +151,7 @@ X;
 // Calculate target time (or alarm time) for thinking on game clock
 static double target(Engine_t self, double time, double inc, int movestogo);
 
-static xThread_t startSearch(struct searchArgs *args, struct threadClosure *thread);
+static xThread_t startSearch(struct searchArgs *args);
 static xThread_t stopSearch(Engine_t self, xThread_t searchThread);
 
 static void uciBestMove(Engine_t self);
@@ -176,7 +176,6 @@ void uciMain(Engine_t self)
         ttSetSize(self, options.Hash * MiB);
 
         // Prepare threading
-        struct threadClosure thread; // TODO: !!! having this here is still ugly !!!
         xThread_t searchThread = null;
         struct searchArgs args;
 
@@ -346,7 +345,7 @@ void uciMain(Engine_t self)
 
                         printf("info string targetTime %.3f alarmTime %.3f\n", args.targetTime, args.alarmTime); // TODO: remove once branching factor is ~2
 
-                        searchThread = startSearch(&args, &thread);
+                        searchThread = startSearch(&args);
                         continue;
                 }
 
@@ -505,12 +504,10 @@ static void uciBestMove(Engine_t self)
 
 static thread_fn searchThreadEntry;
 
-static xThread_t startSearch(struct searchArgs *args, struct threadClosure *thread)
+static xThread_t startSearch(struct searchArgs *args)
 {
-        thread->function = searchThreadEntry;
-        thread->data = args;
         args->self->stopFlag = false;
-        return createThread(thread);
+        return createThread(searchThreadEntry, args);
 }
 
 // Helper for startSearch

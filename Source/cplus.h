@@ -172,7 +172,7 @@ typedef List(uint64_t)      uint64List;
                         sizeof((list).v[0]),\
                         (initialListSize + sizeof((list).v[0]) - 1) / sizeof((list).v[0]));\
                 if (_err != OK)\
-                        xAbort(_err);\
+                        errAbort(_err);\
                 (list).v = _v;\
         }\
         (list).v[(list).len++] = (value); )
@@ -197,39 +197,41 @@ int readLine(void *fp, char **pLine, int *pSize);
  |      Main support                                                    |
  +----------------------------------------------------------------------*/
 
-int xExitMain(err_t err);
-void xAbort(err_t err);
-void systemFailure(const char *function, int r);
+int errExitMain(err_t err);
+void errAbort(err_t err);
+void xAbort(int r, const char *function);
+
+// Conditional abort
+static inline void cAbort(int r, const char *function)
+{
+        if (r != 0)
+                xAbort(r, function);
+}
 
 /*----------------------------------------------------------------------+
  |      Threads and alarms                                              |
  +----------------------------------------------------------------------*/
 
-// Use a dummy struct* instead of void* to provide some static type checking
+/*
+ *  An xThread_t is either a Windows thread or a POSIX thread. To avoid
+ *  exposing these systems' entire APIs, use a typedef. This works because
+ *  on both systems it is safe to cast the handle to a pointer. To provide
+ *  some type safety and prevent mishaps, use a dummy struct* instead of
+ *  void* as handle. In the implementation cast to and from the actual type.
+ */
 typedef struct threadHandle *xThread_t;
 
-// Definitions
-
 typedef void thread_fn(void *data);
-
-struct threadClosure {
-        thread_fn *function;
-        void *data;
-};
-
-struct alarm {
-        thread_fn *function;
-        void *data;
-        double time;
-};
-
-// Functions
-
-xThread_t setAlarm(struct alarm *alarm);
-void clearAlarm(xThread_t alarm);
-
-xThread_t createThread(struct threadClosure *thread);
+xThread_t createThread(thread_fn *function, void *data);
 void joinThread(xThread_t thread);
+
+/*
+ *  An alarm is a thread that runs its main function with a delay,
+ *  and which can be safely aborted while it is waiting to run.
+ */
+typedef struct alarmHandle *xAlarm_t;
+xAlarm_t setAlarm(double delay, thread_fn *function, void *data);
+void clearAlarm(xAlarm_t alarm);
 
 /*----------------------------------------------------------------------+
  |                                                                      |

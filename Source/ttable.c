@@ -99,7 +99,7 @@ void ttSetSize(Engine_t self, size_t size)
                 newSlots = realloc(self->tt.slots, newSize);
         }
         if (!newSlots)
-                systemFailure("realloc", errno);
+                xAbort(errno, "realloc");
 
         if (!self->tt.slots) // initial allocation is uninitialized
                 memset(newSlots, 0, bucketLen * sizeof newSlots[0]);

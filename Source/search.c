@@ -120,12 +120,9 @@ void rootSearch(Engine_t self,
                 self->tt.now = (self->tt.now + 1) & ones(ttDateBits);
         }
 
-        struct alarm alarm = (struct alarm) {
-                .function = stopSearch,
-                .data = self,
-                .time = alarmTime,
-        };
-        xThread_t alarmHandle = setAlarm(alarmTime > 0.0 ? &alarm : null);
+        xAlarm_t alarmHandle = (alarmTime > 0.0)
+                ? setAlarm(alarmTime, stopSearch, self)
+                : null;
 
         // Prepare abort possibility
         jmp_buf here;
@@ -151,7 +148,8 @@ void rootSearch(Engine_t self,
                 (void) infoFunction(infoData);
         }
 
-        clearAlarm(alarmHandle);
+        if (alarmHandle)
+                clearAlarm(alarmHandle);
 }
 
 /*----------------------------------------------------------------------+

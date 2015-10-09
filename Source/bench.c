@@ -64,15 +64,14 @@ static bool noInfoFunction(void *infoData) // TODO: move to search.c
 
 double uciBenchmark(Engine_t self, double time, searchInfo_fn *infoFunction, void *infoData)
 {
-        char oldPosition[maxFenSize];
+        char oldPosition[maxFenSize]; // TODO: clone engine and then share tt instead
         boardToFen(board(self), oldPosition);
 
         long long totalNodes = 0;
         double totalSeconds = 0.0;
 
         for (int i=0; i<arrayLen(positions); i++) {
-                (void) setupBoard(board(self), positions[i]);
-                self->stopFlag = false;
+                setupBoard(board(self), positions[i]);
                 rootSearch(self, maxDepth, 0.0, time, noInfoFunction, null);
                 totalNodes += self->nodeCount;
                 totalSeconds += self->seconds;

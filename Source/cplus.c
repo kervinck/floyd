@@ -1,7 +1,7 @@
 
 /*----------------------------------------------------------------------+
  |                                                                      |
- |      cplus.c - a loose collection of small C extensions              |
+ |      cplus.c -- a loose collection of small C extensions             |
  |                                                                      |
  +----------------------------------------------------------------------*/
 
@@ -152,13 +152,13 @@ cleanup:
 }
 
 /*----------------------------------------------------------------------+
- |      xclock                                                          |
+ |      xTime                                                           |
  +----------------------------------------------------------------------*/
 
 /*
- *  Get clock in seconds
+ *  Get wall time in seconds and subseconds
  */
-double xclock(void)
+double xTime(void)
 {
 #if defined(WIN32)
         struct _timeb t;
@@ -166,18 +166,12 @@ double xclock(void)
         return t.time + t.millitm * 1e-3;
 #endif
 #if defined(POSIX)
-        // TODO: why are we using the CPU time and not wall time...
-        struct rusage ru;
-
-        int r = getrusage(RUSAGE_SELF, &ru);
-        if (r)
+        struct timeval tv;
+        int r = gettimeofday(&tv, null);
+        if (r == 0)
+                return tv.tv_sec + tv.tv_usec * 1e-6;
+        else
                 return -1.0;
-
-        double clock =
-                (ru.ru_utime.tv_usec + ru.ru_stime.tv_usec) / 1.0e6 +
-                (ru.ru_utime.tv_sec  + ru.ru_stime.tv_sec);
-
-        return clock;
 #endif
 }
 
@@ -247,13 +241,9 @@ int readLine(void *fpPointer, char **pLine, int *pSize)
 }
 
 /*----------------------------------------------------------------------+
- |      Windows implementation of threads and alarms                    |
+ |      Threads (Windows)                                               |
  +----------------------------------------------------------------------*/
 #if defined(_WIN32)
-
-/*
- *  Threads
- */
 
 struct threadClosure {
         thread_fn *function;
@@ -289,59 +279,12 @@ void joinThread(xThread_t thread)
         WaitForSingleObject(threadHandle, INFINITE);
         CloseHandle(threadHandle);
 }
-
-/*
- *  Alarms
- */
-
-struct alarmHandle {
-        double delay;
-        thread_fn *function;
-        void *data;
-        HANDLE thread;
-};
-
-static unsigned int __stdcall alarmThreadStart(void *argsPointer)
-{
-        struct alarmHandle *args = argsPointer;
-        DWORD millis = ceil(args->delay * 1e3);
-        Sleep(millis);
-        args->function(args->data);
-        return 0;
-}
-
-xAlarm_t setAlarm(double delay, thread_fn *function, void *data)
-{
-        struct alarmHandle *alarm = malloc(sizeof(*alarm));
-        if (!alarm) xAbort(errno, "malloc");
-
-        alarm->delay = delay;
-        alarm->function = function;
-        alarm->data = data;
-
-        alarm->thread = (HANDLE) _beginthreadex(
-                null, 0, alarmThreadStart, alarm, 0, null);
-
-        return alarm;
-}
-
-void clearAlarm(xAlarm_t alarm)
-{
-        TerminateThread(alarm->thread, 0);
-        WaitForSingleObject(alarm->thread, INFINITE);
-        CloseHandle(alarm->thread);
-        free(alarm);
-}
 #endif
 
 /*----------------------------------------------------------------------+
- |      POSIX implementation of threads and alarms                      |
+ |      Threads (POSIX)                                                 |
  +----------------------------------------------------------------------*/
 #if defined(POSIX)
-
-/*
- *  Threads
- */
 
 struct threadClosure {
         thread_fn *function;
@@ -378,10 +321,65 @@ void joinThread(xThread_t thread)
         int r = pthread_join(threadHandle, null);
         cAbort(r, "pthread_join");
 }
+#endif
 
-/*
- *  Alarms
- */
+
+/*----------------------------------------------------------------------+
+ |      Alarms (Windows)                                                |
+ +----------------------------------------------------------------------*/
+#if defined(_WIN32)
+
+// TODO: check and abort on all error conditions of win32 functions
+
+struct alarmHandle {
+        double delay;
+        thread_fn *function;
+        void *data;
+        HANDLE event;
+        HANDLE thread;
+};
+
+static unsigned int __stdcall alarmThreadStart(void *args)
+{
+        struct alarmHandle *alarm = args;
+        DWORD millis = ceil(alarm->delay * 1e3);
+        DWORD r = WaitForSingleObject(alarm->event, millis);
+        if (r == WAIT_TIMEOUT)
+                alarm->function(alarm->data);
+        return 0;
+}
+
+xAlarm_t setAlarm(double delay, thread_fn *function, void *data)
+{
+        struct alarmHandle *alarm = malloc(sizeof(*alarm));
+        if (!alarm) xAbort(errno, "malloc");
+
+        alarm->delay = delay;
+        alarm->function = function;
+        alarm->data = data;
+        alarm->event = CreateEvent(null, true, false, null);
+        alarm->thread = (HANDLE) _beginthreadex(
+                null, 0, alarmThreadStart, alarm, 0, null);
+
+        return alarm;
+}
+
+void clearAlarm(xAlarm_t alarm)
+{
+        if (alarm) {
+                SetEvent(alarm->event);
+                WaitForSingleObject(alarm->thread, INFINITE);
+                CloseHandle(alarm->thread);
+                CloseHandle(alarm->event);
+                free(alarm);
+        }
+}
+#endif
+
+/*----------------------------------------------------------------------+
+ |      Alarms (POSIX)                                                  |
+ +----------------------------------------------------------------------*/
+#if defined(POSIX)
 
 struct alarmHandle {
         pthread_mutex_t mutex;
@@ -428,15 +426,9 @@ xAlarm_t setAlarm(double delay, thread_fn *function, void *data)
         r = pthread_cond_init(&alarm->cond, null);
         cAbort(r, "pthread_cond_init");
 
-        struct timeval now;
-        r = gettimeofday(&now, null); // Mac doesn't have clock_gettime
-        cAbort(r, "gettimeofday");
-
-        const long giga = 1e9;
-        long nsec = now.tv_usec * 1000 + (long) round(fmod(delay, 1.0) * giga);
-        long sec = now.tv_sec + (long) delay;
-        alarm->abstime.tv_nsec = nsec % giga;
-        alarm->abstime.tv_sec = sec + (nsec / giga);
+        double fabstime = xTime() + delay;
+        alarm->abstime.tv_sec = fabstime;
+        alarm->abstime.tv_nsec = fmod(fabstime, 1.0) * 1e9;
 
         alarm->abort = false;
 
@@ -451,6 +443,9 @@ xAlarm_t setAlarm(double delay, thread_fn *function, void *data)
 
 void clearAlarm(xAlarm_t alarm)
 {
+        if (alarm == null)
+                return;
+
         /*
          *  Stop alarm thread if it is still waiting
          */
@@ -459,7 +454,6 @@ void clearAlarm(xAlarm_t alarm)
         cAbort(r, "pthread_mutex_lock");
 
         alarm->abort = true;
-
         r = pthread_cond_signal(&alarm->cond);
         cAbort(r, "pthread_cond_signal");
 

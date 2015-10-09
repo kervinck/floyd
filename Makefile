@@ -1,32 +1,32 @@
-
 floydVersion:=$(shell python Tools/getVersion.py versions.json Source/*)
+
+uciSources:=bench.c cplus.c evaluate.c floydmain.c format.c kpk.c moves.c parse.c\
+            search.c ttable.c uci.c zobrist.c
 
 CFLAGS:=-std=c11 -pedantic -Wall -O3 -DfloydVersion=$(floydVersion)
 
-# Cross-compiler for windows
-# Installed from gcc-4.8.0-qt-4.8.4-for-mingw32.dmg
+win32_exe:=floyd.w32.exe
+
+# Cross-compiler for windows 32bit (installed from gcc-4.8.0-qt-4.8.4-for-mingw32.dmg)
 xcc_win32:=/usr/local/gcc-4.8.0-qt-4.8.4-for-mingw32/win32-gcc/bin/i586-mingw32-gcc
+win32_flags:=-Wno-format # To suppress warnings about "%lld" (or "%I64d"). Both work fine.
 
 all: module floyd
-win: $(win32_exe)
-
-win32_exe:=floyd$(floydVersion).w32.exe
-win: $(win32_exe)
 
 # As Python module
 module:
 	python setup.py build
 
 # As native UCI engine
-sources=bench.c cplus.c evaluate.c floydmain.c format.c kpk.c moves.c parse.c search.c ttable.c uci.c zobrist.c
-floyd: $(addprefix Source/, $(sources)) $(wildcard Source/*.h) versions.json
+floyd: $(addprefix Source/, $(uciSources)) $(wildcard Source/*.h) versions.json
 	@echo "Version: $(floydVersion)"
-	$(CC) $(CFLAGS) -o $@ $(addprefix Source/, $(sources))
+	$(CC) $(CFLAGS) -o $@ $(addprefix Source/, $(uciSources))
 
 # As Win32 UCI engine
-$(win32_exe): $(addprefix Source/, $(sources)) $(wildcard Source/*.h) versions.json
+win: $(win32_exe)
+$(win32_exe): $(addprefix Source/, $(uciSources)) $(wildcard Source/*.h) versions.json
 	@echo "Version: $(floydVersion)"
-	$(xcc_win32) $(CFLAGS) -o $@ $(addprefix Source/, $(sources))
+	$(xcc_win32) $(CFLAGS) $(win32_flags) -o $@ $(addprefix Source/, $(uciSources))
 
 # TODO: allow testing before install
 test: install

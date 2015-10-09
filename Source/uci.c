@@ -87,12 +87,10 @@ struct options {
  |      Data                                                            |
  +----------------------------------------------------------------------*/
 
-#define X "\n"
-
 static const char helpMessage[] =
+ #define X "\n"
  "This engine uses the Universal Chess Interface (UCI) protocol."
-X"See http://download.shredderchess.com/div/uci.zip for details."
-X
+X"See https://marcelk.net/chess/uci.html for details."
 X"Supported UCI commands are:"
 X"  uci"
 X"        Confirm UCI mode, show engine details and options."
@@ -151,10 +149,13 @@ X;
 // Calculate target time (or alarm time) for thinking on game clock
 static double target(Engine_t self, double time, double inc, int movestogo);
 
-static xThread_t startSearch(struct searchArgs *args);
 static xThread_t stopSearch(Engine_t self, xThread_t searchThread);
+static xThread_t startSearch(struct searchArgs *args);
 
 static void uciBestMove(Engine_t self);
+
+static void updateOptions(Engine_t self,
+        struct options *options, const struct options *newOptions);
 
 static searchInfo_fn benchInfoFunction;
 
@@ -167,13 +168,11 @@ void uciMain(Engine_t self)
         char *line = null;
         int size = 0;
         bool debug = false;
-        struct options options =  {
-                .Hash = 256, // CCRL standard
+        struct options options = {0};
+        struct options newOptions =  {
+                .Hash = 128,
                 .Ponder = false,
         };
-        struct options newOptions = options;
-
-        ttSetSize(self, options.Hash * MiB);
 
         // Prepare threading
         xThread_t searchThread = null;
@@ -181,12 +180,10 @@ void uciMain(Engine_t self)
 
         // Process commands from stdin
         while (fflush(stdout), readLine(stdin, &line, &size) > 0) {
-                char command[15+1];
-                int n, m = 0;
-                char dummy;
+                if (debug) printf("info string input %s", line);
 
-                if (debug)
-                        printf("info string input %s", line);
+                char command[15+1], dummy;
+                int n, m = 0;
 
                 if (sscanf(line, " %15s %n", command, &n) != 1)
                         continue;
@@ -196,14 +193,12 @@ void uciMain(Engine_t self)
                                "id author Marcel van Kervinck\n"
                                "option name Hash type spin default %ld min 0\n"
                                "option name Clear Hash type button\n"
-                               //"option name Threads type spin default 1 min 1 max 1\n"
                                //"option name Ponder type check default false\n" // Keep commented out for now
                                //"option name MultiPV type spin default 1 min 1 max 1\n"
                                //"option name UCI_Chess960 type check default false\n"
                                //"option name Contempt type spin default 0 min -100 max 100\n"
                                "uciok\n",
-                                options.Hash
-                                );
+                                options.Hash);
                         continue;
                 }
 
@@ -226,11 +221,7 @@ void uciMain(Engine_t self)
                 }
 
                 if (strcmp(command, "isready") == 0) {
-                        if (options.Hash != newOptions.Hash)
-                                ttSetSize(self, newOptions.Hash * MiB);
-                        if (options.ClearHash != newOptions.ClearHash)
-                                ttClearFast(self);
-                        options = newOptions;
+                        updateOptions(self, &options, &newOptions);
                         printf("readyok\n");
                         continue;
                 }
@@ -281,6 +272,7 @@ void uciMain(Engine_t self)
 
                 if (strcmp(command, "go") == 0) {
                         searchThread = stopSearch(self, searchThread);
+                        updateOptions(self, &options, &newOptions);
 
                         args = (struct searchArgs) {
                                 .self = self,
@@ -321,11 +313,7 @@ void uciMain(Engine_t self)
                                  ||  sscanf(line+n, "binc %ld     %n", &binc,     &m) == 1
                                  ||  sscanf(line+n, "movestogo %d %n", &movestogo, &m) == 1
                                  ||  sscanf(line+n, "depth %d     %n", &args.depth, &m) == 1
-#if defined(_WIN32)
-                                 ||  sscanf(line+n, "nodes %I64d  %n", &nodes,    &m) == 1
-#else
                                  ||  sscanf(line+n, "nodes %lld   %n", &nodes,    &m) == 1
-#endif
                                  ||  sscanf(line+n, "mate %d      %n", &mate,     &m) == 1
                                  ||  sscanf(line+n, "movetime %ld %n", &movetime, &m) == 1
                                  || (sscanf(line+n, "infinite%c   %n", &dummy,    &m) == 1 && isspace(dummy) && (args.infinite = true))
@@ -344,7 +332,6 @@ void uciMain(Engine_t self)
                         }
 
                         printf("info string targetTime %.3f alarmTime %.3f\n", args.targetTime, args.alarmTime); // TODO: remove once branching factor is ~2
-
                         searchThread = startSearch(&args);
                         continue;
                 }
@@ -378,6 +365,7 @@ void uciMain(Engine_t self)
                 }
 
                 if (strcmp(command, "bench") == 0) {
+                        updateOptions(self, &options, &newOptions);
                         long movetime = 1000;
                         sscanf(line+n, "movetime %ld", &movetime);
                         double nps = uciBenchmark(self, movetime * ms, benchInfoFunction, self);
@@ -395,20 +383,25 @@ void uciMain(Engine_t self)
         line = null;
 }
 
-static
-bool benchInfoFunction(void *infoData)
+/*----------------------------------------------------------------------+
+ |      updateOptions                                                   |
+ +----------------------------------------------------------------------*/
+
+static void updateOptions(Engine_t self,
+        struct options *options, const struct options *newOptions)
 {
-        Engine_t engine = infoData;
-        char fen[maxFenSize];
-        boardToFen(&engine->board, fen);
-        printf("info fen %s time %.f nodes %lld\n", fen, engine->seconds / ms, engine->nodeCount);
-        return false;
+        if (options->Hash != newOptions->Hash)
+                ttSetSize(self, newOptions->Hash * MiB);
+        if (options->ClearHash != newOptions->ClearHash)
+                ttClearFast(self);
+        *options = *newOptions;
 }
 
 /*----------------------------------------------------------------------+
  |      target                                                          |
  +----------------------------------------------------------------------*/
 
+// TODO: move out of uci.c
 static double target(Engine_t self, double time, double inc, int movestogo)
 {
         switch (board(self)->halfmoveClock) {
@@ -447,13 +440,8 @@ bool uciSearchInfo(void *uciInfoData)
                 printf(" depth %d score %s", self->depth, scoreString);
         }
 
-#if defined(_WIN32)
-        printf(" nodes %I64d nps %.f",
-#else
-        printf(" nodes %lld nps %.f",
-#endif
-                self->nodeCount,
-                (self->seconds > 0.0) ? self->nodeCount / self->seconds : 0.0);
+        double nps = (self->seconds > 0.0) ? self->nodeCount / self->seconds : 0.0;
+        printf(" nodes %lld nps %.f", self->nodeCount, nps);
 
         double ttLoad = ttCalcLoad(self);
         printf(" hashfull %d", (int) round(ttLoad * 1000.0));
@@ -499,21 +487,27 @@ static void uciBestMove(Engine_t self)
 }
 
 /*----------------------------------------------------------------------+
- |      startSearch                                                     |
+ |      benchInfoFunction                                               |
  +----------------------------------------------------------------------*/
 
-static thread_fn searchThreadEntry;
-
-static xThread_t startSearch(struct searchArgs *args)
+static bool benchInfoFunction(void *infoData)
 {
-        args->self->stopFlag = false;
-        return createThread(searchThreadEntry, args);
+        Engine_t engine = infoData;
+        char fen[maxFenSize];
+        boardToFen(&engine->board, fen);
+        double s = engine->seconds;
+        double nps = (s > 0.0) ? engine->nodeCount / s : 0.0;
+        printf("info time %.f nps %.f fen %s\n", s / ms, nps, fen);
+        return false;
 }
 
-// Helper for startSearch
-static void searchThreadEntry(void *argsPointer)
+/*----------------------------------------------------------------------+
+ |      startSearch / stopSearch                                        |
+ +----------------------------------------------------------------------*/
+
+static void searchThreadStart(void *argsData)
 {
-        struct searchArgs *args = argsPointer;
+        struct searchArgs *args = argsData;
 
         rootSearch(args->self,
                    args->depth,
@@ -526,9 +520,10 @@ static void searchThreadEntry(void *argsPointer)
         }
 }
 
-/*----------------------------------------------------------------------+
- |      stopSearch                                                      |
- +----------------------------------------------------------------------*/
+static xThread_t startSearch(struct searchArgs *args)
+{
+        return createThread(searchThreadStart, args);
+}
 
 static xThread_t stopSearch(Engine_t self, xThread_t searchThread)
 {

@@ -108,7 +108,7 @@ void rootSearch(Engine_t self,
         double alarmTime,
         searchInfo_fn *infoFunction, void *infoData)
 {
-        double startTime = xclock();
+        double startTime = xTime();
         self->nodeCount = 0;
         self->rootPlyNumber = board(self)->plyNumber;
 
@@ -120,9 +120,10 @@ void rootSearch(Engine_t self,
                 self->tt.now = (self->tt.now + 1) & ones(ttDateBits);
         }
 
-        xAlarm_t alarmHandle = (alarmTime > 0.0)
-                ? setAlarm(alarmTime, stopSearch, self)
-                : null;
+        self->stopFlag = false;
+        xAlarm_t alarmHandle = null;
+        if (alarmTime > 0.0)
+                setAlarm(alarmTime, stopSearch, self);
 
         // Prepare abort possibility
         jmp_buf here;
@@ -133,14 +134,14 @@ void rootSearch(Engine_t self,
                 for (int iteration=0; iteration<=depth && !stop; iteration++) {
                         self->depth = iteration;
                         self->score = pvSearch(self, iteration, -maxInt, maxInt, 0);
-                        self->seconds = xclock() - startTime;
+                        self->seconds = xTime() - startTime;
                         updateBestAndPonderMove(self);
                         stop = infoFunction(infoData)
                             || (self->score + iteration + 2 >= maxMate && iteration > 0) // TODO: remove
                             || (targetTime > 0.0 && self->seconds >= 0.5 * targetTime); // TODO: remove
                 }
         } else { // except abort
-                self->seconds = xclock() - startTime;
+                self->seconds = xTime() - startTime;
                 while (board(self)->plyNumber > self->rootPlyNumber)
                         undoMove(board(self));
                 int pvCut = updateBestAndPonderMove(self);
@@ -148,8 +149,7 @@ void rootSearch(Engine_t self,
                 (void) infoFunction(infoData);
         }
 
-        if (alarmHandle)
-                clearAlarm(alarmHandle);
+        clearAlarm(alarmHandle);
 }
 
 /*----------------------------------------------------------------------+

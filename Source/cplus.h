@@ -1,7 +1,7 @@
 
 /*----------------------------------------------------------------------+
  |                                                                      |
- |      cplus.h - a loose collection of small C extensions              |
+ |      cplus.h -- a loose collection of small C extensions             |
  |                                                                      |
  +----------------------------------------------------------------------*/
 
@@ -189,7 +189,7 @@ typedef List(uint64_t)      uint64List;
 
 err_t list_ensure_len(void **v, int *maxLen, int minLen, int unit, int newLen);
 
-double xclock(void);
+double xTime(void);
 char *stringCopy(char *s, const char *t);
 int readLine(void *fp, char **pLine, int *pSize);
 

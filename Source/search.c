@@ -123,7 +123,7 @@ void rootSearch(Engine_t self,
         self->stopFlag = false;
         xAlarm_t alarmHandle = null;
         if (alarmTime > 0.0)
-                setAlarm(alarmTime, stopSearch, self);
+                alarmHandle = setAlarm(alarmTime, stopSearch, self);
 
         // Prepare abort possibility
         jmp_buf here;

@@ -3,7 +3,13 @@ floydVersion:=$(shell python Tools/getVersion.py versions.json Source/*)
 uciSources:=bench.c cplus.c evaluate.c floydmain.c format.c kpk.c moves.c parse.c\
             search.c ttable.c uci.c zobrist.c
 
+osType:=$(shell uname -s)
+
 CFLAGS:=-std=c11 -pedantic -Wall -O3 -DfloydVersion=$(floydVersion)
+
+ifeq "$(osType)" "Linux"
+ LDFLAGS:=-lm -lpthread
+endif
 
 win32_exe:=floyd.w32.exe
 
@@ -20,7 +26,7 @@ module:
 # As native UCI engine
 floyd: $(addprefix Source/, $(uciSources)) $(wildcard Source/*.h) versions.json
 	@echo "Version: $(floydVersion)"
-	$(CC) $(CFLAGS) -o $@ $(addprefix Source/, $(uciSources))
+	$(CC) $(CFLAGS) -o $@ $(addprefix Source/, $(uciSources)) $(LDFLAGS)
 
 # As Win32 UCI engine
 win: $(win32_exe)

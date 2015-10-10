@@ -1,5 +1,5 @@
 
-import chessmoves
+import chessmoves # Source: https://github.com/kervinck/floyd.git
 import floyd as engine
 import sys
 

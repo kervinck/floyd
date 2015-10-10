@@ -443,10 +443,6 @@ extern void makeMove(Board_t self, int move)
 {
         signed char *sp = &self->undoStack[self->undoLen];
 
-        //char moveString[maxMoveSize];
-        //moveToLongAlgebraic(self, moveString, move);
-        //puts(moveString);
-
         #define push(offset, value) Statement(                          \
                 *sp++ = (value);                                        \
                 *sp++ = (offset);                                       \
@@ -571,6 +567,32 @@ extern void makeMove(Board_t self, int move)
         // Finalize en passant (only safe after self->undoLen update)
         if (self->enPassantPawn)
                 normalizeEnPassantStatus(self);
+}
+
+/*----------------------------------------------------------------------+
+ |      Null move                                                       |
+ +----------------------------------------------------------------------*/
+
+void makeNullMove(Board_t self)
+{
+        signed char *sp = &self->undoStack[self->undoLen];
+        *sp++ = -1; // sentinel
+
+        pushList(self->hashHistory, self->hash);
+
+        push(offsetof_halfmoveClock, self->halfmoveClock);
+        self->halfmoveClock = 1;
+
+        if (self->enPassantPawn) {
+                push(offsetof_enPassantPawn, self->enPassantPawn);
+                self->hash ^= hashEnPassant(self->enPassantPawn);
+                self->enPassantPawn = 0;
+        }
+
+        self->plyNumber++;
+        self->hash ^= zobristTurn[0];
+
+        self->undoLen = sp - self->undoStack;
 }
 
 /*----------------------------------------------------------------------+

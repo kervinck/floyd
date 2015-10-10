@@ -266,7 +266,6 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
 #define isCutNode(nodeType) (( nodeType) & 1)
 #define isAllNode(nodeType) ((~nodeType) & 1)
 
-// TODO: internal deepening
 // TODO: futility
 // TODO: reductions
 // TODO: killers
@@ -293,6 +292,15 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
 
         int check = inCheck(board(self));
         int bestScore = minInt;
+
+        // Null move pruning
+        if (depth >= 2 && isCutNode(nodeType) && !check) {
+                makeNullMove(board(self));
+                int score = -scout(self, max(0, depth-2-1), -(alpha + 1), nodeType); // TODO: nodeType+1?
+                undoMove(board(self));
+                if (score > alpha)
+                        return ttWrite(self, slot, depth, score, alpha, alpha+1);
+        }
 
         int moveList[maxMoves];
         int nrMoves = generateMoves(board(self), moveList);

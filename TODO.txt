@@ -1,17 +1,15 @@
 
-|Todo| Don't use sleep and terminate for the alarm thread [win32]
-
 |Todo| Estimate initial elo [qa]
 
 Cutechess-cli or xboard
 
 ------------------------------------------------------------------------
 
-|Todo| Granularity of win32 clock too low? [win32]
+|Todo| Compile on FreeBSD [qa]
 
 |Todo| Scale passers with material [evaluate]
 
-|Todo| Null-move [search]
+|Todo| Pondering [uci]
 
 |Todo| Estimate elo [qa]
 
@@ -21,7 +19,7 @@ At least when debugging is compiled in
 
 |Todo| Try MVA/LVA instead of fake-SEE
 
-|Todo| Pondering [uci]
+|Todo| Granularity of win32 clock too low? [win32]
 
 |Todo| Move generator test [qa]
 
@@ -124,4 +122,12 @@ floyd help
 floyd bench
 
 |Todo| Win64 version [win64]
+
+|Todo| Consider persistent alarm thread [speed]
+
+Profile first
+
+|Todo| Consider persistent search thread [speed]
+
+Profile first
 

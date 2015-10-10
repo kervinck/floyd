@@ -213,6 +213,11 @@ static inline bool wasLegalMove(Board_t self)
 void undoMove(Board_t self);
 
 /*
+ *  Null moves
+ */
+void makeNullMove(Board_t self);
+
+/*
  *  Convert move to standard algebraic notation, without checkmark
  *  A movelist must be prepared by the caller for disambiguation,
  *  which may include the move itself.

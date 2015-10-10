@@ -824,10 +824,12 @@ double logit(double p)
 
 static int squareOf(Board_t self, int piece)
 {
-        for (int square=0; square<boardSize; square++)
+        int square;
+        for (square=0; square<boardSize; square++)
                 if (self->squares[square] == piece)
-                        return square;
-        assert(false);
+                        break;
+        assert(square < boardSize);
+        return square;
 }
 
 /*----------------------------------------------------------------------+

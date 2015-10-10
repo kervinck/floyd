@@ -505,15 +505,14 @@ extern void makeMove(Board_t self, int move)
                         break;
 
                 case rank5: // White captures en passant
-                case rank4: // Black captures en passant
-                        ;
+                case rank4: { // Black captures en passant
                         int square = square(file(to), rank(from));
                         int victim = self->squares[square];
                         push(square, victim);
                         self->squares[square] = empty;
                         self->hash ^= zobristPiece[victim][square];
                         break;
-
+                }
                 case rank2:
                         if (self->squares[from] == whitePawn) { // Set en passant flag
                                 push(offsetof_enPassantPawn, 0);

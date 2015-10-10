@@ -43,6 +43,7 @@
 
 // C standard
 #include <stdbool.h>
+#include <stdint.h>
 
 // C extension
 #include "cplus.h"

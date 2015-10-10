@@ -68,6 +68,14 @@
 
 #define ones(n) (~(~0ULL << (n)))
 
+#define static_assert(pred, text) extern int _no_static_assert
+#if defined(__STDC_VERSION__) 
+ #if __STDC_VERSION__ >= 201112L
+  #undef static_assert
+  #define static_assert(pred, text) _Static_assert(pred, text)
+ #endif
+#endif
+
 /*----------------------------------------------------------------------+
  |      Exceptions                                                      |
  +----------------------------------------------------------------------*/

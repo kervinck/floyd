@@ -61,7 +61,8 @@
  +----------------------------------------------------------------------*/
 
 // Needed for lockless hashing, plus a sanity check for proper bitfield packing.
-_Static_assert(sizeof(struct ttSlot) == 2 * sizeof(uint64_t), "Unexpected size of struct ttSlot");
+static_assert(sizeof(struct ttSlot) == 2 * sizeof(uint64_t),
+              "Unexpected size of struct ttSlot");
 
 #define bucketLen 4 // must be power of 2
 

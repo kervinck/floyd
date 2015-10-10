@@ -296,7 +296,7 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
         // Null move pruning
         if (depth >= 2 && isCutNode(nodeType) && !check) {
                 makeNullMove(board(self));
-                int score = -scout(self, max(0, depth-2-1), -(alpha + 1), nodeType); // TODO: nodeType+1?
+                int score = -scout(self, max(0, depth-2-1), -(alpha + 1), nodeType+1);
                 undoMove(board(self));
                 if (score > alpha)
                         return ttWrite(self, slot, depth, score, alpha, alpha+1);

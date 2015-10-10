@@ -9,7 +9,8 @@ from zlib import crc32
 from sys import argv
 import json
 
-with open(argv[1]) as fp: versions = json.load(fp)
+with open(argv[1]) as fp:
+        versions = json.load(fp)
 
 crc = 0
 for file in sorted(argv[2:]):

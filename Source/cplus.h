@@ -36,6 +36,7 @@
 
 // Safe definition of statement-like macros
 #define Statement(...) do{ __VA_ARGS__ }while(0)
+#define pass Statement()
 
 #define quote(arg) #arg
 #define quote2(arg) quote(arg)

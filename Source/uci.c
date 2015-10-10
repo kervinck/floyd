@@ -101,7 +101,7 @@ X"        Set option. The new value becomes active with the next `isready'."
 X"  isready"
 X"        Activate any changed options and reply 'isready' when done."
 X"  ucinewgame"
-X"        A new game has started (ignored)."
+X"        A new game has started. (ignored)"
 X"  position [ startpos | fen <fenField> ... ] [ moves <move> ... ]"
 X"        Setup the position on the internal board and play out the sequence"
 X"        of moves. In debug mode also show the resulting FEN and board."
@@ -139,7 +139,7 @@ X"        Speed test using 40 standard positions. Default `movetime' is 1000."
 X"  moves [ depth <ply> ] // TODO: not implemented"
 X"        Move generation test. Default `depth' is 1."
 X
-X"Unknown commands and options are silently ignored, except in debug mode. // TODO: not always true yet"
+X"Unknown commands and options are silently ignored, except in debug mode."
 X;
 
 /*----------------------------------------------------------------------+
@@ -160,12 +160,42 @@ static void updateOptions(Engine_t self,
 static searchInfo_fn benchInfoFunction;
 
 /*----------------------------------------------------------------------+
+ |      _scanToken                                                      |
+ +----------------------------------------------------------------------*/
+
+// Token and (optional) value scanner
+static int _scanToken(char **line, const char *format, void *value)
+{
+        char next = 0;
+        int n = 0;
+        if (value)
+                sscanf(*line, format, value, &next, &n);
+        else
+                sscanf(*line, format, &next, &n);
+        if (!isspace(next)) // space or newline
+                n = 0;
+        *line += n;
+        return n;
+}
+#define scan(tokens) _scanToken(&line, " " tokens "%c %n", null)
+#define scanValue(tokens, value) _scanToken(&line, " " tokens "%c %n", value)
+
+// For skipping unknown commands or options
+#define ignoreOne(type) Statement(\
+        while (isspace(*line)) line++;\
+        int _n=0; char *_s=line;\
+        _scanToken(&line, "%*s%n%c %n", &_n);\
+        if (_n && debug) printf("info string %s ignored (%.*s)\n", type, _n, _s);\
+)
+#define ignoreAll() Statement( while(*line != '\0') ignoreOne("Option"); )
+
+/*----------------------------------------------------------------------+
  |      uciMain                                                         |
  +----------------------------------------------------------------------*/
 
 void uciMain(Engine_t self)
 {
-        char *line = null;
+        char *buffer = null;
         int size = 0;
         bool debug = false;
         struct options options = {0};
@@ -179,16 +209,12 @@ void uciMain(Engine_t self)
         struct searchArgs args;
 
         // Process commands from stdin
-        while (fflush(stdout), readLine(stdin, &line, &size) > 0) {
-                if (debug) printf("info string input %s", line);
+        while (fflush(stdout), readLine(stdin, &buffer, &size) > 0) {
+                if (debug) printf("info string input %s", buffer);
+                char *line = buffer;
 
-                char command[15+1], dummy;
-                int n, m = 0;
-
-                if (sscanf(line, " %15s %n", command, &n) != 1)
-                        continue;
-
-                if (strcmp(command, "uci") == 0) {
+                if (scan("uci")) {
+                        ignoreAll();
                         printf("id name Floyd "quote2(floydVersion)"\n"
                                "id author Marcel van Kervinck\n"
                                "option name Hash type spin default %ld min 0\n"
@@ -198,61 +224,55 @@ void uciMain(Engine_t self)
                                //"option name UCI_Chess960 type check default false\n"
                                //"option name Contempt type spin default 0 min -100 max 100\n"
                                "uciok\n",
-                                options.Hash);
+                               options.Hash);
                         continue;
                 }
-
-                if (strcmp(command, "debug") == 0) {
-                        if (sscanf(line+n, "on%c",  &dummy) == 1 && isspace(dummy)) debug = true;
-                        if (sscanf(line+n, "off%c", &dummy) == 1 && isspace(dummy)) debug = false;
+                if (scan("debug")) {
+                        if (scan("on")) debug = true;
+                        else if (scan("off")) debug = false;
+                        ignoreAll();
                         printf("debug %s\n", debug ? "on" : "off");
                         continue;
                 }
-
-                if (strcmp(command, "setoption") == 0) {
-                        sscanf(line+n, "name Hash value %ld", &newOptions.Hash);
-                        if (sscanf(line+n, "name Ponder value true%c",  &dummy) == 1 && isspace(dummy))
-                                newOptions.Ponder = true;
-                        if (sscanf(line+n, "name Ponder value false%c", &dummy) == 1 && isspace(dummy))
-                                newOptions.Ponder = false;
-                        if (sscanf(line+n, "name Clear Hash%c", &dummy) == 1 && isspace(dummy))
-                                newOptions.ClearHash = !options.ClearHash;
+                if (scan("setoption")) {
+                        if (scanValue("name Hash value %ld", &newOptions.Hash)) pass;
+                        else if (scan("name Ponder value true")) newOptions.Ponder = true;
+                        else if (scan("name Ponder value false")) newOptions.Ponder = false;
+                        else if (scan("name Clear Hash")) newOptions.ClearHash = !options.ClearHash;
+                        ignoreAll();
                         continue;
                 }
-
-                if (strcmp(command, "isready") == 0) {
+                if (scan("isready")) {
+                        ignoreAll();
                         updateOptions(self, &options, &newOptions);
                         printf("readyok\n");
                         continue;
                 }
-
-                if (strcmp(command, "ucinewgame") == 0)
+                if (scan("ucinewgame")) {
+                        ignoreAll();
                         continue;
-
-                if (strcmp(command, "position") == 0) {
+                }
+                if (scan("position")) {
                         searchThread = stopSearch(self, searchThread);
 
-                        if (sscanf(line+n, "startpos%c %n", &dummy, &m) == 1 && isspace(dummy))
+                        if (scan("startpos"))
                                 setupBoard(board(self), startpos);
-                        else if (sscanf(line+n, "fen%c %n", &dummy, &m) == 1 && isspace(dummy)) {
-                                n += m;
-                                m = setupBoard(board(self), line+n);
-                                if (debug && m == 0)
-                                        printf("info string Invalid position\n");
+                        else if (scan("fen")) {
+                                int n = setupBoard(board(self), line);
+                                if (debug && n == 0) printf("info string Invalid position\n");
+                                line += n;
                         }
-                        n += m;
-
-                        if (sscanf(line+n, " moves%c %n", &dummy, &m) == 1 && isspace(dummy)) {
-                                while (m > 0) {
-                                        n += m;
+                        if (scan("moves")) {
+                                for (int n=1; n>0; line+=n) {
                                         int moves[maxMoves], move;
                                         int nrMoves = generateMoves(board(self), moves);
-                                        m = parseMove(board(self), line+n, moves, nrMoves, &move);
-                                        if (m > 0) makeMove(board(self), move);
-                                        if (debug && m == -1) printf("info string Illegal move\n");
-                                        if (debug && m == -2) printf("info string Ambiguous move\n");
+                                        n = parseMove(board(self), line, moves, nrMoves, &move);
+                                        if (n > 0) makeMove(board(self), move);
+                                        if (debug && n == -1) printf("info string Illegal move\n");
+                                        if (debug && n == -2) printf("info string Ambiguous move\n");
                                 }
                         }
+                        ignoreAll();
 
                         if (debug) { // dump FEN and board
                                 char fen[maxFenSize];
@@ -269,8 +289,7 @@ void uciMain(Engine_t self)
                         }
                         continue;
                 }
-
-                if (strcmp(command, "go") == 0) {
+                if (scan("go")) {
                         searchThread = stopSearch(self, searchThread);
                         updateOptions(self, &options, &newOptions);
 
@@ -290,97 +309,97 @@ void uciMain(Engine_t self)
                         long btime = 0;
                         long inc = 0;
                         long binc = 0;
-                        int movestogo = 25; // TODO: migrate game timing logic out of uci.c
+                        int movestogo = 0;
                         long long nodes = maxLongLong;
                         int mate = 0; // TODO: not implemented
                         long movetime = 0;
 
-                        while (line[n] != '\0') {
-                                if (sscanf(line+n, "searchmoves%c %n", &dummy, &m) == 1 && isspace(dummy))
-                                        while (m > 0) {
-                                                n += m;
+                        while (*line != '\0') {
+                                if ((scan("ponder") && (args.ponder = true))
+                                 || scanValue("wtime %ld", &time)
+                                 || scanValue("btime %ld", &btime)
+                                 || scanValue("winc %ld", &inc)
+                                 || scanValue("binc %ld", &binc)
+                                 || scanValue("movestogo %d", &movestogo)
+                                 || scanValue("depth %d", &args.depth)
+                                 || scanValue("nodes %lld", &nodes)
+                                 || scanValue("mate %d", &mate)
+                                 || scanValue("movetime %ld", &movetime)
+                                 || (scan("infinite") && (args.infinite = true)))
+                                        continue;
+                                if (scan("searchmoves")) {
+                                        for (int n=1; n>0; line+=n) {
                                                 int moves[maxMoves], move;
                                                 int nrMoves = generateMoves(board(self), moves);
-                                                m = parseMove(board(self), line+n, moves, nrMoves, &move);
-                                                if (m > 0) pushList(self->searchMoves, move);
-                                                if (debug && m == -1) printf("info string Illegal move\n");
-                                                if (debug && m == -2) printf("info string Ambiguous move\n");
+                                                n = parseMove(board(self), line, moves, nrMoves, &move);
+                                                if (n > 0) pushList(self->searchMoves, move);
+                                                if (debug && n == -1) printf("info string Illegal move\n");
+                                                if (debug && n == -2) printf("info string Ambiguous move\n");
                                         }
-                                if ((sscanf(line+n, "ponder%c     %n", &dummy,    &m) == 1 && isspace(dummy) && (args.ponder = true))
-                                 ||  sscanf(line+n, "wtime %ld    %n", &time,     &m) == 1
-                                 ||  sscanf(line+n, "btime %ld    %n", &btime,    &m) == 1
-                                 ||  sscanf(line+n, "winc %ld     %n", &inc,      &m) == 1
-                                 ||  sscanf(line+n, "binc %ld     %n", &binc,     &m) == 1
-                                 ||  sscanf(line+n, "movestogo %d %n", &movestogo, &m) == 1
-                                 ||  sscanf(line+n, "depth %d     %n", &args.depth, &m) == 1
-                                 ||  sscanf(line+n, "nodes %lld   %n", &nodes,    &m) == 1
-                                 ||  sscanf(line+n, "mate %d      %n", &mate,     &m) == 1
-                                 ||  sscanf(line+n, "movetime %ld %n", &movetime, &m) == 1
-                                 || (sscanf(line+n, "infinite%c   %n", &dummy,    &m) == 1 && isspace(dummy) && (args.infinite = true))
-                                 || (sscanf(line+n, "%*s%c        %n", &dummy,    &m) == 1 && isspace(dummy))) // unknowns
-                                        n += m;
+                                        continue;
+                                }
+                                ignoreOne("Option");
                         }
 
-                        if (movetime > 0)
-                                args.alarmTime = movetime * ms;
-                        else if (time + inc + btime + binc > 0) {
-                                if (sideToMove(board(self)) == black)
-                                        time = btime, inc = binc;
+                        if (sideToMove(board(self)) == black)
+                                time = btime, inc = binc;
+                        if (time || inc) {
+                                // TODO: migrate game timing logic out of uci.c
+                                if (!movestogo) movestogo = 25;
                                 int alarmtogo = min(movestogo, (board(self)->halfmoveClock <= 70) ? 3 : 1);
                                 args.targetTime = target(self, time * ms, inc * ms, movestogo);
                                 args.alarmTime  = target(self, time * ms, inc * ms, alarmtogo);
                         }
+                        if (movetime)
+                                args.alarmTime = movetime * ms;
 
                         printf("info string targetTime %.3f alarmTime %.3f\n", args.targetTime, args.alarmTime); // TODO: remove once branching factor is ~2
                         searchThread = startSearch(&args);
                         continue;
                 }
-
-                if (strcmp(command, "stop") == 0) {
+                if (scan("stop")) {
+                        ignoreAll();
                         searchThread = stopSearch(self, searchThread);
-                        if (args.infinite)
-                                uciBestMove(self);
+                        if (args.infinite) uciBestMove(self);
                         continue;
                 }
-
-                if (strcmp(command, "ponderhit") == 0) // TODO: implement ponder
+                if (scan("ponderhit")) { // TODO: implement ponder
+                        ignoreAll();
                         continue;
-
-                if (strcmp(command, "quit") == 0)
+                }
+                if (scan("quit")) {
+                        ignoreAll();
                         break;
+                }
 
                 /*
                  *  Extra commands
                  */
-
-                if (strcmp(command, "help") == 0) {
+                if (scan("help")) {
+                        ignoreAll();
                         fputs(helpMessage, stdout);
                         continue;
                 }
-
-                if (strcmp(command, "eval") == 0) {
+                if (scan("eval")) {
+                        ignoreAll();
                         int score = evaluate(board(self));
                         printf("info score cp %.0f string intern %+d\n", round(score / 10.0), score);
                         continue;
                 }
-
-                if (strcmp(command, "bench") == 0) {
+                if (scan("bench")) {
                         updateOptions(self, &options, &newOptions);
                         long movetime = 1000;
-                        sscanf(line+n, "movetime %ld", &movetime);
+                        scanValue("movetime %ld", &movetime);
+                        ignoreAll();
                         double nps = uciBenchmark(self, movetime * ms, benchInfoFunction, self);
                         printf("result nps %.f\n", nps);
                         continue;
                 }
-
-                if (debug)
-                        printf("info string No such command (%s)\n", command);
+                ignoreOne("Command");
         }
 
         searchThread = stopSearch(self, searchThread);
-
-        free(line);
-        line = null;
+        free(buffer);
 }
 
 /*----------------------------------------------------------------------+

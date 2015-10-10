@@ -1,8 +1,6 @@
 
 |Todo| Don't use sleep and terminate for the alarm thread [win32]
 
-|Todo| Cleanup use of sscanf in uci.c [qa,uci]
-
 |Todo| Estimate initial elo [qa]
 
 Cutechess-cli or xboard

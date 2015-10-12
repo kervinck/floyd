@@ -20,11 +20,6 @@ and it doesn't start in cutechess-gui."""
 
 http://talkchess.com/forum/viewtopic.php?p=644740#644740
 
-|Todo| Initial default hash is misreported [bug,floyd0.5]
-
-option name Hash type spin default 0 min 0
-Actual default is 128.
-
 http://talkchess.com/forum/viewtopic.php?p=644689#644689
 
 |Todo| Crash under polyglot after ~40 games [bug,floyd0.5]

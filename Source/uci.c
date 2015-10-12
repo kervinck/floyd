@@ -224,7 +224,7 @@ void uciMain(Engine_t self)
                                //"option name UCI_Chess960 type check default false\n"
                                //"option name Contempt type spin default 0 min -100 max 100\n"
                                "uciok\n",
-                               options.Hash);
+                               newOptions.Hash);
                         continue;
                 }
                 if (scan("debug")) {

@@ -3,6 +3,15 @@ Floyd study engine
 
 `floyd' is a chess engine study by Marcel van Kervinck.
 
+FLoyd is not a stand-alone chess program. It can be loaded as an engine
+in chess GUIs such as Winboard, Arena, XBoard, Shredder and others.
+
+In addition to the UCI interface, a Python interface is
+provided for study purposes.
+
+This is the source code archive. Binaries for Windows, Linux
+and Mac can be downloaded from https://marcelk.net/floyd/
+
 Python interface
 ----------------
 ```
@@ -40,8 +49,7 @@ Type "help" for more information, or "quit" to leave.
 
 help
 This engine uses the Universal Chess Interface (UCI) protocol.
-See http://download.shredderchess.com/div/uci.zip for details.
-
+See https://marcelk.net/chess/uci.html for details.
 Supported UCI commands are:
   uci
         Confirm UCI mode, show engine details and options.
@@ -52,7 +60,7 @@ Supported UCI commands are:
   isready
         Activate any changed options and reply 'isready' when done.
   ucinewgame
-        A new game has started (ignored).
+        A new game has started. (ignored)
   position [ startpos | fen <fenField> ... ] [ moves <move> ... ]
         Setup the position on the internal board and play out the sequence
         of moves. In debug mode also show the resulting FEN and board.
@@ -62,15 +70,15 @@ Supported UCI commands are:
         Always show a final result using `bestmove'. (But: see `infinite')
         Command options are:
           searchmoves <move> ...  Only search these moves
-          ponder                  Start search in ponder mode
+          ponder                  Start search in ponder mode // TODO: not implemented
           wtime <millis>          Time remaining on White's clock
           btime <millis>          Time remaining on Black's clock
           winc <millis>           White's increment after each move
           binc <millis>           Black's increment after each move
           movestogo <nrMoves>     Moves to go until next time control
           depth <ply>             Search no deeper than <ply> halfmoves
-          nodes <nrNodes>         Search no more than <nrNodes> nodes
-          mate <nrMoves>          Search for a mate in <nrMoves> moves
+          nodes <nrNodes>         Search no more than <nrNodes> nodes // TODO: not implemented
+          mate <nrMoves>          Search for a mate in <nrMoves> moves // TODO: not implemented
           movetime <millis>       Search no longer than this time
           infinite                Postpone `bestmove' result until `stop'
   ponderhit
@@ -85,10 +93,10 @@ Extra commands:
         Show this list of commands.
   eval
         Show evaluation.
-  bench
-        Run a standardized speed test.
-  moves [ depth <ply> ]
-        Run a move generation test.
+  bench [ movetime <millis> ]
+        Speed test using 40 standard positions. Default `movetime' is 1000.
+  moves [ depth <ply> ] // TODO: not implemented
+        Move generation test. Default `depth' is 1.
 
 Unknown commands and options are silently ignored, except in debug mode.
 ```

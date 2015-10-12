@@ -1,4 +1,19 @@
 
+|Todo| Memory leak in w32 binary [bug,floyd0.5]
+
+http://talkchess.com/forum/viewtopic.php?p=644740#644740
+
+|Todo| Initial default hash is misreported [bug,floyd0.5]
+
+option name Hash type spin default 0 min 0
+Actual default is 128.
+
+http://talkchess.com/forum/viewtopic.php?p=644689#644689
+
+|Todo| Crash under polyglot after ~40 games [bug,floyd0.5]
+
+Assertion failed: (nrKings == 2), function evaluate, file Source/evaluate.c, line 237.
+
 |Todo| Estimate initial elo [qa]
 
 Cutechess-cli or xboard

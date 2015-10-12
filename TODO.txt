@@ -1,4 +1,21 @@
 
+|Todo| Learn how to branch in git [git]
+
+:-)
+
+|Todo| Linux and/or cutechess-gui [bug,floyd0.5]
+
+Reported by Antonio Arias:
+"""I've tested floyd in Linux 64 bits OS in cutechess-gui since the
+first versions (commit 82).  It worked until commit 102.  Now since
+commit 102 none of the versions start in cutechess-gui.  I've found
+the culprit.  It's the file uci.c.  If I copy that file from commit
+102 or earlier to the versions after commit 102, floyd works fine.
+I've narrowed the problem and it seems that changing the strcmp(command,
+x) function to scan(x) in the newer versions doesn't work in Linux.
+I've also tested your pre-compiled binary v0.5 for linux 64 bits
+and it doesn't start in cutechess-gui."""
+
 |Todo| Memory leak in w32 binary [bug,floyd0.5]
 
 http://talkchess.com/forum/viewtopic.php?p=644740#644740

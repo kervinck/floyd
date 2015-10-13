@@ -79,6 +79,7 @@ struct options {
         bool Ponder;
         bool ClearHash;
 };
+#define maxHash ((sizeof(size_t) > 4) ? 64 * 1024L : 1024L)
 
 #define ms (1e-3)
 #define MiB (1ULL << 20)
@@ -198,11 +199,8 @@ void uciMain(Engine_t self)
         char *buffer = null;
         int size = 0;
         bool debug = false;
-        struct options options = {0};
-        struct options newOptions =  {
-                .Hash = 128,
-                .Ponder = false,
-        };
+        struct options oldOptions = { .Hash = -1 };
+        struct options newOptions = { .Hash = 128 };
 
         // Prepare threading
         xThread_t searchThread = null;
@@ -216,15 +214,15 @@ void uciMain(Engine_t self)
                 if (scan("uci")) {
                         ignoreAll();
                         printf("id name Floyd "quote2(floydVersion)"\n"
-                               "id author Marcel van Kervinck\n"
-                               "option name Hash type spin default %ld min 0\n"
-                               "option name Clear Hash type button\n"
-                               //"option name Ponder type check default false\n" // Keep commented out for now
-                               //"option name MultiPV type spin default 1 min 1 max 1\n"
-                               //"option name UCI_Chess960 type check default false\n"
-                               //"option name Contempt type spin default 0 min -100 max 100\n"
-                               "uciok\n",
-                               newOptions.Hash);
+                                "id author Marcel van Kervinck\n"
+                                "option name Hash type spin default %ld min 0 max %ld\n"
+                                "option name Clear Hash type button\n"
+                                //"option name Ponder type check default false\n" // Keep commented out for now
+                                //"option name MultiPV type spin default 1 min 1 max 1\n"
+                                //"option name UCI_Chess960 type check default false\n"
+                                //"option name Contempt type spin default 0 min -100 max 100\n"
+                                "uciok\n",
+                               newOptions.Hash, maxHash);
                         continue;
                 }
                 if (scan("debug")) {
@@ -238,13 +236,13 @@ void uciMain(Engine_t self)
                         if (scanValue("name Hash value %ld", &newOptions.Hash)) pass;
                         else if (scan("name Ponder value true")) newOptions.Ponder = true;
                         else if (scan("name Ponder value false")) newOptions.Ponder = false;
-                        else if (scan("name Clear Hash")) newOptions.ClearHash = !options.ClearHash;
+                        else if (scan("name Clear Hash")) newOptions.ClearHash = !oldOptions.ClearHash;
                         ignoreAll();
                         continue;
                 }
                 if (scan("isready")) {
                         ignoreAll();
-                        updateOptions(self, &options, &newOptions);
+                        updateOptions(self, &oldOptions, &newOptions);
                         printf("readyok\n");
                         continue;
                 }
@@ -291,7 +289,7 @@ void uciMain(Engine_t self)
                 }
                 if (scan("go")) {
                         searchThread = stopSearch(self, searchThread);
-                        updateOptions(self, &options, &newOptions);
+                        updateOptions(self, &oldOptions, &newOptions);
 
                         args = (struct searchArgs) {
                                 .self = self,
@@ -387,7 +385,7 @@ void uciMain(Engine_t self)
                         continue;
                 }
                 if (scan("bench")) {
-                        updateOptions(self, &options, &newOptions);
+                        updateOptions(self, &oldOptions, &newOptions);
                         long movetime = 1000;
                         scanValue("movetime %ld", &movetime);
                         ignoreAll();
@@ -407,13 +405,13 @@ void uciMain(Engine_t self)
  +----------------------------------------------------------------------*/
 
 static void updateOptions(Engine_t self,
-        struct options *options, const struct options *newOptions)
+        struct options *oldOptions, const struct options *newOptions)
 {
-        if (options->Hash != newOptions->Hash)
-                ttSetSize(self, newOptions->Hash * MiB);
-        if (options->ClearHash != newOptions->ClearHash)
+        if (newOptions->Hash < 0 || newOptions->Hash != oldOptions->Hash)
+                ttSetSize(self, max(0, newOptions->Hash) * MiB);
+        if (newOptions->ClearHash != oldOptions->ClearHash)
                 ttClearFast(self);
-        *options = *newOptions;
+        *oldOptions = *newOptions;
 }
 
 /*----------------------------------------------------------------------+

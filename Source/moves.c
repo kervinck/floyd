@@ -546,11 +546,10 @@ extern void makeMove(Board_t self, int move)
         if (self->squares[to] != empty
          || self->squares[from] == whitePawn
          || self->squares[from] == blackPawn) {
-                push(offsetof_halfmoveClock, self->halfmoveClock);
+                push(offsetof_halfmoveClock, self->halfmoveClock); // This is why it is a byte
                 self->halfmoveClock = 0;
         } else
-                self->halfmoveClock++;
-        assert(self->halfmoveClock >= 0);
+                self->halfmoveClock++; // Can overflow the byte, but don't worry
 
         makeSimpleMove(from, to);
 
@@ -563,7 +562,7 @@ extern void makeMove(Board_t self, int move)
 
         self->undoLen = sp - self->undoStack;
 
-        // Finalize en passant (only safe after self->undoLen update)
+        // Finalize en passant (this is only safe after the update of self->undoLen)
         if (self->enPassantPawn)
                 normalizeEnPassantStatus(self);
 }

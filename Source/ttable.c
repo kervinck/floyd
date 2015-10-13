@@ -60,10 +60,6 @@
  |      Definitions                                                     |
  +----------------------------------------------------------------------*/
 
-// Needed for lockless hashing, plus a sanity check for proper bitfield packing.
-static_assert(sizeof(struct ttSlot) == 2 * sizeof(uint64_t),
-              "Unexpected size of struct ttSlot");
-
 #define bucketLen 4 // must be power of 2
 
 /*----------------------------------------------------------------------+
@@ -79,6 +75,9 @@ static inline int prio(Engine_t self, int ix);
 // Change table size. Size is given as bytes.
 void ttSetSize(Engine_t self, size_t size)
 {
+        // Needed for lockless hashing, and a sanity check for proper bitfield packing.
+        assert(sizeof(struct ttSlot) == 2 * sizeof(uint64_t));
+
         // Calculate largest new size (and mask) not exceeding the requested size
         size_t newSize = bucketLen * sizeof(struct ttSlot);
         size = max(size, newSize); // but allow no smaller than this

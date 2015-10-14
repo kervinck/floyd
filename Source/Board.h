@@ -93,9 +93,9 @@ struct Board {
         /*
          *  Move undo administration
          */
-        signed char undoStack[2048];
-        int undoLen;
-        int *movePtr; // For in move generation
+        sByteList undoStack;
+
+        int *movePtr; // Used only during move generation
 };
 
 /*

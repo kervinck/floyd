@@ -187,7 +187,7 @@ extern int setupBoard(Board_t self, const char *fen)
         self->sideInfoPlyNumber = -1; // side info is invalid now
 
         // Reset the undo stack
-        self->undoLen = 0;
+        self->undoStack.len = 0;
 
         // Initialize hash and its history
         self->hash = hash(self);

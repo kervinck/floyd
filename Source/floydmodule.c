@@ -218,6 +218,7 @@ floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
 
         // TODO: move this to a destructor
         freeList(engine.board.hashHistory);
+        freeList(engine.board.undoStack);
         freeList(engine.searchMoves);
         freeList(engine.pv);
         free(engine.tt.slots);

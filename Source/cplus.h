@@ -44,11 +44,11 @@
 #define arrayLen(a) (sizeof(a) / sizeof((a)[0]))
 
 #if !defined(max)
-#define max(a, b) ((a) >= (b) ? (a) : (b))
+ #define max(a, b) ((a) >= (b) ? (a) : (b))
 #endif
 
 #if !defined(min)
-#define min(a, b) ((a) <= (b) ? (a) : (b))
+ #define min(a, b) ((a) <= (b) ? (a) : (b))
 #endif
 
 #define setMax(a, b) Statement( if ((a) < (b)) (a) = (b); )
@@ -135,60 +135,44 @@ struct {\
 
 #define emptyList { null, 0, 0 }
 
-typedef List(unsigned char) byteList;
-typedef List(char)          charList;
-typedef List(short)         shortList;
-typedef List(int)           intList;
-typedef List(long)          longList;
-typedef List(uint64_t)      uint64List;
+typedef List(uint8_t)   uByteList;
+typedef List(int8_t)    sByteList;
+typedef List(char)      charList;
+typedef List(short)     shortList;
+typedef List(int)       intList;
+typedef List(long)      longList;
+typedef List(uint64_t)  uint64List;
+typedef List(void)      voidList;
 
-#define initialListSize (128)
+#define fastPushList(list, value)\
+        ((list).v[(list).len++] = (value))
 
-// TODO: remove this one?
-#define errPushList(list, value) Statement(\
-        if ((list).len >= (list).maxLen) {\
-                /* Avoid GCC warning "dereferencing type-punned pointer\
-                   will break strict-aliasing rules" */\
-                void *_v = (list).v;\
-                err = list_ensure_len(\
-                        &_v,\
-                        &(list).maxLen,\
-                        (list).len + 1,\
-                        sizeof((list).v[0]),\
-                        (initialListSize + sizeof((list).v[0]) - 1) / sizeof((list).v[0]));\
-                check(err);\
-                (list).v = _v;\
-        }\
-        (list).v[(list).len++] = (value); )
+#define popList(list)\
+        ((list).v[--(list).len])
 
 #define pushList(list, value) Statement(\
-        if ((list).len >= (list).maxLen) {\
-                /* Avoid GCC warning "dereferencing type-punned pointer\
-                   will break strict-aliasing rules" */\
-                void *_v = (list).v;\
-                err_t _err = list_ensure_len(\
-                        &_v,\
-                        &(list).maxLen,\
-                        (list).len + 1,\
-                        sizeof((list).v[0]),\
-                        (initialListSize + sizeof((list).v[0]) - 1) / sizeof((list).v[0]));\
-                if (_err != OK)\
-                        errAbort(_err);\
-                (list).v = _v;\
-        }\
-        (list).v[(list).len++] = (value); )
+        preparePushList(list, 1);                               \
+        fastPushList(list, value);                              \
+)
 
-#define popList(list) ((list).v[--(list).len])
+#define preparePushList(list, nrItems) Statement(\
+        if ((list).len + (nrItems) > (list).maxLen) {           \
+                err_t _err = listEnsureMaxLen(                  \
+                        (voidList*)&(list), sizeof((list).v[0]),\
+                        (list).len + (nrItems), 128);           \
+                if (_err != OK)                                 \
+                        errAbort(_err);                         \
+        })
 
-#define freeList(list) Statement(       \
-        if ((list).v) {                 \
-                free((list).v);         \
-                (list).v = null;        \
-                (list).len = 0;         \
-                (list).maxLen = 0;      \
-        } )
+#define freeList(list) Statement(\
+        if ((list).v) {                                         \
+                free((list).v);                                 \
+                (list).v = null;                                \
+                (list).len = 0;                                 \
+                (list).maxLen = 0;                              \
+        })
 
-err_t list_ensure_len(void **v, int *maxLen, int minLen, int unit, int newLen);
+err_t listEnsureMaxLen(voidList *list, int itemSize, int minLen, int minSize);
 
 double xTime(void);
 char *stringCopy(char *s, const char *t);

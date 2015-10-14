@@ -38,6 +38,7 @@
  |      Includes                                                        |
  +----------------------------------------------------------------------*/
 
+#include <assert.h>
 #include <errno.h>
 #include <math.h>
 #include <stdbool.h>
@@ -115,37 +116,32 @@ void xAbort(int r, const char *function)
  +----------------------------------------------------------------------*/
 
 /*
- *  @Assumption: Type** can be cast to void** and then dereferenced
- *
- *  -- `newLen' should prefarably to a compile-time constant
- *  *v       the list data
- *  *maxLen  the current allocated length (list elements, not bytes)
- *  minLen   the requested minimum length (list elements, not bytes)
- *  unit     size of a list elements
- *  newLen   starting size for buffer (list elements, not bytes)
+ *  Ensure a mimimum capacity for a list before it needs resizing.
+ *  The resulting size will be rounded up in exponential manner to
+ *  amortize the costs of repeatedly adding single ites.
+ *      list:      Pointer to list object
+ *      itemSize:  Item size in bytes
+ *      minLen:    Minimum number of required items. Must be at least list->len
+ *      minSize:   Minimum size in bytes of a non-empty list
  */
-err_t list_ensure_len(void **v, int *maxLen, int minLen, int unit, int newLen)
+err_t listEnsureMaxLen(voidList *list, int itemSize, int minLen, int minSize)
 {
         err_t err = OK;
+        assert(minLen >= list->len);
+        assert(minLen > 0);
 
-        if ((*maxLen == 0) && (*v != null)) {
+        if ((list->maxLen == 0) && (list->v != null))
                 xRaise("Invalid operation on fixed-length list");
-        }
 
-        while (newLen < minLen) {
-                newLen *= 2;
-        }
-        if (newLen != *maxLen) {
-                void *newv = null;
-                if (newLen > 0) {
-                        newv = realloc(*v, newLen * unit);
-                        if (newv == null) xRaise("Out of memory");
-                } else {
-                        free(*v);
-                        newv = null;
-                }
-                *v = newv;
-                *maxLen = newLen;
+        int newMax = max(1, (minSize + itemSize - 1) / itemSize);
+        while (newMax < minLen)
+                newMax *= 2; // TODO: make this robust for huge lists (overflows etc)
+
+        if (newMax != list->maxLen) {
+                void *v = realloc(list->v, newMax * itemSize);
+                if (v == null) xRaise("Out of memory");
+                list->v = v;
+                list->maxLen = newMax;
         }
 cleanup:
         return err;

@@ -52,10 +52,13 @@ int main(void)
 
         setupBoard(&engine.board, startpos); // be nice and allow `go' without `position'
 
+
+
         uciMain(&engine);
 
         // TODO: move this to a destructor
         freeList(engine.board.hashHistory);
+        freeList(engine.board.undoStack);
         freeList(engine.searchMoves);
         freeList(engine.pv);
         free(engine.tt.slots);

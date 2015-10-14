@@ -81,4 +81,7 @@ clean:
 	python setup.py clean --all
 	rm -f floyd $(win32_exe)
 
+bench: floyd
+	for N in 1 2 3 4 5; do echo bench | ./floyd | grep result; done
+
 # vi: noexpandtab

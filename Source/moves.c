@@ -419,21 +419,22 @@ extern int generateMoves(Board_t self, int moveList[maxMoves])
  |      make/unmake move                                                |
  +----------------------------------------------------------------------*/
 
+#define maxMoveUndo 13 // Maximum number of bytes per move pushed on undo stack
+#define sentinel (-1)
+
 extern void undoMove(Board_t self)
 {
         self->halfmoveClock--;
         self->plyNumber--;
         self->hash = popList(self->hashHistory);
 
-        assert(self->undoLen > 0);
-        signed char *bytes = (signed char *)self;
-        int len = self->undoLen;
+        assert(self->undoStack.len > 0);
+        signed char *bytes = (signed char*)self;
         for (;;) {
-                int offset = self->undoStack[--len];
-                if (offset < 0) break; // sentinel
-                bytes[offset] = self->undoStack[--len];
+                int offset = popList(self->undoStack);
+                if (offset == sentinel) break;
+                bytes[offset] = popList(self->undoStack);
         }
-        self->undoLen = len;
 
         if (self->plyNumber < self->sideInfoPlyNumber)
                 self->sideInfoPlyNumber = -1; // side info is invalid now
@@ -441,7 +442,10 @@ extern void undoMove(Board_t self)
 
 extern void makeMove(Board_t self, int move)
 {
-        signed char *sp = &self->undoStack[self->undoLen];
+        preparePushList(self->undoStack, maxMoveUndo);
+
+        signed char *sp = &self->undoStack.v[self->undoStack.len];
+        *sp++ = sentinel;
 
         #define push(offset, value) Statement(                          \
                 *sp++ = (value);                                        \
@@ -465,8 +469,6 @@ extern void makeMove(Board_t self, int move)
                             ^ zobristPiece[_piece][to]                  \
                             ^ zobristPiece[_victim][to];                \
         )
-
-        *sp++ = -1; // sentinel
 
         pushList(self->hashHistory, self->hash);
 
@@ -560,9 +562,9 @@ extern void makeMove(Board_t self, int move)
                 self->hash ^= hashCastleFlags(flagsToClear);
         }
 
-        self->undoLen = sp - self->undoStack;
+        self->undoStack.len = sp - self->undoStack.v;
 
-        // Finalize en passant (this is only safe after the update of self->undoLen)
+        // Finalize en passant (this is only safe after the update of self->undoStack.len)
         if (self->enPassantPawn)
                 normalizeEnPassantStatus(self);
 }
@@ -573,8 +575,10 @@ extern void makeMove(Board_t self, int move)
 
 void makeNullMove(Board_t self)
 {
-        signed char *sp = &self->undoStack[self->undoLen];
-        *sp++ = -1; // sentinel
+        preparePushList(self->undoStack, maxMoveUndo);
+
+        signed char *sp = &self->undoStack.v[self->undoStack.len];
+        *sp++ = sentinel;
 
         pushList(self->hashHistory, self->hash);
 
@@ -590,7 +594,7 @@ void makeNullMove(Board_t self)
         self->plyNumber++;
         self->hash ^= zobristTurn[0];
 
-        self->undoLen = sp - self->undoStack;
+        self->undoStack.len = sp - self->undoStack.v;
 }
 
 /*----------------------------------------------------------------------+

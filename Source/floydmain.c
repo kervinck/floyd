@@ -52,8 +52,6 @@ int main(void)
 
         setupBoard(&engine.board, startpos); // be nice and allow `go' without `position'
 
-
-
         uciMain(&engine);
 
         // TODO: move this to a destructor

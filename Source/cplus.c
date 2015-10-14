@@ -118,7 +118,7 @@ void xAbort(int r, const char *function)
 /*
  *  Ensure a mimimum capacity for a list before it needs resizing.
  *  The resulting size will be rounded up in exponential manner to
- *  amortize the costs of repeatedly adding single ites.
+ *  amortize the costs of repeatedly adding single items.
  *      list:      Pointer to list object
  *      itemSize:  Item size in bytes
  *      minLen:    Minimum number of required items. Must be at least list->len

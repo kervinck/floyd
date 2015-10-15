@@ -75,6 +75,14 @@ static const int pieceValue[] = {
 
 static const int promotionValue[] = { 9, 5, 3, 3 };
 
+static const int allowNullMoveTable[] = { // 1=slider, 2=white piece, 4=black piece
+        [empty] = 0,
+        [whiteKing]   = 0, [whiteQueen]  = 3, [whiteRook] = 3,
+        [whiteBishop] = 3, [whiteKnight] = 2, [whitePawn] = 0,
+        [blackKing]   = 0, [blackQueen]  = 5, [blackRook] = 5,
+        [blackBishop] = 5, [blackKnight] = 4, [blackPawn] = 0,
+};
+
 /*----------------------------------------------------------------------+
  |      Functions                                                       |
  +----------------------------------------------------------------------*/
@@ -89,6 +97,7 @@ static int filterAndSort(Board_t self, int moveList[], int nrMoves, int moveFilt
 static int filterLegalMoves(Board_t self, int moveList[], int nrMoves);
 static void moveToFront(int moveList[], int nrMoves, int move);
 static bool repetition(Engine_t self);
+static int allowNullMove(Board_t self);
 
 /*----------------------------------------------------------------------+
  |      rootSearch                                                      |
@@ -191,6 +200,7 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                         return cutPv(), slot.score;
 
         int check = inCheck(board(self));
+        int extension = check;
         int moveFilter = minInt;
         int bestScore = minInt;
 
@@ -216,7 +226,7 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                 else
                         pushList(self->pv, moveList[0]); // expand the pv
                 makeMove(board(self), moveList[0]);
-                int newDepth = max(0, depth - 1 + check);
+                int newDepth = max(0, depth - 1 + extension);
                 int newAlpha = max(alpha, bestScore);
                 int score = -pvSearch(self, newDepth, -beta, -newAlpha, pvIndex + 1);
                 if (score > bestScore) {
@@ -232,13 +242,13 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
         int reduction = 2;
         for (int i=1; i<nrMoves && bestScore<beta; i++) {
                 makeMove(board(self), moveList[i]);
-                int newDepth = max(0, depth - 1 + check - reduction);
+                int newDepth = max(0, depth - 1 + extension - reduction);
                 int newAlpha = max(alpha, bestScore);
                 int score = -scout(self, newDepth, -newAlpha - 1, 1);
                 if (score > bestScore) {
                         int pvLen = self->pv.len;
                         pushList(self->pv, moveList[i]);
-                        int researchDepth = max(0, depth - 1 + check);
+                        int researchDepth = max(0, depth - 1 + extension);
                         score = -pvSearch(self, researchDepth, -beta, -newAlpha, pvLen + 1);
                         if (score > bestScore) {
                                 bestScore = score;
@@ -289,12 +299,13 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
                         return slot.score;
 
         int check = inCheck(board(self));
+        int extension = check;
         int bestScore = minInt;
 
         // Null move pruning
-        if (depth >= 2 && isCutNode(nodeType) && !check) {
+        if (depth >= 2 && isCutNode(nodeType) && !check && alpha < maxEval && allowNullMove(board(self))) {
                 makeNullMove(board(self));
-                int score = -scout(self, max(0, depth-2-1), -(alpha + 1), nodeType+1);
+                int score = -scout(self, max(0, depth - 2 - 1), -(alpha + 1), nodeType+1);
                 undoMove(board(self));
                 if (score > alpha)
                         return ttWrite(self, slot, depth, score, alpha, alpha+1);
@@ -308,8 +319,8 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
         for (int i=0; i<nrMoves && bestScore<=alpha; i++) {
                 makeMove(board(self), moveList[i]);
                 if (wasLegalMove(board(self))) {
-                        int newDepth = max(0, depth - 1 + check);
-                        int score = -scout(self, newDepth, -(alpha + 1), nodeType + 1);
+                        int newDepth = max(0, depth - 1 + extension);
+                        int score = -scout(self, newDepth, -(alpha + 1), nodeType+1);
                         bestScore = max(bestScore, score);
                         if (score > alpha)
                                 slot.move = moveList[i];
@@ -484,6 +495,20 @@ static bool repetition(Engine_t self)
                         if (++count >= 3 || ix >= searchRoot)
                                 return true;
         return false;
+}
+
+/*----------------------------------------------------------------------+
+ |      allowNullMove                                                   |
+ +----------------------------------------------------------------------*/
+
+// Both sides must have pieces and there must be a slider
+static int allowNullMove(Board_t self)
+{
+        int bits = 0;
+        for (int i=0; i<boardSize; i++)
+                bits |= allowNullMoveTable[self->squares[i]];
+        //return bits & 1;
+        return bits == 7;
 }
 
 /*----------------------------------------------------------------------+

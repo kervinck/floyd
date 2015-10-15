@@ -475,11 +475,15 @@ int evaluate(Board_t self)
                 wiloScore = 0; // KK
 
         if (nrEffectivePieces == 3) {
-                if (e.nrQueens[side] + e.nrRooks[side] > 0)
+                if (e.nrQueens[side] + e.nrRooks[side] > 0) {
                         wiloScore += v[winBonus]; // KQK, KRK
+                        drawScore -= v[winBonus];
+                }
 
-                if (e.nrQueens[xside] + e.nrRooks[xside] > 0)
+                if (e.nrQueens[xside] + e.nrRooks[xside] > 0) {
                         wiloScore -= v[winBonus]; // KKQ, KKR
+                        drawScore -= v[winBonus];
+                }
 
                 if (nrBishops + nrKnights > 0)
                         wiloScore = 0; // KBK, KNK (and KB+K of like-bishops)
@@ -502,8 +506,10 @@ int evaluate(Board_t self)
                         int egtScore = kpkProbe(egtSide, wKing, wPawn, bKing);
                         if (egtScore == 0)
                                 wiloScore = 0;
-                        else
+                        else {
                                 wiloScore += egtScore * v[winBonus];
+                                drawScore -= v[winBonus];
+                        }
                 }
         }
 

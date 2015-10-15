@@ -1,10 +1,4 @@
 
-|Todo| 1998 should probably be removed from the copyright notice [legal]
-
-"""If the work is a derivative work or a compilation incorporating
-previously published material, the year date of first publication
-of the derivative work or compilation is sufficient."""
-
 |Todo| Release as 0.6 when reliability confirmed and some elo added as well
 
 ------------------------------------------------------------------------

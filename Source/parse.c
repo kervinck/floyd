@@ -6,7 +6,7 @@
  +----------------------------------------------------------------------*/
 
 /*
- *  Copyright (C) 1998-2015, Marcel van Kervinck
+ *  Copyright (C) 2015, Marcel van Kervinck
  *  All rights reserved
  *
  *  Redistribution and use in source and binary forms, with or without

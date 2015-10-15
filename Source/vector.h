@@ -29,7 +29,7 @@
 // {
         P(eloDiff, 51),
         P(tempo, 40),
-        P(winBonus, 20009),
+        P(winBonus, 2262),
 
         P(castleK, -74),
         P(castleQ, -69),

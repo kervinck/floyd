@@ -172,7 +172,6 @@ static inline int drawScore(Engine_t self)
  |      pvSearch                                                        |
  +----------------------------------------------------------------------*/
 
-// TODO: reductions
 // TODO: single-reply extensions
 // TODO: killers
 static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
@@ -230,7 +229,7 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                 cutPv(); // game end or leaf node (horizon)
 
         // Search the others with zero window and reductions, research if needed
-        int reduction = 0;
+        int reduction = 2;
         for (int i=1; i<nrMoves && bestScore<beta; i++) {
                 makeMove(board(self), moveList[i]);
                 int newDepth = max(0, depth - 1 + check - reduction);
@@ -267,7 +266,6 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
 #define isAllNode(nodeType) ((~nodeType) & 1)
 
 // TODO: futility
-// TODO: reductions
 // TODO: killers
 // TODO: null move
 static int scout(Engine_t self, int depth, int alpha, int nodeType)
@@ -307,11 +305,10 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
         nrMoves = filterAndSort(board(self), moveList, nrMoves, minInt);
         moveToFront(moveList, nrMoves, slot.move);
 
-        int reduction = 0;
         for (int i=0; i<nrMoves && bestScore<=alpha; i++) {
                 makeMove(board(self), moveList[i]);
                 if (wasLegalMove(board(self))) {
-                        int newDepth = max(0, depth - 1 + check - reduction);
+                        int newDepth = max(0, depth - 1 + check);
                         int score = -scout(self, newDepth, -(alpha + 1), nodeType + 1);
                         bestScore = max(bestScore, score);
                         if (score > alpha)

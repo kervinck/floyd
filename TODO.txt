@@ -1,12 +1,3 @@
-Fix possible crashes in late end games [bug]
-
-|Todo| Learn how to branch in git :-) [git]
-
-Also provide a source zip file on the download page.
-
-|Todo| Estimate initial elo [qa]
-
-cutechess-cli & xboard
 
 |Todo| 1998 should probably be removed from the copyright notice [legal]
 
@@ -14,28 +5,35 @@ cutechess-cli & xboard
 previously published material, the year date of first publication
 of the derivative work or compilation is sufficient."""
 
-|Todo| Add some elo [elo]
-
 |Todo| Release as 0.6 when reliability confirmed and some elo added as well
 
 ------------------------------------------------------------------------
+
+|Todo| Win64 version from Makefile [win64]
+
+|Todo| Learn how to branch in git :-) [git]
+
+Also provide a source zip file on the download page.
 
 |Todo| Scale passers with material [evaluate]
 
 |Todo| King safety [evaluate]
 
-|Todo| Remove evaluate.h
+|Todo| Remove evaluate.h [cleanup]
 
-|Todo| Basic reductions
-|Todo| Basic killers
-|Todo| Basic history
+|Todo| Basic killers [search]
+
+|Todo| Basic history [search]
+
+|Todo| Basic counter move? [search]
+
+|Todo| Try MVA/LVA instead of fake-SEE
+
+|Todo| Try simple SEE
+
 |Todo| Checks in qsearch, at least in PV
 
 #define minDepth -7
-
-|Todo| Estimate elo [qa]
-
-|Todo| Try MVA/LVA instead of fake-SEE
 
 |Todo| Granularity of win32 clock too low? [win32]
 
@@ -132,8 +130,6 @@ eg.
 floyd go depth 8
 floyd help
 floyd bench
-
-|Todo| Win64 version from Makefile [win64]
 
 |Todo| Consider persistent alarm thread [speed]
 

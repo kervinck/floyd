@@ -27,7 +27,7 @@ def update(match):
 
 for line in sys.stdin:
         line = re.sub(
-                'P\( (?P<id>\w+), [^)]* \)', # Matches 'X(<id>, <value>)'
+                'P\( (?P<id>\w+), [^)]* \)', # Matches 'P(<id>, <value>)'
                 update,
                 line,
                 flags=re.VERBOSE)

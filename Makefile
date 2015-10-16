@@ -1,3 +1,11 @@
+
+# If the default compiler doesn't support --std=c11 yet, install gcc-4.8
+# and type `make CC=gcc-4.8'
+#
+# If you get "fatal error: Python.h: No such file or directory",
+# install the python-dev package: `sudo apt-get install python-dev'
+
+
 floydVersion:=$(shell python Tools/getVersion.py versions.json Source/*)
 
 uciSources:=bench.c cplus.c evaluate.c floydmain.c format.c kpk.c moves.c\
@@ -22,7 +30,7 @@ all: module floyd
 
 # As Python module
 module:
-	python setup.py build
+	env CC=$(CC) python setup.py build
 
 # As native UCI engine
 floyd: $(wildcard Source/*) Makefile versions.json

@@ -15,7 +15,7 @@ floydModule = Extension(
                 'Source/ttable.c',
                 'Source/uci.c',
                 'Source/zobrist.c' ],
-        extra_compile_args = ['-O3', '-std=c11', '-Wall', '-pedantic'],
+        extra_compile_args = ['-std=c11', '-pedantic'],
         undef_macros = ['NDEBUG']
 )
 

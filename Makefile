@@ -22,7 +22,7 @@ all: module floyd
 
 # As Python module
 module:
-	python setup.py build
+	env CFLAGS="$(CFLAGS)" python setup.py build
 
 # As native UCI engine
 floyd: $(wildcard Source/*) Makefile versions.json

@@ -1,17 +1,24 @@
 
-|Todo| Disable null move in KRK and pawn only endings [eg]
-
 |Todo| Investigate sudden time losses of win64 version Shreddder [reliab]
 
 |Todo| Release as 0.6 when reliability confirmed and some elo added as well
 
 ------------------------------------------------------------------------
 
+|Todo| Try single reply extensions
+
+|Todo| Try null move threat extensions
+
+|Todo| Try MVA/LVA instead of fake-SEE
+
+|Todo| Try simple SEE
+
 |Todo| Win64 version from Makefile [win64]
 
 |Todo| Learn how to branch in git :-) [git]
 
 Also provide a source zip file on the download page.
+http://nvie.com/posts/a-successful-git-branching-model/
 
 |Todo| Scale passers with material [evaluate]
 
@@ -24,10 +31,6 @@ Also provide a source zip file on the download page.
 |Todo| Basic history [search]
 
 |Todo| Basic counter move? [search]
-
-|Todo| Try MVA/LVA instead of fake-SEE
-
-|Todo| Try simple SEE
 
 |Todo| Checks in qsearch, at least in PV
 

@@ -1,11 +1,9 @@
 
-|Todo| Investigate sudden time losses of win64 version Shreddder [reliab]
-
 |Todo| Release as 0.6 when reliability confirmed and some elo added as well
 
 ------------------------------------------------------------------------
 
-|Todo| Try single reply extensions
+|Todo| Run program through valgrind
 
 |Todo| Try null move threat extensions
 

@@ -258,7 +258,7 @@ static unsigned int __stdcall threadStart(void *args)
 xThread_t createThread(thread_fn *function, void *data)
 {
         // We can't pass these on the stack due to the race-condition
-        struct threadClosure *closure = malloc(sizeof(closure));
+        struct threadClosure *closure = malloc(sizeof(*closure));
         if (!closure)
                 xAbort(errno, "malloc");
         closure->function = function;
@@ -299,7 +299,7 @@ static void *threadStart(void *args)
 xThread_t createThread(thread_fn *function, void *data)
 {
         // We can't pass these on the stack due to the race-condition
-        struct threadClosure *closure = malloc(sizeof(closure));
+        struct threadClosure *closure = malloc(sizeof(*closure));
         if (!closure)
                 xAbort(errno, "malloc");
         closure->function = function;

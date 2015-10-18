@@ -14,7 +14,8 @@ uciSources:=$(addprefix Source/, $(uciSources))
 
 osType:=$(shell uname -s)
 
-CFLAGS:=-std=c11 -pedantic -Wall -O3 -DfloydVersion=$(floydVersion)
+CFLAGS:=-std=c11 -pedantic -Wall -O3 -fstrict-aliasing -fomit-frame-pointer\
+	-DfloydVersion=$(floydVersion)
 
 ifeq "$(osType)" "Linux"
  LDFLAGS:=-lm -lpthread

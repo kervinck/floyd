@@ -93,7 +93,7 @@ install:
 	env floydVersion=$(floydVersion) python setup.py install --user
 
 clean:
-	python setup.py clean --all
+	env floydVersion=$(floydVersion) python setup.py clean --all
 	rm -f floyd $(win32_exe)
 
 bench: floyd

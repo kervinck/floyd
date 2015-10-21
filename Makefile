@@ -31,7 +31,7 @@ all: module floyd
 
 # As Python module
 module:
-	env CC="$(CC)" CFLAGS="$(CFLAGS)" python setup.py build
+	env CC="$(CC)" CFLAGS="$(CFLAGS)" floydVersion="$(floydVersion)" python setup.py build
 
 # As native UCI engine
 floyd: $(wildcard Source/*) Makefile versions.json
@@ -90,7 +90,7 @@ update: clean Tuning/tables.png
 	[ -s vector.h.tmp ] && mv vector.h.tmp Source/vector.h
 
 install:
-	python setup.py install --user
+	env floydVersion=$(floydVersion) python setup.py install --user
 
 clean:
 	python setup.py clean --all

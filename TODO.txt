@@ -1,30 +1,4 @@
 
-|Done| Add node count regression test 'make nodes'
-
-0 4667 4.667
-1 72022 15.4322
-2 276885 3.84445
-3 656101 2.36958
-4 1465726 2.23399
-5 4268470 2.91219
-6 12369825 2.89795
-7 41353130 3.34307
-8 145561974 3.51997
-
-0 4667 4.667
-1 72022 15.4322
-2 276885 3.84445
-3 656220 2.37001
-4 1476931 2.25066
-5 4500497 3.0472
-6 13429713 2.98405
-7 50237376 3.74076
-8 188069105 3.74361
-
-------------------------------------------------------------------------
-
-|Todo| Add __version__ to module
-
 |Todo| Introduce move flags
 
 |Todo| Run program through valgrind
@@ -132,8 +106,6 @@ https://en.wikipedia.org/wiki/Rosenbrock_function
 - side to move attacks other king
 
 - also update chessmoves module for this
-
-|Todo| Export version string to Python [python]
 
 |Todo| In debugging mode give moves also in SAN for readability
 

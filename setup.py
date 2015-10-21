@@ -1,4 +1,5 @@
 from distutils.core import setup, Extension
+import os
 
 floydModule = Extension(
         'floyd',
@@ -20,7 +21,7 @@ floydModule = Extension(
 
 setup(
         name         = 'floyd',
-        version      = '0.1a',
+        version      = os.environ['floydVersion'],
         description  = 'Chess engine study',
         author       = 'Marcel van Kervinck',
         author_email = 'marcelk@bitpit.net',

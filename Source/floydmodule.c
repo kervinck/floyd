@@ -232,10 +232,10 @@ floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
  +----------------------------------------------------------------------*/
 
 static PyMethodDef floydMethods[] = {
-	{ "evaluate",       floydmodule_evaluate,            METH_VARARGS,               evaluate_doc },
-	{ "setCoefficient", floydmodule_setCoefficient,      METH_VARARGS,               setCoefficient_doc },
-	{ "search",         (PyCFunction)floydmodule_search, METH_VARARGS|METH_KEYWORDS, search_doc },
-	{ null, }
+        { "evaluate",       floydmodule_evaluate,            METH_VARARGS,               evaluate_doc },
+        { "setCoefficient", floydmodule_setCoefficient,      METH_VARARGS,               setCoefficient_doc },
+        { "search",         (PyCFunction)floydmodule_search, METH_VARARGS|METH_KEYWORDS, search_doc },
+        { null, }
 };
 
 /*----------------------------------------------------------------------+
@@ -246,7 +246,13 @@ PyMODINIT_FUNC
 initfloyd(void)
 {
         // Create the module and add the functions
-	Py_InitModule3("floyd", floydMethods, floyd_doc);
+        PyObject *module = Py_InitModule3("floyd", floydMethods, floyd_doc);
+        if (!module)
+                return;
+
+        PyObject *versionString = PyString_FromString(quote2(floydVersion));
+        if (versionString)
+                PyModule_AddObject(module, "__version__", versionString);
 }
 
 /*----------------------------------------------------------------------+

@@ -99,6 +99,9 @@ static void moveToFront(int moveList[], int nrMoves, int move);
 static bool repetition(Engine_t self);
 static int allowNullMove(Board_t self);
 
+static void killersToFront(Engine_t self, int ply, int moveList[], int nrMoves);
+static void updateKillers(Engine_t self, int ply, int move);
+
 /*----------------------------------------------------------------------+
  |      rootSearch                                                      |
  +----------------------------------------------------------------------*/
@@ -125,6 +128,7 @@ void rootSearch(Engine_t self,
         if (hash(board(self)) != self->lastSearched) {
                 self->lastSearched = hash(board(self));
                 self->pv.len = 0;
+                self->killers.len = 0;
                 updateBestAndPonderMove(self);
                 self->tt.now = (self->tt.now + 1) & ones(ttDateBits);
         }
@@ -151,7 +155,7 @@ void rootSearch(Engine_t self,
                 }
         } else { // except abort
                 self->seconds = xTime() - startTime;
-                while (board(self)->plyNumber > self->rootPlyNumber)
+                while (ply(self) > 0)
                         undoMove(board(self));
                 int pvCut = updateBestAndPonderMove(self);
                 self->pv.len = min(self->pv.len, pvCut);
@@ -168,8 +172,7 @@ void rootSearch(Engine_t self,
 // TODO: move to evaluate.h
 static inline int endScore(Engine_t self, bool inCheck)
 {
-        int rootDistance = board(self)->plyNumber - self->rootPlyNumber;
-        return inCheck ? minMate + rootDistance : 0;
+        return inCheck ? minMate + ply(self) : 0;
 }
 
 static inline int drawScore(Engine_t self)
@@ -186,7 +189,7 @@ static inline int drawScore(Engine_t self)
 static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
 {
         self->nodeCount++;
-        bool inRoot = (pvIndex == 0);
+        bool inRoot = (ply(self) == 0);
         #define cutPv() (self->pv.len = pvIndex)
 
         if (repetition(self) && !inRoot)
@@ -276,7 +279,6 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
 #define isAllNode(nodeType) ((~nodeType) & 1)
 
 // TODO: futility
-// TODO: killers
 // TODO: null move
 static int scout(Engine_t self, int depth, int alpha, int nodeType)
 {
@@ -314,16 +316,20 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
         int moveList[maxMoves];
         int nrMoves = generateMoves(board(self), moveList);
         nrMoves = filterAndSort(board(self), moveList, nrMoves, minInt);
+        killersToFront(self, ply(self), moveList, nrMoves);
         moveToFront(moveList, nrMoves, slot.move);
 
-        for (int i=0; i<nrMoves && bestScore<=alpha; i++) {
+        for (int i=0, j=0; i<nrMoves && bestScore<=alpha; i++) {
                 makeMove(board(self), moveList[i]);
                 if (wasLegalMove(board(self))) {
                         int newDepth = max(0, depth - 1 + extension);
                         int score = -scout(self, newDepth, -(alpha + 1), nodeType+1);
                         bestScore = max(bestScore, score);
-                        if (score > alpha)
+                        if (score > alpha) {
                                 slot.move = moveList[i];
+                                if (j > 0) updateKillers(self, ply(self)-1, moveList[i]);
+                        }
+                        j++;
                 }
                 undoMove(board(self));
         }
@@ -488,7 +494,7 @@ static bool repetition(Engine_t self)
                 return false;
         int ix = board->hashHistory.len;
         int lastZeroing = max(0, ix - board->halfmoveClock);
-        int searchRoot = ix - (board->plyNumber - self->rootPlyNumber);
+        int searchRoot = ix - ply(self);
         int count = 1;
         for (ix=ix-4; ix>=lastZeroing; ix-=2)
                 if (board(self)->hashHistory.v[ix] == board->hash)
@@ -509,6 +515,39 @@ static int allowNullMove(Board_t self)
                 bits |= allowNullMoveTable[self->squares[i]];
         //return bits & 1;
         return bits == 7;
+}
+
+/*----------------------------------------------------------------------+
+ |      killers                                                         |
+ +----------------------------------------------------------------------*/
+
+static void killersToFront(Engine_t self, int ply, int moveList[], int nrMoves)
+{
+        while (self->killers.len <= ply) // Expand table when needed
+                pushList(self->killers, (killersTuple) {.v={0}});
+
+        for (int i=nrKillers-1; i>=0; i--)
+                moveToFront(moveList, nrMoves, self->killers.v[ply].v[i]);
+}
+
+static void updateKillers(Engine_t self, int ply, int move)
+{
+        killersTuple *killers = &self->killers.v[ply];
+        int i = nrKillers-1;
+        while (i >= 0 && killers->v[i] != move)
+                i--;
+
+        if (i < 0) {
+                // Insert new killer and shift the others down (demote)
+                if (killers->v[newKillerIndex] != 0)
+                        for (int i=nrKillers-1; i>newKillerIndex; i--)
+                                killers->v[i] = killers->v[i-1];
+                killers->v[newKillerIndex] = move;
+        } else if (i > 0) {
+                // Shift up or promote a pre-existing killer
+                killers->v[i] = killers->v[i-1];
+                killers->v[i-1] = move;
+        }
 }
 
 /*----------------------------------------------------------------------+

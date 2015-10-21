@@ -39,6 +39,8 @@
  +----------------------------------------------------------------------*/
 
 #define maxDepth 120
+#define nrKillers 5
+#define newKillerIndex 2
 
 typedef struct Engine *Engine_t;
 
@@ -71,6 +73,10 @@ struct ttSlot {
         };
 };
 
+typedef Tuple(int, nrKillers) killersTuple;
+
+#define ply(self) (board(self)->plyNumber - (self)->rootPlyNumber)
+
 /*
  *  Chess engine
  */
@@ -89,6 +95,8 @@ struct Engine {
                 unsigned int now;  // incremented when root changes
                 uint64_t baseHash; // For fast clearing
         } tt;
+
+        List(killersTuple) killers;
 
         // last search result
         struct {

@@ -70,6 +70,12 @@ tables: Tuning/tables.png
 Tuning/tables.png: Tools/plotTables.py Tuning/vector.json
 	python Tools/plotTables.py Tuning/vector.json
 
+# Node count regression test
+nodes:
+	python Tools/nodetest.py 8 < Data/thousand.epd | awk '\
+	/ nodes / { n[$$5] += $$10; n[-1] += !$$5 }\
+	END       { for (d=0; n[d]; d++) print d, n[d], n[d] / n[d-1] }'
+
 residual:
 	bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/tune.py -q Tuning/vector.json
 

@@ -221,6 +221,7 @@ floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
         freeList(engine.board.undoStack);
         freeList(engine.searchMoves);
         freeList(engine.pv);
+        freeList(engine.killers);
         free(engine.tt.slots);
 
         return result;

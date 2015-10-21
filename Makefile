@@ -99,4 +99,7 @@ clean:
 bench: floyd
 	for N in 1 2 3 4 5; do echo bench | ./floyd | grep result; done
 
+log:
+	git log --oneline --decorate --graph --all
+
 # vi: noexpandtab

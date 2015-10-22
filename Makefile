@@ -47,19 +47,19 @@ $(win32_exe): $(wildcard Source/*) Makefile versions.json
 	@echo "Version: $(floydVersion)"
 	$(xcc_win32) $(CFLAGS) $(win32_flags) -o $@ $(uciSources)
 
-test:
+test: module
 	python Tools/searchtest.py
 
 # 1 seconds tests
-easy wac krk5 tt eg ece3:
+easy wac krk5 tt eg ece3: module
 	python Tools/bmtest.py 1 < Data/$@.epd
 
 # 10 seconds tests
-hard draw nodraw mate bk:
+hard draw nodraw mate bk: module
 	python Tools/bmtest.py 10 < Data/$@.epd
 
 # 1000 seconds tests
-nolot:
+nolot: module
 	python Tools/bmtest.py 1000 < Data/$@.epd
 
 todo: # xtodo
@@ -73,28 +73,28 @@ Tuning/tables.png: Tools/plotTables.py Tuning/vector.json
 	python Tools/plotTables.py Tuning/vector.json
 
 # Node count regression test
-nodes:
+nodes: module
 	python Tools/nodetest.py 8 < Data/thousand.epd | awk '\
 	/ nodes / { n[$$5] += $$10; n[-1] += !$$5 }\
 	END       { for (d=0; n[d]; d++) print d, n[d], n[d] / n[d-1] }'
 
-residual:
+residual: module
 	bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/tune.py -q Tuning/vector.json
 
-tune:
+tune: module
 	bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/tune.py -s 2 Tuning/vector.json
 
-ftune:
+ftune: module
 	bzcat Data/ccrl-shuffled-3M.epd.bz2 | head -500000 | python Tools/tune.py -s 2 -m 100000 fvector.json
 
 update: clean Tuning/tables.png
 	python Tools/updateDefaults.py Tuning/vector.json < Source/vector.h > vector.h.tmp
 	[ -s vector.h.tmp ] && mv vector.h.tmp Source/vector.h
 
-install:
+install: module
 	env floydVersion=$(floydVersion) python setup.py install --user
 
-sysinstall:
+sysinstall: module
 	env floydVersion=$(floydVersion) python setup.py install
 
 clean:

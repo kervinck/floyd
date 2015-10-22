@@ -2,7 +2,6 @@
 |Todo| Introduce move flags
 
 - Simplify UCI move formatting
-- Don't clear flags after filterAndSort
 
          dynamic                static (movegen)
 +------------+------------+------------+-------------+

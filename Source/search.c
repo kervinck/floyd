@@ -437,7 +437,7 @@ static int filterAndSort(Board_t self, int moveList[], int nrMoves, int moveFilt
         for (int i=0; i<nrMoves; i++) {
                 int moveScore = exchange(self, moveList[i]);
                 if (moveScore >= moveFilter)
-                        moveList[n++] = (moveScore << 16) + (moveList[i] & moveMask);
+                        moveList[j++] = (moveScore << 16) + (moveList[i] & moveMask);
         }
         qsort(moveList, j, sizeof(moveList[0]), compareMoves);
         return j;

@@ -34,8 +34,6 @@ http://nvie.com/posts/a-successful-git-branching-model/
 
 |Todo| Granularity of win32 clock too low? [win32]
 
-|Todo| Enable test before install [build]
-
 |Todo| Preserve parameter order in vector.json [tuning]
 
 |Todo| Multicore support for tuning [speed]

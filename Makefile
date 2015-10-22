@@ -5,7 +5,6 @@
 # If you get "fatal error: Python.h: No such file or directory",
 # install the python-dev package: `sudo apt-get install python-dev'
 
-
 floydVersion:=$(shell python Tools/getVersion.py versions.json Source/*)
 
 uciSources:=bench.c cplus.c evaluate.c floydmain.c format.c kpk.c moves.c\
@@ -27,11 +26,15 @@ win32_exe:=floyd.w32.exe
 xcc_win32:=/usr/local/gcc-4.8.0-qt-4.8.4-for-mingw32/win32-gcc/bin/i586-mingw32-gcc
 win32_flags:=-Wno-format # Suppress warnings about "%lld"/"%I64d". Both work fine.
 
+# Allow testing before installation 
+PYTHONPATH=build/lib/python:$$PYTHONPATH
+
 all: module floyd
 
 # As Python module
 module:
 	env CC="$(CC)" CFLAGS="$(CFLAGS)" floydVersion="$(floydVersion)" python setup.py build
+	env floydVersion="$(floydVersion)" python setup.py install --home=build
 
 # As native UCI engine
 floyd: $(wildcard Source/*) Makefile versions.json
@@ -44,8 +47,7 @@ $(win32_exe): $(wildcard Source/*) Makefile versions.json
 	@echo "Version: $(floydVersion)"
 	$(xcc_win32) $(CFLAGS) $(win32_flags) -o $@ $(uciSources)
 
-# TODO: allow testing before install
-test: install
+test:
 	python Tools/searchtest.py
 
 # 1 seconds tests
@@ -91,6 +93,9 @@ update: clean Tuning/tables.png
 
 install:
 	env floydVersion=$(floydVersion) python setup.py install --user
+
+sysinstall:
+	env floydVersion=$(floydVersion) python setup.py install
 
 clean:
 	env floydVersion=$(floydVersion) python setup.py clean --all

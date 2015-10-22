@@ -100,7 +100,7 @@ extern char *moveToUci(Board_t self, char moveString[maxMoveSize], int move)
         *moveString++ = fileToChar(file(to));
         *moveString++ = rankToChar(rank(to));
         if (isPromotion(self, from, to))
-                *moveString++ = tolower(promotionPieceToChar[move>>promotionBits]);
+                *moveString++ = tolower(promotionPieceToChar[(move>>promotionBits)&3]);
         *moveString = '\0';
 
         return moveString;
@@ -143,7 +143,7 @@ extern char *moveToLongAlgebraic(Board_t self, char moveString[maxMoveSize], int
         // Promotion piece
         if (isPromotion(self, from, to)) {
                 *moveString++ = '=';
-                *moveString++ = promotionPieceToChar[move>>promotionBits];
+                *moveString++ = promotionPieceToChar[(move>>promotionBits)&3];
         }
 
         *moveString = '\0';
@@ -181,7 +181,7 @@ extern char *moveToStandardAlgebraic(Board_t self, char moveString[maxMoveSize],
                 // Promote to piece (=Q, =R, =B, =N)
                 if (isPromotion(self, from, to)) {
                         *moveString++ = '=';
-                        *moveString++ = promotionPieceToChar[move>>promotionBits];
+                        *moveString++ = promotionPieceToChar[(move>>promotionBits)&3];
                 }
                 *moveString = '\0';
                 return moveString;

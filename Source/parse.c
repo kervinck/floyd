@@ -341,7 +341,7 @@ extern int parseMove(Board_t self, const char *line, int xMoves[maxMoves], int x
                 int xPiece = self->squares[xFrom];
                 int xPromotionPiece = 0;
                 if (isPromotion(self, xFrom, xTo))
-                        xPromotionPiece = promotionPieceToChar[xMove>>promotionBits];
+                        xPromotionPiece = promotionPieceToChar[(xMove>>promotionBits)&3];
 
                 // Do all parsed elements match with this candidate move? And is it legal?
                 if ((fromPiece      && fromPiece != toupper(pieceToChar[xPiece]))

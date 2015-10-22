@@ -68,6 +68,7 @@ enum {
 #define maxMoves 256
 #define maxMoveSize sizeof("a7-a8=N+")
 #define maxFenSize 128
+#define moveMask ones(16)
 
 struct Board {
         signed char squares[boardSize];

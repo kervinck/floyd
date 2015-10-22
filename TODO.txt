@@ -1,6 +1,15 @@
 
 |Todo| Introduce move flags
 
+- Simplify UCI move formatting
+- Don't clear flags after filterAndSort
+
+         dynamic                static (movegen)
++------------+------------+------------+-------------+
+| SEE/killer |   history  | properties |     move    |
++------------+------------+------------+-------------+
+      16            16           16           16
+
 |Todo| Run program through valgrind
 
 |Todo| Try null move threat extensions

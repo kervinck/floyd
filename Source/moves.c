@@ -499,7 +499,7 @@ extern void makeMove(Board_t self, int move)
                                 self->hash ^= hashEnPassant(to);
                         } else {
                                 push(from, self->squares[from]); // White promotes
-                                int promoPiece = whiteQueen + (move >> promotionBits);
+                                int promoPiece = whiteQueen + ((move >> promotionBits) & 3);
                                 self->squares[from] = promoPiece;
                                 self->hash ^= zobristPiece[whitePawn][from]
                                             ^ zobristPiece[promoPiece][from];
@@ -522,7 +522,7 @@ extern void makeMove(Board_t self, int move)
                                 self->hash ^= hashEnPassant(to);
                         } else {
                                 push(from, self->squares[from]); // Black promotes
-                                int promoPiece = blackQueen + (move >> promotionBits);
+                                int promoPiece = blackQueen + ((move >> promotionBits) & 3);
                                 self->squares[from] = promoPiece;
                                 self->hash ^= zobristPiece[blackPawn][from]
                                             ^ zobristPiece[promoPiece][from];

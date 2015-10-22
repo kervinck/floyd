@@ -414,7 +414,7 @@ static int exchange(Board_t self, int move)
                 score -= pieceValue[piece];
         } else {
                 if (isPromotion(self, from, to))
-                        score += promotionValue[move >> promotionBits] - 1;
+                        score += promotionValue[(move>>promotionBits)&3] - 1;
         }
         return score;
 }
@@ -433,19 +433,14 @@ static int compareMoves(const void *ap, const void *bp)
 
 static int filterAndSort(Board_t self, int moveList[], int nrMoves, int moveFilter)
 {
-        int n = 0;
+        int j = 0;
         for (int i=0; i<nrMoves; i++) {
                 int moveScore = exchange(self, moveList[i]);
                 if (moveScore >= moveFilter)
-                        moveList[n++] = (moveScore << 16) + (moveList[i] & 0xffff);
+                        moveList[n++] = (moveScore << 16) + (moveList[i] & moveMask);
         }
-
-        qsort(moveList, n, sizeof(moveList[0]), compareMoves);
-
-        for (int i=0; i<n; i++)
-                moveList[i] &= 0xffff;
-
-        return n;
+        qsort(moveList, j, sizeof(moveList[0]), compareMoves);
+        return j;
 }
 
 /*----------------------------------------------------------------------+
@@ -470,11 +465,12 @@ static int filterLegalMoves(Board_t self, int moveList[], int nrMoves)
 
 static void moveToFront(int moveList[], int nrMoves, int move)
 {
+        move &= moveMask;
         if (move == 0)
                 return;
 
         for (int i=0; i<nrMoves; i++) {
-                if (moveList[i] == move) {
+                if ((moveList[i] & moveMask) == move) {
                         memmove(&moveList[1], &moveList[0], i * sizeof(moveList[0]));
                         moveList[0] = move;
                         break;
@@ -534,7 +530,7 @@ static void updateKillers(Engine_t self, int ply, int move)
 {
         killersTuple *killers = &self->killers.v[ply];
         int i = nrKillers-1;
-        while (i >= 0 && killers->v[i] != move)
+        while (i >= 0 && killers->v[i] != (move & moveMask))
                 i--;
 
         if (i < 0) {
@@ -542,11 +538,11 @@ static void updateKillers(Engine_t self, int ply, int move)
                 if (killers->v[newKillerIndex] != 0)
                         for (int i=nrKillers-1; i>newKillerIndex; i--)
                                 killers->v[i] = killers->v[i-1];
-                killers->v[newKillerIndex] = move;
+                killers->v[newKillerIndex] = move & moveMask;
         } else if (i > 0) {
                 // Shift up or promote a pre-existing killer
                 killers->v[i] = killers->v[i-1];
-                killers->v[i-1] = move;
+                killers->v[i-1] = move & moveMask;
         }
 }
 

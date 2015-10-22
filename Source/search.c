@@ -97,7 +97,7 @@ static int filterAndSort(Board_t self, int moveList[], int nrMoves, int moveFilt
 static int filterLegalMoves(Board_t self, int moveList[], int nrMoves);
 static void moveToFront(int moveList[], int nrMoves, int move);
 static bool repetition(Engine_t self);
-static int allowNullMove(Board_t self);
+static bool allowNullMove(Board_t self);
 
 static void killersToFront(Engine_t self, int ply, int moveList[], int nrMoves);
 static void updateKillers(Engine_t self, int ply, int move);
@@ -305,7 +305,7 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
         int bestScore = minInt;
 
         // Null move pruning
-        if (depth >= 2 && isCutNode(nodeType) && !check && alpha < maxEval && allowNullMove(board(self))) {
+        if (depth >= 2 && isCutNode(nodeType) && alpha < maxEval && allowNullMove(board(self))) {
                 makeNullMove(board(self));
                 int score = -scout(self, max(0, depth - 2 - 1), -(alpha + 1), nodeType+1);
                 undoMove(board(self));
@@ -507,13 +507,13 @@ static bool repetition(Engine_t self)
  |      allowNullMove                                                   |
  +----------------------------------------------------------------------*/
 
-// Both sides must have pieces and there must be a slider
-static int allowNullMove(Board_t self)
+// Not in check, both sides must have pieces and there must be a slider
+static bool allowNullMove(Board_t self)
 {
         int bits = 0;
-        for (int i=0; i<boardSize; i++)
-                bits |= allowNullMoveTable[self->squares[i]];
-        //return bits & 1;
+        if (!inCheck(self))
+                for (int i=0; i<boardSize; i++)
+                        bits |= allowNullMoveTable[self->squares[i]];
         return bits == 7;
 }
 

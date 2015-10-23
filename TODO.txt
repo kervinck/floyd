@@ -1,13 +1,22 @@
 
-|Todo| Introduce move flags
+|Todo| Introduce move flags for 32 bit
 
 - Simplify UCI move formatting
 
-         dynamic                static (movegen)
+|Todo| Extend move flags
+
+- Extend flags beyond 
+
+Concept choice: keep flags with move or in seperate table
+or combine with the move word?
+
+          search                     board
 +------------+------------+------------+-------------+
 | SEE/killer |   history  | properties |     move    |
 +------------+------------+------------+-------------+
       16            16           16           16
+
+        moveList[i] += self->history[moveList[i] & moveMask]
 
 |Todo| Run program through valgrind
 
@@ -21,16 +30,26 @@
 
 |Todo| Learn how to branch in git :-) [git]
 
-Also provide a source zip file on the download page.
+Make Docs/branching.txt
+
 http://nvie.com/posts/a-successful-git-branching-model/
+
+"master": releases
+"patch": for fixes on release. Short lived. Push into int and into master
+        Fixes on release give a new release
+"int": upcoming release branch, for integration testing
+        push into master and dev
+"dev": fast-paced changes
+        merge dev into int to start preparing next release
+        Then only allow fixes
+        Make release notes
+        Merge into master
 
 |Todo| Scale passers with material [evaluate]
 
 |Todo| King safety [evaluate]
 
 |Todo| Remove evaluate.h [cleanup]
-
-|Todo| Basic killers [search]
 
 |Todo| Basic history [search]
 
@@ -151,4 +170,10 @@ Also recognize 50-move as a game during search.
 |Todo| Move generator test [qa]
 
 moves 5 (includes divide, no time info)
+
+|Todo| eggs metadata [python]
+
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
 

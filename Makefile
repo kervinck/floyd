@@ -62,10 +62,6 @@ $(win32_exe): $(wildcard Source/*) Makefile versions.json
 	@echo "Version: $(floydVersion)"
 	$(xcc_win32) $(CFLAGS) $(win32_flags) -o $@ $(uciSources)
 
-# Run simple test
-test: module
-	python Tools/searchtest.py
-
 # Run 1 second position tests
 easy wac krk5 tt eg ece3: module
 	python Tools/bmtest.py 1 < Data/$@.epd
@@ -125,7 +121,7 @@ clean:
 	env floydVersion=$(floydVersion) python setup.py clean --all
 	rm -f floyd $(win32_exe)
 
-# Show all open todo items
+# Show all open to-do items
 todo: # xtodo
 	@find . -not -path './.git/*' -type f -size -1M -print0 | xargs -0 grep -i todo | grep -v xtodo
 

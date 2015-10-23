@@ -1,9 +1,19 @@
 
+#-----------------------------------------------------------------------
+#
+#       Makefile for Linux and OSX (type 'make help' for an overview)
+#
+#-----------------------------------------------------------------------
+
 # If the default compiler doesn't support --std=c11 yet, install gcc-4.8
 # and type `make CC=gcc-4.8'
 #
 # If you get "fatal error: Python.h: No such file or directory",
 # install the python-dev package: `sudo apt-get install python-dev'
+
+#-----------------------------------------------------------------------
+#       Definitions
+#-----------------------------------------------------------------------
 
 floydVersion:=$(shell python Tools/getVersion.py versions.json Source/*)
 
@@ -29,82 +39,105 @@ win32_flags:=-Wno-format # Suppress warnings about "%lld"/"%I64d". Both work fin
 # Allow testing before installation 
 PYTHONPATH=build/lib/python:$$PYTHONPATH
 
+#-----------------------------------------------------------------------
+#       Targets
+#-----------------------------------------------------------------------
+
+# Compile both as Python module and as native UCI engine
 all: module floyd
 
-# As Python module
+# Compile as Python module
 module:
 	env CC="$(CC)" CFLAGS="$(CFLAGS)" floydVersion="$(floydVersion)" python setup.py build
 	env floydVersion="$(floydVersion)" python setup.py install --home=build
 
-# As native UCI engine
+# Compile as native UCI engine
 floyd: $(wildcard Source/*) Makefile versions.json
 	@echo "Version: $(floydVersion)"
 	$(CC) $(CFLAGS) -o $@ $(uciSources) $(LDFLAGS)
 
-# As Win32 UCI engine
+# Cross-compile as Win32 UCI engine
 win: $(win32_exe)
 $(win32_exe): $(wildcard Source/*) Makefile versions.json
 	@echo "Version: $(floydVersion)"
 	$(xcc_win32) $(CFLAGS) $(win32_flags) -o $@ $(uciSources)
 
+# Run simple test
 test: module
 	python Tools/searchtest.py
 
-# 1 seconds tests
+# Run 1 second position tests
 easy wac krk5 tt eg ece3: module
 	python Tools/bmtest.py 1 < Data/$@.epd
 
-# 10 seconds tests
+# Run 10 second position tests
 hard draw nodraw mate bk: module
 	python Tools/bmtest.py 10 < Data/$@.epd
 
-# 1000 seconds tests
+# Run 1000 second position tests
 nolot: module
 	python Tools/bmtest.py 1000 < Data/$@.epd
 
-todo: # xtodo
-	@find . -not -path './.git/*' -type f -size -1M -print0 | xargs -0 grep -i todo | grep -v xtodo
+# Run node count regression test
+nodes: module
+	python Tools/nodetest.py 8 < Data/thousand.epd | awk '\
+	/ nodes / { n[$$5] += $$10; n[-1] += !$$5 }\
+	END       { for (d=0; n[d]; d++) print d, n[d], n[d] / n[d-1] }'
 
-# Dump resulting evaluation tables for easy inspection
+# Run nodes per second benchmark 5 times
+bench: floyd
+	for N in 1 2 3 4 5; do echo bench | ./floyd | grep result; done
+
+# Calculate residual of evaluation function
+residual: module
+	bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/tune.py -q Tuning/vector.json
+
+# Run one iteration of the evaluation tuner
+tune: module
+	bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/tune.py -s 2 Tuning/vector.json
+
+# Run one fast iteration of the evaluation tuner
+ftune: module
+	bzcat Data/ccrl-shuffled-3M.epd.bz2 | head -500000 | python Tools/tune.py -s 2 -m 100000 fvector.json
+
+# Plot evaluation tables for easy inspection
 tables: Tuning/tables.png
 	[ `uname -s` = 'Darwin' ] && open Tuning/tables.png
 
 Tuning/tables.png: Tools/plotTables.py Tuning/vector.json
 	python Tools/plotTables.py Tuning/vector.json
 
-# Node count regression test
-nodes: module
-	python Tools/nodetest.py 8 < Data/thousand.epd | awk '\
-	/ nodes / { n[$$5] += $$10; n[-1] += !$$5 }\
-	END       { for (d=0; n[d]; d++) print d, n[d], n[d] / n[d-1] }'
-
-residual: module
-	bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/tune.py -q Tuning/vector.json
-
-tune: module
-	bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/tune.py -s 2 Tuning/vector.json
-
-ftune: module
-	bzcat Data/ccrl-shuffled-3M.epd.bz2 | head -500000 | python Tools/tune.py -s 2 -m 100000 fvector.json
-
+# Update source code with the tuned coefficients
 update: clean Tuning/tables.png
 	python Tools/updateDefaults.py Tuning/vector.json < Source/vector.h > vector.h.tmp
 	[ -s vector.h.tmp ] && mv vector.h.tmp Source/vector.h
 
+# Install Python module for the current user
 install: module
 	env floydVersion=$(floydVersion) python setup.py install --user
 
+# Install Python module for all system users ('sudo make sysinstall')
 sysinstall: module
 	env floydVersion=$(floydVersion) python setup.py install
 
+# Remove compilation intermediates and results
 clean:
 	env floydVersion=$(floydVersion) python setup.py clean --all
 	rm -f floyd $(win32_exe)
 
-bench: floyd
-	for N in 1 2 3 4 5; do echo bench | ./floyd | grep result; done
+# Show all open todo items
+todo: # xtodo
+	@find . -not -path './.git/*' -type f -size -1M -print0 | xargs -0 grep -i todo | grep -v xtodo
 
+# Show simplified git log
 log:
 	git log --oneline --decorate --graph --all
 
+# Show summary of make targets
+help:
+	@awk -F: '/^[a-z].*:( .*)?$$/{printf"%-26s %s\n",$$1,lastLine}{lastLine=$$0}' Makefile 
+
+#-----------------------------------------------------------------------
+#
+#-----------------------------------------------------------------------
 # vi: noexpandtab

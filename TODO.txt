@@ -1,4 +1,6 @@
 
+|Todo| Lazy move generation for pvSearch
+
 |Todo| Introduce move flags for 32 bit
 
 - Simplify UCI move formatting
@@ -18,11 +20,21 @@ or combine with the move word?
 
         moveList[i] += self->history[moveList[i] & moveMask]
 
-|Todo| Run program through valgrind
+1. Sort a long key.
+        - Makes everyone upgrade to Move_t
+        + Can use standard qsort
+2. Sort only the scores, with back reference to the move (index)
+3. Sort through a history table, requires modified qsort
+4. Hide all in a move picker object
+5. Place scores at index+256
+        - Doesn't work with qsort
 
-|Todo| Try null move threat extensions
+Desirable properties
+- generateMove still generates ints (32bit)
+- can use stdlib qsort
 
-|Todo| Try MVA/LVA instead of fake-SEE
+|Todo| Lazy move generation for qSearch
+Makes it slower?
 
 |Todo| Try simple SEE
 
@@ -176,4 +188,20 @@ moves 5 (includes divide, no time info)
 License: UNKNOWN
 Description: UNKNOWN
 Platform: UNKNOWN
+
+|Todo| Remove SAN functions
+
+------------------------------------------------------------------------
+
+Avoid system-in-system effect:
+Things that definitely don't belong in a chess engine:
+- PGN reading and writing
+- Logging facilities
+- SAN reading and writing
+- libreadline
+- Configuration files
+- Over-pedantic checks: input validation for other conditions than those
+  that can crash the implementation later on
+- Recovery from system failures. Instead log failure and abort
+- Checking for system/library compliancy to their specification
 

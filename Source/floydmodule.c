@@ -144,7 +144,7 @@ PyDoc_STRVAR(search_doc,
 );
 
 // Suppress search info
-static bool emptyInfoFunction(void *infoData)
+static bool emptyInfoFunction(void *infoData, const char *string, ...)
 {
         return false;
 }

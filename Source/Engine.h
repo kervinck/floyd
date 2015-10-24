@@ -44,6 +44,9 @@
 
 typedef struct Engine *Engine_t;
 
+// Callback interface for handling of search progress
+typedef bool searchInfo_fn(void *infoData, const char *string, ...);
+
 /*
  *  Transposition table
  */
@@ -110,6 +113,9 @@ struct Engine {
                 long long nodeCount;
         };
 
+        searchInfo_fn *infoFunction;
+        void *infoData;
+
         void *abortTarget;
 };
 
@@ -120,9 +126,6 @@ struct Engine {
  *  `board' is the first element of `struct Engine'.
  */
 #define board(engine) (&(engine)->board)
-
-// Callback interface for handling of search progress
-typedef bool searchInfo_fn(void *infoData);
 
 /*----------------------------------------------------------------------+
  |      Functions                                                       |

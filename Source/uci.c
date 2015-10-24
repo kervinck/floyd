@@ -42,10 +42,11 @@
 #include <assert.h>
 #include <ctype.h>
 #include <math.h>
+#include <stdarg.h>
 #include <stdbool.h>
-#include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 // C extension
@@ -439,12 +440,22 @@ static double target(Engine_t self, double time, double inc, int movestogo)
  |      uciSearchInfo                                                   |
  +----------------------------------------------------------------------*/
 
-bool uciSearchInfo(void *uciInfoData)
+bool uciSearchInfo(void *uciInfoData, const char *string, ...)
 {
         Engine_t self = uciInfoData;
 
         long milliSeconds = round(self->seconds / ms);
         printf("info time %ld", milliSeconds);
+
+        if (string != null) {
+                va_list ap;
+                va_start(ap, string);
+                printf(" nodes %lld string ", self->nodeCount);
+                vprintf(string, ap);
+                va_end(ap);
+                putchar('\n');
+                return false;
+        }
 
         if (self->pv.len > 0 || self->depth == 0) {
                 char scoreString[16];
@@ -479,7 +490,7 @@ bool uciSearchInfo(void *uciInfoData)
         if (self->seconds >= 0.1)
                 fflush(stdout);
 
-        return false; // don't abort
+        return false; // don't abort the search
 }
 
 /*----------------------------------------------------------------------+
@@ -507,7 +518,7 @@ static void uciBestMove(Engine_t self)
  |      benchInfoFunction                                               |
  +----------------------------------------------------------------------*/
 
-static bool benchInfoFunction(void *infoData)
+static bool benchInfoFunction(void *infoData, const char *string, ...)
 {
         Engine_t engine = infoData;
         char fen[maxFenSize];

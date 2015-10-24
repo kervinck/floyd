@@ -61,6 +61,15 @@
  |      Definitions                                                     |
  +----------------------------------------------------------------------*/
 
+struct Node {
+        struct ttSlot slot;
+
+        // Lazy move generation
+        int phase;
+        int nrMoves, i;
+        int moveList[maxMoves];
+};
+
 /*----------------------------------------------------------------------+
  |      Data                                                            |
  +----------------------------------------------------------------------*/
@@ -95,12 +104,15 @@ static int updateBestAndPonderMove(Engine_t self);
 static int exchange(Board_t self, int move);
 static int filterAndSort(Board_t self, int moveList[], int nrMoves, int moveFilter);
 static int filterLegalMoves(Board_t self, int moveList[], int nrMoves);
-static void moveToFront(int moveList[], int nrMoves, int move);
+static bool moveToFront(int moveList[], int nrMoves, int move);
 static bool repetition(Engine_t self);
 static bool allowNullMove(Board_t self);
 
 static void killersToFront(Engine_t self, int ply, int moveList[], int nrMoves);
 static void updateKillers(Engine_t self, int ply, int move);
+
+static int makeFirstMove(Engine_t self, struct Node *node);
+static int makeNextMove(Engine_t self, struct Node *node);
 
 /*----------------------------------------------------------------------+
  |      rootSearch                                                      |
@@ -123,6 +135,9 @@ void rootSearch(Engine_t self,
         double startTime = xTime();
         self->nodeCount = 0;
         self->rootPlyNumber = board(self)->plyNumber;
+
+        self->infoFunction = infoFunction;
+        self->infoData = infoData;
 
         assert(board(self)->hash == hash(board(self)));
         if (hash(board(self)) != self->lastSearched) {
@@ -149,7 +164,7 @@ void rootSearch(Engine_t self,
                         self->score = pvSearch(self, iteration, -maxInt, maxInt, 0);
                         self->seconds = xTime() - startTime;
                         updateBestAndPonderMove(self);
-                        stop = infoFunction(infoData)
+                        stop = infoFunction(infoData, null)
                             || (self->score + iteration + 2 >= maxMate && iteration > 0) // TODO: remove
                             || (targetTime > 0.0 && self->seconds >= 0.5 * targetTime); // TODO: remove
                 }
@@ -159,7 +174,7 @@ void rootSearch(Engine_t self,
                         undoMove(board(self));
                 int pvCut = updateBestAndPonderMove(self);
                 self->pv.len = min(self->pv.len, pvCut);
-                (void) infoFunction(infoData);
+                (void) infoFunction(infoData, null);
         }
 
         clearAlarm(alarmHandle);
@@ -279,7 +294,6 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
 #define isAllNode(nodeType) ((~nodeType) & 1)
 
 // TODO: futility
-// TODO: null move
 static int scout(Engine_t self, int depth, int alpha, int nodeType)
 {
         self->nodeCount++;
@@ -287,18 +301,19 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
         if (depth == 0)       return qSearch(self, alpha);
         if (self->stopFlag)   longjmp(self->abortTarget, 1); // raise abort
 
-        struct ttSlot slot = ttRead(self);
+        struct Node node;
+        node.slot = ttRead(self);
 
         // Internal iterative deepening
-        if (depth >= 3 && isCutNode(nodeType) && !slot.move) {
+        if (depth >= 3 && isCutNode(nodeType) && !node.slot.move) {
                 scout(self, depth - 2, alpha, nodeType);
-                slot = ttRead(self);
+                node.slot = ttRead(self);
         }
 
-        if (slot.depth >= depth || slot.isHardBound)
-                if ((slot.isUpperBound && slot.score <= alpha)
-                 || (slot.isLowerBound && slot.score > alpha))
-                        return slot.score;
+        if (node.slot.depth >= depth || node.slot.isHardBound)
+                if ((node.slot.isUpperBound && node.slot.score <= alpha)
+                 || (node.slot.isLowerBound && node.slot.score > alpha))
+                        return node.slot.score;
 
         int check = inCheck(board(self));
         int extension = check;
@@ -310,34 +325,25 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
                 int score = -scout(self, max(0, depth - 2 - 1), -(alpha + 1), nodeType+1);
                 undoMove(board(self));
                 if (score > alpha)
-                        return ttWrite(self, slot, depth, score, alpha, alpha+1);
+                        return ttWrite(self, node.slot, depth, score, alpha, alpha+1);
         }
 
-        int moveList[maxMoves];
-        int nrMoves = generateMoves(board(self), moveList);
-        nrMoves = filterAndSort(board(self), moveList, nrMoves, minInt);
-        killersToFront(self, ply(self), moveList, nrMoves);
-        moveToFront(moveList, nrMoves, slot.move);
-
-        for (int i=0, j=0; i<nrMoves && bestScore<=alpha; i++) {
-                makeMove(board(self), moveList[i]);
-                if (wasLegalMove(board(self))) {
-                        int newDepth = max(0, depth - 1 + extension);
-                        int score = -scout(self, newDepth, -(alpha + 1), nodeType+1);
-                        bestScore = max(bestScore, score);
-                        if (score > alpha) {
-                                slot.move = moveList[i];
-                                if (j > 0) updateKillers(self, ply(self)-1, moveList[i]);
-                        }
-                        j++;
-                }
+        for (int j=0, move=makeFirstMove(self,&node); move; j++, move=makeNextMove(self,&node)) {
+                int newDepth = max(0, depth - 1 + extension);
+                int score = -scout(self, newDepth, -(alpha + 1), nodeType+1);
                 undoMove(board(self));
+                bestScore = max(bestScore, score);
+                if (score > alpha) {
+                        node.slot.move = move;
+                        if (j > 0) updateKillers(self, ply(self), move);
+                        break;
+                }
         }
 
         if (bestScore == minInt)
                 bestScore = endScore(self, check);
 
-        return ttWrite(self, slot, depth, bestScore, alpha, alpha+1);
+        return ttWrite(self, node.slot, depth, bestScore, alpha, alpha+1);
 }
 
 /*----------------------------------------------------------------------+
@@ -377,6 +383,49 @@ static int qSearch(Engine_t self, int alpha)
                 bestScore = endScore(self, check);
 
         return ttWrite(self, slot, 0, bestScore, alpha, alpha+1);
+}
+
+/*----------------------------------------------------------------------+
+ |      Lazy move generator                                             |
+ +----------------------------------------------------------------------*/
+
+static int makeFirstMove(Engine_t self, struct Node *node)
+{
+        node->phase = 0;
+        node->i = 0;
+        int ttMove = node->moveList[0] = node->slot.move;
+        if (ttMove) {
+                makeMove(board(self), ttMove);
+                if (wasLegalMove(board(self)))
+                        return ttMove;
+                self->infoFunction(self->infoData, "Illegal hash table move");
+                undoMove(board(self));
+        }
+        return makeNextMove(self, node);
+}
+
+static int makeNextMove(Engine_t self, struct Node *node)
+{
+        if (node->phase == 0) {
+                int ttMove = node->moveList[0];
+                node->nrMoves = generateMoves(board(self), node->moveList);
+                node->nrMoves = filterAndSort(board(self), node->moveList, node->nrMoves, minInt);
+                killersToFront(self, ply(self), node->moveList, node->nrMoves);
+                node->i = 0;
+                if (moveToFront(node->moveList, node->nrMoves, ttMove))
+                        node->i++; // skip if already emited
+                node->phase = 1;
+        }
+        if (node->phase == 1) {
+                while (node->i < node->nrMoves) {
+                        int move = node->moveList[node->i++];
+                        makeMove(board(self), move);
+                        if (wasLegalMove(board(self)))
+                                return move;
+                        undoMove(board(self));
+                }
+        }
+        return 0;
 }
 
 /*----------------------------------------------------------------------+
@@ -463,19 +512,20 @@ static int filterLegalMoves(Board_t self, int moveList[], int nrMoves)
  |      moveToFront                                                     |
  +----------------------------------------------------------------------*/
 
-static void moveToFront(int moveList[], int nrMoves, int move)
+static bool moveToFront(int moveList[], int nrMoves, int move)
 {
         move &= moveMask;
         if (move == 0)
-                return;
+                return false;
 
         for (int i=0; i<nrMoves; i++) {
                 if ((moveList[i] & moveMask) == move) {
                         memmove(&moveList[1], &moveList[0], i * sizeof(moveList[0]));
                         moveList[0] = move;
-                        break;
+                        return true;
                 }
         }
+        return false;
 }
 
 /*----------------------------------------------------------------------+

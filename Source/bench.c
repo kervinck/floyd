@@ -57,7 +57,7 @@ static const char *positions[] = {
 
 // Functions
 
-static bool noInfoFunction(void *infoData) // TODO: move to search.c
+static bool noInfoFunction(void *infoData, const char *string, ...) // TODO: move to search.c
 {
         return false;
 }
@@ -75,7 +75,7 @@ double uciBenchmark(Engine_t self, double time, searchInfo_fn *infoFunction, voi
                 rootSearch(self, maxDepth, 0.0, time, noInfoFunction, null);
                 totalNodes += self->nodeCount;
                 totalSeconds += self->seconds;
-                infoFunction(infoData);
+                infoFunction(infoData, null);
         }
 
         setupBoard(board(self), oldPosition);

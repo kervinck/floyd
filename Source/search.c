@@ -54,18 +54,13 @@
 #include "Board.h"
 #include "Engine.h"
 
-// Other modules
-#include "evaluate.h"
-
 /*----------------------------------------------------------------------+
  |      Definitions                                                     |
  +----------------------------------------------------------------------*/
 
 struct Node {
         struct ttSlot slot;
-
-        // Lazy move generation
-        int phase;
+        int phase; // Lazy move generation
         int nrMoves, i;
         int moveList[maxMoves];
 };
@@ -386,13 +381,33 @@ static int qSearch(Engine_t self, int alpha)
 }
 
 /*----------------------------------------------------------------------+
+ |      repetition                                                      |
+ +----------------------------------------------------------------------*/
+
+// Search for a simple repetition upto root, or for threefold before root
+static bool repetition(Engine_t self)
+{
+        Board_t board = board(self);
+        if (board->halfmoveClock < 4)
+                return false;
+        int ix = board->hashHistory.len;
+        int lastZeroing = max(0, ix - board->halfmoveClock);
+        int searchRoot = ix - ply(self);
+        int count = 1;
+        for (ix=ix-4; ix>=lastZeroing; ix-=2)
+                if (board(self)->hashHistory.v[ix] == board->hash)
+                        if (++count >= 3 || ix >= searchRoot)
+                                return true;
+        return false;
+}
+
+/*----------------------------------------------------------------------+
  |      Lazy move generator                                             |
  +----------------------------------------------------------------------*/
 
 static int makeFirstMove(Engine_t self, struct Node *node)
 {
         node->phase = 0;
-        node->i = 0;
         int ttMove = node->moveList[0] = node->slot.move;
         if (ttMove) {
                 makeMove(board(self), ttMove);
@@ -411,12 +426,10 @@ static int makeNextMove(Engine_t self, struct Node *node)
                 node->nrMoves = generateMoves(board(self), node->moveList);
                 node->nrMoves = filterAndSort(board(self), node->moveList, node->nrMoves, minInt);
                 killersToFront(self, ply(self), node->moveList, node->nrMoves);
-                node->i = 0;
-                if (moveToFront(node->moveList, node->nrMoves, ttMove))
-                        node->i++; // skip if already emited
+                node->i = moveToFront(node->moveList, node->nrMoves, ttMove); // skip if already emited
                 node->phase = 1;
         }
-        if (node->phase == 1) {
+        if (node->phase == 1)
                 while (node->i < node->nrMoves) {
                         int move = node->moveList[node->i++];
                         makeMove(board(self), move);
@@ -424,26 +437,7 @@ static int makeNextMove(Engine_t self, struct Node *node)
                                 return move;
                         undoMove(board(self));
                 }
-        }
         return 0;
-}
-
-/*----------------------------------------------------------------------+
- |      updateBestAndPonderMove                                         |
- +----------------------------------------------------------------------*/
-
-// Safe update from a possibly aborted PV
-static int updateBestAndPonderMove(Engine_t self)
-{
-        if (self->pv.len >= 1 && self->pv.v[0] != self->bestMove)
-                self->ponderMove = 0;
-        if (self->pv.len >= 2)
-                self->ponderMove = self->pv.v[1];
-
-        if (self->pv.len >= 1)
-                self->bestMove = self->pv.v[0];
-
-        return !self->bestMove + !self->ponderMove; // 0, 1 or 2 halfmoves
 }
 
 /*----------------------------------------------------------------------+
@@ -509,61 +503,6 @@ static int filterLegalMoves(Board_t self, int moveList[], int nrMoves)
 }
 
 /*----------------------------------------------------------------------+
- |      moveToFront                                                     |
- +----------------------------------------------------------------------*/
-
-static bool moveToFront(int moveList[], int nrMoves, int move)
-{
-        move &= moveMask;
-        if (move == 0)
-                return false;
-
-        for (int i=0; i<nrMoves; i++) {
-                if ((moveList[i] & moveMask) == move) {
-                        memmove(&moveList[1], &moveList[0], i * sizeof(moveList[0]));
-                        moveList[0] = move;
-                        return true;
-                }
-        }
-        return false;
-}
-
-/*----------------------------------------------------------------------+
- |      repetition                                                      |
- +----------------------------------------------------------------------*/
-
-// Search for a simple repetition upto root, or for threefold before root
-static bool repetition(Engine_t self)
-{
-        Board_t board = board(self);
-        if (board->halfmoveClock < 4)
-                return false;
-        int ix = board->hashHistory.len;
-        int lastZeroing = max(0, ix - board->halfmoveClock);
-        int searchRoot = ix - ply(self);
-        int count = 1;
-        for (ix=ix-4; ix>=lastZeroing; ix-=2)
-                if (board(self)->hashHistory.v[ix] == board->hash)
-                        if (++count >= 3 || ix >= searchRoot)
-                                return true;
-        return false;
-}
-
-/*----------------------------------------------------------------------+
- |      allowNullMove                                                   |
- +----------------------------------------------------------------------*/
-
-// Not in check, both sides must have pieces and there must be a slider
-static bool allowNullMove(Board_t self)
-{
-        int bits = 0;
-        if (!inCheck(self))
-                for (int i=0; i<boardSize; i++)
-                        bits |= allowNullMoveTable[self->squares[i]];
-        return bits == 7;
-}
-
-/*----------------------------------------------------------------------+
  |      killers                                                         |
  +----------------------------------------------------------------------*/
 
@@ -594,6 +533,58 @@ static void updateKillers(Engine_t self, int ply, int move)
                 killers->v[i] = killers->v[i-1];
                 killers->v[i-1] = move & moveMask;
         }
+}
+
+/*----------------------------------------------------------------------+
+ |      moveToFront                                                     |
+ +----------------------------------------------------------------------*/
+
+static bool moveToFront(int moveList[], int nrMoves, int move)
+{
+        move &= moveMask;
+        if (move == 0)
+                return false;
+
+        for (int i=0; i<nrMoves; i++) {
+                if ((moveList[i] & moveMask) == move) {
+                        memmove(&moveList[1], &moveList[0], i * sizeof(moveList[0]));
+                        moveList[0] = move;
+                        return true;
+                }
+        }
+        return false;
+}
+
+/*----------------------------------------------------------------------+
+ |      allowNullMove                                                   |
+ +----------------------------------------------------------------------*/
+
+// Not in check, both sides must have pieces and there must be a slider
+static bool allowNullMove(Board_t self)
+{
+        int bits = 0;
+        if (!inCheck(self))
+                for (int i=0; i<boardSize; i++)
+                        bits |= allowNullMoveTable[self->squares[i]];
+        return bits == 7;
+}
+
+/*----------------------------------------------------------------------+
+ |      updateBestAndPonderMove                                         |
+ +----------------------------------------------------------------------*/
+
+// Safe update from a possibly aborted PV
+static int updateBestAndPonderMove(Engine_t self)
+{
+        if (self->pv.len >= 1 && self->pv.v[0] != self->bestMove)
+                self->ponderMove = 0;
+        if (self->pv.len >= 2)
+                self->ponderMove = self->pv.v[1];
+
+        if (self->pv.len >= 1)
+                self->bestMove = self->pv.v[0];
+
+        return !self->bestMove + !self->ponderMove; // 0, 1 or 2 halfmoves
 }
 
 /*----------------------------------------------------------------------+

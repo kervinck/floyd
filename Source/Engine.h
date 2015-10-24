@@ -142,6 +142,12 @@ void rootSearch(Engine_t self,
 void abortSearch(Engine_t self);
 
 /*
+ *  Evaluate
+ */
+
+int evaluate(Board_t self);
+
+/*
  *  Transposition table
  */
 

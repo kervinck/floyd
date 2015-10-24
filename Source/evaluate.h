@@ -100,9 +100,3 @@ extern int globalVector[];
 extern const int vectorLen;
 extern const char * const vectorLabels[];
 
-/*
- *  Functions
- */
-
-int evaluate(Board_t self);
-

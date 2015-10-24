@@ -14,7 +14,6 @@ r2q1rk1/pp2nppp/4n3/8/3PP3/P3Q1B1/4N1PP/R4RK1 w - - bm d5; c0 "Winning Chess by 
 r1br1k2/1p4pp/pn1Np3/2qpPp2/3N1P1P/2PQ3R/PP4P1/R3K3 w - - bm Nxb7; c0 "Winning Chess by Chernev & Reinfeld, 152A"; 
 4r3/ppn3k1/3p1Rpn/1PpPr1p1/P1P3P1/7P/3N4/3N1RK1 b - - bm Nf5; 
 3r2k1/5ppp/pb2p3/1p2P3/1P2bPP1/P1B5/6P1/R4R1K b - - bm Rd3; "Winning Chess by Chernev & Reinfeld, 100A"; 
-R7/2p2rpk/1p4np/3Pp3/4BPq1/6P1/2Q2BK1/8 w - - bm Bxg6; c0 "Winning Chess by Chernev & Reinfeld, 175A, slightly modified"; 
 r5k1/ppp1brpp/2p2q2/2P5/3P1B2/5QP1/PP3P1P/R4R1K b - - bm g5; c0 "Winning Chess by Chernev & Reinfeld, 35A, slightly modified"; 
 r4k2/p3nppp/3q4/2Np1b2/1r1P3P/5QP1/P4PB1/2R1R1K1 w - - bm Rxe7; c0 "Bent Larsen: Bent Larsen's good move guide, Oxford University Press 1982, Ch. 1 #1"; 
 r5rk/p1qnbp1p/1p2p2Q/3pP2p/P1pPb3/2P2N1P/1P2BPP1/RNR3K1 b - - bm Bxf3; 

@@ -426,7 +426,7 @@ static int makeNextMove(Engine_t self, struct Node *node)
                 node->nrMoves = generateMoves(board(self), node->moveList);
                 node->nrMoves = filterAndSort(board(self), node->moveList, node->nrMoves, minInt);
                 killersToFront(self, ply(self), node->moveList, node->nrMoves);
-                node->i = moveToFront(node->moveList, node->nrMoves, ttMove); // skip if already emited
+                node->i = moveToFront(node->moveList, node->nrMoves, ttMove); // skip if already emitted
                 node->phase = 1;
         }
         if (node->phase == 1)
@@ -449,16 +449,14 @@ static int exchange(Board_t self, int move)
         int from = from(move);
         int to = to(move);
 
-        int victim = self->squares[to];
-        int score = pieceValue[victim];
+        int piece  = self->squares[from];
+        int victim = self->squares[to]; // can be empty
+        int score  = pieceValue[victim];
 
-        if (self->xside->attacks[to] != 0) {
-                int piece = self->squares[from];
+        if (self->xside->attacks[to] != 0)
                 score -= pieceValue[piece];
-        } else {
-                if (isPromotion(self, from, to))
-                        score += promotionValue[(move>>promotionBits)&3] - 1;
-        }
+        else if (isPromotion(self, from, to))
+                score += promotionValue[(move>>promotionBits)&3] - pieceValue[piece];
         return score;
 }
 
@@ -511,8 +509,11 @@ static void killersToFront(Engine_t self, int ply, int moveList[], int nrMoves)
         while (self->killers.len <= ply) // Expand table when needed
                 pushList(self->killers, (killersTuple) {.v={0}});
 
+        int j=0;
+        while (j < nrMoves && moveList[j] >= (3 << 16)) j++;
+
         for (int i=nrKillers-1; i>=0; i--)
-                moveToFront(moveList, nrMoves, self->killers.v[ply].v[i]);
+                moveToFront(moveList+j, nrMoves-j, self->killers.v[ply].v[i]);
 }
 
 static void updateKillers(Engine_t self, int ply, int move)

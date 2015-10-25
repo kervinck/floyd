@@ -1,16 +1,15 @@
 
-|Todo| Lazy move generation for pvSearch
-
 |Todo| Introduce move flags for 32 bit
 
 - Simplify UCI move formatting
+
+|Todo| Lazy move generation for pvSearch
 
 |Todo| Extend move flags
 
 - Extend flags beyond 
 
-Concept choice: keep flags with move or in seperate table
-or combine with the move word?
+Concept choice: keep flags with move or in seperate table?
 
           search                     board
 +------------+------------+------------+-------------+
@@ -21,7 +20,7 @@ or combine with the move word?
         moveList[i] += self->history[moveList[i] & moveMask]
 
 1. Sort a long key.
-        - Makes everyone upgrade to Move_t
+        - Makes everyone migrate to Move_t
         + Can use standard qsort
 2. Sort only the scores, with back reference to the move (index)
 3. Sort through a history table, requires modified qsort
@@ -30,7 +29,7 @@ or combine with the move word?
         - Doesn't work with qsort
 
 Desirable properties
-- generateMove still generates ints (32bit)
+- generateMoves still generates ints (32bit)
 - can use stdlib qsort
 
 |Todo| Lazy move generation for qSearch

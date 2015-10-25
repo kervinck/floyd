@@ -67,7 +67,7 @@ easy wac krk5 tt eg ece3: module
 	python Tools/bmtest.py 1 < Data/$@.epd
 
 # Run 10 second position tests
-hard draw nodraw mate bk: module
+hard draw nodraw xmate mate bk: module
 	python Tools/bmtest.py 10 < Data/$@.epd
 
 # Run 1000 second position tests

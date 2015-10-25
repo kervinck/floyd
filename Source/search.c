@@ -257,7 +257,7 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                 makeMove(board(self), moveList[i]);
                 int newDepth = max(0, depth - 1 + extension - reduction);
                 int newAlpha = max(alpha, bestScore);
-                int score = -scout(self, newDepth, -newAlpha - 1, 1);
+                int score = -scout(self, newDepth, -(newAlpha+1), 1);
                 if (score > bestScore) {
                         int pvLen = self->pv.len;
                         pushList(self->pv, moveList[i]);
@@ -296,6 +296,7 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
         if (depth == 0)       return qSearch(self, alpha);
         if (self->stopFlag)   longjmp(self->abortTarget, 1); // raise abort
 
+        int check = inCheck(board(self));
         struct Node node;
         node.slot = ttRead(self);
 
@@ -305,27 +306,27 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
                 node.slot = ttRead(self);
         }
 
+        // Transposition table pruning
         if (node.slot.depth >= depth || node.slot.isHardBound)
                 if ((node.slot.isUpperBound && node.slot.score <= alpha)
                  || (node.slot.isLowerBound && node.slot.score > alpha))
                         return node.slot.score;
 
-        int check = inCheck(board(self));
-        int extension = check;
-        int bestScore = minInt;
-
         // Null move pruning
-        if (depth >= 2 && isCutNode(nodeType) && alpha < maxEval && allowNullMove(board(self))) {
+        if (depth >= 2 && isCutNode(nodeType) && alpha < maxEval && !check && allowNullMove(board(self))) {
                 makeNullMove(board(self));
-                int score = -scout(self, max(0, depth - 2 - 1), -(alpha + 1), nodeType+1);
+                int score = -scout(self, max(0, depth - 2 - 1), -(alpha+1), nodeType+1);
                 undoMove(board(self));
                 if (score > alpha)
                         return ttWrite(self, node.slot, depth, score, alpha, alpha+1);
         }
 
+        // Search deeper until all moves exhausted or one fails high
+        int extension = check;
+        int bestScore = minInt;
         for (int j=0, move=makeFirstMove(self,&node); move; j++, move=makeNextMove(self,&node)) {
                 int newDepth = max(0, depth - 1 + extension);
-                int score = -scout(self, newDepth, -(alpha + 1), nodeType+1);
+                int score = -scout(self, newDepth, -(alpha+1), nodeType+1);
                 undoMove(board(self));
                 bestScore = max(bestScore, score);
                 if (score > alpha) {
@@ -560,13 +561,12 @@ static bool moveToFront(int moveList[], int nrMoves, int move)
  |      allowNullMove                                                   |
  +----------------------------------------------------------------------*/
 
-// Not in check, both sides must have pieces and there must be a slider
+// Both sides must have pieces and there must be a slider
 static bool allowNullMove(Board_t self)
 {
         int bits = 0;
-        if (!inCheck(self))
-                for (int i=0; i<boardSize; i++)
-                        bits |= allowNullMoveTable[self->squares[i]];
+        for (int i=0; i<boardSize; i++)
+                bits |= allowNullMoveTable[self->squares[i]];
         return bits == 7;
 }
 

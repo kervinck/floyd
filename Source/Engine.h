@@ -58,7 +58,12 @@ enum {
         minMate = -32000, minEval = -29999, minDtz  = -31000,
         maxMate =  32000, maxEval =  29999, maxDtz  =  31000,
 };
-#define isMateScore(score) (abs(score) >= maxDtz)
+#define isDrawScore(score)     ((score) == 0)
+#define isWinScore(score)      ((score) > maxEval)
+#define isLossScore(score)     ((score) < minEval)
+#define isMateWinScore(score)  ((score) >= maxDtz)
+#define isMateLossScore(score) ((score) <= minDtz)
+#define isMateScore(score)     (abs(score) >= maxDtz)
 
 struct ttSlot {
         uint64_t key;
@@ -90,6 +95,7 @@ struct Engine {
         int rootPlyNumber;
         intList searchMoves;    // root moves to search, empty means all
         volatile bool stopFlag; // aborts search when alarm time exceeded
+        bool mateStop;          // stops the search once the shortest mate is found
 
         // transposition table
         struct {

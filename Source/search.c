@@ -155,12 +155,13 @@ void rootSearch(Engine_t self,
         if (setjmp(here) == 0) { // try search
                 bool stop = false;
                 for (int iteration=0; iteration<=depth && !stop; iteration++) {
+                        self->mateStop = true;
                         self->depth = iteration;
                         self->score = pvSearch(self, iteration, -maxInt, maxInt, 0);
                         self->seconds = xTime() - startTime;
                         updateBestAndPonderMove(self);
                         stop = infoFunction(infoData, null)
-                            || (self->score + iteration + 2 >= maxMate && iteration > 0) // TODO: remove
+                            || (isMateScore(self->score) && self->mateStop && self->depth > 0)
                             || (targetTime > 0.0 && self->seconds >= 0.5 * targetTime); // TODO: remove
                 }
         } else { // except abort
@@ -258,6 +259,8 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                 int newDepth = max(0, depth - 1 + extension - reduction);
                 int newAlpha = max(alpha, bestScore);
                 int score = -scout(self, newDepth, -(newAlpha+1), 1);
+                if (isMateWinScore(bestScore) && !isMateScore(score) && !isDrawScore(score))
+                        self->mateStop = false; // shortest mate not yet proven
                 if (score > bestScore) {
                         int pvLen = self->pv.len;
                         pushList(self->pv, moveList[i]);
@@ -295,6 +298,10 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
         if (repetition(self)) return drawScore(self);
         if (depth == 0)       return qSearch(self, alpha);
         if (self->stopFlag)   longjmp(self->abortTarget, 1); // raise abort
+
+        // Mate distance pruning
+        int mateBound = maxMate - ply(self) - 2;
+        if (mateBound <= alpha) return mateBound;
 
         int check = inCheck(board(self));
         struct Node node;

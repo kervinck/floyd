@@ -64,15 +64,19 @@ $(win32_exe): $(wildcard Source/*) Makefile versions.json
 
 # Run 1 second position tests
 easy wac krk5 tt eg ece3: module
-	python Tools/bmtest.py 1 < Data/$@.epd
+	python Tools/epdtest.py 1 < Data/$@.epd
 
 # Run 10 second position tests
-hard draw nodraw xmate mate bk: module
-	python Tools/bmtest.py 10 < Data/$@.epd
+hard draw nodraw bk: module
+	python Tools/epdtest.py 10 < Data/$@.epd
+
+# Run 100 second position tests
+mate mated qmate mate5: module
+	python Tools/epdtest.py 100 < Data/$@.epd
 
 # Run 1000 second position tests
 nolot: module
-	python Tools/bmtest.py 1000 < Data/$@.epd
+	python Tools/epdtest.py 1000 < Data/$@.epd
 
 # Run node count regression test
 nodes: module

@@ -71,7 +71,7 @@ hard draw nodraw bk: module
 	python Tools/epdtest.py 10 < Data/$@.epd
 
 # Run 100 second position tests
-mate mated qmate mate5: module
+mate mated qmate: module
 	python Tools/epdtest.py 100 < Data/$@.epd
 
 # Run 1000 second position tests

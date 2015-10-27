@@ -320,7 +320,7 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
                         return node.slot.score;
 
         // Null move pruning
-        if (depth >= 2 && isCutNode(nodeType) && alpha < maxEval && !check && allowNullMove(board(self))) {
+        if (depth >= 2 && isCutNode(nodeType) && minEval <= alpha && alpha < maxEval && !check && allowNullMove(board(self))) {
                 makeNullMove(board(self));
                 int score = -scout(self, max(0, depth - 2 - 1), -(alpha+1), nodeType+1);
                 undoMove(board(self));

@@ -54,7 +54,7 @@ module:
 # Compile as native UCI engine
 floyd: $(wildcard Source/*) Makefile versions.json
 	@echo "Version: $(floydVersion)"
-	$(CC) $(CFLAGS) -o $@ $(uciSources) $(LDFLAGS) -DNDEBUG
+	$(CC) $(CFLAGS) -o $@ $(uciSources) $(LDFLAGS)
 
 # Compile with profile-guided optimization (gcc 4.8)
 pgo: floyd-pgo1 floyd-pgo2

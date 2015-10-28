@@ -1,70 +1,4 @@
 
-|Todo| Some remaining failures in the mate5 test set:
-
-make mate5:
-----------
-8/3N4/6p1/1p5p/5b1p/P2k2n1/1B6/3KQ3 w - - acn 138553; acs 0; bm Ba1; ce 32758; dm 5; pv Ba1 h3 Nf6 b4 Qe6 Bd2 Qd6+ Ke3 Qxg3#;
-info time 0 depth 0 score cp 799 nodes 1 nps 19600 hashfull 0
-info time 0 depth 1 score cp 851 nodes 50 nps 229448 hashfull 0 pv d7e5 f4e5 e1e5
-info time 0 depth 2 score cp 851 nodes 117 nps 335201 hashfull 0 pv d7e5 f4e5 e1e5
-info time 1 depth 3 score cp 879 nodes 213 nps 412840 hashfull 1 pv d7e5 f4e5 e1e5 d3c4
-info time 2 depth 4 score cp 932 nodes 761 nps 442700 hashfull 2 pv d7e5 f4e5 e1e5 d3c4 e5e6 c4d3 e6g6 d3e3
-info time 7 depth 5 score cp 1135 nodes 3668 nps 494478 hashfull 9 pv e1e6 g3e4 e6b3 e4c3 b2c3 h4h3 c3e5 d3e4 e5f4 e4f4
-info time 30 depth 6 score cp 1159 nodes 20721 nps 690838 hashfull 53 pv e1e6 f4e5 d7e5 d3e4 e6c6 e4f5 b2d4 h4h3
-info time 122 depth 7 score cp 1166 nodes 101398 nps 831009 hashfull 253 pv e1e6 f4d6 e6d6 d3e3 b2d4 e3f3 d7e5 f3g2 d6d5 g2h3 d5d8
-info time 523 depth 8 score mate 6 nodes 464437 nps 888791 hashfull 842 pv e1c3 d3e4 d7f6 e4f5 c3c8 f5g5 f6h7 g5h6 c8f8 h6h7 f8h8
-info time 2033 depth 9 score mate 6 nodes 1818666 nps 894447 hashfull 1000 pv e1c3 d3e4 d7f6 e4f5 c3c8 f5g5 f6h7 g5h6 c8f8 h6h7 f8h8
-info time 6892 depth 10 score mate 6 nodes 5978138 nps 867425 hashfull 1000 pv e1c3 d3e4 d7f6 e4f5 c3c8 f5g5 f6h7 g5h6 c8f8 h6h7 f8h8
-bestmove e1c3 score 31.989 mate 6
-test result FAILED passed 403 total 404
---> +M5 confirmed. NOK
-
-2RR2bK/b1N4p/1pkNp1r1/p3p2r/6P1/n1p5/n5P1/6B1 w - - acn 330710; acs 1; bm g3; ce 32758; dm 5; pv g3 h6 Ncb5+ Kd5 Nxc3+ Nxc3 Nc4+ Ke4 Nd2#;
-info time 0 depth 0 score cp -321 nodes 3 nps 47663 hashfull 0 pv g4h5 g6g2
-info time 0 depth 1 score cp -224 nodes 120 nps 259174 hashfull 0 pv c7e6 c6d5 g4h5 g6g2
-info time 1 depth 2 score cp -224 nodes 217 nps 307384 hashfull 1 pv c7e6 c6d5 g4h5 g6g2
-info time 1 depth 3 score cp -224 nodes 304 nps 365349 hashfull 1 pv c7e6 c6d5 g4h5 g6g2
-info time 3 depth 4 score cp -200 nodes 1122 nps 382416 hashfull 3 pv c7b5 c6d5 d6c4 d5e4 g4h5 g6g2 c4a3 g2g1 b5a7
-info time 11 depth 5 score cp 130 nodes 5037 nps 472200 hashfull 16 pv c7e8 c6d5 e8f6 g6f6 d6e8 d5e4 e8f6 e4f4 f6h5 f4g4 d8g8 g4h5 h8h7
-info time 51 depth 6 score cp 344 nodes 31131 nps 609695 hashfull 93 pv c7e8 c6d5 g4h5 c3c2 d6f7 d5e4 e8d6 e4d5 h5g6
-info time 289 depth 7 score cp 440 nodes 202970 nps 702761 hashfull 560 pv g4h5 c3c2 c7e6 c6d5 e6c7 d5c6 c7b5 c6d5 h5g6 c2c1q c8c1 a2c1 h8g8
-info time 1684 depth 8 score mate 6 nodes 1188902 nps 706139 hashfull 1000 pv c7e6 c6d5 d6f5 d5e6 d8d6 e6f7 c8c7 f7e8 c7e7 e8f8 d6d8
-info time 7666 depth 9 score mate 6 nodes 5451505 nps 711118 hashfull 1000 pv c7e6 c6d5 d6f5 d5e6 d8d6 e6f7 c8c7 f7e8 c7e7 e8f8 d6d8
-info time 25851 depth 10 score mate 6 nodes 17815758 nps 689162 hashfull 1000 pv c7e6 c6d5 d6f5 d5e6 d8d6 e6f7 c8c7 f7e8 c7e7 e8f8 d6d8
-bestmove c7e6 score 31.989 mate 6
-test result FAILED passed 632 total 634
---> +M5 confirmed. NOK
-
-6R1/PPPP1P1P/4R3/2BN1N2/7Q/3B1K2/ppPb4/kr6 w - - acn 977087; acs 1; bm h8=B h8=Q; ce 32758; dm 5; pv h8=Q Rf1+ Bxf1 Bc1 Bd3 Bd2 Rg1+ Bc1 Rxc1#;
-info time 0 depth 0 score cp 1870 nodes 25 nps 211834 hashfull 0 pv h7h8q
-info time 0 depth 1 score cp 1870 nodes 135 nps 356120 hashfull 0 pv h7h8q
-info time 2 depth 2 score cp 1955 nodes 674 nps 439925 hashfull 2 pv h7h8q b1f1 d3f1
-info time 4 depth 3 score cp 1959 nodes 1861 nps 435216 hashfull 5 pv h7h8q d2g5 f7f8q g5h4 c7c8q
-info time 10 depth 4 score cp 1959 nodes 5158 nps 535952 hashfull 16 pv h7h8q d2g5 f7f8q g5h4 c7c8q
-info time 22 depth 5 score cp 1959 nodes 17772 nps 801871 hashfull 44 pv h7h8q d2g5 f7f8q g5h4 c7c8q
-info time 409 depth 6 score cp 2130 nodes 300232 nps 733225 hashfull 787 pv a7a8q b1f1 d3f1 a1b1 h7h8q a2a1b f7f8q b1c2 d7d8q b2b1r
-info time 2644 depth 7 score cp 2130 nodes 1966134 nps 743505 hashfull 1000 pv a7a8q b1f1 d3f1 a1b1 h7h8q a2a1b f7f8q b1c2 d7d8q b2b1r
-info time 61975 depth 8 score cp 2293 nodes 44095890 nps 711508 hashfull 1000 pv a7a8q d2a5 h7h8q b1f1 d3f1 a1b1 c7c8q a2a1r f7f8q b1c2 b7b8q b2b1r
-info time 100001 nodes 71551481 nps 715509 hashfull 1000
-bestmove a7a8q score 22.928 mate None
-test result FAILED passed 664 total 667
---> Search explosion & timeout. OK
-
-6RQ/6pP/p5K1/1r2p2N/p3k3/R7/B7/B7 w - - acn 106602; acs 0; bm Qxg7 Rc3; ce 32758; dm 5; pv Rc3 Rb6+ Kg5 Rg6+ Kxg6 a3 Rd8 a5 Bb1#;
-info time 0 depth 0 score cp 1056 nodes 12 nps 146313 hashfull 0
-info time 0 depth 1 score cp 1138 nodes 99 nps 309416 hashfull 0 pv a3e3 e4e3
-info time 0 depth 2 score cp 1139 nodes 180 nps 397355 hashfull 0 pv a3e3 e4e3 a1c3
-info time 1 depth 3 score cp 1138 nodes 501 nps 467797 hashfull 2 pv a3e3 e4e3 a1c3 a4a3
-info time 4 depth 4 score cp 1231 nodes 1564 nps 438115 hashfull 5 pv h5f6 e4f4 a3f3 f4f3 h8g7 f3g3 h7h8q
-info time 12 depth 5 score cp 1231 nodes 6763 nps 559070 hashfull 19 pv h5f6 e4f4 a3f3 f4f3 h8g7 f3g3 h7h8q
-info time 56 depth 6 score cp 1400 nodes 41216 nps 731014 hashfull 128 pv h5g3 e4f4 g8f8 f4g4 h8g8 b5b3 g8e6 g4g3 a3b3 g3h2 h7h8q h2g2
-info time 343 depth 7 score mate 6 nodes 268270 nps 781081 hashfull 721 pv h5g3 e4f4 g8f8 f4g4 a2e6 g4h4 f8f4 e5f4 h8d8 b5g5 d8g5
-info time 2235 depth 8 score mate 6 nodes 1769253 nps 791677 hashfull 1000 pv h5g3 e4f4 g8f8 f4g4 a2e6 g4h4 f8f4 e5f4 h8d8 b5g5 d8g5
-info time 10989 depth 9 score mate 6 nodes 8973364 nps 816589 hashfull 1000 pv h5g3 e4f4 g8f8 f4g4 a2e6 g4h4 f8f4 e5f4 h8d8 b5g5 d8g5
-bestmove h5g3 score 31.989 mate 6
-test result FAILED passed 770 total 774
---> +M5 confirmed. NOK
-
 |Todo| Don't allow 0 as heuristic evalation [evaluate]
 
 |Todo| Introduce move flags for 32 bit
@@ -106,6 +40,9 @@ Makes it slower?
 |Todo| Try simple SEE
 
 |Todo| Win64 version from Makefile [win64]
+
+Joost: Intel C compiler versie 15
+https://software.intel.com/en-us/qualify-for-free-software
 
 |Todo| Learn how to branch in git :-) [git]
 
@@ -257,6 +194,12 @@ Description: UNKNOWN
 Platform: UNKNOWN
 
 |Todo| Remove SAN functions
+
+|Todo| Some remaining failures in the mate5 test set:
+
+8/3N4/6p1/1p5p/5b1p/P2k2n1/1B6/3KQ3 w - - acn 138553; acs 0; bm Ba1; ce 32758; dm 5; pv Ba1 h3 Nf6 b4 Qe6 Bd2 Qd6+ Ke3 Qxg3#;
+2RR2bK/b1N4p/1pkNp1r1/p3p2r/6P1/n1p5/n5P1/6B1 w - - acn 330710; acs 1; bm g3; ce 32758; dm 5; pv g3 h6 Ncb5+ Kd5 Nxc3+ Nxc3 Nc4+ Ke4 Nd2#;
+6RQ/6pP/p5K1/1r2p2N/p3k3/R7/B7/B7 w - - acn 106602; acs 0; bm Qxg7 Rc3; ce 32758; dm 5; pv Rc3 Rb6+ Kg5 Rg6+ Kxg6 a3 Rd8 a5 Bb1#;
 
 ------------------------------------------------------------------------
 

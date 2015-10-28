@@ -237,7 +237,7 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                 int newDepth = max(0, depth - 1 + extension - reduction);
                 int newAlpha = max(alpha, bestScore);
                 int score = -scout(self, newDepth, -(newAlpha+1), 1);
-                if (isMateWinScore(bestScore) && !isMateScore(score) && !isDrawScore(score))
+                if (!isMateScore(score) && !isDrawScore(score))
                         self->mateStop = false; // shortest mate not yet proven
                 if (score > bestScore) {
                         int pvLen = self->pv.len;

@@ -66,28 +66,6 @@ struct Node {
 };
 
 /*----------------------------------------------------------------------+
- |      Data                                                            |
- +----------------------------------------------------------------------*/
-
-static const int pieceValue[] = {
-        [empty] = -1,
-        [whiteKing]   = 27, [whiteQueen]  = 9, [whiteRook] = 5,
-        [whiteBishop] = 3,  [whiteKnight] = 3, [whitePawn] = 1,
-        [blackKing]   = 27, [blackQueen]  = 9, [blackRook] = 5,
-        [blackBishop] = 3,  [blackKnight] = 3, [blackPawn] = 1,
-};
-
-static const int promotionValue[] = { 9, 5, 3, 3 };
-
-static const int allowNullMoveTable[] = { // 1=slider, 2=white piece, 4=black piece
-        [empty] = 0,
-        [whiteKing]   = 0, [whiteQueen]  = 3, [whiteRook] = 3,
-        [whiteBishop] = 3, [whiteKnight] = 2, [whitePawn] = 0,
-        [blackKing]   = 0, [blackQueen]  = 5, [blackRook] = 5,
-        [blackBishop] = 5, [blackKnight] = 4, [blackPawn] = 0,
-};
-
-/*----------------------------------------------------------------------+
  |      Functions                                                       |
  +----------------------------------------------------------------------*/
 
@@ -96,7 +74,7 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType);
 static int qSearch(Engine_t self, int alpha);
 
 static int updateBestAndPonderMove(Engine_t self);
-static int exchange(Board_t self, int move);
+static int staticMoveScore(Board_t self, int move);
 static int filterAndSort(Board_t self, int moveList[], int nrMoves, int moveFilter);
 static int filterLegalMoves(Board_t self, int moveList[], int nrMoves);
 static bool moveToFront(int moveList[], int nrMoves, int move);
@@ -449,22 +427,55 @@ static int makeNextMove(Engine_t self, struct Node *node)
 }
 
 /*----------------------------------------------------------------------+
- |      exchange (not really "SEE" yet)                                 |
+ |      staticMoveScore                                                 |
  +----------------------------------------------------------------------*/
 
-static int exchange(Board_t self, int move)
+// Static Exchange Evaluation (SEE)
+static int see(int next, int attackers, int defenders, int pGain)
 {
-        int from = from(move);
+        if (!attackers) return 0;
+        else if (attackers >= attackPawn)
+                           next += pGain - see(1 + pGain, defenders, attackers - attackPawn,  pGain);
+        else if (attackers >= attackMinor) next -= see(3, defenders, attackers - attackMinor, pGain);
+        else if (attackers >= attackRook)  next -= see(5, defenders, attackers - attackRook,  pGain);
+        else if (attackers >= attackQueen) next -= see(9, defenders, attackers - attackQueen, pGain);
+        else /* attackers >= attackKing */ if (defenders) return 0;
+        return max(0, next);
+}
+
+static int staticMoveScore(Board_t self, int move)
+{
+        static const int pieceValue[] = {
+                [empty] = -1, // rank non-captures behind neutral exchange sequences
+                [whiteKing]   = 27, [whiteQueen]  = 9, [whiteRook] = 5,
+                [whiteBishop] = 3,  [whiteKnight] = 3, [whitePawn] = 1,
+                [blackKing]   = 27, [blackQueen]  = 9, [blackRook] = 5,
+                [blackBishop] = 3,  [blackKnight] = 3, [blackPawn] = 1,
+        };
+        static const int pieceAttack[] = {
+                [27] = attackKing, [9] = attackQueen, [5] = attackRook, [3] = attackMinor
+        };
+        static const int promotionValue[] = { 9, 5, 3, 3 };
+
         int to = to(move);
+        int victim = self->squares[to]; // may be empty
+        int score = pieceValue[victim];
 
-        int piece  = self->squares[from];
-        int victim = self->squares[to]; // can be empty
-        int score  = pieceValue[victim];
+        int from = from(move);
+        int piece = self->squares[from];
+        int next = pieceValue[piece];
 
-        if (self->xside->attacks[to] != 0)
-                score -= pieceValue[piece];
-        else if (isPromotion(self, from, to))
-                score += promotionValue[(move>>promotionBits)&3] - pieceValue[piece];
+        int attackers = self->side->attacks[to] - pieceAttack[next];
+        if (next == 1 && score >= 0) attackers -= attackPawn; // TODO: en passant?
+
+        bool lastRank = (rank(to) == rank1 || rank(to) == rank8);
+        if (next == 1 && lastRank) { // pawn promotion
+                next = promotionValue[(move>>promotionBits)&3];
+                score += next - 1;
+        }
+
+        int defenders = self->xside->attacks[to];
+        if (defenders) score -= see(next, defenders, attackers, lastRank ? 8 : 0);
         return score;
 }
 
@@ -484,7 +495,7 @@ static int filterAndSort(Board_t self, int moveList[], int nrMoves, int moveFilt
 {
         int j = 0;
         for (int i=0; i<nrMoves; i++) {
-                int moveScore = exchange(self, moveList[i]);
+                int moveScore = staticMoveScore(self, moveList[i]);
                 if (moveScore >= moveFilter)
                         moveList[j++] = (moveScore << 16) + (moveList[i] & moveMask);
         }
@@ -571,9 +582,16 @@ static bool moveToFront(int moveList[], int nrMoves, int move)
 // Both sides must have pieces and there must be a slider
 static bool allowNullMove(Board_t self)
 {
+        static const int table[] = { // 1=slider, 2=white piece, 4=black piece
+                [empty] = 0,
+                [whiteKing]   = 0, [whiteQueen]  = 3, [whiteRook] = 3,
+                [whiteBishop] = 3, [whiteKnight] = 2, [whitePawn] = 0,
+                [blackKing]   = 0, [blackQueen]  = 5, [blackRook] = 5,
+                [blackBishop] = 5, [blackKnight] = 4, [blackPawn] = 0,
+        };
         int bits = 0;
         for (int i=0; i<boardSize; i++)
-                bits |= allowNullMoveTable[self->squares[i]];
+                bits |= table[self->squares[i]];
         return bits == 7;
 }
 

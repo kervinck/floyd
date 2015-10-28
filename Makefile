@@ -54,7 +54,19 @@ module:
 # Compile as native UCI engine
 floyd: $(wildcard Source/*) Makefile versions.json
 	@echo "Version: $(floydVersion)"
-	$(CC) $(CFLAGS) -o $@ $(uciSources) $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ $(uciSources) $(LDFLAGS) -DNDEBUG
+
+# Compile with profile-guided optimization (gcc 4.8)
+pgo: floyd-pgo1 floyd-pgo2
+
+floyd-pgo1: $(wildcard Source/*) Makefile versions.json
+	gcc-mp-4.8 $(CFLAGS) -o $@ $(uciSources) $(LDFLAGS) -fprofile-generate -DNDEBUG
+	echo bench | ./$@ | grep result
+
+floyd-pgo2: $(wildcard Source/*) Makefile versions.json
+	gcc-mp-4.8 $(CFLAGS) -o $@ $(uciSources) $(LDFLAGS) -fprofile-use -DNDEBUG \
+	-UfloydVersion -DfloydVersion="$(floydVersion) [pgo]"
+	for N in 1 2 3 4 5; do echo bench | ./$@ | grep result; done
 
 # Cross-compile as Win32 UCI engine
 win: $(win32_exe)
@@ -123,7 +135,7 @@ sysinstall: module
 # Remove compilation intermediates and results
 clean:
 	env floydVersion=$(floydVersion) python setup.py clean --all
-	rm -f floyd $(win32_exe)
+	rm -f floyd $(win32_exe) floyd-pgo[12] *.gcda
 
 # Show all open to-do items
 todo: # xtodo
@@ -135,7 +147,7 @@ log:
 
 # Show summary of make targets
 help:
-	@awk -F: '/^[a-z].*:( .*)?$$/{printf"%-26s %s\n",$$1,lastLine}{lastLine=$$0}' Makefile 
+	@awk -F: '/^[a-z].*:( .*)?$$/ && last~/^#/ {printf"%-26s %s\n",$$1,last}{last=$$0}' Makefile 
 
 #-----------------------------------------------------------------------
 #

@@ -72,6 +72,7 @@ PyDoc_STRVAR(evaluate_doc,
 static PyObject *
 floydmodule_evaluate(PyObject *self, PyObject *args)
 {
+        unused(self);
         char *fen;
 
         if (!PyArg_ParseTuple(args, "s", &fen))
@@ -103,6 +104,7 @@ PyDoc_STRVAR(setCoefficient_doc,
 static PyObject *
 floydmodule_setCoefficient(PyObject *self, PyObject *args)
 {
+        unused(self);
         int coef, newValue;
 
         if (!PyArg_ParseTuple(args, "ii", &coef, &newValue))
@@ -146,12 +148,15 @@ PyDoc_STRVAR(search_doc,
 // Suppress search info
 static bool emptyInfoFunction(void *infoData, const char *string, ...)
 {
+        unused(infoData);
+        unused(string);
         return false;
 }
 
 static PyObject *
 floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
 {
+        unused(self);
         char *fen;
         int depth = maxDepth;
         double movetime = 0.0;
@@ -235,7 +240,7 @@ static PyMethodDef floydMethods[] = {
         { "evaluate",       floydmodule_evaluate,            METH_VARARGS,               evaluate_doc },
         { "setCoefficient", floydmodule_setCoefficient,      METH_VARARGS,               setCoefficient_doc },
         { "search",         (PyCFunction)floydmodule_search, METH_VARARGS|METH_KEYWORDS, search_doc },
-        { null, }
+        { null, null, 0, null }
 };
 
 /*----------------------------------------------------------------------+

@@ -41,7 +41,7 @@
 #define quote(arg) #arg
 #define quote2(arg) quote(arg)
 
-#define arrayLen(a) (sizeof(a) / sizeof((a)[0]))
+#define arrayLen(a) ((int) (sizeof(a) / sizeof((a)[0])))
 
 #if !defined(max)
  #define max(a, b) ((a) >= (b) ? (a) : (b))
@@ -67,6 +67,8 @@
 #define minLongLong (-maxLongLong - 1LL)
 
 #define ones(n) (~(~0ULL << (n)))
+
+#define unused(a) ((void)(a))
 
 /*----------------------------------------------------------------------+
  |      Exceptions                                                      |

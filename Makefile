@@ -23,8 +23,11 @@ uciSources:=$(addprefix Source/, $(uciSources))
 
 osType:=$(shell uname -s)
 
-CFLAGS:=-std=c11 -pedantic -Wall -O3 -fstrict-aliasing -fomit-frame-pointer\
+CFLAGS:=-std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer\
 	-DfloydVersion=$(floydVersion)
+
+# Use a real gcc for pgo
+GCC:=gcc-mp-4.8
 
 ifeq "$(osType)" "Linux"
  LDFLAGS:=-lm -lpthread
@@ -47,31 +50,27 @@ PYTHONPATH=build/lib/python:$$PYTHONPATH
 all: module floyd
 
 # Compile as Python module
-module:
+module: $(wildcard Source/*) Makefile versions.json
 	env CC="$(CC)" CFLAGS="$(CFLAGS)" floydVersion="$(floydVersion)" python setup.py build
-	env floydVersion="$(floydVersion)" python setup.py install --home=build
+	env floydVersion="$(floydVersion)" python setup.py install --home=build && touch module
 
 # Compile as native UCI engine
 floyd: $(wildcard Source/*) Makefile versions.json
-	@echo "Version: $(floydVersion)"
 	$(CC) $(CFLAGS) -o $@ $(uciSources) $(LDFLAGS)
 
-# Compile with profile-guided optimization (gcc 4.8)
+# Compile with profile-guided optimization (gcc-4.8)
 pgo: floyd-pgo1 floyd-pgo2
 
 floyd-pgo1: $(wildcard Source/*) Makefile versions.json
-	gcc-mp-4.8 $(CFLAGS) -o $@ $(uciSources) $(LDFLAGS) -fprofile-generate -DNDEBUG
+	$(GCC) $(CFLAGS) -DNDEBUG -o $@ $(uciSources) $(LDFLAGS) -fprofile-generate
 	echo bench | ./$@ | grep result
 
-floyd-pgo2: $(wildcard Source/*) Makefile versions.json
-	gcc-mp-4.8 $(CFLAGS) -o $@ $(uciSources) $(LDFLAGS) -fprofile-use -DNDEBUG \
-	-UfloydVersion -DfloydVersion="$(floydVersion) [pgo]"
-	for N in 1 2 3 4 5; do echo bench | ./$@ | grep result; done
+floyd-pgo2: $(wildcard Source/*) Makefile versions.json floyd-pgo1
+	$(GCC) $(CFLAGS) -DNDEBUG -o $@ $(uciSources) $(LDFLAGS) -fprofile-use
 
 # Cross-compile as Win32 UCI engine
 win: $(win32_exe)
 $(win32_exe): $(wildcard Source/*) Makefile versions.json
-	@echo "Version: $(floydVersion)"
 	$(xcc_win32) $(CFLAGS) $(win32_flags) -o $@ $(uciSources)
 
 # Run 1 second position tests
@@ -96,9 +95,9 @@ nodes: module
 	/ nodes / { n[$$5] += $$10; n[-1] += !$$5 }\
 	END       { for (d=0; n[d]; d++) print d, n[d], n[d] / n[d-1] }'
 
-# Run nodes per second benchmark 5 times
-bench: floyd
-	for N in 1 2 3 4 5; do echo bench | ./floyd | grep result; done
+# Run nodes per second benchmark 3 times
+bench: floyd-pgo2
+	for N in 1 2 3; do echo bench | ./floyd-pgo2 | grep result; done
 
 # Calculate residual of evaluation function
 residual: module
@@ -135,11 +134,17 @@ sysinstall: module
 # Remove compilation intermediates and results
 clean:
 	env floydVersion=$(floydVersion) python setup.py clean --all
-	rm -f floyd $(win32_exe) floyd-pgo[12] *.gcda
+	rm -f floyd $(win32_exe) floyd-pgo[12] *.gcda module
+	rm -rf build
 
 # Show all open to-do items
 todo: # xtodo
 	@find . -not -path './.git/*' -type f -size -1M -print0 | xargs -0 grep -i todo | grep -v xtodo
+
+# Make fingerprint for regression testing
+fingerprint: clean
+	@env floydVersion=$(floydVersion) sh -x Tools/fingerprint.sh | tee fingerprint
+	[ `uname -s` = 'Darwin' ] && opendiff Docs/fingerprint fingerprint
 
 # Show simplified git log
 log:

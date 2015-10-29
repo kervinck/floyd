@@ -65,6 +65,8 @@ struct Node {
         int moveList[maxMoves];
 };
 
+#define moveMask ((int) ones(16))
+
 /*----------------------------------------------------------------------+
  |      Functions                                                       |
  +----------------------------------------------------------------------*/
@@ -122,7 +124,7 @@ void rootSearch(Engine_t self,
         }
 
         self->stopFlag = false;
-        xAlarm_t alarmHandle = null;
+        volatile xAlarm_t alarmHandle = null;
         if (alarmTime > 0.0)
                 alarmHandle = setAlarm(alarmTime, stopSearch, self);
 
@@ -166,6 +168,7 @@ static inline int endScore(Engine_t self, bool inCheck)
 
 static inline int drawScore(Engine_t self)
 {
+        unused(self);
         return 0; // TODO: heuristic draws
 }
 

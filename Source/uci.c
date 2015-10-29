@@ -137,7 +137,7 @@ X"        Show this list of commands."
 X"  eval"
 X"        Show evaluation."
 X"  bench [ movetime <millis> ]"
-X"        Speed test using 40 standard positions. Default `movetime' is 1000."
+X"        Speed test of 40 standard positions. Default is `movetime 1000'."
 X"  moves [ depth <ply> ] // TODO: not implemented"
 X"        Move generation test. Default `depth' is 1."
 X
@@ -183,13 +183,13 @@ static int _scanToken(char **line, const char *format, void *value)
 #define scanValue(tokens, value) _scanToken(&line, " " tokens "%c %n", value)
 
 // For skipping unknown commands or options
-#define ignoreOne(type) Statement(\
+#define ignoreOneToken(type) Statement(\
         while (isspace(*line)) line++;\
         int _n=0; char *_s=line;\
         _scanToken(&line, "%*s%n%c %n", &_n);\
         if (_n && debug) printf("info string %s ignored (%.*s)\n", type, _n, _s);\
 )
-#define ignoreAll() Statement( while(*line != '\0') ignoreOne("Option"); )
+#define ignoreOtherTokens() Statement( while(*line != '\0') ignoreOneToken("Option"); )
 
 /*----------------------------------------------------------------------+
  |      uciMain                                                         |
@@ -213,7 +213,7 @@ void uciMain(Engine_t self)
                 char *line = buffer;
 
                 if (scan("uci")) {
-                        ignoreAll();
+                        ignoreOtherTokens();
                         printf("id name Floyd "quote2(floydVersion)"\n"
                                 "id author Marcel van Kervinck\n"
                                 "option name Hash type spin default %ld min 0 max %ld\n"
@@ -224,34 +224,29 @@ void uciMain(Engine_t self)
                                 //"option name Contempt type spin default 0 min -100 max 100\n"
                                 "uciok\n",
                                newOptions.Hash, maxHash);
-                        continue;
                 }
-                if (scan("debug")) {
+                else if (scan("debug")) {
                         if (scan("on")) debug = true;
                         else if (scan("off")) debug = false;
-                        ignoreAll();
+                        ignoreOtherTokens();
                         printf("debug %s\n", debug ? "on" : "off");
-                        continue;
                 }
-                if (scan("setoption")) {
+                else if (scan("setoption")) {
                         if (scanValue("name Hash value %ld", &newOptions.Hash)) pass;
                         else if (scan("name Ponder value true")) newOptions.Ponder = true;
                         else if (scan("name Ponder value false")) newOptions.Ponder = false;
                         else if (scan("name Clear Hash")) newOptions.ClearHash = !oldOptions.ClearHash;
-                        ignoreAll();
-                        continue;
+                        ignoreOtherTokens();
                 }
-                if (scan("isready")) {
-                        ignoreAll();
+                else if (scan("isready")) {
+                        ignoreOtherTokens();
                         updateOptions(self, &oldOptions, &newOptions);
                         printf("readyok\n");
-                        continue;
                 }
-                if (scan("ucinewgame")) {
-                        ignoreAll();
-                        continue;
-                }
-                if (scan("position")) {
+                else if (scan("ucinewgame"))
+                        ignoreOtherTokens();
+
+                else if (scan("position")) {
                         searchThread = stopSearch(self, searchThread);
 
                         if (scan("startpos"))
@@ -271,7 +266,7 @@ void uciMain(Engine_t self)
                                         if (debug && n == -2) printf("info string Ambiguous move\n");
                                 }
                         }
-                        ignoreAll();
+                        ignoreOtherTokens();
 
                         if (debug) { // dump FEN and board
                                 char fen[maxFenSize];
@@ -286,9 +281,8 @@ void uciMain(Engine_t self)
                                                 printf("  %c", next);
                                 printf("\ninfo string    a  b  c  d  e  f  g  h\n");
                         }
-                        continue;
                 }
-                if (scan("go")) {
+                else if (scan("go")) {
                         searchThread = stopSearch(self, searchThread);
                         updateOptions(self, &oldOptions, &newOptions);
 
@@ -313,7 +307,7 @@ void uciMain(Engine_t self)
                         int mate = 0; // TODO: not implemented
                         long movetime = 0;
 
-                        while (*line != '\0') {
+                        while (*line != '\0')
                                 if ((scan("ponder") && (args.ponder = true))
                                  || scanValue("wtime %ld", &time)
                                  || scanValue("btime %ld", &btime)
@@ -325,8 +319,8 @@ void uciMain(Engine_t self)
                                  || scanValue("mate %d", &mate)
                                  || scanValue("movetime %ld", &movetime)
                                  || (scan("infinite") && (args.infinite = true)))
-                                        continue;
-                                if (scan("searchmoves")) {
+                                        pass;
+                                else if (scan("searchmoves"))
                                         for (int n=1; n>0; line+=n) {
                                                 int moves[maxMoves], move;
                                                 int nrMoves = generateMoves(board(self), moves);
@@ -335,10 +329,7 @@ void uciMain(Engine_t self)
                                                 if (debug && n == -1) printf("info string Illegal move\n");
                                                 if (debug && n == -2) printf("info string Ambiguous move\n");
                                         }
-                                        continue;
-                                }
-                                ignoreOne("Option");
-                        }
+                                else ignoreOneToken("Option");
 
                         if (sideToMove(board(self)) == black)
                                 time = btime, inc = binc;
@@ -354,47 +345,40 @@ void uciMain(Engine_t self)
 
                         printf("info string targetTime %.3f alarmTime %.3f\n", args.targetTime, args.alarmTime); // TODO: remove once branching factor is ~2
                         searchThread = startSearch(&args);
-                        continue;
                 }
-                if (scan("stop")) {
-                        ignoreAll();
+                else if (scan("stop")) {
+                        ignoreOtherTokens();
                         searchThread = stopSearch(self, searchThread);
                         if (args.infinite) uciBestMove(self);
-                        continue;
                 }
-                if (scan("ponderhit")) { // TODO: implement ponder
-                        ignoreAll();
-                        continue;
-                }
-                if (scan("quit")) {
-                        ignoreAll();
+                else if (scan("ponderhit")) // TODO: implement ponder
+                        ignoreOtherTokens();
+                else if (scan("quit")) {
+                        ignoreOtherTokens();
                         break;
                 }
 
                 /*
                  *  Extra commands
                  */
-                if (scan("help")) {
-                        ignoreAll();
+                else if (scan("help")) {
+                        ignoreOtherTokens();
                         fputs(helpMessage, stdout);
-                        continue;
                 }
-                if (scan("eval")) {
-                        ignoreAll();
+                else if (scan("eval")) {
+                        ignoreOtherTokens();
                         int score = evaluate(board(self));
                         printf("info score cp %.0f string intern %+d\n", round(score / 10.0), score);
-                        continue;
                 }
-                if (scan("bench")) {
+                else if (scan("bench")) {
                         updateOptions(self, &oldOptions, &newOptions);
                         long movetime = 1000;
                         scanValue("movetime %ld", &movetime);
-                        ignoreAll();
+                        ignoreOtherTokens();
                         double nps = uciBenchmark(self, movetime * ms, benchInfoFunction, self);
                         printf("result nps %.f\n", nps);
-                        continue;
                 }
-                ignoreOne("Command");
+                else ignoreOneToken("Command");
         }
 
         searchThread = stopSearch(self, searchThread);
@@ -520,6 +504,8 @@ static void uciBestMove(Engine_t self)
 
 static bool benchInfoFunction(void *infoData, const char *string, ...)
 {
+        (void)infoData;
+        (void)string;
         Engine_t engine = infoData;
         char fen[maxFenSize];
         boardToFen(&engine->board, fen);

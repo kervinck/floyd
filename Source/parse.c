@@ -351,11 +351,8 @@ extern int parseMove(Board_t self, const char *line, int xMoves[maxMoves], int x
                  || (toFile         && toFile    != fileToChar(file(xTo)))
                  || (toRank         && toRank    != rankToChar(rank(xTo)))
                  || (promotionPiece && promotionPiece != xPromotionPiece)
-                 || !isLegalMove(self, xMove)
-                ) {
-                        continue;
-                }
-                // else: the candidate move matches
+                 || !isLegalMove(self, xMove))
+                        continue; // no match
 
                 int xPrecedence = 0;
                 if (xPiece == whitePawn || xPiece == blackPawn)

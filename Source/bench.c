@@ -59,6 +59,8 @@ static const char *positions[] = {
 
 static bool noInfoFunction(void *infoData, const char *string, ...) // TODO: move to search.c
 {
+        unused(infoData);
+        unused(string);
         return false;
 }
 

@@ -69,7 +69,7 @@ Supported UCI commands are:
         given by the options, or until the `stop' command is received.
         Always show a final result using `bestmove'. (But: see `infinite')
         Command options are:
-          searchmoves <move> ...  Only search these moves
+          searchmoves <move> ...  Only search these moves // TODO: not implemented
           ponder                  Start search in ponder mode // TODO: not implemented
           wtime <millis>          Time remaining on White's clock
           btime <millis>          Time remaining on Black's clock
@@ -94,7 +94,7 @@ Extra commands:
   eval
         Show evaluation.
   bench [ movetime <millis> ]
-        Speed test using 40 standard positions. Default `movetime' is 1000.
+        Speed test of 40 standard positions. Default is `movetime 1000'.
   moves [ depth <ply> ] // TODO: not implemented
         Move generation test. Default `depth' is 1.
 

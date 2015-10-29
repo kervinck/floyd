@@ -201,6 +201,11 @@ Platform: UNKNOWN
 2RR2bK/b1N4p/1pkNp1r1/p3p2r/6P1/n1p5/n5P1/6B1 w - - acn 330710; acs 1; bm g3; ce 32758; dm 5; pv g3 h6 Ncb5+ Kd5 Nxc3+ Nxc3 Nc4+ Ke4 Nd2#;
 6RQ/6pP/p5K1/1r2p2N/p3k3/R7/B7/B7 w - - acn 106602; acs 0; bm Qxg7 Rc3; ce 32758; dm 5; pv Rc3 Rb6+ Kg5 Rg6+ Kxg6 a3 Rd8 a5 Bb1#;
 
+|Todo| Best of <n> benchmark [qa]
+
+First verify that variance of the extreme is indeed better than
+the variance of the mean.
+
 ------------------------------------------------------------------------
 
 Avoid system-in-system effect:

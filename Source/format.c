@@ -260,14 +260,12 @@ extern void boardToFen(Board_t self, char *fen)
                         int square = square(file, rank);
                         int piece = self->squares[square];
 
-                        if (piece == empty) {
+                        if (piece != empty) {
+                                if (emptySquares > 0) *fen++ = '0' + emptySquares;
+                                *fen++ = pieceToChar[piece];
+                                emptySquares = 0;
+                        } else
                                 emptySquares++;
-                                continue;
-                        }
-
-                        if (emptySquares > 0) *fen++ = '0' + emptySquares;
-                        *fen++ = pieceToChar[piece];
-                        emptySquares = 0;
                 }
                 if (emptySquares > 0) *fen++ = '0' + emptySquares;
                 if (rank != rank1) *fen++ = '/';

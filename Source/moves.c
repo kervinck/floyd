@@ -270,11 +270,10 @@ extern int generateMoves(Board_t self, int moveList[maxMoves])
                                 dir -= dirs; // pick next
                                 dir &= dirs;
                                 to = from + kingStep[dir];
-                                if (self->squares[to] != empty
-                                 && pieceColor(self->squares[to]) == sideToMove(self))
-                                        continue;
-                                if (self->xside->attacks[to] == 0)
-                                        pushMove(self, from, to);
+                                if (self->squares[to] == empty
+                                 || pieceColor(self->squares[to]) != sideToMove(self))
+                                        if (self->xside->attacks[to] == 0)
+                                                pushMove(self, from, to);
                         } while (dirs -= dir); // remove and go to next
                         break;
 
@@ -301,10 +300,9 @@ extern int generateMoves(Board_t self, int moveList[maxMoves])
                                 dir -= dirs; // pick next
                                 dir &= dirs;
                                 to = from + knightJump[dir];
-                                if (self->squares[to] != empty
-                                 && pieceColor(self->squares[to]) == sideToMove(self))
-                                        continue;
-                                pushMove(self, from, to);
+                                if (self->squares[to] == empty
+                                 || pieceColor(self->squares[to]) != sideToMove(self))
+                                        pushMove(self, from, to);
                         } while (dirs -= dir); // remove and go to next
                         break;
 

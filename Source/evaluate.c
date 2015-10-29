@@ -38,9 +38,9 @@
  |      Includes                                                        |
  +----------------------------------------------------------------------*/
 
+
 // C standard
 #include <assert.h>
-#define _XOPEN_SOURCE
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -76,6 +76,88 @@ enum vector {
         #undef P
 };
 
+struct evaluation {
+
+        /*
+         *  Piece counts per side
+         */
+        int nrKings[2];
+        int nrQueens[2];
+        int nrRooks[2];
+        int nrBishops[2];
+        int nrKnights[2];
+        int nrPawns[2];
+        int nrMinors[2];
+
+        /*
+         *  Also counting bishops and pawns for only the "odd" square color.
+         *  With that we can figure out unlike bishops etc
+         */
+        int nrBishopsX[2];
+        int nrPawnsX[2];
+
+        /*
+         *  Maximum distance of pawn to rank1, for each file and both sides.
+         *  And then the same from rank8 point of view.
+         *  Used to detect open files, doubled pawns, passers, etc.
+         */
+        int maxPawnFromRank1[10][2];
+        int maxPawnFromRank8[10][2];
+
+        /*
+         *  Outmost files with pawns, to extract pawn span and center.
+         *  We don't calculate 'min' directly for easier initialization.
+         */
+        int maxPawnFromFileA[2];
+        int maxPawnFromFileH[2];
+
+        /*
+         *  Material
+         */
+        int material[2];
+
+        int attackForce[2][2];          // available material per flank and side
+        int pawnShelter[8][2];          // pawn shelter per file
+        int kingLocation[2];            // back rank is good, side is good. get added to shelter
+        int kingAttacks[2];             // attacks on the king 3x3 area
+
+                                        // something about attacking strength on the king flank
+                                        // something about defenders. this is always a problem in rookie
+
+        int safety[2];                  // total king safety
+
+        int kings[2];                   // PST, distance to weak pawns, distance to passers (w+b)
+        int queens[2];                  // PST
+        int rooks[2];                   // PST, doubled, strong squares
+        int bishops[2];                 // PST, trapped, strong squares, can engage enemy pawns, not blocked by own pawns, pawn span is good
+        int knights[2];                 // PST, strong squares, pawn span is bad
+        int pawns[2];                   // PST, doubled, grouped, mobile
+
+        //int pawnBlocks;
+
+        int mobility[2];           // use extended attack maps
+        int control[2];            // control of each square
+
+        int passerScaling[2];           // based on material
+        int passers[2];                 // passers, not scalled
+
+        // rooks behind passers (w+b)
+        // rooks before passers (w+b)
+        // distance from enemy king file
+        // occupancy of front square
+        // occupancy of second square
+        // occupancy of any  square
+        // control of front square
+        // control of second square
+        // control of any square
+        // supported passer
+        // connected passers
+
+        int sideToMove;
+        int contempt;                   // linked to own queen (typically for black)
+                                        // "Positive values of contempt favor more "risky" play,"
+};
+
 /*----------------------------------------------------------------------+
  |      Data                                                            |
  +----------------------------------------------------------------------*/
@@ -100,17 +182,15 @@ int globalVector[] = {
  +----------------------------------------------------------------------*/
 
 static double sigmoid(double x);
-
 static double logit(double p);
 
 static int squareOf(Board_t self, int piece);
 
 static int evaluatePawn(const int v[vectorLen],
-                              int minRank[10][2],
-                              int maxRank[10][2],
+                        const int minRank[][2],
+                        const int maxRank[][2],
                         int fileIndex, int side,
                         int king, int xking);
-
 static int evaluateKnight(const int v[vectorLen], int fileIndex, int rankIndex);
 static int evaluateBishop(const int v[vectorLen], int fileIndex, int rankIndex);
 static int evaluateRook(const int v[vectorLen], int fileIndex, int rankIndex);
@@ -342,20 +422,20 @@ int evaluate(Board_t self)
                 // TODO: recognize opposite castled kings
 
                 e.pawns[white] += evaluatePawn(v,
-                                              &e.maxPawnFromRank1[1+fileIndex],
-                                              &e.maxPawnFromRank8[1+fileIndex],
-                                              fileIndex,
-                                              white,
-                                              self->whiteSide.king,
-                                              self->blackSide.king);
+                        // C won't allow an implicit const cast of the 2D array here,
+                        // see also http://stackoverflow.com/questions/28062095/
+                        (const int(*)[2]) &e.maxPawnFromRank1[1+fileIndex],
+                        (const int(*)[2]) &e.maxPawnFromRank8[1+fileIndex],
+                        fileIndex, white,
+                        self->whiteSide.king,
+                        self->blackSide.king);
 
                 e.pawns[black] += evaluatePawn(v,
-                                              &e.maxPawnFromRank8[1+fileIndex],
-                                              &e.maxPawnFromRank1[1+fileIndex],
-                                              fileIndex,
-                                              black,
-                                              square(0, 7) ^ self->blackSide.king,
-                                              square(0, 7) ^ self->whiteSide.king);
+                        (const int(*)[2]) &e.maxPawnFromRank8[1+fileIndex],
+                        (const int(*)[2]) &e.maxPawnFromRank1[1+fileIndex],
+                        fileIndex, black,
+                        square(0, 7) ^ self->blackSide.king,
+                        square(0, 7) ^ self->whiteSide.king);
         }
 
         /*--------------------------------------------------------------+
@@ -527,28 +607,25 @@ int evaluate(Board_t self)
          |      Total                                                   |
          +--------------------------------------------------------------*/
 
-        e.wiloScore = wiloScore;
-        e.drawScore = drawScore;
-
         // Combine wiloScore and drawScore into an expected game result
         double Wp = sigmoid(wiloScore * 1e-3);
         double D = sigmoid(drawScore * 1e-3);
-        e.P = 0.5 * D + Wp - D * Wp;
+        double P = 0.5 * D + Wp - D * Wp;
 
         static const double Ci = 4.0 / M_LN10;
-        e.score = round(Ci * logit(e.P) * 1e+3);
+        int score = round(Ci * logit(P) * 1e+3);
 
-        e.score = min(e.score,  maxEval);
-        e.score = max(e.score, -maxEval);
+        score = min(score,  maxEval);
+        score = max(score, -maxEval);
 
         //printf("%s wilo %d Wp %.3f draw %d D %.1f P %.3f score %d\n",
-                //__func__, e.wiloScore, Wp, e.drawScore, D, e.P, e.score);
+                //__func__, wiloScore, Wp, drawScore, D, P, score);
 
         /*--------------------------------------------------------------+
          |      Return                                                  |
          +--------------------------------------------------------------*/
 
-        return e.score;
+        return score;
 }
 
 /*----------------------------------------------------------------------+
@@ -556,12 +633,14 @@ int evaluate(Board_t self)
  +----------------------------------------------------------------------*/
 
 static int evaluatePawn(const int v[vectorLen],
-                     /*const*/int maxPawnFromRank1[][2], // TODO: why does MinGW complain about const here?
-                     /*const*/int maxPawnFromRank8[][2], // TODO: why does MinGW complain about const here?
-                        int fileIndex,
-                        int side,
+                        const int maxPawnFromRank1[][2],
+                        const int maxPawnFromRank8[][2],
+                        int fileIndex, int side,
                         int king, int xking)
 {
+        unused(king);
+        unused(xking);
+
         #define maxRank(i, j)  maxPawnFromRank1[i][j]
         #define minRank(i, j) (maxPawnFromRank8[i][j] ^ 7)
 

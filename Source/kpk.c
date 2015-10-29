@@ -72,7 +72,7 @@ enum { N = a2-a1, S = -N, E = b1-a1, W = -E }; // Derived geometry
                     | allW(set)                   | allE(set)       \
                     | allW(allS(set)) | allS(set) | allE(allS(set)))
 
-#define arrayLen(a) (sizeof(a) / sizeof((a)[0]))
+#define arrayLen(a) ((int) (sizeof(a) / sizeof((a)[0])))
 enum { white, black };
 
 #define kpIndex(wKing,wPawn) (((wKing) << 5) + (file(wPawn) << 3) + rank(wPawn))

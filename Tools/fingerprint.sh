@@ -67,3 +67,6 @@ echo "*** Speed:"
 echo bench movetime 10000 | ./floyd-pgo2
 echo
 
+echo "*** Todo list:" # xtodo
+make todo | wc -l
+echo

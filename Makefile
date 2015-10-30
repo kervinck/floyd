@@ -27,7 +27,12 @@ CFLAGS:=-std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-poin
 	-DfloydVersion=$(floydVersion)
 
 # Use a real gcc for pgo
-GCC:=gcc-mp-4.8
+ifeq "$(osType)" "Darwin"
+ GCC:=gcc-mp-4.8
+endif
+ifeq "$(osType)" "Linux"
+ GCC:=gcc-4.8
+endif
 
 ifeq "$(osType)" "Linux"
  LDFLAGS:=-lm -lpthread
@@ -40,7 +45,7 @@ xcc_win32:=/usr/local/gcc-4.8.0-qt-4.8.4-for-mingw32/win32-gcc/bin/i586-mingw32-
 win32_flags:=-Wno-format # Suppress warnings about "%lld"/"%I64d". Both work fine.
 
 # Allow testing before installation 
-PYTHONPATH=build/lib/python:$$PYTHONPATH
+export PYTHONPATH:=build/lib/python:${PYTHONPATH}
 
 #-----------------------------------------------------------------------
 #       Targets
@@ -113,7 +118,7 @@ ftune: module
 
 # Plot evaluation tables for easy inspection
 tables: Tuning/tables.png
-	[ `uname -s` = 'Darwin' ] && open Tuning/tables.png
+	[ `uname -s` != 'Darwin' ] || open Tuning/tables.png
 
 Tuning/tables.png: Tools/plotTables.py Tuning/vector.json
 	python Tools/plotTables.py Tuning/vector.json
@@ -139,12 +144,13 @@ clean:
 
 # Show all open to-do items
 todo: # xtodo
-	@find . -not -path './.git/*' -type f -size -1M -print0 | xargs -0 grep -I -i todo | grep -v xtodo
+	@find . -not -path './.git/*' -type f -size -1M -print0 |\
+	xargs -0 grep -I -i todo | grep -v xtodo
 
 # Make fingerprint for regression testing
 fingerprint: clean
-	@env floydVersion=$(floydVersion) sh -x Tools/fingerprint.sh | tee fingerprint
-	[ `uname -s` = 'Darwin' ] && opendiff Docs/fingerprint fingerprint
+	@env floydVersion=$(floydVersion) sh -x Tools/fingerprint.sh 2>&1 | tee fingerprint
+	[ `uname -s` != 'Darwin' ] || opendiff Docs/fingerprint fingerprint
 
 # Show simplified git log
 log:

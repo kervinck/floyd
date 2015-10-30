@@ -26,15 +26,27 @@ echo "*** Git status:"
 git status
 echo
 
+echo "*** Todo list:" # xtodo
+make todo | wc -l # xtodo
+echo
+
+echo "*** Line count:"
+CountLoc Source # http://talkchess.com/forum/viewtopic.php?t=56201
+echo
+
 echo "*** Build:"
-make clean floyd module floyd.w32.exe floyd-pgo2
+make clean
+make floyd
+make module
+make floyd-pgo2
+make floyd.w32.exe
 echo
 
 echo "*** Help text:"
 echo help | ./floyd
 echo
 
-echo "*** Smoke test:"
+echo "*** Smoke tests:"
 make easy | grep result
 echo bench | ./floyd
 echo bench | wine ./floyd.w32.exe
@@ -44,7 +56,7 @@ echo "*** Game playing:"
 cutechess-cli -concurrency 4 -rounds 50 -repeat -each tc=10+0.15\
 	-openings file=Data/book-6000-openings.pgn\
 	-engine cmd=./floyd-pgo2 proto=uci\
-	-engine cmd=floyd0.6.osx proto=uci
+	-engine cmd=floyd0.6 proto=uci
 echo
 
 echo "*** Node count and branching factor:"
@@ -65,8 +77,4 @@ echo
 
 echo "*** Speed:"
 echo bench movetime 10000 | ./floyd-pgo2
-echo
-
-echo "*** Todo list:" # xtodo
-make todo | wc -l
 echo

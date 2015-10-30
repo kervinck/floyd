@@ -303,7 +303,8 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
         // Null move pruning
         if (depth >= 2 && isCutNode(nodeType) && minEval <= alpha && alpha < maxEval && !check && allowNullMove(board(self))) {
                 makeNullMove(board(self));
-                int score = -scout(self, max(0, depth - 2 - 1), -(alpha+1), nodeType+1);
+                int reduction = 2;
+                int score = -scout(self, max(0, depth - reduction - 1), -(alpha+1), nodeType+1);
                 undoMove(board(self));
                 if (score > alpha)
                         return ttWrite(self, node.slot, depth, score, alpha, alpha+1);
@@ -312,9 +313,13 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
         // Search deeper until all moves exhausted or one fails high
         int extension = check;
         int bestScore = minInt;
+        int newDepth = max(0, depth - 1 + extension);
         for (int j=0, move=makeFirstMove(self,&node); move; j++, move=makeNextMove(self,&node)) {
-                int newDepth = max(0, depth - 1 + extension);
-                int score = -scout(self, newDepth, -(alpha+1), nodeType+1);
+                int reduction = (depth >= 4) && (j >= 1) && (move < 0) && isCutNode(nodeType);
+                int reducedDepth = max(0, depth - 1 - reduction + extension);
+                int score = -scout(self, reducedDepth, -(alpha+1), nodeType+1);
+                if (score > alpha && newDepth != reducedDepth)
+                        score = -scout(self, newDepth, -(alpha+1), nodeType+1);
                 undoMove(board(self));
                 bestScore = max(bestScore, score);
                 if (score > alpha) {

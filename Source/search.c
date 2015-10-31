@@ -152,7 +152,6 @@ void rootSearch(Engine_t self)
  |      endScore / drawScore                                            |
  +----------------------------------------------------------------------*/
 
-// TODO: move to evaluate.h
 static inline int endScore(Engine_t self, bool inCheck)
 {
         return inCheck ? minMate + ply(self) : 0;

@@ -51,7 +51,6 @@
 // Other modules
 #include "Board.h"
 #include "Engine.h"
-#include "evaluate.h"
 #include "uci.h"
 
 /*----------------------------------------------------------------------+

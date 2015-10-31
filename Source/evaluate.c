@@ -52,7 +52,6 @@
 // Own interface
 #include "Board.h"
 #include "Engine.h"
-#include "evaluate.h"
 
 // Other modules
 #include "kpk.h"

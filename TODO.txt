@@ -1,11 +1,34 @@
 
+|Todo| Remove evaluate.h [cleanup]
+
+|Todo| Isolated pawns [evaluate]
+
+|Todo| Scale passers with material [evaluate]
+
+|Todo| King safety [evaluate]
+
+|Todo| Rooks and queens on open files [evaluate]
+
+|Todo| Left-right location parameters [evaluate]
+
 |Todo| Don't allow 0 as heuristic evalation [evaluate]
+
+|Todo| Check Rebel evaluation features [evaluate]
+
+Ref: http://www.top-5000.nl/authors/rebel/chess840.htm
+
+|Todo| Check Stockfish evaluation features [evaluate]
+
+|Todo| Check "Fruit/Rybka" evaluation features [evaluate]
+
+Go through eval_comp forwards and backwards again and
+take many things.
+
+|Todo| LittleChessEvaluationCompendium.pdf [evaluate]
 
 |Todo| Introduce move flags for 32 bit
 
 - Simplify UCI move formatting
-
-|Todo| Lazy move generation for pvSearch
 
 |Todo| Extend move flags
 
@@ -34,11 +57,6 @@ Desirable properties
 - generateMoves still generates ints (32bit)
 - can use stdlib qsort
 
-|Todo| Lazy move generation for qSearch
-Makes it slower?
-
-|Todo| Try simple SEE
-
 |Todo| Win64 version from Makefile [win64]
 
 Joost: Intel C compiler versie 15
@@ -61,12 +79,6 @@ http://nvie.com/posts/a-successful-git-branching-model/
         Make release notes
         Merge into master
 
-|Todo| Scale passers with material [evaluate]
-
-|Todo| King safety [evaluate]
-
-|Todo| Remove evaluate.h [cleanup]
-
 |Todo| Basic history [search]
 
 |Todo| Basic counter move? [search]
@@ -81,8 +93,6 @@ http://nvie.com/posts/a-successful-git-branching-model/
 
 |Todo| Multicore support for tuning [speed]
 
-|Todo| Left-right location parameters [evaluate]
-
 |Todo| Before breaking out the tune loop, do a quadratic fit on the
        nearest 3 points and probe the bottom [tune]
 
@@ -95,19 +105,6 @@ http://nvie.com/posts/a-successful-git-branching-model/
 |Todo| Add left/right testing [qa,evaluate]
 
 |Todo| Terminology: coefficient or parameter [qa]
-
-|Todo| Check Rebel evaluation features [evaluate]
-
-Ref: http://www.top-5000.nl/authors/rebel/chess840.htm
-
-|Todo| Check Stockfish evaluation features [evaluate]
-
-|Todo| Check "Fruit/Rybka" evaluation features [evaluate]
-
-Go through eval_comp forwards and backwards again and
-take many things.
-
-|Todo| LittleChessEvaluationCompendium.pdf [evaluate]
 
 |Todo| Measure repeatibility of tuner [verification,tune]
 
@@ -207,6 +204,8 @@ First verify that variance of the extreme is indeed better than
 the variance of the mean.
 
 See timing.log and timing3.log
+
+|Todo| Move logit() from evaluate to rootSearch [speed]
 
 ------------------------------------------------------------------------
 

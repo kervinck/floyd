@@ -1,7 +1,12 @@
 
-|Todo| Remove evaluate.h [cleanup]
-
 |Todo| Isolated pawns [evaluate]
+
+|Todo| Investigate tune anomaly [tune]
+
+evaluate id middlePawnClosedA residual 0.322199863 value 0
+evaluate id middlePawnClosedA residual 0.322199863 active 9286 value -40
+evaluate id middlePawnClosedA residual 0.322199863 active 9286 value 40
+evaluate id middlePawnClosedA residual 0.322199863 value -20
 
 |Todo| Scale passers with material [evaluate]
 

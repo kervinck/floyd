@@ -115,6 +115,41 @@
         P(backwardPawnA, -1), P(backwardPawnB, -46), P(backwardPawnC, -68), P(backwardPawnD, -148),
         P(backwardPawnE, -125), P(backwardPawnF, -63), P(backwardPawnG, -29), P(backwardPawnH, 26),
 
+        P(isolatedPawnClosedA, 20), P(isolatedPawnClosedB, -31),
+        P(isolatedPawnClosedC, -10), P(isolatedPawnClosedD, 53),
+        P(isolatedPawnClosedE, 25), P(isolatedPawnClosedF, -20),
+        P(isolatedPawnClosedG, -10), P(isolatedPawnClosedH, 30),
+
+        P(isolatedPawnOpenA, -17), P(isolatedPawnOpenB, -30),
+        P(isolatedPawnOpenC, -60), P(isolatedPawnOpenD, -80),
+        P(isolatedPawnOpenE, -75), P(isolatedPawnOpenF, -80),
+        P(isolatedPawnOpenG, -70), P(isolatedPawnOpenH, -17),
+
+        P(sidePawnClosedA, 0), P(sidePawnClosedB, 6),
+        P(sidePawnClosedC, 9), P(sidePawnClosedD, 0),
+        P(sidePawnClosedE, -1), P(sidePawnClosedF, -3),
+        P(sidePawnClosedG, -1), P(sidePawnClosedH, 3),
+
+        P(sidePawnOpenA, -17), P(sidePawnOpenB, 25),
+        P(sidePawnOpenC, 30), P(sidePawnOpenD, -10),
+        P(sidePawnOpenE, 3), P(sidePawnOpenF, 11),
+        P(sidePawnOpenG, 16), P(sidePawnOpenH, 5),
+
+        P(middlePawnClosedA, 0), P(middlePawnClosedB, -13),
+        P(middlePawnClosedC, -5), P(middlePawnClosedD, 10),
+        P(middlePawnClosedE, 5), P(middlePawnClosedF, -1),
+        P(middlePawnClosedG, -10), P(middlePawnClosedH, 0),
+
+        P(middlePawnOpenA, 0), P(middlePawnOpenB, -10),
+        P(middlePawnOpenC, 1), P(middlePawnOpenD, 30),
+        P(middlePawnOpenE, 21), P(middlePawnOpenF, -5),
+        P(middlePawnOpenG, -10), P(middlePawnOpenH, 0),
+
+        P(duoPawnA, -5), P(duoPawnB, -3),
+        P(duoPawnC, 0), P(duoPawnD, 39),
+        P(duoPawnE, 30), P(duoPawnF, 19),
+        P(duoPawnG, -1), P(duoPawnH, -35),
+
         // Quadratic polynomials for passers
         P(passerA_0, -112), P(passerB_0, -54), P(passerC_0, -84), P(passerD_0, -179),
         P(passerE_0, -92), P(passerF_0, -32), P(passerG_0, -32), P(passerH_0, 32),

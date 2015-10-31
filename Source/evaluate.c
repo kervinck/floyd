@@ -9,35 +9,13 @@
  *  Copyright (C) 2015, Marcel van Kervinck
  *  All rights reserved
  *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *  notice, this list of conditions and the following disclaimer.
- *
- *  2. Redistributions in binary form must reproduce the above copyright
- *  notice, this list of conditions and the following disclaimer in the
- *  documentation and/or other materials provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- *  COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- *  POSSIBILITY OF SUCH DAMAGE.
+ *  Please read the enclosed file `LICENSE' or retrieve this document
+ *  from https://marcelk.net/floyd/LICENSE for terms and conditions.
  */
 
 /*----------------------------------------------------------------------+
  |      Includes                                                        |
  +----------------------------------------------------------------------*/
-
 
 // C standard
 #include <assert.h>
@@ -76,7 +54,6 @@ enum vector {
 };
 
 struct evaluation {
-
         /*
          *  Piece counts per side
          */
@@ -111,50 +88,20 @@ struct evaluation {
         int maxPawnFromFileH[2];
 
         /*
-         *  Material
+         *  Accumulators
          */
         int material[2];
-
-        int attackForce[2][2];          // available material per flank and side
-        int pawnShelter[8][2];          // pawn shelter per file
-        int kingLocation[2];            // back rank is good, side is good. get added to shelter
-        int kingAttacks[2];             // attacks on the king 3x3 area
-
-                                        // something about attacking strength on the king flank
-                                        // something about defenders. this is always a problem in rookie
-
-        int safety[2];                  // total king safety
-
-        int kings[2];                   // PST, distance to weak pawns, distance to passers (w+b)
-        int queens[2];                  // PST
-        int rooks[2];                   // PST, doubled, strong squares
-        int bishops[2];                 // PST, trapped, strong squares, can engage enemy pawns, not blocked by own pawns, pawn span is good
-        int knights[2];                 // PST, strong squares, pawn span is bad
-        int pawns[2];                   // PST, doubled, grouped, mobile
-
-        //int pawnBlocks;
-
-        int mobility[2];           // use extended attack maps
-        int control[2];            // control of each square
-
-        int passerScaling[2];           // based on material
-        int passers[2];                 // passers, not scalled
-
-        // rooks behind passers (w+b)
-        // rooks before passers (w+b)
-        // distance from enemy king file
-        // occupancy of front square
-        // occupancy of second square
-        // occupancy of any  square
-        // control of front square
-        // control of second square
-        // control of any square
-        // supported passer
-        // connected passers
-
-        int sideToMove;
-        int contempt;                   // linked to own queen (typically for black)
-                                        // "Positive values of contempt favor more "risky" play,"
+        int safety[2];   // total king safety
+        int passers[2];  // passers, not scaled
+        int control[2];  // control of each square
+        int mobility[2]; // use extended attack maps
+        int kings[2];    // PST, distance to weak pawns, distance to passers (w+b)
+        int queens[2];
+        int rooks[2];    // PST, doubled, strong squares
+        int bishops[2];  // PST, trapped, strong squares, can engage enemy pawns, not blocked by own pawns, pawn span is good
+        int knights[2];  // PST, strong squares, pawn span is bad
+        int pawns[2];    // PST, doubled, grouped, mobile
+        int others[2];
 };
 
 /*----------------------------------------------------------------------+
@@ -201,6 +148,20 @@ static int evaluateCastleFlags(const int v[vectorLen], int kSideFlag, int qSideF
 /*----------------------------------------------------------------------+
  |      evaluate                                                        |
  +----------------------------------------------------------------------*/
+
+// TODO:
+// pawnBlocks
+// rooks behind passers (w+b)
+// rooks before passers (w+b)
+// distance from enemy king file
+// occupancy of front square
+// occupancy of second square
+// occupancy of any  square
+// control of front square
+// control of second square
+// control of any square
+// supported passer
+// connected passers
 
 int evaluate(Board_t self)
 {
@@ -523,20 +484,13 @@ int evaluate(Board_t self)
                 + e.rooks[side] \
                 + e.bishops[side] \
                 + e.knights[side] \
-                + e.pawns[side])
+                + e.pawns[side] \
+                + e.others[side])
+
+        e.others[side] += v[tempo]; // side to move bonus
+        e.others[white] += self->eloDiff * v[eloDiff] / 10; // contempt
 
         int wiloScore = partial(side) - partial(xside);
-
-        wiloScore += v[tempo]; // side to move bonus
-
-        /*--------------------------------------------------------------+
-         |      Contempt                                                |
-         +--------------------------------------------------------------*/
-
-        if (side == white)
-                wiloScore += self->eloDiff * v[eloDiff] / 10;
-        else
-                wiloScore -= self->eloDiff * v[eloDiff] / 10;
 
         /*--------------------------------------------------------------+
          |      Special endgames                                        |
@@ -704,19 +658,22 @@ static int evaluatePawn(const int v[vectorLen],
           || maxRank(+1, xside) == frontPawn + 2))
                 pawnScore += v[backwardPawnA + fileIndex];
 
-#if 0
         /*
-         *  Isolated
+         *  Isolated, middle or end of group
          */
+        int neighbours = (maxRank(-1, side) > 0) + (maxRank(+1, side) > 0);
+        int openFile = (maxRank(0, xside) <= frontPawn);
+        static const int offsets[3][2] = {
+                { isolatedPawnClosedA, isolatedPawnOpenA },
+                { sidePawnClosedA,     sidePawnOpenA     },
+                { middlePawnClosedA,   middlePawnOpenA   } };
+        pawnScore += v[offsets[neighbours][openFile] + fileIndex];
 
         /*
-         *  Half connected
+         *  Duo
          */
-
-        /*
-         *  Full connected
-         */
-#endif
+        if (frontPawn == maxRank(-1, side) || frontPawn == maxRank(+1, side))
+                pawnScore += v[duoPawnA + fileIndex];
 
         /*
          *  Passer

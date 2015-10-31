@@ -197,8 +197,7 @@ static int _scanToken(char **line, const char *format, void *value)
 
 void uciMain(Engine_t self)
 {
-        char *buffer = null;
-        int size = 0;
+        charList lineBuffer = emptyList;
         bool debug = false;
         struct options oldOptions = { .Hash = -1 };
         struct options newOptions = { .Hash = 128 };
@@ -208,9 +207,9 @@ void uciMain(Engine_t self)
         struct searchArgs args;
 
         // Process commands from stdin
-        while (fflush(stdout), readLine(stdin, &buffer, &size) > 0) {
-                if (debug) printf("info string input %s", buffer);
-                char *line = buffer;
+        while (fflush(stdout), readLine(stdin, &lineBuffer) > 0) {
+                char *line = lineBuffer.v;
+                if (debug) printf("info string input %s", line);
 
                 if (scan("uci")) {
                         ignoreOtherTokens();
@@ -382,7 +381,7 @@ void uciMain(Engine_t self)
         }
 
         searchThread = stopSearch(self, searchThread);
-        free(buffer);
+        freeList(lineBuffer);
 }
 
 /*----------------------------------------------------------------------+

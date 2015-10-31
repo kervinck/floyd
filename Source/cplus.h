@@ -34,6 +34,10 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
+/*----------------------------------------------------------------------+
+ |      Definitions                                                     |
+ +----------------------------------------------------------------------*/
+
 // Safe definition of statement-like macros
 #define Statement(...) do{ __VA_ARGS__ }while(0)
 #define pass Statement()
@@ -82,46 +86,31 @@ struct xError {
         int argc;
         // struct xValue argv[];
 };
-
 typedef struct xError *err_t;
 
 #define OK ((err_t) 0)
+#define check(err) Statement( if ((err) != OK) goto cleanup; )
 
-#define check(err) Statement(\
-        if ((err) != OK)      \
-                goto cleanup; \
+#define xRaise(msg) Statement(                  \
+        static struct xError _static_err = {    \
+                .format = (msg),                \
+                .file = __FILE__,               \
+                .function = __func__,           \
+                .line = __LINE__,               \
+                .argc = -1                      \
+        };                                      \
+        err = &_static_err;                     \
+        goto cleanup;                           \
 )
-
-err_t err_free(err_t err);
-
-#define xRaise(msg) Statement(\
-        static struct xError _static_err = {\
-                .format = (msg),\
-                .file = __FILE__,\
-                .function = __func__,\
-                .line = __LINE__,\
-                .argc = -1\
-        };\
-        err = &_static_err;\
-        goto cleanup;\
-)
-
-#define xAssert(cond) Statement(\
-        if (!(cond))\
-                xRaise("Assertion (" #cond ") failed");\
-)
+err_t freeErr(err_t err);
 
 /*----------------------------------------------------------------------+
- |      Pairs / Tuples                                                  |
+ |      Tuples and pairs                                                |
  +----------------------------------------------------------------------*/
 
-#define Tuple(type, n)\
-struct {\
-        type v[n];\
-}
+#define Tuple(type, n) struct { type v[n]; }
 
 #define Pair(type)              Tuple(type, 2)
-
 typedef Pair(int)               intPair;
 
 /*----------------------------------------------------------------------+
@@ -176,9 +165,13 @@ typedef List(void)      voidList;
 
 err_t listEnsureMaxLen(voidList *list, int itemSize, int minLen, int minSize);
 
+/*----------------------------------------------------------------------+
+ |      Functions                                                       |
+ +----------------------------------------------------------------------*/
+
 double xTime(void);
 char *stringCopy(char *s, const char *t);
-int readLine(void *fp, char **pLine, int *pSize);
+int readLine(void *fp, charList *lineBuffer);
 
 /*----------------------------------------------------------------------+
  |      Main support                                                    |
@@ -191,8 +184,7 @@ void xAbort(int r, const char *function);
 // Conditional abort
 static inline void cAbort(int r, const char *function)
 {
-        if (r != 0)
-                xAbort(r, function);
+        if (r != 0) xAbort(r, function);
 }
 
 /*----------------------------------------------------------------------+

@@ -206,6 +206,8 @@ Platform: UNKNOWN
 First verify that variance of the extreme is indeed better than
 the variance of the mean.
 
+See timing.log and timing3.log
+
 ------------------------------------------------------------------------
 
 Avoid system-in-system effect:

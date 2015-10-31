@@ -282,7 +282,7 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
 
         // Mate distance pruning
         int mateBound = maxMate - ply(self) - 2;
-        if (mateBound <= alpha) return mateBound;
+        if (alpha >= mateBound) return mateBound;
 
         int check = inCheck(board(self));
         struct Node node;
@@ -301,7 +301,9 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
                         return node.slot.score;
 
         // Null move pruning
-        if (depth >= 2 && isCutNode(nodeType) && minEval <= alpha && alpha < maxEval && !check && allowNullMove(board(self))) {
+        if (depth >= 2 && isCutNode(nodeType)
+         && minEval <= alpha && alpha < maxEval
+         && !check && allowNullMove(board(self))) {
                 makeNullMove(board(self));
                 int reduction = 2;
                 int score = -scout(self, max(0, depth - reduction - 1), -(alpha+1), nodeType+1);
@@ -313,12 +315,12 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
         // Search deeper until all moves exhausted or one fails high
         int extension = check;
         int bestScore = minInt;
-        int newDepth = max(0, depth - 1 + extension);
         for (int j=0, move=makeFirstMove(self,&node); move; j++, move=makeNextMove(self,&node)) {
+                int newDepth = max(0, depth - 1 + extension);
                 int reduction = (depth >= 4) && (j >= 1) && (move < 0) && isCutNode(nodeType);
-                int reducedDepth = max(0, depth - 1 - reduction + extension);
+                int reducedDepth = max(0, newDepth - reduction);
                 int score = -scout(self, reducedDepth, -(alpha+1), nodeType+1);
-                if (score > alpha && newDepth != reducedDepth)
+                if (score > alpha && reducedDepth < newDepth)
                         score = -scout(self, newDepth, -(alpha+1), nodeType+1);
                 undoMove(board(self));
                 bestScore = max(bestScore, score);

@@ -57,13 +57,6 @@ static const char *positions[] = {
 
 // Functions
 
-static bool noInfoFunction(void *infoData, const char *string, ...) // TODO: move to search.c
-{
-        unused(infoData);
-        unused(string);
-        return false;
-}
-
 double uciBenchmark(Engine_t self, double time, searchInfo_fn *infoFunction, void *infoData)
 {
         char oldPosition[maxFenSize]; // TODO: clone engine and then share tt instead
@@ -74,7 +67,11 @@ double uciBenchmark(Engine_t self, double time, searchInfo_fn *infoFunction, voi
 
         for (int i=0; i<arrayLen(positions); i++) {
                 setupBoard(board(self), positions[i]);
-                rootSearch(self, maxDepth, 0.0, time, noInfoFunction, null);
+                self->targetTime = 0.0;
+                self->abortTime = time;
+                self->targetDepth = maxDepth;
+                self->infoFunction = noInfoFunction;
+                rootSearch(self);
                 totalNodes += self->nodeCount;
                 totalSeconds += self->seconds;
                 infoFunction(infoData, null);

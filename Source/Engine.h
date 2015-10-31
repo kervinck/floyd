@@ -120,6 +120,10 @@ struct Engine {
                 long long nodeCount;
         };
 
+        double targetTime;
+        double abortTime;
+        int targetDepth;
+
         searchInfo_fn *infoFunction;
         void *infoData;
 
@@ -141,17 +145,12 @@ struct Engine {
 /*
  *  Search
  */
-
-void rootSearch(Engine_t self,
-                int depth,
-                double targetTime, double alarmTime,
-                searchInfo_fn *infoFunction, void *infoData);
-void abortSearch(Engine_t self);
+void rootSearch(Engine_t self);
+searchInfo_fn noInfoFunction;
 
 /*
  *  Evaluate
  */
-
 int evaluate(Board_t self);
 
 /*
@@ -163,6 +162,11 @@ int ttWrite(Engine_t self, struct ttSlot slot, int depth, int score, int alpha, 
 struct ttSlot ttRead(Engine_t self);
 void ttClearFast(Engine_t self);
 double ttCalcLoad(Engine_t self);
+
+/*
+ *  Time control
+ */
+void setTimeTargets(Engine_t self, double time, double inc, int movestogo, double movetime);
 
 /*----------------------------------------------------------------------+
  |                                                                      |

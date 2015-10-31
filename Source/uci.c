@@ -66,11 +66,6 @@
 
 struct searchArgs {
         Engine_t self;
-        int depth;
-        double targetTime;
-        double alarmTime;
-        searchInfo_fn *infoFunction;
-        void *infoData;
         bool ponder;
         bool infinite;
 };
@@ -147,9 +142,6 @@ X;
 /*----------------------------------------------------------------------+
  |      Functions                                                       |
  +----------------------------------------------------------------------*/
-
-// Calculate target time (or alarm time) for thinking on game clock
-static double target(Engine_t self, double time, double inc, int movestogo);
 
 static xThread_t stopSearch(Engine_t self, xThread_t searchThread);
 static xThread_t startSearch(struct searchArgs *args);
@@ -287,33 +279,27 @@ void uciMain(Engine_t self)
 
                         args = (struct searchArgs) {
                                 .self = self,
-                                .depth = maxDepth,
-                                .targetTime = 0.0,
-                                .alarmTime = 0.0,
-                                .infoFunction = uciSearchInfo,
-                                .infoData = self,
                                 .ponder = false,
                                 .infinite = false,
                         };
+                        self->infoFunction = uciSearchInfo;
+                        self->infoData = self;
 
-                        self->searchMoves.len = 0; // TODO: not implemented
-                        long time = 0;
-                        long btime = 0;
-                        long inc = 0;
-                        long binc = 0;
+                        long time = 0, btime = 0;
+                        long inc = 0, binc = 0;
                         int movestogo = 0;
+                        self->targetDepth = maxDepth;
                         long long nodes = maxLongLong;
                         int mate = 0; // TODO: not implemented
                         long movetime = 0;
+                        self->searchMoves.len = 0; // TODO: not implemented
 
                         while (*line != '\0')
                                 if ((scan("ponder") && (args.ponder = true))
-                                 || scanValue("wtime %ld", &time)
-                                 || scanValue("btime %ld", &btime)
-                                 || scanValue("winc %ld", &inc)
-                                 || scanValue("binc %ld", &binc)
+                                 || scanValue("wtime %ld", &time) || scanValue("btime %ld", &btime)
+                                 || scanValue("winc %ld", &inc)   || scanValue("binc %ld", &binc)
                                  || scanValue("movestogo %d", &movestogo)
-                                 || scanValue("depth %d", &args.depth)
+                                 || scanValue("depth %d", &self->targetDepth)
                                  || scanValue("nodes %lld", &nodes)
                                  || scanValue("mate %d", &mate)
                                  || scanValue("movetime %ld", &movetime)
@@ -332,17 +318,9 @@ void uciMain(Engine_t self)
 
                         if (sideToMove(board(self)) == black)
                                 time = btime, inc = binc;
-                        if (time || inc) {
-                                // TODO: migrate game timing logic out of uci.c
-                                if (!movestogo) movestogo = 25;
-                                int alarmtogo = min(movestogo, (board(self)->halfmoveClock <= 70) ? 3 : 1);
-                                args.targetTime = target(self, time * ms, inc * ms, movestogo);
-                                args.alarmTime  = target(self, time * ms, inc * ms, alarmtogo);
-                        }
-                        if (movetime)
-                                args.alarmTime = movetime * ms;
+                        setTimeTargets(self, time * ms, inc * ms, movestogo, movetime * ms);
+                        printf("info string targetTime %.3f abortTime %.3f\n", self->targetTime, self->abortTime);
 
-                        printf("info string targetTime %.3f alarmTime %.3f\n", args.targetTime, args.alarmTime); // TODO: remove once branching factor is ~2
                         searchThread = startSearch(&args);
                 }
                 else if (scan("stop")) {
@@ -396,27 +374,6 @@ static void updateOptions(Engine_t self,
         if (newOptions->ClearHash != oldOptions->ClearHash)
                 ttClearFast(self);
         *oldOptions = *newOptions;
-}
-
-/*----------------------------------------------------------------------+
- |      target                                                          |
- +----------------------------------------------------------------------*/
-
-// TODO: move out of uci.c
-static double target(Engine_t self, double time, double inc, int movestogo)
-{
-        switch (board(self)->halfmoveClock) {
-        case 29: case 30: movestogo = min(movestogo, 5); break;
-        case 49: case 50: movestogo = min(movestogo, 4); break;
-        case 69: case 70: movestogo = min(movestogo, 3); break;
-        case 89: case 90: movestogo = min(movestogo, 2); break;
-        }
-
-        double safety = 5.0;
-        double target = (time + (movestogo - 1) * inc - safety) / movestogo;
-        target = max(target, 0.05);
-
-        return target;
 }
 
 /*----------------------------------------------------------------------+
@@ -522,10 +479,7 @@ static void searchThreadStart(void *argsData)
 {
         struct searchArgs *args = argsData;
 
-        rootSearch(args->self,
-                   args->depth,
-                   args->targetTime, args->alarmTime,
-                   args->infoFunction, args->infoData);
+        rootSearch(args->self);
 
         if (!args->infinite) {
                 uciBestMove(args->self);

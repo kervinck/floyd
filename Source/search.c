@@ -93,26 +93,18 @@ static int makeNextMove(Engine_t self, struct Node *node);
  |      rootSearch                                                      |
  +----------------------------------------------------------------------*/
 
-static void stopSearch(void *data)
+static void abortSearch(void *data)
 {
         Engine_t self = data;
         self->stopFlag = true;
 }
 
-// TODO: all timing decisions from search.c
 // TODO: aspiration search
-void rootSearch(Engine_t self,
-        int depth,
-        double targetTime,
-        double alarmTime,
-        searchInfo_fn *infoFunction, void *infoData)
+void rootSearch(Engine_t self)
 {
         double startTime = xTime();
         self->nodeCount = 0;
         self->rootPlyNumber = board(self)->plyNumber;
-
-        self->infoFunction = infoFunction;
-        self->infoData = infoData;
 
         assert(board(self)->hash == hash(board(self)));
         if (hash(board(self)) != self->lastSearched) {
@@ -125,24 +117,24 @@ void rootSearch(Engine_t self,
 
         self->stopFlag = false;
         volatile xAlarm_t alarmHandle = null;
-        if (alarmTime > 0.0)
-                alarmHandle = setAlarm(alarmTime, stopSearch, self);
+        if (self->abortTime > 0.0)
+                alarmHandle = setAlarm(self->abortTime, abortSearch, self);
 
         // Prepare abort possibility
         jmp_buf here;
         self->abortTarget = &here;
 
         if (setjmp(here) == 0) { // try search
-                bool stop = false;
-                for (int iteration=0; iteration<=depth && !stop; iteration++) {
+                for (int iteration=0; iteration<=self->targetDepth; iteration++) {
                         self->mateStop = true;
                         self->depth = iteration;
                         self->score = pvSearch(self, iteration, -maxInt, maxInt, 0);
                         self->seconds = xTime() - startTime;
                         updateBestAndPonderMove(self);
-                        stop = infoFunction(infoData, null)
-                            || (isMateScore(self->score) && self->mateStop && self->depth > 0)
-                            || (targetTime > 0.0 && self->seconds >= 0.5 * targetTime); // TODO: remove
+                        if (self->infoFunction(self->infoData, null)
+                         || (isMateScore(self->score) && self->mateStop && self->depth > 0)
+                         || (self->targetTime > 0.0 && self->seconds >= 0.5 * self->targetTime))
+                                break;
                 }
         } else { // except abort
                 self->seconds = xTime() - startTime;
@@ -150,7 +142,7 @@ void rootSearch(Engine_t self,
                         undoMove(board(self));
                 int pvCut = updateBestAndPonderMove(self);
                 self->pv.len = min(self->pv.len, pvCut);
-                (void) infoFunction(infoData, null);
+                (void) self->infoFunction(self->infoData, null);
         }
 
         clearAlarm(alarmHandle);
@@ -409,7 +401,6 @@ static int makeFirstMove(Engine_t self, struct Node *node)
                 makeMove(board(self), ttMove);
                 if (wasLegalMove(board(self)))
                         return ttMove;
-                self->infoFunction(self->infoData, "Illegal hash table move");
                 undoMove(board(self));
         }
         return makeNextMove(self, node);
@@ -621,6 +612,50 @@ static int updateBestAndPonderMove(Engine_t self)
                 self->bestMove = self->pv.v[0];
 
         return !self->bestMove + !self->ponderMove; // 0, 1 or 2 halfmoves
+}
+
+/*----------------------------------------------------------------------+
+ |      setTimeTargets                                                  |
+ +----------------------------------------------------------------------*/
+
+static double target(double time, double inc, int movestogo)
+{
+        double safety = 2.5;
+        double target = (time + (movestogo - 1) * inc - safety) / movestogo;
+        return max(target, 0.03);
+}
+
+void setTimeTargets(Engine_t self, double time, double inc, int movestogo, double movetime)
+{
+        if (time || inc) {
+                if (!movestogo) // Default time allocation horizon
+                        movestogo = 25;
+                switch (board(self)->halfmoveClock / 2) { // Induce a couple of "mild panics" when no progress
+                case 15: movestogo = min(movestogo, 5); break;
+                case 25: movestogo = min(movestogo, 4); break;
+                case 35: movestogo = min(movestogo, 3); break;
+                case 45: movestogo = min(movestogo, 2); break;
+                }
+                int mintogo = min(movestogo, (board(self)->halfmoveClock / 2 < 35) ? 3 : 1);
+
+                self->targetTime = target(time, inc, movestogo);
+                double panicTime = target(time, inc, mintogo);
+                double flagTime  = target(time, inc, 1);
+                self->abortTime  = min(panicTime, flagTime);
+        }
+        if (movetime)
+                self->abortTime = movetime;
+}
+
+/*----------------------------------------------------------------------+
+ |      noInfoFunction                                                  |
+ +----------------------------------------------------------------------*/
+
+bool noInfoFunction(void *infoData, const char *string, ...)
+{
+        unused(infoData);
+        unused(string);
+        return false;
 }
 
 /*----------------------------------------------------------------------+

@@ -111,7 +111,7 @@ residual: module
 
 # Run one iteration of the evaluation tuner
 tune: module
-	bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/tune.py Tuning/vector.json
+	bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/tune.py -n 8 Tuning/vector.json
 
 # Run one fast iteration of the evaluation tuner
 ftune: module

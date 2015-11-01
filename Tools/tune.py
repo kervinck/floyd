@@ -164,7 +164,7 @@ def tuneSingle(coef, tests, initialValue, initialResidual):
                         # Determine if the result is an improvement
                         if (nextResidual, abs(nextValue)) < (bestResidual, abs(bestValue)):
                                 bestValue, bestResidual = nextValue, nextResidual
-                                print 'best'
+                                print 'best',
                                 xUpdate()
                         print # newline
 
@@ -196,11 +196,11 @@ def tuneSingle(coef, tests, initialValue, initialResidual):
                 print 'evaluate id %s residual %.9f' % (names[coef], nextResidual),
                 if not quick and not dirty:
                         print 'active %d' % active,
-                print 'value %d fit' % nextValue,
+                print 'value %d' % nextValue,
 
                 if (nextResidual, abs(nextValue)) < (bestResidual, abs(bestValue)):
                         bestValue, bestResidual = nextValue, nextResidual
-                        print 'best'
+                        print 'best',
                         xUpdate()
                 print # newline
 
@@ -249,9 +249,10 @@ def calcWindow(value):
 #       writeVector
 #-----------------------------------------------------------------------
 
-def writeVector(vector, filename):
+def writeVector(vector, deltas, filename):
         with open(filename, 'w') as fp:
-                json.dump(dict(zip(names, vector)), fp, indent=1, separators=(',', ': '), sort_keys=True)
+                asList = sorted(zip(names, vector, deltas),  key=lambda x: x[2])
+                json.dump(asList, fp, indent=1, separators=(',', ':'))
                 fp.write('\n')
 
 #-----------------------------------------------------------------------
@@ -339,6 +340,7 @@ if __name__ == '__main__':
         # -- Step 0: Get vector definition from module
 
         vector, names = getVector()
+        deltas = [-1.0] * len(vector) # priority for new items
 
         # -- Step 1: Parse command line arguments
 
@@ -393,7 +395,13 @@ if __name__ == '__main__':
         try:
                 with open(filename, 'r') as fp:
                         values = dict(zip(names, vector))
-                        values.update(json.load(fp))
+                        for i, (name, value, delta) in enumerate(json.load(fp)):
+                                try:
+                                        coef = names.index(name)
+                                        values[name] = value
+                                        deltas[coef] = delta
+                                except ValueError:
+                                        print 'warning invalid id', name
                         vector = [values[name] for name in names]
         except IOError as err:
                 print err
@@ -425,12 +433,12 @@ if __name__ == '__main__':
         nrRounds = 0
         exitValue = 1
         exhausted = False
+        coefList = sorted(coefList, key=lambda x:deltas[x])
         while len(coefList) > 0 and not exhausted:
                 nrRounds += 1
                 print 'round %d count %d' % (nrRounds, len(coefList))
                 print
 
-                deltas = {}
                 exhausted = True
                 for coef in coefList:
                         oldValue = vector[coef]
@@ -443,10 +451,10 @@ if __name__ == '__main__':
                                 print 'update id %s residual %.9f delta %.3e active %d oldValue %d newValue %d' % (
                                         names[coef], newResidual, deltaResidual, active, oldValue, newValue)
                                 vector[coef] = newValue
-                                writeVector(vector, filename)
                                 exitValue = 0
                                 bestResidual = newResidual
                                 exhausted = False
+                        writeVector(vector, deltas, filename)
                         print
 
                 # Keep the most volatile half for the next round
@@ -460,7 +468,6 @@ if __name__ == '__main__':
         print
 
         stopWorkers(workers)
-
         sys.exit(exitValue)
 
 #-----------------------------------------------------------------------

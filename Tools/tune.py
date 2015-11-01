@@ -153,8 +153,7 @@ def tuneSingle(coef, tests, initialValue, initialResidual):
                         exhausted = False
 
                         xSetCoefficient(coef, nextValue)
-                        sumSquaredErrors, nrTests, active = xEvaluateVector(tests, quick or dirty)
-                        nextResidual = math.sqrt(sumSquaredErrors / nrTests)
+                        nextResidual, active = xEvaluateVector(tests, quick or dirty)
                         cache[nextValue] = nextResidual
 
                         print 'evaluate id %s residual %.9f' % (names[coef], nextResidual),
@@ -162,19 +161,18 @@ def tuneSingle(coef, tests, initialValue, initialResidual):
                                 print 'active %d' % active,
                         print 'value %d' % nextValue,
 
-                        # Track changes in number of active positions for this parameter
-                        if active != lastActive:
-                                streak = 0
-                        lastActive = active
-                        streak += 1
-
                         # Determine if the result is an improvement
                         if (nextResidual, abs(nextValue)) < (bestResidual, abs(bestValue)):
                                 bestValue, bestResidual = nextValue, nextResidual
                                 print 'best'
                                 xUpdate()
-                        else:
-                                print # newline
+                        print # newline
+
+                        # Track changes in number of active positions for this parameter
+                        if active != lastActive:
+                                streak = 0
+                        lastActive = active
+                        streak += 1
 
                 # Shrink the window if the best value is near the center
                 if abs(bestValue - center) < window / 4:
@@ -188,10 +186,54 @@ def tuneSingle(coef, tests, initialValue, initialResidual):
 
                 dirty = lastActive >= minActive
 
+        # Try a quadratic fit on the 5 nearest points
+        X, Y = zip(*sorted(cache.items(), key=lambda item: abs(item[0] - bestValue)))
+        nextValue = int(round(quadFit(X[:5], Y[:5])))
+        if nextValue not in cache:
+                xSetCoefficient(coef, nextValue)
+                nextResidual, active = xEvaluateVector(tests, quick or dirty)
+
+                print 'evaluate id %s residual %.9f' % (names[coef], nextResidual),
+                if not quick and not dirty:
+                        print 'active %d' % active,
+                print 'value %d fit' % nextValue,
+
+                if (nextResidual, abs(nextValue)) < (bestResidual, abs(bestValue)):
+                        bestValue, bestResidual = nextValue, nextResidual
+                        print 'best'
+                        xUpdate()
+                print # newline
+
         # Update vector
         xSetCoefficient(coef, bestValue)
 
         return bestValue, bestResidual, active
+
+def quadFit(X, Y):
+        """The extreme of a quadratic least square fit"""
+
+        SumX   = sum(X)
+        SumY   = sum(Y)
+        SumX2  = sum([x * x for x in X])
+        SumXY  = sum([x * y for x, y in zip(X, Y)])
+        SumX3  = sum([x ** 3 for x in X])
+        SumX2Y = sum([x * x * y for x, y in zip(X, Y)])
+        SumX4  = sum([x ** 4 for x in X])
+
+        n = float(len(X))
+        Sxx   = SumX2  - SumX * SumX / n
+        Sxy   = SumXY  - SumX * SumY / n
+        Sxx2  = SumX3  - SumX * SumX2 / n
+        Sx2y  = SumX2Y - SumX2 * SumY / n
+        Sx2x2 = SumX4  - SumX2 * SumX2 / n
+
+        a = Sx2y * Sxx   - Sxy  * Sxx2
+        b = Sxy  * Sx2x2 - Sx2y * Sxx2
+
+        if a != 0.0:
+                return -b / (2 * a)
+        else:
+                return SumX / n
 
 #-----------------------------------------------------------------------
 #       calcWindow
@@ -286,7 +328,7 @@ def xEvaluateVector(tests, useCache):
                 nrTests          += subNrTests
                 nrActive         += subNrActive
         assert(nrTests == len(tests))
-        return sumSquaredErrors, nrTests, nrActive
+        return math.sqrt(sumSquaredErrors / nrTests), nrActive
 
 #-----------------------------------------------------------------------
 #       main
@@ -368,8 +410,7 @@ if __name__ == '__main__':
 
         # -- Step 3: Prepare. Calculate initial scores and residual
 
-        sumSquaredErrors, nrTests, nrActive = xEvaluateVector(tests, False)
-        bestResidual = math.sqrt(sumSquaredErrors / nrTests)
+        bestResidual, nrActive = xEvaluateVector(tests, False)
 
         print 'vector filename %s residual %.9f positions %d depth %d' % (repr(filename), bestResidual, len(tests), depth)
         print

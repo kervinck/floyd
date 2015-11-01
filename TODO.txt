@@ -1,12 +1,5 @@
 
-|Todo| Isolated pawns [evaluate]
-
-|Todo| Investigate tune anomaly [tune]
-
-evaluate id middlePawnClosedA residual 0.322199863 value 0
-evaluate id middlePawnClosedA residual 0.322199863 active 9286 value -40
-evaluate id middlePawnClosedA residual 0.322199863 active 9286 value 40
-evaluate id middlePawnClosedA residual 0.322199863 value -20
+|Todo| Fine tuning of new pawn features and testing [tuning]
 
 |Todo| Scale passers with material [evaluate]
 
@@ -97,9 +90,6 @@ http://nvie.com/posts/a-successful-git-branching-model/
 |Todo| Preserve parameter order in vector.json [tuning]
 
 |Todo| Multicore support for tuning [speed]
-
-|Todo| Before breaking out the tune loop, do a quadratic fit on the
-       nearest 3 points and probe the bottom [tune]
 
 |Todo| Experiment: tune each bishop square [evaluate]
 

@@ -197,26 +197,9 @@ void undoMove(Board_t self);
 void makeNullMove(Board_t self);
 
 /*
- *  Convert move to standard algebraic notation, without checkmark
- *  A movelist must be prepared by the caller for disambiguation,
- *  which may include the move itself.
- */
-char *moveToStandardAlgebraic(Board_t self, char moveString[maxMoveSize], int move, int xmoves[maxMoves], int xlen);
-
-/*
- *  Convert move to long algebraic notation, without checkmark
- */
-char *moveToLongAlgebraic(Board_t self, char moveString[maxMoveSize], int move);
-
-/*
  *  Convert move to computer notation (UCI)
  */
 char *moveToUci(Board_t self, char moveString[maxMoveSize], int move);
-
-/*
- *  Determine the check status for the current position ("", "+" or "#")
- */
-const char *getCheckMark(Board_t self);
 
 /*
  *  Parse move input, disambiguate abbreviated notations

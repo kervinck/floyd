@@ -111,11 +111,11 @@ residual: module
 
 # Run one iteration of the evaluation tuner
 tune: module
-	bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/tune.py -s 2 Tuning/vector.json
+	bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/tune.py Tuning/vector.json
 
 # Run one fast iteration of the evaluation tuner
 ftune: module
-	bzcat Data/ccrl-shuffled-3M.epd.bz2 | head -500000 | python Tools/tune.py -s 2 -m 100000 fvector.json
+	bzcat Data/ccrl-shuffled-3M.epd.bz2 | head -500000 | python Tools/tune.py -m 100000 Tuning/vector.json
 
 # Plot evaluation tables for easy inspection
 tables: Tuning/tables.png

@@ -8,22 +8,28 @@
 import floyd as engine
 import json
 import math
+import multiprocessing
 import sys
 
 #-----------------------------------------------------------------------
-#       options
+#       Options
 #-----------------------------------------------------------------------
 
-cpu = 0
+# Number of workers to launch (-n)
+cpu = 4
 
+# Search depth for evaluations. 0 means qSearch only (-d)
 depth = 0
 
-nrSteps = 6  # 1.....2.....3..X..4.....5.....6
-nrSteps = 4  # 1.........2....X....3.........4
-#nrSteps = 2 # 1..............X..............2
+# Number of probes around best known value before narrowing the window (-s)
+#nrSteps = 6 # 1.....2.....3..X..4.....5.....6
+#nrSteps = 4 # 1.........2....X....3.........4
+nrSteps = 2  # 1..............X..............2
 
-maxActive = float('+Inf') # "dirty mode"
+# Number of active positions to find before entering quick and dirty mode (-m)
+minActive = float('+Inf') # "dirty mode"
 
+# Quit after calculating initial residual (-q)
 quit = False
 
 #-----------------------------------------------------------------------
@@ -81,18 +87,23 @@ def evaluateVector(tests, passive, useCache):
 
         sumSquaredErrors = 0.0
         scores = []
+        active = 0
         for pos, target in tests:
                 if not useCache or pos not in passive:
                         score, move = engine.search(pos, depth) # slow
-                        if pos in passive and score != passive[pos]:
-                                del passive[pos]
+                        if pos in passive:
+                                if  score != passive[pos]:
+                                        del passive[pos]
+                                        active += 1
+                        else:
+                                active += 1
                 else:
                         score = passive[pos] # fast
                 scores.append(score)
                 p = scoreToP(score)
                 sumSquaredErrors += (p - target) * (p - target) 
 
-        return math.sqrt(sumSquaredErrors / len(tests)), scores
+        return sumSquaredErrors, scores, active
 
 #-----------------------------------------------------------------------
 #       scoreToP
@@ -106,21 +117,21 @@ def scoreToP(score):
 #       tuneSingle
 #-----------------------------------------------------------------------
 
-def tuneSingle(coef, tests, initialValue, initialResidual, initialScores):
+def tuneSingle(coef, tests, initialValue, initialResidual):
         """Tune a single coefficient using robust a form of hill-climbing"""
 
         print 'evaluate id %s residual %.9f value %d' % (names[coef], initialResidual, initialValue)
 
         cache = { initialValue: initialResidual } # value -> residual
 
-        bestValue, bestResidual, bestScores = initialValue, initialResidual, initialScores
+        bestValue, bestResidual = initialValue, initialResidual
 
         # Initial window scales with the magnitude of the initial value
         window = calcWindow(initialValue)
 
         # For switching to quick mode
         positions = [item[0] for item in tests]
-        passive = dict(zip(positions, bestScores))
+        xNext()
         lastActive, streak = None, 0
         quick, dirty = False, False
 
@@ -141,11 +152,11 @@ def tuneSingle(coef, tests, initialValue, initialResidual, initialScores):
                                 continue
                         exhausted = False
 
-                        engine.setCoefficient(coef, nextValue)
-                        nextResidual, nextScores = evaluateVector(tests, passive, quick or dirty)
+                        xSetCoefficient(coef, nextValue)
+                        sumSquaredErrors, nrTests, active = xEvaluateVector(tests, quick or dirty)
+                        nextResidual = math.sqrt(sumSquaredErrors / nrTests)
                         cache[nextValue] = nextResidual
 
-                        active = len(positions) - len(passive)
                         print 'evaluate id %s residual %.9f' % (names[coef], nextResidual),
                         if not quick and not dirty:
                                 print 'active %d' % active,
@@ -159,8 +170,9 @@ def tuneSingle(coef, tests, initialValue, initialResidual, initialScores):
 
                         # Determine if the result is an improvement
                         if (nextResidual, abs(nextValue)) < (bestResidual, abs(bestValue)):
-                                bestValue, bestResidual, bestScores = nextValue, nextResidual, nextScores
+                                bestValue, bestResidual = nextValue, nextResidual
                                 print 'best'
+                                xUpdate()
                         else:
                                 print # newline
 
@@ -174,12 +186,12 @@ def tuneSingle(coef, tests, initialValue, initialResidual, initialScores):
                         if min(bestValue - minValue, maxValue - bestValue) < window / 8:
                                 window *= 1.25 # Slight increase when at the edge
 
-                dirty = lastActive >= maxActive
+                dirty = lastActive >= minActive
 
         # Update vector
-        engine.setCoefficient(coef, bestValue)
+        xSetCoefficient(coef, bestValue)
 
-        return bestValue, bestResidual, bestScores, active
+        return bestValue, bestResidual, active
 
 #-----------------------------------------------------------------------
 #       calcWindow
@@ -201,6 +213,82 @@ def writeVector(vector, filename):
                 fp.write('\n')
 
 #-----------------------------------------------------------------------
+#       Workers
+#-----------------------------------------------------------------------
+
+def startWorkers(count, tests, vector):
+        if count == 0:
+                return None
+
+        N = len(tests)
+        offsets = range(0, N, N//count)[:count] + [N]
+
+        pipes = [multiprocessing.Pipe() for x in range(count)] # these are Python Connection objects
+
+        workers = {}
+        for x in range(count):
+                pipe = pipes[x]
+                i, j = offsets[x], offsets[x+1]
+                process = multiprocessing.Process(target=runWorker, args=(pipe[1], tests[i:j], vector))
+                workers[process] = pipe[0]
+
+        for process in workers:
+                process.start()
+
+        return workers
+
+def runWorker(pipe, tests, vector):
+        for coef in range(len(vector)):
+                engine.setCoefficient(coef, vector[coef])
+        passive = {}
+        positions = [item[0] for item in tests]
+        bestScores = None
+        message = pipe.recv()
+        while message != None:
+                if message[0] == 'update':
+                        bestScores = lastScores
+                elif message[0] == 'next':
+                        passive = dict(zip(positions, bestScores))
+                elif message[0] == 'setCoefficient':
+                        (command, coef, value) = message
+                        engine.setCoefficient(coef, value)
+                elif message[0] == 'evaluateVector':
+                        (command, useCache) = message
+                        sumSquaredErrors, lastScores, active = evaluateVector(tests, passive, useCache)
+                        pipe.send((sumSquaredErrors, len(tests), active))
+                message = pipe.recv()
+
+def stopWorkers(workers):
+        for process, pipe in workers.items():
+                pipe.send(None)
+                process.join()
+                del workers[process]
+
+def xSetCoefficient(coef, value):
+        for process, pipe in workers.items():
+                pipe.send(('setCoefficient', coef, value))
+
+def xUpdate():
+        for process, pipe in workers.items():
+                pipe.send(('update',))
+
+def xNext():
+        for process, pipe in workers.items():
+                pipe.send(('next',))
+
+def xEvaluateVector(tests, useCache):
+        for process, pipe in workers.items():
+                pipe.send(('evaluateVector', useCache))
+        sumSquaredErrors, nrTests, nrActive = 0.0, 0, 0
+        for process, pipe in workers.items():
+                (subSumSquaredErrors, subNrTests, subNrActive) = pipe.recv()
+                sumSquaredErrors += subSumSquaredErrors
+                nrTests          += subNrTests
+                nrActive         += subNrActive
+        assert(nrTests == len(tests))
+        return sumSquaredErrors, nrTests, nrActive
+
+#-----------------------------------------------------------------------
 #       main
 #-----------------------------------------------------------------------
 
@@ -218,7 +306,7 @@ if __name__ == '__main__':
                 print '    vector         - JSON file to tune (input/output)'
                 print '    parameter ...  - names of parameter(s) to tune (empty means all)'
                 print 'Options:'
-                print '    -n <cpu>       - (not implemented)'
+                print '    -n <cpu>       - number of parallel processes to use (default 4)'
                 print '    -d <depth>     - search depth per position (default 0)'
                 print '    -s <steps>     - probe steps before window shrink (default 2)'
                 print '    -m <count>     - active positions before short-cut evaluation (default +Inf)'
@@ -245,7 +333,7 @@ if __name__ == '__main__':
                         continue
 
                 if sys.argv[argi] == '-m':
-                        maxActive = int(sys.argv[argi+1])
+                        minActive = int(sys.argv[argi+1])
                         argi += 2
                         continue
 
@@ -265,8 +353,6 @@ if __name__ == '__main__':
                         values = dict(zip(names, vector))
                         values.update(json.load(fp))
                         vector = [values[name] for name in names]
-                        for coef in range(len(vector)):
-                                engine.setCoefficient(coef, vector[coef])
         except IOError as err:
                 print err
                 print 'continue'
@@ -278,16 +364,20 @@ if __name__ == '__main__':
         # -- Step 2: Read positions from stdin
 
         tests = readTestsFromEpd(sys.stdin)
+        workers = startWorkers(cpu, tests, vector)
 
         # -- Step 3: Prepare. Calculate initial scores and residual
 
-        bestResidual, bestScores = evaluateVector(tests, {}, False)
+        sumSquaredErrors, nrTests, nrActive = xEvaluateVector(tests, False)
+        bestResidual = math.sqrt(sumSquaredErrors / nrTests)
 
         print 'vector filename %s residual %.9f positions %d depth %d' % (repr(filename), bestResidual, len(tests), depth)
         print
 
         if quit:
+                stopWorkers(workers)
                 sys.exit(0)
+        xUpdate()
 
         # -- Step 4: Tune all, half the set and repeat tuning until no more halving
 
@@ -303,7 +393,7 @@ if __name__ == '__main__':
                 exhausted = True
                 for coef in coefList:
                         oldValue = vector[coef]
-                        newValue, newResidual, newScores, active = tuneSingle(coef, tests, oldValue, bestResidual, bestScores)
+                        newValue, newResidual, active = tuneSingle(coef, tests, oldValue, bestResidual)
 
                         deltaResidual = newResidual - bestResidual
                         deltas[coef] = deltaResidual
@@ -314,7 +404,7 @@ if __name__ == '__main__':
                                 vector[coef] = newValue
                                 writeVector(vector, filename)
                                 exitValue = 0
-                                bestResidual, bestScores = newResidual, newScores
+                                bestResidual = newResidual
                                 exhausted = False
                         print
 
@@ -327,6 +417,8 @@ if __name__ == '__main__':
 
         print 'vector filename %s residual %.9f positions %d depth %d' % (repr(filename), bestResidual, len(tests), depth)
         print
+
+        stopWorkers(workers)
 
         sys.exit(exitValue)
 

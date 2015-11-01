@@ -3,7 +3,7 @@ Floyd study engine
 
 `floyd' is a chess engine study by Marcel van Kervinck.
 
-FLoyd is not a stand-alone chess program. It can be loaded as an engine
+Floyd is not a stand-alone chess program. It can be loaded as an engine
 in chess GUIs such as Winboard, Arena, XBoard, Shredder and others.
 
 In addition to the UCI interface, a Python interface is
@@ -41,8 +41,8 @@ Command interface
 $ make
 $ ./floyd 
 
-Floyd Chess Program - Version 0.1a
-Copyright (C)1998-2015 by Marcel van Kervinck
+Floyd Chess Engine - Version 0.6
+Copyright (C) 2015, Marcel van Kervinck
 All rights reserved
 
 Type "help" for more information, or "quit" to leave.
@@ -94,7 +94,7 @@ Extra commands:
   eval
         Show evaluation.
   bench [ movetime <millis> ]
-        Speed test of 40 standard positions. Default is `movetime 1000'.
+        Speed test using 40 standard positions. Default `movetime' is 1000.
   moves [ depth <ply> ] // TODO: not implemented
         Move generation test. Default `depth' is 1.
 
@@ -112,7 +112,7 @@ Hierarchy for source modules is as follows:
   |     +--- uci.c                      UCI driver
   |     `--- bench.c                    Built-in speed benchmark
   +--- Engine.h
-  |     +--- search.c                   PVS, scout, quiescence search, "SEE"
+  |     +--- search.c                   PVS, scout, quiescence search, SEE
   |     +--- ttable.c                   Transposition table
   |     `--- evaluate.c                 Position evaluation
   |           +--- vector.h             Evaluation features and weights

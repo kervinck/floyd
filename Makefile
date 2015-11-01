@@ -125,7 +125,7 @@ Tuning/tables.png: Tools/plotTables.py Tuning/vector.json
 	python Tools/plotTables.py Tuning/vector.json
 
 # Update source code with the tuned coefficients
-update: clean Tuning/tables.png
+update: clean
 	python Tools/updateDefaults.py Tuning/vector.json < Source/vector.h > vector.h.tmp
 	[ -s vector.h.tmp ] && mv vector.h.tmp Source/vector.h
 

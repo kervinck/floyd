@@ -7,9 +7,11 @@
 
 |Todo| Rooks and queens on open files [evaluate]
 
-|Todo| Left-right location parameters [evaluate]
-
 |Todo| Don't allow 0 as heuristic evalation [evaluate]
+
+------------------------------------------------------------------------
+
+|Todo| Left-right location parameters [evaluate]
 
 |Todo| Check Rebel evaluation features [evaluate]
 
@@ -23,6 +25,14 @@ Go through eval_comp forwards and backwards again and
 take many things.
 
 |Todo| LittleChessEvaluationCompendium.pdf [evaluate]
+
+|Todo| Experiment: tune each bishop square [evaluate]
+
+|Todo| Expand board control. Include mobility [evaluate]
+
+|Todo| Add white/black testing [qa,evaluate]
+
+|Todo| Add left/right testing [qa,evaluate]
 
 |Todo| Introduce move flags for 32 bit
 
@@ -89,14 +99,6 @@ http://nvie.com/posts/a-successful-git-branching-model/
 
 |Todo| Multicore support for tuning [speed]
 
-|Todo| Experiment: tune each bishop square [evaluate]
-
-|Todo| Expand board control. Include mobility [evaluate]
-
-|Todo| Add white/black testing [qa,evaluate]
-
-|Todo| Add left/right testing [qa,evaluate]
-
 |Todo| Terminology: coefficient or parameter [qa]
 
 |Todo| Measure repeatibility of tuner [verification,tune]
@@ -138,8 +140,6 @@ https://en.wikipedia.org/wiki/Rosenbrock_function
 
 - also update chessmoves module for this
 
-|Todo| In debugging mode give moves also in SAN for readability
-
 |Todo| Accept a lambda as value to `info' in search() [python]
 
 As a callback interface with the search info data
@@ -153,9 +153,13 @@ Then also cache evaluation in ttable
 floyd [ <uciCommand> <uciOption> ... ]
 
 eg.
-floyd go depth 8
+floyd 'debug on'
+floyd 'go depth 8'
 floyd help
 floyd bench
+
+Main obstacle is that the token scanner assumes there is always a
+whitespace or newline after each word.
 
 |Todo| Consider persistent alarm thread [speed]
 
@@ -183,8 +187,6 @@ License: UNKNOWN
 Description: UNKNOWN
 Platform: UNKNOWN
 
-|Todo| Remove SAN functions
-
 |Todo| Some remaining failures in the mate5 test set:
 
 8/3N4/6p1/1p5p/5b1p/P2k2n1/1B6/3KQ3 w - - acn 138553; acs 0; bm Ba1; ce 32758; dm 5; pv Ba1 h3 Nf6 b4 Qe6 Bd2 Qd6+ Ke3 Qxg3#;
@@ -200,17 +202,22 @@ See timing.log and timing3.log
 
 |Todo| Move logit() from evaluate to rootSearch [speed]
 
+|Todo| Null move for zugzwang
+
 ------------------------------------------------------------------------
 
-Avoid system-in-system effect:
+|Anti patterns|
+
+Avoid system-in-system effect
 Things that definitely don't belong in a chess engine:
 - PGN reading and writing
 - Logging facilities
 - SAN reading and writing
 - libreadline
 - Configuration files
-- Over-pedantic checks: input validation for other conditions than those
+- Over-pedantic checks: input validation for conditions other than those
   that can crash the implementation later on
 - Recovery from system failures. Instead log failure and abort
 - Checking for system/library compliancy to their specification
+- ANSI colors
 

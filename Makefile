@@ -145,8 +145,7 @@ clean:
 
 # Show all open to-do items
 todo: # xtodo
-	@find . -not -path './.git/*' -type f -size -1M -print0 |\
-	xargs -0 grep -I -i todo | grep -v xtodo
+	@git ls-files | grep -v '/fingerprint$$' | xargs grep -I -i todo | grep -v xtodo
 
 # Make fingerprint for regression testing
 fingerprint: clean

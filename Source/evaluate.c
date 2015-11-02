@@ -607,10 +607,8 @@ static int evaluatePawn(const int v[vectorLen],
 
         /*
          *  Doubled pawn
-         *
          *  After this don't evaluate the back pawn in more detail
          */
-
         if (backPawn < frontPawn)
                 pawnScore += v[doubledPawnA + fileIndex];
 

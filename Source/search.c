@@ -148,6 +148,9 @@ static inline int drawScore(Engine_t self)
 
 // TODO: single-reply extensions
 // TODO: killers
+// TODO: recapture extension
+// TODO: end game extension
+// TODO: singular extension
 static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
 {
         self->nodeCount++;

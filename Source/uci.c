@@ -108,8 +108,8 @@ X"        Show this list of commands."
 X"  eval"
 X"        Show evaluation."
 X"  bench [ movetime <millis> ]"
-X"        Speed test of 40 standard positions. Default is `movetime 1000'."
-X"  moves [ depth <ply> ] // TODO: not implemented"
+X"        Speed test of 40 standard positions. Default `movetime' is 1000."
+X"  moves [ depth <ply> ]"
 X"        Move generation test. Default `depth' is 1."
 X
 X"Unknown commands and options are silently ignored, except in debug mode."
@@ -126,8 +126,6 @@ static void uciBestMove(Engine_t self);
 
 static void updateOptions(Engine_t self,
         struct options *options, const struct options *newOptions);
-
-static searchInfo_fn benchInfoFunction;
 
 /*----------------------------------------------------------------------+
  |      _scanToken                                                      |
@@ -328,8 +326,13 @@ void uciMain(Engine_t self)
                         long movetime = 1000;
                         scanValue("movetime %ld", &movetime);
                         ignoreOtherTokens();
-                        double nps = uciBenchmark(self, movetime * ms, benchInfoFunction, self);
+                        double nps = uciBenchmark(self, movetime * ms);
                         printf("result nps %.f\n", nps);
+                } else if (scan("moves")) {
+                        int depth = 1;
+                        scanValue("depth %d", &depth);
+                        long long total = (depth > 0) ? uciMoves(board(self), depth) : 1;
+                        printf("result total %lld\n", total);
                 }
                 else ignoreOneToken("Command");
         }
@@ -428,23 +431,6 @@ static void uciBestMove(Engine_t self)
                 printf(" ponder %s", moveString);
         }
         putchar('\n');
-}
-
-/*----------------------------------------------------------------------+
- |      benchInfoFunction                                               |
- +----------------------------------------------------------------------*/
-
-static bool benchInfoFunction(void *infoData, const char *string, ...)
-{
-        (void)infoData;
-        (void)string;
-        Engine_t engine = infoData;
-        char fen[maxFenSize];
-        boardToFen(&engine->board, fen);
-        double s = engine->seconds;
-        double nps = (s > 0.0) ? engine->nodeCount / s : 0.0;
-        printf("info time %.f nps %.f fen %s\n", s / ms, nps, fen);
-        return false;
 }
 
 /*----------------------------------------------------------------------+

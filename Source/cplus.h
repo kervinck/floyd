@@ -150,6 +150,7 @@ err_t listEnsureMaxLen(voidList *list, int itemSize, int minLen, int minSize);
 
 double xTime(void);
 char *stringCopy(char *s, const char *t);
+int compareInt(const void *ap, const void *bp);
 int readLine(void *fp, charList *lineBuffer);
 
 /*----------------------------------------------------------------------+

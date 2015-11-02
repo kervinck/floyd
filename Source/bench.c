@@ -1,17 +1,41 @@
 
+/*----------------------------------------------------------------------+
+ |                                                                      |
+ |      bench.c                                                         |
+ |                                                                      |
+ +----------------------------------------------------------------------*/
+
+/*
+ *  Copyright (C) 2015, Marcel van Kervinck
+ *  All rights reserved
+ *
+ *  Please read the enclosed file `LICENSE' or retrieve this document
+ *  from https://marcelk.net/floyd/LICENSE for terms and conditions.
+ */
+
+/*----------------------------------------------------------------------+
+ |      Includes                                                        |
+ +----------------------------------------------------------------------*/
+
+// C standard
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
+// C extension
 #include "cplus.h"
 
+// Own interface
 #include "Board.h"
 #include "Engine.h"
-
 #include "uci.h"
 
-// Data
+/*----------------------------------------------------------------------+
+ |      Data                                                            |
+ +----------------------------------------------------------------------*/
+
 static const char *positions[] = {
         "r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -",
         "4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -",
@@ -55,9 +79,15 @@ static const char *positions[] = {
         "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -",
 };
 
-// Functions
+/*----------------------------------------------------------------------+
+ |      Functions                                                       |
+ +----------------------------------------------------------------------*/
 
-double uciBenchmark(Engine_t self, double time, searchInfo_fn *infoFunction, void *infoData)
+/*----------------------------------------------------------------------+
+ |      uciBenchmark                                                    |
+ +----------------------------------------------------------------------*/
+
+double uciBenchmark(Engine_t self, double time)
 {
         char oldPosition[maxFenSize]; // TODO: clone engine and then share tt instead
         boardToFen(board(self), oldPosition);
@@ -73,12 +103,42 @@ double uciBenchmark(Engine_t self, double time, searchInfo_fn *infoFunction, voi
                 self->infoFunction = noInfoFunction;
                 rootSearch(self);
                 totalNodes += self->nodeCount;
-                totalSeconds += self->seconds;
-                infoFunction(infoData, null);
+                double s = self->seconds;
+                totalSeconds += s;
+                double nps = (s > 0.0) ? self->nodeCount / s : 0.0;
+                printf("info time %.f nps %.f fen %s\n", s * 1e3, nps, positions[i]);
         }
 
         setupBoard(board(self), oldPosition);
 
         return (double) totalNodes / totalSeconds;
 }
+
+/*----------------------------------------------------------------------+
+ |      uciMoves                                                        |
+ +----------------------------------------------------------------------*/
+
+long long uciMoves(Board_t self, int depth)
+{
+        int moveList[maxMoves];
+        int nrMoves = generateMoves(self, moveList);
+        qsort(moveList, nrMoves, sizeof(moveList[0]), compareInt);
+        long long total = 0;
+        for (int i=0; i<nrMoves; i++) {
+                char moveString[maxMoveSize];
+                moveToUci(self, moveString, moveList[i]);
+                makeMove(self, moveList[i]);
+                if (wasLegalMove(self)) {
+                        long long count = moveTest(self, depth - 1);
+                        printf("info move %s count %lld\n", moveString, count);
+                        total += count;
+                }
+                undoMove(self);
+        }
+        return total;
+}
+
+/*----------------------------------------------------------------------+
+ |                                                                      |
+ +----------------------------------------------------------------------*/
 

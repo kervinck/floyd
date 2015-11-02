@@ -805,6 +805,26 @@ void normalizeEnPassantStatus(Board_t self)
 }
 
 /*----------------------------------------------------------------------+
+ |      moveTest                                                        |
+ +----------------------------------------------------------------------*/
+
+long long moveTest(Board_t self, int depth)
+{
+        if (depth <= 0)
+                return 1;
+        long long total = 0;
+        int moveList[maxMoves];
+        int nrMoves = generateMoves(self, moveList);
+        for (int i=0; i<nrMoves; i++) {
+                makeMove(self, moveList[i]);
+                if (wasLegalMove(self))
+                        total += moveTest(self, depth - 1);
+                undoMove(self);
+        }
+        return total;
+}
+
+/*----------------------------------------------------------------------+
  |                                                                      |
  +----------------------------------------------------------------------*/
 

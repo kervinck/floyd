@@ -223,6 +223,9 @@ extern bool isLegalMove(Board_t self, int move);
 // Is the move a pawn promotion?
 extern bool isPromotion(Board_t self, int from, int to);
 
+// Search tree to fixed depth for correctness testing
+extern long long moveTest(Board_t self, int depth);
+
 /*----------------------------------------------------------------------+
  |                                                                      |
  +----------------------------------------------------------------------*/

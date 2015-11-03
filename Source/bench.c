@@ -87,7 +87,7 @@ static const char *positions[] = {
  |      uciBenchmark                                                    |
  +----------------------------------------------------------------------*/
 
-double uciBenchmark(Engine_t self, double time)
+void uciBenchmark(Engine_t self, double time)
 {
         char oldPosition[maxFenSize]; // TODO: clone engine and then share tt instead
         boardToFen(board(self), oldPosition);
@@ -108,22 +108,22 @@ double uciBenchmark(Engine_t self, double time)
                 double nps = (s > 0.0) ? self->nodeCount / s : 0.0;
                 printf("info time %.f nps %.f fen %s\n", s * 1e3, nps, positions[i]);
         }
+        printf("result nps %.0f\n", (double) totalNodes / totalSeconds);
 
         setupBoard(board(self), oldPosition);
-
-        return (double) totalNodes / totalSeconds;
 }
 
 /*----------------------------------------------------------------------+
  |      uciMoves                                                        |
  +----------------------------------------------------------------------*/
 
-long long uciMoves(Board_t self, int depth)
+void uciMoves(Board_t self, int depth)
 {
         int moveList[maxMoves];
         int nrMoves = generateMoves(self, moveList);
         qsort(moveList, nrMoves, sizeof(moveList[0]), compareInt);
         long long total = 0;
+        double startTime = xTime();
         for (int i=0; i<nrMoves; i++) {
                 char moveString[maxMoveSize];
                 moveToUci(self, moveString, moveList[i]);
@@ -135,7 +135,8 @@ long long uciMoves(Board_t self, int depth)
                 }
                 undoMove(self);
         }
-        return total;
+        double seconds = xTime() - startTime;
+        printf("result total %lld frequency %.0f\n", total, total / seconds);
 }
 
 /*----------------------------------------------------------------------+

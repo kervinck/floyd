@@ -326,13 +326,12 @@ void uciMain(Engine_t self)
                         long movetime = 1000;
                         scanValue("movetime %ld", &movetime);
                         ignoreOtherTokens();
-                        double nps = uciBenchmark(self, movetime * ms);
-                        printf("result nps %.f\n", nps);
+                        uciBenchmark(self, movetime * ms);
                 } else if (scan("moves")) {
                         int depth = 1;
                         scanValue("depth %d", &depth);
-                        long long total = (depth > 0) ? uciMoves(board(self), depth) : 1;
-                        printf("result total %lld\n", total);
+                        ignoreOtherTokens();
+                        uciMoves(board(self), depth);
                 }
                 else ignoreOneToken("Command");
         }
@@ -388,7 +387,7 @@ bool uciSearchInfo(void *uciInfoData, const char *string, ...)
         }
 
         double nps = (self->seconds > 0.0) ? self->nodeCount / self->seconds : 0.0;
-        printf(" nodes %lld nps %.f", self->nodeCount, nps);
+        printf(" nodes %lld nps %.0f", self->nodeCount, nps);
 
         double ttLoad = ttCalcLoad(self);
         printf(" hashfull %d", (int) round(ttLoad * 1000.0));

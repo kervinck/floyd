@@ -207,11 +207,7 @@ int evaluate(Board_t self)
 
                 // `fileIndex' and `rankIndex' are relative to the own king
                 int fileIndex, rankIndex;
-
-                // TODO: we should be able to write 'self->side[side].king' here
-                int king = (side == white)
-                        ? self->whiteSide.king
-                        : self->blackSide.king;
+                int king = self->sides[side].king;
 
                 if (isKingFlankFile(file(king)))
                         fileIndex = file ^ fileA;
@@ -247,10 +243,10 @@ int evaluate(Board_t self)
                         e.knights[side] += evaluateKnight(v, fileIndex, rankIndex);
                         break;
                 case whitePawn: case blackPawn: {
-                        int fileIndex = file ^ fileA; // TODO: BUG hides fileIndex
+                        int absFileIndex = file ^ fileA;
                         #define setMax(a, b) if ((a) < (b)) (a) = (b);
-                        setMax(e.maxPawnFromRank1[1+fileIndex][side], rank ^ rank1);
-                        setMax(e.maxPawnFromRank8[1+fileIndex][side], rank ^ rank8);
+                        setMax(e.maxPawnFromRank1[1+ absFileIndex][side], rank ^ rank1);
+                        setMax(e.maxPawnFromRank8[1+ absFileIndex][side], rank ^ rank8);
                         setMax(e.maxPawnFromFileA[side], file ^ fileA);
                         setMax(e.maxPawnFromFileH[side], file ^ fileH);
                         break;
@@ -339,8 +335,8 @@ int evaluate(Board_t self)
                 || (sq)==f3 || (sq)==f4 || (sq)==f5 || (sq)==f6)
 
         for (int square=0; square<boardSize; square++) {
-                int wAttack = self->whiteSide.attacks[square];
-                int bAttack = self->blackSide.attacks[square];
+                int wAttack = self->sides[white].attacks[square];
+                int bAttack = self->sides[black].attacks[square];
 
                 int controlValue;
                 if (isCenter(square))
@@ -361,7 +357,7 @@ int evaluate(Board_t self)
          |      Pawns                                                   |
          +--------------------------------------------------------------*/
 
-        for (int fileIndex=0; fileIndex<8; fileIndex++) {
+        for (int absFileIndex=0; absFileIndex<8; absFileIndex++) {
 
                 // TODO: flip file based on king location
                 // TODO: recognize opposite castled kings
@@ -369,18 +365,18 @@ int evaluate(Board_t self)
                 e.pawns[white] += evaluatePawn(v,
                         // C won't allow an implicit const cast of the 2D array here,
                         // see also http://stackoverflow.com/questions/28062095/
-                        (const int(*)[2]) &e.maxPawnFromRank1[1+fileIndex],
-                        (const int(*)[2]) &e.maxPawnFromRank8[1+fileIndex],
-                        fileIndex, white,
-                        self->whiteSide.king,
-                        self->blackSide.king);
+                        (const int(*)[2]) &e.maxPawnFromRank1[1+absFileIndex],
+                        (const int(*)[2]) &e.maxPawnFromRank8[1+absFileIndex],
+                        absFileIndex, white,
+                        self->sides[white].king,
+                        self->sides[black].king);
 
                 e.pawns[black] += evaluatePawn(v,
-                        (const int(*)[2]) &e.maxPawnFromRank8[1+fileIndex],
-                        (const int(*)[2]) &e.maxPawnFromRank1[1+fileIndex],
-                        fileIndex, black,
-                        square(0, 7) ^ self->blackSide.king,
-                        square(0, 7) ^ self->whiteSide.king);
+                        (const int(*)[2]) &e.maxPawnFromRank8[1+absFileIndex],
+                        (const int(*)[2]) &e.maxPawnFromRank1[1+absFileIndex],
+                        absFileIndex, black,
+                        square(0, 7) ^ self->sides[black].king,
+                        square(0, 7) ^ self->sides[white].king);
         }
 
         /*--------------------------------------------------------------+
@@ -510,14 +506,14 @@ int evaluate(Board_t self)
 
                         if (nrPawns(white) == 1) {
                                 egtSide = side;
-                                wKing = self->whiteSide.king;
+                                wKing = self->sides[white].king;
                                 wPawn = squareOf(self, whitePawn);
-                                bKing = self->blackSide.king;
+                                bKing = self->sides[black].king;
                         } else {
                                 egtSide = xside;
-                                wKing = square(0, 7) ^ self->blackSide.king;
+                                wKing = square(0, 7) ^ self->sides[black].king;
                                 wPawn = square(0, 7) ^ squareOf(self, blackPawn);
-                                bKing = square(0, 7) ^ self->whiteSide.king;
+                                bKing = square(0, 7) ^ self->sides[white].king;
                         }
 
                         int egtScore = kpkProbe(egtSide, wKing, wPawn, bKing);

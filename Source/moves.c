@@ -307,7 +307,7 @@ extern int generateMoves(Board_t self, int moveList[maxMoves])
                                 to += stepN;
                                 if (self->squares[to] == empty) {
                                         pushMove(self, from, to);
-                                        if (self->blackSide.attacks[to+stepS])
+                                        if (self->sides[black].attacks[to+stepS])
                                                 self->movePtr[-1] |= specialMoveFlag;
                                 }
                         }
@@ -335,7 +335,7 @@ extern int generateMoves(Board_t self, int moveList[maxMoves])
                                 to += stepS;
                                 if (self->squares[to] == empty) {
                                         pushMove(self, from, to);
-                                        if (self->whiteSide.attacks[to+stepN])
+                                        if (self->sides[white].attacks[to+stepN])
                                                 self->movePtr[-1] |= specialMoveFlag;
                                 }
                         }
@@ -600,11 +600,11 @@ extern void updateSideInfo(Board_t self)
         if (self->sideInfoPlyNumber == self->plyNumber)
                 return;
 
-        memset(&self->whiteSide, 0, sizeof self->whiteSide);
-        memset(&self->blackSide, 0, sizeof self->blackSide);
+        memset(&self->sides[white], 0, sizeof self->sides[white]);
+        memset(&self->sides[black], 0, sizeof self->sides[black]);
 
-        self->side  = (sideToMove(self) == white) ? &self->whiteSide : &self->blackSide;
-        self->xside = (sideToMove(self) == white) ? &self->blackSide : &self->whiteSide;
+        self->side  = (sideToMove(self) == white) ? &self->sides[white] : &self->sides[black];
+        self->xside = (sideToMove(self) == white) ? &self->sides[black] : &self->sides[white];
 
         for (int from=0; from<boardSize; from++) {
                 int piece = self->squares[from];
@@ -620,9 +620,9 @@ extern void updateSideInfo(Board_t self)
                                 dir -= dirs; // pick next
                                 dir &= dirs;
                                 int to = from + kingStep[dir];
-                                self->whiteSide.attacks[to] += attackKing;
+                                self->sides[white].attacks[to] += attackKing;
                         } while (dirs -= dir); // remove and go to next
-                        self->whiteSide.king = from;
+                        self->sides[white].king = from;
                         break;
 
                 case blackKing:
@@ -632,33 +632,33 @@ extern void updateSideInfo(Board_t self)
                                 dir -= dirs; // pick next
                                 dir &= dirs;
                                 int to = from + kingStep[dir];
-                                self->blackSide.attacks[to] += attackKing;
+                                self->sides[black].attacks[to] += attackKing;
                         } while (dirs -= dir); // remove and go to next
-                        self->blackSide.king = from;
+                        self->sides[black].king = from;
                         break;
 
                 case whiteQueen:
-                        updateSliderAttacks(self, from, dirsQueen, &self->whiteSide, attackQueen);
+                        updateSliderAttacks(self, from, dirsQueen, &self->sides[white], attackQueen);
                         break;
 
                 case blackQueen:
-                        updateSliderAttacks(self, from, dirsQueen, &self->blackSide, attackQueen);
+                        updateSliderAttacks(self, from, dirsQueen, &self->sides[black], attackQueen);
                         break;
 
                 case whiteRook:
-                        updateSliderAttacks(self, from, dirsRook, &self->whiteSide, attackRook);
+                        updateSliderAttacks(self, from, dirsRook, &self->sides[white], attackRook);
                         break;
 
                 case blackRook:
-                        updateSliderAttacks(self, from, dirsRook, &self->blackSide, attackRook);
+                        updateSliderAttacks(self, from, dirsRook, &self->sides[black], attackRook);
                         break;
 
                 case whiteBishop:
-                        updateSliderAttacks(self, from, dirsBishop, &self->whiteSide, attackMinor);
+                        updateSliderAttacks(self, from, dirsBishop, &self->sides[white], attackMinor);
                         break;
 
                 case blackBishop:
-                        updateSliderAttacks(self, from, dirsBishop, &self->blackSide, attackMinor);
+                        updateSliderAttacks(self, from, dirsBishop, &self->sides[black], attackMinor);
                         break;
 
                 case whiteKnight:
@@ -668,7 +668,7 @@ extern void updateSideInfo(Board_t self)
                                 dir -= dirs; // pick next
                                 dir &= dirs;
                                 int to = from + knightJump[dir];
-                                self->whiteSide.attacks[to] += attackMinor;
+                                self->sides[white].attacks[to] += attackMinor;
                         } while (dirs -= dir); // remove and go to next
                         break;
 
@@ -679,22 +679,22 @@ extern void updateSideInfo(Board_t self)
                                 dir -= dirs; // pick next
                                 dir &= dirs;
                                 int to = from + knightJump[dir];
-                                self->blackSide.attacks[to] += attackMinor;
+                                self->sides[black].attacks[to] += attackMinor;
                         } while (dirs -= dir); // remove and go to next
                         break;
 
                 case whitePawn:
                         if (file(from) != fileH)
-                                self->whiteSide.attacks[from+stepNE] += attackPawn;
+                                self->sides[white].attacks[from+stepNE] += attackPawn;
                         if (file(from) != fileA)
-                                self->whiteSide.attacks[from+stepNW] += attackPawn;
+                                self->sides[white].attacks[from+stepNW] += attackPawn;
                         break;
 
                 case blackPawn:
                         if (file(from) != fileH)
-                                self->blackSide.attacks[from+stepSE] = attackPawn;
+                                self->sides[black].attacks[from+stepSE] = attackPawn;
                         if (file(from) != fileA)
-                                self->blackSide.attacks[from+stepSW] = attackPawn;
+                                self->sides[black].attacks[from+stepSW] = attackPawn;
                         break;
                 }
         }

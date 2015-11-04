@@ -65,8 +65,7 @@ struct Board {
          *  Side data
          */
         struct side *side, *xside;
-        struct side whiteSide;
-        struct side blackSide;
+        struct side sides[2];
         int sideInfoPlyNumber; // for auto-update
 
         /*

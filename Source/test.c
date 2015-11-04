@@ -1,7 +1,7 @@
 
 /*----------------------------------------------------------------------+
  |                                                                      |
- |      bench.c                                                         |
+ |      test.c                                                          |
  |                                                                      |
  +----------------------------------------------------------------------*/
 
@@ -31,6 +31,9 @@
 #include "Board.h"
 #include "Engine.h"
 #include "uci.h"
+
+// Other modules
+#include "kpk.h"
 
 /*----------------------------------------------------------------------+
  |      Data                                                            |
@@ -92,6 +95,9 @@ void uciBenchmark(Engine_t self, double time)
         char oldPosition[maxFenSize]; // TODO: clone engine and then share tt instead
         boardToFen(board(self), oldPosition);
 
+        kpkGenerate(); // Initialize before measuring speed
+        printf("egt class KPK check %s\n", kpkSelfCheck() ? "OK" : "FAILED");
+
         long long totalNodes = 0;
         double totalSeconds = 0.0;
 
@@ -106,8 +112,9 @@ void uciBenchmark(Engine_t self, double time)
                 double s = self->seconds;
                 totalSeconds += s;
                 double nps = (s > 0.0) ? self->nodeCount / s : 0.0;
-                printf("info time %.f nps %.f fen %s\n", s * 1e3, nps, positions[i]);
+                printf("time %.f nps %.f fen %s\n", s * 1e3, nps, positions[i]);
         }
+
         printf("result nps %.0f\n", (double) totalNodes / totalSeconds);
 
         setupBoard(board(self), oldPosition);
@@ -122,21 +129,19 @@ void uciMoves(Board_t self, int depth)
         int moveList[maxMoves];
         int nrMoves = generateMoves(self, moveList);
         qsort(moveList, nrMoves, sizeof(moveList[0]), compareInt);
-        long long total = 0;
-        double startTime = xTime();
+        long long totalCount = 0;
         for (int i=0; i<nrMoves; i++) {
                 char moveString[maxMoveSize];
                 moveToUci(self, moveString, moveList[i]);
                 makeMove(self, moveList[i]);
                 if (wasLegalMove(self)) {
                         long long count = moveTest(self, depth - 1);
-                        printf("info move %s count %lld\n", moveString, count);
-                        total += count;
+                        printf("move %s count %lld\n", moveString, count);
+                        totalCount += count;
                 }
                 undoMove(self);
         }
-        double seconds = xTime() - startTime;
-        printf("result total %lld frequency %.0f\n", total, total / seconds);
+        printf("result count %lld\n", totalCount);
 }
 
 /*----------------------------------------------------------------------+

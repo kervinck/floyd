@@ -34,9 +34,6 @@
  #define min(a, b) ((a) <= (b) ? (a) : (b))
 #endif
 
-#define setMax(a, b) Statement( if ((a) < (b)) (a) = (b); )
-#define setMin(a, b) Statement( if ((a) > (b)) (a) = (b); )
-
 #define null      ((void*) 0)
 #define constNull ((const void*) 0)
 

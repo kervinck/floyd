@@ -26,6 +26,10 @@ take many things.
 
 |Todo| LittleChessEvaluationCompendium.pdf [evaluate]
 
+|Todo| Chess programming wiki [evaluate]
+
+https://chessprogramming.wikispaces.com/Evaluation
+
 |Todo| Experiment: tune each bishop square [evaluate]
 
 |Todo| Expand board control. Include mobility [evaluate]

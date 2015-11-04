@@ -4,7 +4,6 @@ import os
 floydModule = Extension(
         'floyd',
         sources = [
-                'Source/bench.c',
                 'Source/cplus.c',
                 'Source/evaluate.c',
                 'Source/floydmodule.c',
@@ -13,6 +12,7 @@ floydModule = Extension(
                 'Source/kpk.c',
                 'Source/parse.c',
                 'Source/search.c',
+                'Source/test.c',
                 'Source/ttable.c',
                 'Source/uci.c',
                 'Source/zobrist.c' ],

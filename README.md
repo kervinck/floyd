@@ -110,7 +110,7 @@ Hierarchy for source modules is as follows:
  floydmodule.c                          Python interface to search and evaluate
   +--- uci.h
   |     +--- uci.c                      UCI driver
-  |     `--- bench.c                    Built-in speed benchmark
+  |     `--- test.c                     Built-in speed benchmark and self test
   +--- Engine.h
   |     +--- search.c                   PVS, scout, quiescence search, SEE
   |     +--- ttable.c                   Transposition table

@@ -151,7 +151,7 @@
         P(duoPawnG, 43), P(duoPawnH, -64),
 
         // Quadratic polynomials for passers
-        P(passerA_0, -95), P(passerB_0, -47), P(passerC_0, -44), P(passerD_0, -122),
+        P(passerA_0, 5), P(passerB_0, -47), P(passerC_0, -44), P(passerD_0, -122),
         P(passerE_0, -38), P(passerF_0, 10), P(passerG_0, -21), P(passerH_0, 37),
 
         P(passerA_1, 83), P(passerB_1, 31), P(passerC_1, -3), P(passerD_1, 15),
@@ -159,6 +159,18 @@
 
         P(passerA_2, 138), P(passerB_2, 190), P(passerC_2, 203), P(passerD_2, 170),
         P(passerE_2, 193), P(passerF_2, 242), P(passerG_2, 184), P(passerH_2, 128),
+
+        P(passerScalingOffset, 0),
+        P(passerAndQueen, 0),
+        P(passerAndRook, 0),
+        P(passerAndBishop, 0),
+        P(passerAndKnight, 0),
+        P(passerAndPawn, 0),
+        P(passerVsQueen, 0),
+        P(passerVsRook, 0),
+        P(passerVsBishop, 0),
+        P(passerVsKnight, 0),
+        P(passerVsPawn, 0),
 
 #if 0
         P(drawBlockedA, 0), P(drawBlockedB, 0), P(drawBlockedC, 0), P(drawBlockedD, 0),

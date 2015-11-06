@@ -84,6 +84,8 @@ struct evaluation {
         int knights[2];  // PST, strong squares, pawn span is bad
         int pawns[2];    // PST, doubled, grouped, mobile
         int others[2];
+
+        double passerScaling[2];
 };
 
 #define nrPawns(side)      (int)(((materialKey) >> (((side) << 2) + 0)) & 15)
@@ -145,7 +147,8 @@ static int evaluatePawn(const int v[vectorLen],
                         const int minRank[][2],
                         const int maxRank[][2],
                         int fileIndex, int side,
-                        int king, int xking);
+                        int king, int xking,
+                        const double passerScaling[2]);
 static int evaluateKnight(const int v[vectorLen], int fileIndex, int rankIndex);
 static int evaluateBishop(const int v[vectorLen], int fileIndex, int rankIndex);
 static int evaluateRook(const int v[vectorLen], int fileIndex, int rankIndex);
@@ -318,6 +321,19 @@ int evaluate(Board_t self)
 
                 if (nrPawns(side) > 0)
                         e.material[side] += v[pawnValue1 + nrPawns(side) - 1];
+
+                int x = v[passerScalingOffset]
+                        + nrQueens(side)   * v[passerAndQueen]
+                        + nrRooks(side)    * v[passerAndRook]
+                        + nrBishops(side)  * v[passerAndBishop]
+                        + nrKnights(side)  * v[passerAndKnight]
+                        + nrPawns(side)    * v[passerAndPawn]
+                        + nrQueens(xside)  * v[passerVsQueen]
+                        + nrRooks(xside)   * v[passerVsRook]
+                        + nrBishops(xside) * v[passerVsBishop]
+                        + nrKnights(xside) * v[passerVsKnight]
+                        + nrPawns(xside)   * v[passerVsPawn];
+                e.passerScaling[side] = sigmoid(x * 1e-3);
         }
 
         /*--------------------------------------------------------------+
@@ -369,14 +385,16 @@ int evaluate(Board_t self)
                         (const int(*)[2]) &e.maxPawnFromRank8[1+absFileIndex],
                         absFileIndex, white,
                         self->sides[white].king,
-                        self->sides[black].king);
+                        self->sides[black].king,
+                        e.passerScaling);
 
                 e.pawns[black] += evaluatePawn(v,
                         (const int(*)[2]) &e.maxPawnFromRank8[1+absFileIndex],
                         (const int(*)[2]) &e.maxPawnFromRank1[1+absFileIndex],
                         absFileIndex, black,
                         square(0, 7) ^ self->sides[black].king,
-                        square(0, 7) ^ self->sides[white].king);
+                        square(0, 7) ^ self->sides[white].king,
+                        e.passerScaling);
         }
 
         /*--------------------------------------------------------------+
@@ -569,7 +587,8 @@ static int evaluatePawn(const int v[vectorLen],
                         const int maxPawnFromRank1[][2],
                         const int maxPawnFromRank8[][2],
                         int fileIndex, int side,
-                        int king, int xking)
+                        int king, int xking,
+                        const double passerScaling[2])
 {
         unused(king);
         unused(xking);
@@ -656,13 +675,14 @@ static int evaluatePawn(const int v[vectorLen],
         /*
          *  Passer
          */
-
         if (maxRank(-1, xside) <= frontPawn
          && maxRank( 0, xside) <= frontPawn
-         && maxRank(+1, xside) <= frontPawn)
-                pawnScore += v[passerA_0 + fileIndex]
-                           + v[passerA_1 + fileIndex] * (frontPawn - 1)
-                           + v[passerA_2 + fileIndex] * (frontPawn - 1) * (frontPawn - 2) / 4;
+         && maxRank(+1, xside) <= frontPawn) {
+                int nominal = v[passerA_0 + fileIndex]
+                            + v[passerA_1 + fileIndex] * (frontPawn - 1)
+                            + v[passerA_2 + fileIndex] * (frontPawn - 1) * (frontPawn - 2) / 4;
+                pawnScore += round(passerScaling[side] * nominal);
+        }
 
         return pawnScore;
 }

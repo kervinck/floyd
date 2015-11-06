@@ -1,5 +1,21 @@
 
-|Todo| Fine tuning of new pawn features and testing [tuning]
+|Todo| Release notes for 0.7
+
+Draft:
+Strength increase of ~150 elo at fast time controls.
+Adding of basic killers.
+Adding of "moves [ depth <ply> ]" command.
+Adding of UCI "mate" option, mate distance pruning and stop condition.
+Basic cut node reductions.
+Simple lazy move generation for scout.
+Faster evaluation weight tuning.
+General code cleanup, such as the removal of needless SAN output code.
+Slightly improved passer evaluation.
+Introduction of material table.
+
+|Todo| Mate option [uci]
+
+------------------------------------------------------------------------
 
 |Todo| Scale passers with material [evaluate]
 
@@ -8,8 +24,6 @@
 |Todo| Rooks and queens on open files [evaluate]
 
 |Todo| Don't allow 0 as heuristic evalation [evaluate]
-
-------------------------------------------------------------------------
 
 |Todo| Left-right location parameters [evaluate]
 
@@ -207,21 +221,4 @@ See timing.log and timing3.log
 |Todo| Move logit() from evaluate to rootSearch [speed]
 
 |Todo| Null move for zugzwang
-
-------------------------------------------------------------------------
-
-|Anti patterns|
-
-Avoid system-in-system effect
-Things that definitely don't belong in a chess engine:
-- PGN reading and writing
-- Logging facilities
-- SAN reading and writing
-- libreadline
-- Configuration files
-- Over-pedantic checks: input validation for conditions other than those
-  that can crash the implementation later on
-- Recovery from system failures. Instead log failure and abort
-- Checking for system/library compliancy to their specification
-- ANSI colors
 

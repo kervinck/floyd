@@ -103,9 +103,11 @@ void uciBenchmark(Engine_t self, double time)
 
         for (int i=0; i<arrayLen(positions); i++) {
                 setupBoard(board(self), positions[i]);
-                self->targetTime = 0.0;
-                self->abortTime = time;
-                self->targetDepth = maxDepth;
+                self->target.time = 0.0;
+                self->target.abortTime = time;
+                self->target.depth = maxDepth;
+                self->target.nodes = maxLongLong;
+                self->target.window = (intPair) {{ -maxInt, maxInt }};
                 self->infoFunction = noInfoFunction;
                 rootSearch(self);
                 totalNodes += self->nodeCount;

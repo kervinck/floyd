@@ -99,10 +99,13 @@ struct Engine {
                 long long nodeCount;
         };
 
-        double targetTime;
-        double abortTime;
-        int targetDepth;
-        intPair targetWindow;
+        struct {
+                double time;
+                double abortTime;
+                int depth;
+                long long nodes;
+                intPair window;
+        } target;
 
         searchInfo_fn *infoFunction;
         void *infoData;

@@ -75,7 +75,7 @@ static int makeNextMove(Engine_t self, struct Node *node);
 static void abortSearch(void *data)
 {
         Engine_t self = data;
-        self->stopFlag = true;
+        self->target.nodes = 0;
 }
 
 // TODO: aspiration search
@@ -94,27 +94,26 @@ void rootSearch(Engine_t self)
                 self->tt.now = (self->tt.now + 1) & ones(ttDateBits);
         }
 
-        self->stopFlag = false;
         volatile xAlarm_t alarmHandle = null;
-        if (self->abortTime > 0.0)
-                alarmHandle = setAlarm(self->abortTime, abortSearch, self);
+        if (self->target.abortTime > 0.0)
+                alarmHandle = setAlarm(self->target.abortTime, abortSearch, self);
 
         // Prepare abort possibility
         jmp_buf here;
         self->abortTarget = &here;
 
         if (setjmp(here) == 0) { // try search
-                for (int iteration=0; iteration<=self->targetDepth; iteration++) {
+                for (int iteration=0; iteration<=self->target.depth; iteration++) {
                         self->mateStop = true;
                         self->depth = iteration;
                         self->score = pvSearch(self, iteration, -maxInt, maxInt, 0);
                         self->seconds = xTime() - startTime;
                         updateBestAndPonderMove(self);
                         self->infoFunction(self->infoData);
-                        if (self->score <= self->targetWindow.v[0]
-                         || self->score >= self->targetWindow.v[1]
+                        if (self->score <= self->target.window.v[0]
+                         || self->score >= self->target.window.v[1]
                          || (isMateScore(self->score) && self->mateStop && self->depth > 0)
-                         || (self->targetTime > 0.0 && self->seconds >= 0.5 * self->targetTime))
+                         || (self->target.time > 0.0 && self->seconds >= 0.5 * self->target.time))
                                 break;
                 }
         } else { // except abort
@@ -252,8 +251,8 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
 {
         self->nodeCount++;
         if (repetition(self)) return drawScore(self);
-        if (depth == 0)       return qSearch(self, alpha);
-        if (self->stopFlag)   longjmp(self->abortTarget, 1); // raise abort
+        if (depth == 0) return qSearch(self, alpha);
+        if (self->nodeCount >= self->target.nodes) longjmp(self->abortTarget, 1); // raise abort
 
         // Mate distance pruning
         int mateBound = maxMate - ply(self) - 2;
@@ -621,13 +620,13 @@ void setTimeTargets(Engine_t self, double time, double inc, int movestogo, doubl
                 }
                 int mintogo = min(movestogo, (board(self)->halfmoveClock / 2 < 35) ? 3 : 1);
 
-                self->targetTime = target(time, inc, movestogo);
+                self->target.time = target(time, inc, movestogo);
                 double panicTime = target(time, inc, mintogo);
                 double flagTime  = target(time, inc, 1);
-                self->abortTime  = min(panicTime, flagTime);
+                self->target.abortTime  = min(panicTime, flagTime);
         }
         if (movetime)
-                self->abortTime = movetime;
+                self->target.abortTime = movetime;
 }
 
 /*----------------------------------------------------------------------+

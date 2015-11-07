@@ -91,7 +91,7 @@ X"          winc <millis>           White's increment after each move"
 X"          binc <millis>           Black's increment after each move"
 X"          movestogo <nrMoves>     Moves to go until next time control"
 X"          depth <ply>             Search no deeper than <ply> halfmoves"
-X"          nodes <nrNodes>         Search no more than <nrNodes> nodes // TODO: not implemented"
+X"          nodes <nrNodes>         Search no more than <nrNodes> nodes"
 X"          mate <nrMoves>          Search for a mate in <nrMoves> moves or less"
 X"          movetime <millis>       Search no longer than this time"
 X"          infinite                Postpone `bestmove' result until `stop'"
@@ -260,22 +260,22 @@ void uciMain(Engine_t self)
                         self->infoFunction = uciSearchInfo;
                         self->infoData = self;
 
+                        self->target.depth = maxDepth;
+                        self->target.nodes = maxLongLong;
+                        self->searchMoves.len = 0; // TODO: not implemented
                         long time = 0, btime = 0;
                         long inc = 0, binc = 0;
                         int movestogo = 0;
-                        self->targetDepth = maxDepth;
-                        long long nodes = maxLongLong;
                         int mate = 0;
                         long movetime = 0;
-                        self->searchMoves.len = 0; // TODO: not implemented
 
                         while (*line != '\0')
                                 if ((scan("ponder") && (args.ponder = true))
                                  || scanValue("wtime %ld", &time) || scanValue("btime %ld", &btime)
                                  || scanValue("winc %ld", &inc)   || scanValue("binc %ld", &binc)
                                  || scanValue("movestogo %d", &movestogo)
-                                 || scanValue("depth %d", &self->targetDepth)
-                                 || scanValue("nodes %lld", &nodes)
+                                 || scanValue("depth %d", &self->target.depth)
+                                 || scanValue("nodes %lld", &self->target.nodes)
                                  || scanValue("mate %d", &mate)
                                  || scanValue("movetime %ld", &movetime)
                                  || (scan("infinite") && (args.infinite = true)))
@@ -294,9 +294,8 @@ void uciMain(Engine_t self)
                         if (sideToMove(board(self)) == black)
                                 time = btime, inc = binc;
                         setTimeTargets(self, time * ms, inc * ms, movestogo, movetime * ms);
-                        printf("info string targetTime %.3f abortTime %.3f\n", self->targetTime, self->abortTime);
-                        self->targetWindow.v[0] = minMate - 2 * min(0, mate);
-                        self->targetWindow.v[1] = maxMate - 2 * max(0, mate);
+                        self->target.window.v[0] = minMate - 2 * min(0, mate);
+                        self->target.window.v[1] = maxMate - 2 * max(0, mate);
                         searchThread = startSearch(&args);
                 }
                 else if (scan("stop")) {

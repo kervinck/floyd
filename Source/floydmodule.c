@@ -185,10 +185,11 @@ floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
                         return PyErr_Format(PyExc_ValueError, "Invalid info type (%s)", info);
         }
 
-        engine.targetDepth = depth;
-        engine.targetWindow = (intPair) {{ -maxInt, maxInt }};;
-        engine.targetTime = 0.0;
-        engine.abortTime = movetime;
+        engine.target.depth = depth;
+        engine.target.nodes = maxLongLong;
+        engine.target.window = (intPair) {{ -maxInt, maxInt }};;
+        engine.target.time = 0.0;
+        engine.target.abortTime = movetime;
         engine.infoFunction = infoFunction;
         engine.infoData = infoData;
         rootSearch(&engine);

@@ -144,14 +144,6 @@ PyDoc_STRVAR(search_doc,
 //      "       'xboard': Write XBoard info lines to stdout\n"
 );
 
-// Suppress search info
-static bool emptyInfoFunction(void *infoData, const char *string, ...)
-{
-        unused(infoData);
-        unused(string);
-        return false;
-}
-
 static PyObject *
 floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
 {
@@ -184,7 +176,7 @@ floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
         if (movetime < 0.0)
                 return PyErr_Format(PyExc_ValueError, "Invalid movetime (%g)", movetime);
 
-        searchInfo_fn *infoFunction = emptyInfoFunction;
+        searchInfo_fn *infoFunction = noInfoFunction;
         void *infoData = &engine;
         if (info != null) {
                 if (!strcmp(info, "uci"))
@@ -194,6 +186,7 @@ floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
         }
 
         engine.targetDepth = depth;
+        engine.targetWindow = (intPair) {{ -maxInt, maxInt }};;
         engine.targetTime = 0.0;
         engine.abortTime = movetime;
         engine.infoFunction = infoFunction;

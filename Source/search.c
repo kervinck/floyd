@@ -110,7 +110,9 @@ void rootSearch(Engine_t self)
                         self->score = pvSearch(self, iteration, -maxInt, maxInt, 0);
                         self->seconds = xTime() - startTime;
                         updateBestAndPonderMove(self);
-                        if (self->infoFunction(self->infoData, null)
+                        self->infoFunction(self->infoData);
+                        if (self->score <= self->targetWindow.v[0]
+                         || self->score >= self->targetWindow.v[1]
                          || (isMateScore(self->score) && self->mateStop && self->depth > 0)
                          || (self->targetTime > 0.0 && self->seconds >= 0.5 * self->targetTime))
                                 break;
@@ -121,7 +123,7 @@ void rootSearch(Engine_t self)
                         undoMove(board(self));
                 int pvCut = updateBestAndPonderMove(self);
                 self->pv.len = min(self->pv.len, pvCut);
-                (void) self->infoFunction(self->infoData, null);
+                self->infoFunction(self->infoData);
         }
 
         clearAlarm(alarmHandle);
@@ -632,11 +634,9 @@ void setTimeTargets(Engine_t self, double time, double inc, int movestogo, doubl
  |      noInfoFunction                                                  |
  +----------------------------------------------------------------------*/
 
-bool noInfoFunction(void *infoData, const char *string, ...)
+void noInfoFunction(void *infoData)
 {
         unused(infoData);
-        unused(string);
-        return false;
 }
 
 /*----------------------------------------------------------------------+

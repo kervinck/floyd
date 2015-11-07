@@ -24,7 +24,7 @@
 typedef struct Engine *Engine_t;
 
 // Callback interface for handling of search progress
-typedef bool searchInfo_fn(void *infoData, const char *string, ...);
+typedef void searchInfo_fn(void *infoData);
 
 /*
  *  Transposition table
@@ -102,6 +102,7 @@ struct Engine {
         double targetTime;
         double abortTime;
         int targetDepth;
+        intPair targetWindow;
 
         searchInfo_fn *infoFunction;
         void *infoData;

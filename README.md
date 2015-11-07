@@ -78,7 +78,7 @@ Supported UCI commands are:
           movestogo <nrMoves>     Moves to go until next time control
           depth <ply>             Search no deeper than <ply> halfmoves
           nodes <nrNodes>         Search no more than <nrNodes> nodes // TODO: not implemented
-          mate <nrMoves>          Search for a mate in <nrMoves> moves // TODO: not implemented
+          mate <nrMoves>          Search for a mate in <nrMoves> moves or less
           movetime <millis>       Search no longer than this time
           infinite                Postpone `bestmove' result until `stop'
   ponderhit

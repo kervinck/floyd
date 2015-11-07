@@ -92,7 +92,7 @@ X"          binc <millis>           Black's increment after each move"
 X"          movestogo <nrMoves>     Moves to go until next time control"
 X"          depth <ply>             Search no deeper than <ply> halfmoves"
 X"          nodes <nrNodes>         Search no more than <nrNodes> nodes // TODO: not implemented"
-X"          mate <nrMoves>          Search for a mate in <nrMoves> moves // TODO: not implemented"
+X"          mate <nrMoves>          Search for a mate in <nrMoves> moves or less"
 X"          movetime <millis>       Search no longer than this time"
 X"          infinite                Postpone `bestmove' result until `stop'"
 X"  ponderhit"
@@ -108,7 +108,7 @@ X"        Show this list of commands."
 X"  eval"
 X"        Show evaluation."
 X"  bench [ movetime <millis> ]"
-X"        Speed test of 40 standard positions. Default `movetime' is 1000."
+X"        Speed test using 40 standard positions. Default `movetime' is 1000."
 X"  moves [ depth <ply> ]"
 X"        Move generation test. Default `depth' is 1."
 X
@@ -221,6 +221,7 @@ void uciMain(Engine_t self)
                                 if (debug && n == 0) printf("info string Invalid position\n");
                                 line += n;
                         }
+
                         if (scan("moves")) {
                                 for (int n=1; n>0; line+=n) {
                                         int moves[maxMoves], move;
@@ -264,7 +265,7 @@ void uciMain(Engine_t self)
                         int movestogo = 0;
                         self->targetDepth = maxDepth;
                         long long nodes = maxLongLong;
-                        int mate = 0; // TODO: not implemented
+                        int mate = 0;
                         long movetime = 0;
                         self->searchMoves.len = 0; // TODO: not implemented
 
@@ -294,7 +295,8 @@ void uciMain(Engine_t self)
                                 time = btime, inc = binc;
                         setTimeTargets(self, time * ms, inc * ms, movestogo, movetime * ms);
                         printf("info string targetTime %.3f abortTime %.3f\n", self->targetTime, self->abortTime);
-
+                        self->targetWindow.v[0] = minMate - 2 * min(0, mate);
+                        self->targetWindow.v[1] = maxMate - 2 * max(0, mate);
                         searchThread = startSearch(&args);
                 }
                 else if (scan("stop")) {
@@ -358,22 +360,12 @@ static void updateOptions(Engine_t self,
  |      uciSearchInfo                                                   |
  +----------------------------------------------------------------------*/
 
-bool uciSearchInfo(void *uciInfoData, const char *string, ...)
+void uciSearchInfo(void *uciInfoData)
 {
         Engine_t self = uciInfoData;
 
         long milliSeconds = round(self->seconds / ms);
         printf("info time %ld", milliSeconds);
-
-        if (string != null) {
-                va_list ap;
-                va_start(ap, string);
-                printf(" nodes %lld string ", self->nodeCount);
-                vprintf(string, ap);
-                va_end(ap);
-                putchar('\n');
-                return false;
-        }
 
         if (self->pv.len > 0 || self->depth == 0) {
                 char scoreString[16];
@@ -407,8 +399,6 @@ bool uciSearchInfo(void *uciInfoData, const char *string, ...)
         putchar('\n');
         if (self->seconds >= 0.1)
                 fflush(stdout);
-
-        return false; // don't abort the search
 }
 
 /*----------------------------------------------------------------------+

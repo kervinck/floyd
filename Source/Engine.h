@@ -73,7 +73,6 @@ struct Engine {
 
         int rootPlyNumber;
         intList searchMoves;    // root moves to search, empty means all
-        volatile bool stopFlag; // aborts search when alarm time exceeded
         bool mateStop;          // stops the search once the shortest mate is found
 
         // transposition table
@@ -103,13 +102,16 @@ struct Engine {
                 double time;
                 double abortTime;
                 int depth;
-                long long nodes;
+                long long nodeCount; // also used to abort the search
                 intPair window;
         } target;
 
         searchInfo_fn *infoFunction;
         void *infoData;
 
+        volatile bool pondering;
+        volatile bool moveReady;
+        xAlarm_t alarmHandle;
         void *abortTarget;
 };
 
@@ -138,6 +140,7 @@ extern const char * const vectorLabels[];
  */
 void rootSearch(Engine_t self);
 searchInfo_fn noInfoFunction;
+void abortSearch(void *engine);
 
 /*
  *  Evaluate
@@ -158,6 +161,7 @@ double ttCalcLoad(Engine_t self);
  *  Time control
  */
 void setTimeTargets(Engine_t self, double time, double inc, int movestogo, double movetime);
+void setupAlarm(Engine_t self);
 
 /*----------------------------------------------------------------------+
  |                                                                      |

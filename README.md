@@ -70,7 +70,7 @@ Supported UCI commands are:
         Always show a final result using `bestmove'. (But: see `infinite')
         Command options are:
           searchmoves <move> ...  Only search these moves // TODO: not implemented
-          ponder                  Start search in ponder mode // TODO: not implemented
+          ponder                  Start search in ponder mode
           wtime <millis>          Time remaining on White's clock
           btime <millis>          Time remaining on Black's clock
           winc <millis>           White's increment after each move

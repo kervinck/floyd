@@ -40,12 +40,6 @@
  |      Definitions                                                     |
  +----------------------------------------------------------------------*/
 
-struct searchArgs {
-        Engine_t self;
-        bool ponder;
-        bool infinite;
-};
-
 struct options {
         long Hash;
         bool Ponder;
@@ -84,7 +78,7 @@ X"        given by the options, or until the `stop' command is received."
 X"        Always show a final result using `bestmove'. (But: see `infinite')"
 X"        Command options are:"
 X"          searchmoves <move> ...  Only search these moves // TODO: not implemented"
-X"          ponder                  Start search in ponder mode // TODO: not implemented"
+X"          ponder                  Start search in ponder mode"
 X"          wtime <millis>          Time remaining on White's clock"
 X"          btime <millis>          Time remaining on Black's clock"
 X"          winc <millis>           White's increment after each move"
@@ -94,11 +88,12 @@ X"          depth <ply>             Search no deeper than <ply> halfmoves"
 X"          nodes <nrNodes>         Search no more than <nrNodes> nodes"
 X"          mate <nrMoves>          Search for a mate in <nrMoves> moves or less"
 X"          movetime <millis>       Search no longer than this time"
-X"          infinite                Postpone `bestmove' result until `stop'"
+X"          infinite                Ignore clock and search until `stop'"
+X"         Note: `ponder' and `infinite' behave exactly the same in Floyd."
 X"  ponderhit"
 X"        Opponent has played the ponder move. Continue searching in own time."
 X"  stop"
-X"        Stop any search. In `infinite' mode also show the `bestmove' result."
+X"        Immediately stop any active `go' command and show its `bestmove' result."
 X"  quit"
 X"        Terminate engine."
 X
@@ -120,9 +115,7 @@ X;
  +----------------------------------------------------------------------*/
 
 static xThread_t stopSearch(Engine_t self, xThread_t searchThread);
-static xThread_t startSearch(struct searchArgs *args);
-
-static void uciBestMove(Engine_t self);
+static xThread_t startSearch(Engine_t self);
 
 static void updateOptions(Engine_t self,
         struct options *options, const struct options *newOptions);
@@ -170,7 +163,6 @@ void uciMain(Engine_t self)
 
         // Prepare threading
         xThread_t searchThread = null;
-        struct searchArgs args;
 
         // Process commands from stdin
         while (fflush(stdout), readLine(stdin, &lineBuffer) > 0) {
@@ -252,16 +244,13 @@ void uciMain(Engine_t self)
                         searchThread = stopSearch(self, searchThread);
                         updateOptions(self, &oldOptions, &newOptions);
 
-                        args = (struct searchArgs) {
-                                .self = self,
-                                .ponder = false,
-                                .infinite = false,
-                        };
                         self->infoFunction = uciSearchInfo;
                         self->infoData = self;
+                        self->pondering = false;
+                        self->moveReady = false;
 
                         self->target.depth = maxDepth;
-                        self->target.nodes = maxLongLong;
+                        self->target.nodeCount = maxLongLong;
                         self->searchMoves.len = 0; // TODO: not implemented
                         long time = 0, btime = 0;
                         long inc = 0, binc = 0;
@@ -270,15 +259,15 @@ void uciMain(Engine_t self)
                         long movetime = 0;
 
                         while (*line != '\0')
-                                if ((scan("ponder") && (args.ponder = true))
+                                if ((scan("ponder") && (self->pondering = true))
+                                 || (scan("infinite") && (self->pondering = true)) // same
                                  || scanValue("wtime %ld", &time) || scanValue("btime %ld", &btime)
                                  || scanValue("winc %ld", &inc)   || scanValue("binc %ld", &binc)
                                  || scanValue("movestogo %d", &movestogo)
                                  || scanValue("depth %d", &self->target.depth)
-                                 || scanValue("nodes %lld", &self->target.nodes)
+                                 || scanValue("nodes %lld", &self->target.nodeCount)
                                  || scanValue("mate %d", &mate)
-                                 || scanValue("movetime %ld", &movetime)
-                                 || (scan("infinite") && (args.infinite = true)))
+                                 || scanValue("movetime %ld", &movetime))
                                         pass;
                                 else if (scan("searchmoves"))
                                         for (int n=1; n>0; line+=n) {
@@ -296,18 +285,23 @@ void uciMain(Engine_t self)
                         setTimeTargets(self, time * ms, inc * ms, movestogo, movetime * ms);
                         self->target.window.v[0] = minMate - 2 * min(0, mate);
                         self->target.window.v[1] = maxMate - 2 * max(0, mate);
-                        searchThread = startSearch(&args);
+                        searchThread = startSearch(self);
                 }
                 else if (scan("stop")) {
                         ignoreOtherTokens();
                         searchThread = stopSearch(self, searchThread);
-                        if (args.infinite) uciBestMove(self);
                 }
-                else if (scan("ponderhit")) // TODO: implement ponder
+                else if (scan("ponderhit")) {
                         ignoreOtherTokens();
+                        self->pondering = false;
+                        if (self->moveReady)
+                                searchThread = stopSearch(self, searchThread);
+                        else
+                                setupAlarm(self);
+                }
                 else if (scan("quit")) {
                         ignoreOtherTokens();
-                        break;
+                        break; // leave the readline loop
                 }
 
                 /*
@@ -401,11 +395,23 @@ void uciSearchInfo(void *uciInfoData)
 }
 
 /*----------------------------------------------------------------------+
- |      uciBestMove                                                     |
+ |      startSearch / stopSearch                                        |
  +----------------------------------------------------------------------*/
 
-static void uciBestMove(Engine_t self)
+static void searchThreadStart(void *args)
 {
+        Engine_t self = args;
+
+        rootSearch(self);
+
+        if (self->pondering) {
+                // move is ready but we must wait for "stop" or "ponderhit"
+                printf("info string move ready, waiting\n");
+                fflush(stdout);
+                while (self->pondering) // TODO: synchronize properly using a primitive
+                        pass;
+        }
+
         char moveString[maxMoveSize];
 
         if (self->bestMove) {
@@ -419,25 +425,10 @@ static void uciBestMove(Engine_t self)
                 printf(" ponder %s", moveString);
         }
         putchar('\n');
+        fflush(stdout);
 }
 
-/*----------------------------------------------------------------------+
- |      startSearch / stopSearch                                        |
- +----------------------------------------------------------------------*/
-
-static void searchThreadStart(void *argsData)
-{
-        struct searchArgs *args = argsData;
-
-        rootSearch(args->self);
-
-        if (!args->infinite) {
-                uciBestMove(args->self);
-                fflush(stdout);
-        }
-}
-
-static xThread_t startSearch(struct searchArgs *args)
+static xThread_t startSearch(Engine_t args)
 {
         return createThread(searchThreadStart, args);
 }
@@ -445,7 +436,8 @@ static xThread_t startSearch(struct searchArgs *args)
 static xThread_t stopSearch(Engine_t self, xThread_t searchThread)
 {
         if (searchThread != null) {
-                self->stopFlag = true;
+                self->pondering = false;
+                abortSearch(self);
                 joinThread(searchThread);
         }
         return null;

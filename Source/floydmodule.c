@@ -186,10 +186,12 @@ floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
         }
 
         engine.target.depth = depth;
-        engine.target.nodes = maxLongLong;
+        engine.target.nodeCount = maxLongLong;
         engine.target.window = (intPair) {{ -maxInt, maxInt }};;
         engine.target.time = 0.0;
         engine.target.abortTime = movetime;
+        engine.pondering = false;
+        engine.moveReady = false;
         engine.infoFunction = infoFunction;
         engine.infoData = infoData;
         rootSearch(&engine);

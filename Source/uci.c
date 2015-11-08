@@ -296,7 +296,7 @@ void uciMain(Engine_t self)
                                 searchThread = stopSearch(self, searchThread);
                                 if (self->pondering)
                                         uciBestMove(self);
-                        } else if (self->pondering) {
+                        } else if (self->pondering)
                                 self->alarmHandle = setAlarm(self->target.maxTime, abortSearch, self);
                         self->pondering = false; // TODO: avoid the race-condition when pondering
                 }

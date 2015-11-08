@@ -42,7 +42,6 @@
 
 struct options {
         long Hash;
-        bool Ponder;
         bool ClearHash;
 };
 #define maxHash ((sizeof(size_t) > 4) ? 64 * 1024L : 1024L)
@@ -88,8 +87,8 @@ X"          depth <ply>             Search no deeper than <ply> halfmoves"
 X"          nodes <nrNodes>         Search no more than <nrNodes> nodes"
 X"          mate <nrMoves>          Search for a mate in <nrMoves> moves or less"
 X"          movetime <millis>       Search no longer than this time"
-X"          infinite                Ignore clock and search until `stop'"
-X"         Note: `ponder' and `infinite' behave exactly the same in Floyd."
+X"          infinite                Postpone `bestmove' result until `stop'"
+X"         (Note: In Floyd `ponder' and `infinite' behave the same.)"
 X"  ponderhit"
 X"        Opponent has played the ponder move. Continue searching in own time."
 X"  stop"
@@ -116,6 +115,7 @@ X;
 
 static xThread_t stopSearch(Engine_t self, xThread_t searchThread);
 static xThread_t startSearch(Engine_t self);
+static void uciBestMove(Engine_t self);
 
 static void updateOptions(Engine_t self,
         struct options *options, const struct options *newOptions);
@@ -142,13 +142,13 @@ static int _scanToken(char **line, const char *format, void *value)
 #define scanValue(tokens, value) _scanToken(&line, " " tokens "%c %n", value)
 
 // For skipping unknown commands or options
-#define ignoreOneToken(type) Statement(\
+#define skipOneToken(type) Statement(\
         while (isspace(*line)) line++;\
         int _n=0; char *_s=line;\
         _scanToken(&line, "%*s%n%c %n", &_n);\
         if (_n && debug) printf("info string %s ignored (%.*s)\n", type, _n, _s);\
 )
-#define ignoreOtherTokens() Statement( while(*line != '\0') ignoreOneToken("Option"); )
+#define skipOtherTokens() Statement( while(*line != '\0') skipOneToken("Option"); )
 
 /*----------------------------------------------------------------------+
  |      uciMain                                                         |
@@ -170,38 +170,35 @@ void uciMain(Engine_t self)
                 if (debug) printf("info string input %s", line);
 
                 if (scan("uci")) {
-                        ignoreOtherTokens();
+                        skipOtherTokens();
                         printf("id name Floyd "quote2(floydVersion)"\n"
                                 "id author Marcel van Kervinck\n"
                                 "option name Hash type spin default %ld min 0 max %ld\n"
                                 "option name Clear Hash type button\n"
-                                //"option name Ponder type check default false\n" // Keep commented out for now
-                                //"option name MultiPV type spin default 1 min 1 max 1\n"
-                                //"option name UCI_Chess960 type check default false\n"
-                                //"option name Contempt type spin default 0 min -100 max 100\n"
+                                "option name Ponder type check default true\n"
                                 "uciok\n",
                                newOptions.Hash, maxHash);
                 }
                 else if (scan("debug")) {
                         if (scan("on")) debug = true;
                         else if (scan("off")) debug = false;
-                        ignoreOtherTokens();
+                        skipOtherTokens();
                         printf("debug %s\n", debug ? "on" : "off");
                 }
                 else if (scan("setoption")) {
                         if (scanValue("name Hash value %ld", &newOptions.Hash)) pass;
-                        else if (scan("name Ponder value true")) newOptions.Ponder = true;
-                        else if (scan("name Ponder value false")) newOptions.Ponder = false;
+                        else if (scan("name Ponder value true")) pass;
+                        else if (scan("name Ponder value false")) pass;
                         else if (scan("name Clear Hash")) newOptions.ClearHash = !oldOptions.ClearHash;
-                        ignoreOtherTokens();
+                        skipOtherTokens();
                 }
                 else if (scan("isready")) {
-                        ignoreOtherTokens();
+                        skipOtherTokens();
                         updateOptions(self, &oldOptions, &newOptions);
                         printf("readyok\n");
                 }
                 else if (scan("ucinewgame"))
-                        ignoreOtherTokens();
+                        skipOtherTokens();
 
                 else if (scan("position")) {
                         searchThread = stopSearch(self, searchThread);
@@ -224,7 +221,7 @@ void uciMain(Engine_t self)
                                         if (debug && n == -2) printf("info string Ambiguous move\n");
                                 }
                         }
-                        ignoreOtherTokens();
+                        skipOtherTokens();
 
                         if (debug) { // dump FEN and board
                                 char fen[maxFenSize];
@@ -252,22 +249,21 @@ void uciMain(Engine_t self)
                         self->target.depth = maxDepth;
                         self->target.nodeCount = maxLongLong;
                         self->searchMoves.len = 0; // TODO: not implemented
-                        long time = 0, btime = 0;
-                        long inc = 0, binc = 0;
+                        long time = 0, inc = 0, btime = 0, binc = 0;
                         int movestogo = 0;
                         int mate = 0;
                         long movetime = 0;
 
                         while (*line != '\0')
                                 if ((scan("ponder") && (self->pondering = true))
-                                 || (scan("infinite") && (self->pondering = true)) // same
-                                 || scanValue("wtime %ld", &time) || scanValue("btime %ld", &btime)
-                                 || scanValue("winc %ld", &inc)   || scanValue("binc %ld", &binc)
+                                 || scanValue("wtime %ld", &time)  || scanValue("winc %ld", &inc)
+                                 || scanValue("btime %ld", &btime) || scanValue("binc %ld", &binc)
                                  || scanValue("movestogo %d", &movestogo)
-                                 || scanValue("depth %d", &self->target.depth)
-                                 || scanValue("nodes %lld", &self->target.nodeCount)
-                                 || scanValue("mate %d", &mate)
-                                 || scanValue("movetime %ld", &movetime))
+                                 || scanValue("depth %d",     &self->target.depth)
+                                 || scanValue("nodes %lld",   &self->target.nodeCount)
+                                 || scanValue("mate %d",      &mate)
+                                 || scanValue("movetime %ld", &movetime)
+                                 || (scan("infinite") && (self->pondering = true))) // as ponder
                                         pass;
                                 else if (scan("searchmoves"))
                                         for (int n=1; n>0; line+=n) {
@@ -278,41 +274,46 @@ void uciMain(Engine_t self)
                                                 if (debug && n == -1) printf("info string Illegal move\n");
                                                 if (debug && n == -2) printf("info string Ambiguous move\n");
                                         }
-                                else ignoreOneToken("Option");
+                                else skipOneToken("Option");
 
                         if (sideToMove(board(self)) == black)
                                 time = btime, inc = binc;
                         setTimeTargets(self, time * ms, inc * ms, movestogo, movetime * ms);
-                        self->target.window.v[0] = minMate - 2 * min(0, mate);
-                        self->target.window.v[1] = maxMate - 2 * max(0, mate);
+                        self->target.window.v[0] = minMate - 2 * min(0, mate); // for "mate -n"
+                        self->target.window.v[1] = maxMate - 2 * max(0, mate); // for "mate n"
                         searchThread = startSearch(self);
                 }
                 else if (scan("stop")) {
-                        ignoreOtherTokens();
+                        skipOtherTokens();
                         searchThread = stopSearch(self, searchThread);
+                        if (self->pondering)
+                                uciBestMove(self);
+                        self->pondering = false;
                 }
                 else if (scan("ponderhit")) {
-                        ignoreOtherTokens();
-                        self->pondering = false;
-                        if (self->moveReady)
+                        skipOtherTokens();
+                        if (self->moveReady) {
                                 searchThread = stopSearch(self, searchThread);
-                        else
-                                setupAlarm(self);
+                                if (self->pondering)
+                                        uciBestMove(self);
+                        } else if (self->pondering) {
+                                self->alarmHandle = setAlarm(self->target.maxTime, abortSearch, self);
+                        self->pondering = false; // TODO: avoid the race-condition when pondering
                 }
                 else if (scan("quit")) {
-                        ignoreOtherTokens();
-                        break; // leave the readline loop
+                        skipOtherTokens();
+                        break; // leaving the readline loop
                 }
 
                 /*
                  *  Extra commands
                  */
                 else if (scan("help")) {
-                        ignoreOtherTokens();
+                        skipOtherTokens();
                         fputs(helpMessage, stdout);
                 }
                 else if (scan("eval")) {
-                        ignoreOtherTokens();
+                        skipOtherTokens();
                         int score = evaluate(board(self));
                         printf("info score cp %.0f string intern %+d\n", round(score / 10.0), score);
                 }
@@ -320,15 +321,15 @@ void uciMain(Engine_t self)
                         updateOptions(self, &oldOptions, &newOptions);
                         long movetime = 1000;
                         scanValue("movetime %ld", &movetime);
-                        ignoreOtherTokens();
+                        skipOtherTokens();
                         uciBenchmark(self, movetime * ms);
                 } else if (scan("moves")) {
                         int depth = 1;
                         scanValue("depth %d", &depth);
-                        ignoreOtherTokens();
+                        skipOtherTokens();
                         uciMoves(board(self), depth);
                 }
-                else ignoreOneToken("Command");
+                else skipOneToken("Command");
         }
 
         searchThread = stopSearch(self, searchThread);
@@ -395,23 +396,11 @@ void uciSearchInfo(void *uciInfoData)
 }
 
 /*----------------------------------------------------------------------+
- |      startSearch / stopSearch                                        |
+ |      uciBestMove                                                     |
  +----------------------------------------------------------------------*/
 
-static void searchThreadStart(void *args)
+static void uciBestMove(Engine_t self)
 {
-        Engine_t self = args;
-
-        rootSearch(self);
-
-        if (self->pondering) {
-                // move is ready but we must wait for "stop" or "ponderhit"
-                printf("info string move ready, waiting\n");
-                fflush(stdout);
-                while (self->pondering) // TODO: synchronize properly using a primitive
-                        pass;
-        }
-
         char moveString[maxMoveSize];
 
         if (self->bestMove) {
@@ -428,6 +417,18 @@ static void searchThreadStart(void *args)
         fflush(stdout);
 }
 
+/*----------------------------------------------------------------------+
+ |      startSearch / stopSearch                                        |
+ +----------------------------------------------------------------------*/
+
+static void searchThreadStart(void *args)
+{
+        Engine_t self = args;
+        rootSearch(self);
+        if (!self->pondering)
+                uciBestMove(self);
+}
+
 static xThread_t startSearch(Engine_t args)
 {
         return createThread(searchThreadStart, args);
@@ -436,7 +437,6 @@ static xThread_t startSearch(Engine_t args)
 static xThread_t stopSearch(Engine_t self, xThread_t searchThread)
 {
         if (searchThread != null) {
-                self->pondering = false;
                 abortSearch(self);
                 joinThread(searchThread);
         }

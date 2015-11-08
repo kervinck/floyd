@@ -1,28 +1,31 @@
 
-|Todo| Release notes for 0.7
+|Todo| Scale passers with material [evaluate]
 
-Draft:
+|Todo| Release as 0.7
+
+After next HGM tourney
+
 User:
-Strength increase of ~150 elo at fast time controls.
-Slightly improved passer evaluation.
-UCI "mate" option.
-Stopping of search after having established the shortest mate.
+- Strength increase of ~150 elo at fast time controls.
+- Slightly improved passer evaluation.
+- Support of pondering.
+- Mate search.
+- Stopping of search after having established the shortest mate.
+- Node count search.
 
-Implemention of "moves [ depth <ply> ]" command.
-Mate distance pruning.
-Basic killers.
-Basic cut node reductions.
-Simple lazy move generation in scout.
-Faster evaluation weight tuning using multiprocessing.
-Faster evaluation weight tuning using quadratic fit before bailing out.
-General code cleanup, such as the removal of needless SAN output code.
+Internal:
+- Implemention of "moves [ depth <ply> ]" command.
+- Mate distance pruning.
+- Basic killers.
+- Basic cut node reductions.
+- Simple lazy move generation in scout.
+- Faster evaluation weight tuning using multiprocessing.
+- Faster evaluation weight tuning using quadratic fit before bailing out.
+- General code cleanup, such as the removal of needless SAN output code.
 
-|Todo| Mate option [uci]
-
-Introduction of material table.
 ------------------------------------------------------------------------
 
-|Todo| Scale passers with material [evaluate]
+Introduction of material table.
 
 |Todo| King safety [evaluate]
 

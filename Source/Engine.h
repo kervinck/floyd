@@ -100,7 +100,7 @@ struct Engine {
 
         struct {
                 double time;
-                double abortTime;
+                double maxTime;
                 int depth;
                 long long nodeCount; // also used to abort the search
                 intPair window;
@@ -161,7 +161,6 @@ double ttCalcLoad(Engine_t self);
  *  Time control
  */
 void setTimeTargets(Engine_t self, double time, double inc, int movestogo, double movetime);
-void setupAlarm(Engine_t self);
 
 /*----------------------------------------------------------------------+
  |                                                                      |

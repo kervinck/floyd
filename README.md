@@ -41,7 +41,7 @@ Command interface
 $ make
 $ ./floyd 
 
-Floyd Chess Engine - Version 0.6
+Floyd Chess Engine - Version 0.x
 Copyright (C) 2015, Marcel van Kervinck
 All rights reserved
 
@@ -81,10 +81,11 @@ Supported UCI commands are:
           mate <nrMoves>          Search for a mate in <nrMoves> moves or less
           movetime <millis>       Search no longer than this time
           infinite                Postpone `bestmove' result until `stop'
+         (Note: In Floyd `ponder' and `infinite' behave the same.)
   ponderhit
         Opponent has played the ponder move. Continue searching in own time.
   stop
-        Stop any search. In `infinite' mode also show the `bestmove' result.
+        Immediately stop any active `go' command and show its `bestmove' result.
   quit
         Terminate engine.
 

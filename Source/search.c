@@ -78,12 +78,6 @@ void abortSearch(void *engine)
         self->target.nodeCount = 0;
 }
 
-void setupAlarm(Engine_t self)
-{
-        clearAlarm(self->alarmHandle);
-        self->alarmHandle = setAlarm(self->target.abortTime, abortSearch, self);
-}
-
 // TODO: aspiration search
 void rootSearch(Engine_t self)
 {
@@ -100,8 +94,8 @@ void rootSearch(Engine_t self)
                 self->tt.now = (self->tt.now + 1) & ones(ttDateBits);
         }
 
-        if (self->target.abortTime > 0.0 && !self->pondering)
-                setupAlarm(self);
+        if (self->target.maxTime > 0.0 && !self->pondering)
+                self->alarmHandle = setAlarm(self->target.maxTime, abortSearch, self);
 
         // Prepare abort possibility
         jmp_buf here;
@@ -622,7 +616,7 @@ void setTimeTargets(Engine_t self, double time, double inc, int movestogo, doubl
         if (time > 0.0 || inc > 0.0) {
                 if (!movestogo) // Default time allocation horizon
                         movestogo = 25;
-                switch (board(self)->halfmoveClock / 2) { // Induce a couple of "mild panics" when no progress
+                switch (board(self)->halfmoveClock / 2) { // Some "mild panics" when no progress
                 case 15: movestogo = min(movestogo, 5); break;
                 case 25: movestogo = min(movestogo, 4); break;
                 case 35: movestogo = min(movestogo, 3); break;
@@ -633,10 +627,11 @@ void setTimeTargets(Engine_t self, double time, double inc, int movestogo, doubl
                 self->target.time = target(time, inc, movestogo);
                 double panicTime = target(time, inc, mintogo);
                 double flagTime = target(time, inc, 1);
-                self->target.abortTime  = min(panicTime, flagTime);
-        }
-        if (movetime)
-                self->target.abortTime = movetime;
+                self->target.maxTime  = min(panicTime, flagTime);
+        } else
+                self->target.time = self->target.maxTime = 0.0;
+        if (movetime > 0.0)
+                self->target.maxTime = movetime;
 }
 
 /*----------------------------------------------------------------------+

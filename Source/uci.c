@@ -285,10 +285,8 @@ void uciMain(Engine_t self)
                 }
                 else if (scan("stop")) {
                         skipOtherTokens();
-                        searchThread = stopSearch(self, searchThread);
-                        if (self->pondering)
-                                uciBestMove(self);
                         self->pondering = false;
+                        searchThread = stopSearch(self, searchThread);
                 }
                 else if (scan("ponderhit")) {
                         skipOtherTokens();

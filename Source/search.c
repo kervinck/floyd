@@ -186,7 +186,11 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
         }
 
         int moveList[maxMoves];
-        int nrMoves = generateMoves(board(self), moveList);
+        int nrMoves = self->searchMoves.len;
+        if (inRoot && nrMoves > 0)
+                memcpy(moveList, self->searchMoves.v, nrMoves * sizeof(int));
+        else
+                nrMoves = generateMoves(board(self), moveList);
         nrMoves = filterAndSort(board(self), moveList, nrMoves, moveFilter);
         nrMoves = filterLegalMoves(board(self), moveList, nrMoves); // easier for PVS
         moveToFront(moveList, nrMoves, slot.move);

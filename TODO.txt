@@ -1,6 +1,4 @@
 
-|Todo| Scale passers with material [evaluate]
-
 |Todo| Release as 0.7
 
 After next HGM tourney
@@ -8,10 +6,8 @@ After next HGM tourney
 User:
 - Strength increase of ~150 elo at fast time controls.
 - Slightly improved passer evaluation.
-- Support of pondering.
-- Mate search.
 - Stopping of search after having established the shortest mate.
-- Node count search.
+- Full UCI support: pondering, mate & node limited search, searchmoves
 
 Internal:
 - Implemention of "moves [ depth <ply> ]" command.
@@ -200,12 +196,6 @@ Profile first
 Also recognize 50-move as a game during search.
 
 |Todo| Compile on FreeBSD [qa]
-
-|Todo| Pondering [uci]
-
-|Todo| Move generator test [qa]
-
-moves 5 (includes divide, no time info)
 
 |Todo| eggs metadata [python]
 

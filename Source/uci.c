@@ -76,7 +76,7 @@ X"        Start searching from the current position within the constraints"
 X"        given by the options, or until the `stop' command is received."
 X"        Always show a final result using `bestmove'. (But: see `infinite')"
 X"        Command options are:"
-X"          searchmoves <move> ...  Only search these moves // TODO: not implemented"
+X"          searchmoves <move> ...  Only search these moves"
 X"          ponder                  Start search in ponder mode"
 X"          wtime <millis>          Time remaining on White's clock"
 X"          btime <millis>          Time remaining on Black's clock"
@@ -248,7 +248,7 @@ void uciMain(Engine_t self)
 
                         self->target.depth = maxDepth;
                         self->target.nodeCount = maxLongLong;
-                        self->searchMoves.len = 0; // TODO: not implemented
+                        self->searchMoves.len = 0;
                         long time = 0, inc = 0, btime = 0, binc = 0;
                         int movestogo = 0;
                         int mate = 0;
@@ -323,7 +323,8 @@ void uciMain(Engine_t self)
                         scanValue("movetime %ld", &movetime);
                         skipOtherTokens();
                         uciBenchmark(self, movetime * ms);
-                } else if (scan("moves")) {
+                }
+                else if (scan("moves")) {
                         int depth = 1;
                         scanValue("depth %d", &depth);
                         skipOtherTokens();

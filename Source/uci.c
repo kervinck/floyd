@@ -169,8 +169,7 @@ void uciMain(Engine_t self)
                 char *line = lineBuffer.v;
                 if (debug) printf("info string input %s", line);
 
-                if (scan("uci")) {
-                        skipOtherTokens();
+                if (scan("uci"))
                         printf("id name Floyd "quote2(floydVersion)"\n"
                                 "id author Marcel van Kervinck\n"
                                 "option name Hash type spin default %ld min 0 max %ld\n"
@@ -178,11 +177,10 @@ void uciMain(Engine_t self)
                                 "option name Ponder type check default true\n"
                                 "uciok\n",
                                newOptions.Hash, maxHash);
-                }
+
                 else if (scan("debug")) {
                         if (scan("on")) debug = true;
                         else if (scan("off")) debug = false;
-                        skipOtherTokens();
                         printf("debug %s\n", debug ? "on" : "off");
                 }
                 else if (scan("setoption")) {
@@ -190,15 +188,13 @@ void uciMain(Engine_t self)
                         else if (scan("name Ponder value true")) pass;
                         else if (scan("name Ponder value false")) pass;
                         else if (scan("name Clear Hash")) newOptions.ClearHash = !oldOptions.ClearHash;
-                        skipOtherTokens();
                 }
                 else if (scan("isready")) {
-                        skipOtherTokens();
                         updateOptions(self, &oldOptions, &newOptions);
                         printf("readyok\n");
                 }
                 else if (scan("ucinewgame"))
-                        skipOtherTokens();
+                        pass;
 
                 else if (scan("position")) {
                         searchThread = stopSearch(self, searchThread);
@@ -221,7 +217,6 @@ void uciMain(Engine_t self)
                                         if (debug && n == -2) printf("info string Ambiguous move\n");
                                 }
                         }
-                        skipOtherTokens();
 
                         if (debug) { // dump FEN and board
                                 char fen[maxFenSize];
@@ -284,12 +279,10 @@ void uciMain(Engine_t self)
                         searchThread = startSearch(self);
                 }
                 else if (scan("stop")) {
-                        skipOtherTokens();
                         self->pondering = false;
                         searchThread = stopSearch(self, searchThread);
                 }
                 else if (scan("ponderhit")) {
-                        skipOtherTokens();
                         if (self->pondering)
                                 self->alarmHandle = setAlarm(self->target.maxTime, abortSearch, self);
                         self->pondering = false;
@@ -302,12 +295,10 @@ void uciMain(Engine_t self)
                 /*
                  *  Extra commands
                  */
-                else if (scan("help")) {
-                        skipOtherTokens();
+                else if (scan("help"))
                         fputs(helpMessage, stdout);
-                }
+
                 else if (scan("eval")) {
-                        skipOtherTokens();
                         int score = evaluate(board(self));
                         printf("info score cp %.0f string intern %+d\n", round(score / 10.0), score);
                 }
@@ -315,16 +306,17 @@ void uciMain(Engine_t self)
                         updateOptions(self, &oldOptions, &newOptions);
                         long movetime = 1000;
                         scanValue("movetime %ld", &movetime);
-                        skipOtherTokens();
                         uciBenchmark(self, movetime * ms);
                 }
                 else if (scan("moves")) {
                         int depth = 1;
                         scanValue("depth %d", &depth);
-                        skipOtherTokens();
                         uciMoves(board(self), depth);
                 }
-                else skipOneToken("Command");
+                else
+                        skipOneToken("Command");
+
+                skipOtherTokens(); // For info when debugging
         }
 
         searchThread = stopSearch(self, searchThread);

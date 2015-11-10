@@ -187,7 +187,7 @@ floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
 
         engine.target.depth = depth;
         engine.target.nodeCount = maxLongLong;
-        engine.target.window = (intPair) {{ -maxInt, maxInt }};;
+        engine.target.scores = (intPair) {{ -maxInt, maxInt }};;
         engine.target.time = 0.0;
         engine.target.maxTime = movetime;
         engine.pondering = false;

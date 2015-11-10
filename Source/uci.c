@@ -143,10 +143,10 @@ static int _scanToken(char **line, const char *format, void *value)
 
 // For skipping unknown commands or options
 #define skipOneToken(type) Statement(\
-        while (isspace(*line)) line++;\
-        int _n=0; char *_s=line;\
-        _scanToken(&line, "%*s%n%c %n", &_n);\
-        if (_n && debug) printf("info string %s ignored (%.*s)\n", type, _n, _s);\
+        while (isspace(*line)) line++;        \
+        int _n=0; char *_s=line;              \
+        _scanToken(&line, "%*s%n%c %n", &_n); \
+        if (_n && debug) printf("info string %s ignored (%.*s)\n", type, _n, _s); \
 )
 #define skipOtherTokens() Statement( while(*line != '\0') skipOneToken("Option"); )
 
@@ -279,8 +279,8 @@ void uciMain(Engine_t self)
                         if (sideToMove(board(self)) == black)
                                 time = btime, inc = binc;
                         setTimeTargets(self, time * ms, inc * ms, movestogo, movetime * ms);
-                        self->target.window.v[0] = minMate - 2 * min(0, mate); // for "mate -n"
-                        self->target.window.v[1] = maxMate - 2 * max(0, mate); // for "mate n"
+                        self->target.scores.v[0] = minMate - 2 * min(0, mate); // for "mate -n"
+                        self->target.scores.v[1] = maxMate - 2 * max(0, mate); // for "mate n"
                         searchThread = startSearch(self);
                 }
                 else if (scan("stop")) {
@@ -292,13 +292,9 @@ void uciMain(Engine_t self)
                 }
                 else if (scan("ponderhit")) {
                         skipOtherTokens();
-                        if (self->moveReady) {
-                                searchThread = stopSearch(self, searchThread);
-                                if (self->pondering)
-                                        uciBestMove(self);
-                        } else if (self->pondering)
+                        if (self->pondering)
                                 self->alarmHandle = setAlarm(self->target.maxTime, abortSearch, self);
-                        self->pondering = false; // TODO: avoid the race-condition when pondering
+                        self->pondering = false;
                 }
                 else if (scan("quit")) {
                         skipOtherTokens();
@@ -426,8 +422,9 @@ static void searchThreadStart(void *args)
 {
         Engine_t self = args;
         rootSearch(self);
-        if (!self->pondering)
-                uciBestMove(self);
+        while (self->pondering)
+                pass; // TODO: change into a sempahore
+        uciBestMove(self);
 }
 
 static xThread_t startSearch(Engine_t args)

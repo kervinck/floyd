@@ -95,7 +95,7 @@ struct Engine {
                 int ponderMove;
                 intList pv;
                 double seconds;
-                long long nodeCount;
+                volatile long long nodeCount;
         };
 
         struct {
@@ -103,7 +103,7 @@ struct Engine {
                 double maxTime;
                 int depth;
                 long long nodeCount; // also used to abort the search
-                intPair window;
+                intPair scores;
         } target;
 
         searchInfo_fn *infoFunction;

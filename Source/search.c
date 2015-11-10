@@ -111,8 +111,8 @@ void rootSearch(Engine_t self)
                         updateBestAndPonderMove(self);
                         self->moveReady = self->bestMove && (self->target.time > 0.0)
                                         && (self->seconds >= 0.5 * self->target.time);
-                        if (self->score <= self->target.window.v[0]
-                         || self->score >= self->target.window.v[1]
+                        if (self->score <= self->target.scores.v[0]
+                         || self->score >= self->target.scores.v[1]
                          || (isMateScore(self->score) && self->mateStop && self->depth > 0)
                          || (self->moveReady && !self->pondering))
                                 break;
@@ -125,7 +125,7 @@ void rootSearch(Engine_t self)
                 self->pv.len = min(self->pv.len, pvCut);
                 self->infoFunction(self->infoData);
         }
-        self->moveReady = true;
+        self->moveReady = true; // TODO: remove
 
         clearAlarm(self->alarmHandle);
         self->alarmHandle = null;

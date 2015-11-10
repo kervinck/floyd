@@ -107,7 +107,7 @@ void uciBenchmark(Engine_t self, double time)
                 self->target.maxTime = time;
                 self->target.depth = maxDepth;
                 self->target.nodeCount = maxLongLong;
-                self->target.window = (intPair) {{ -maxInt, maxInt }};
+                self->target.scores = (intPair) {{ -maxInt, maxInt }};
                 self->infoFunction = noInfoFunction;
                 rootSearch(self);
                 totalNodes += self->nodeCount;

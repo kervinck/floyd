@@ -425,6 +425,7 @@ static xThread_t startSearch(Engine_t args)
 static xThread_t stopSearch(Engine_t self, xThread_t searchThread)
 {
         if (searchThread != null) {
+                self->pondering = false;
                 abortSearch(self);
                 joinThread(searchThread);
         }

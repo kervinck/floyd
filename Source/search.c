@@ -224,6 +224,7 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                 if (!isMateScore(score) && !isDrawScore(score))
                         self->mateStop = false; // shortest mate not yet proven
                 if (score > bestScore) {
+                        pushList(self->pv, 0); // separator
                         int pvLen = self->pv.len;
                         pushList(self->pv, moveList[i]);
                         int researchDepth = max(0, depth - 1 + extension);
@@ -235,7 +236,7 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                                         self->pv.v[pvIndex+j] = self->pv.v[pvLen+j];
                                 self->pv.len -= pvLen - pvIndex;
                         } else
-                                self->pv.len = pvLen; // research failed, it happens
+                                self->pv.len = pvLen - 1; // research failed, it happens
                 }
                 undoMove(board(self));
         }

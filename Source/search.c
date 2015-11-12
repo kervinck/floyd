@@ -596,7 +596,7 @@ static int updateBestAndPonderMove(Engine_t self)
 {
         if (self->pv.len >= 1 && self->pv.v[0] != self->bestMove)
                 self->ponderMove = 0;
-        if (self->pv.len >= 2)
+        if (self->pv.len >= 3) // At least 3 to avoid pondering at game-end
                 self->ponderMove = self->pv.v[1];
 
         if (self->pv.len >= 1)

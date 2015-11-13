@@ -194,7 +194,7 @@ void uciMain(Engine_t self)
                         printf("readyok\n");
                 }
                 else if (scan("ucinewgame"))
-                        pass;
+                        searchThread = stopSearch(self, searchThread);
 
                 else if (scan("position")) {
                         searchThread = stopSearch(self, searchThread);

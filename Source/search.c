@@ -160,8 +160,9 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
         self->nodeCount++;
         bool inRoot = (ply(self) == 0);
         #define cutPv() (self->pv.len = pvIndex)
+        int eval = evaluate(board(self));
 
-        if (repetition(self) && !inRoot)
+        if (!inRoot && (repetition(self) || eval == 0))
                 return cutPv(), drawScore(self);
 
         struct ttSlot slot = ttRead(self);
@@ -177,7 +178,7 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
         int bestScore = minInt;
 
         if (depth == 0 && !check) {
-                bestScore = evaluate(board(self));
+                bestScore = eval;
                 if (bestScore >= beta) {
                         self->pv.len = pvIndex;
                         return ttWrite(self, slot, depth, bestScore, alpha, beta);

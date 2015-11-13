@@ -27,8 +27,6 @@ Introduction of material table.
 
 |Todo| Rooks and queens on open files [evaluate]
 
-|Todo| Don't allow 0 as heuristic evalation [evaluate]
-
 |Todo| Left-right location parameters [evaluate]
 
 |Todo| Check Rebel evaluation features [evaluate]

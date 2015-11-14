@@ -503,7 +503,8 @@ int evaluate(Board_t self)
         int nrEffectivePieces = 2 + nrQueens + nrRooks + nrEffectiveBishops + nrKnights + nrPawns;
 
         if (nrEffectivePieces == 2)
-                return 0; // Insufficient mating material (KK)
+                //wiloScore = 0; // Insufficient mating material (KK)
+                return 0;
 
         if (nrEffectivePieces == 3) {
                 if (nrQueens(side) + nrRooks(side) > 0) {
@@ -517,7 +518,8 @@ int evaluate(Board_t self)
                 }
 
                 if (nrBishops + nrKnights > 0)
-                        return 0; // Insufficient mating material (KNK, KB...K of like-bishops)
+                        //wiloScore = 0; // Insufficient mating material (KNK, KB...K of like-bishops)
+                        return 0;
 
                 if (nrPawns > 0) { // KPK
                         int egtSide, wKing, wPawn, bKing;
@@ -536,7 +538,8 @@ int evaluate(Board_t self)
 
                         int egtScore = kpkProbe(egtSide, wKing, wPawn, bKing);
                         if (egtScore == 0)
-                                wiloScore = 0;
+                                //wiloScore = 0;
+                                return 0;
                         else {
                                 wiloScore += egtScore * v[winBonus];
                                 drawScore -= v[winBonus];
@@ -566,7 +569,7 @@ int evaluate(Board_t self)
         static const double Ci = 4.0 / M_LN10;
         int score = round(Ci * logit(P) * 1e+3);
 
-        if (score == 0) score = 1; // Reserve 0 exclusively for draws
+        if (score == 0) score++; // Reserve 0 exclusively for draws
         score = min(score,  maxEval);
         score = max(score, -maxEval);
 

@@ -4,20 +4,21 @@
 After next HGM tourney
 
 User:
-- Strength increase of ~150 elo at fast time controls.
-- Slightly improved passer evaluation.
-- Stopping of search after having established the shortest mate.
+- Strength increase of ~150 elo at fast time controls
+- Slightly improved passer evaluation
+- Stopping of search after having established the shortest mate
 - Full UCI support: pondering, mate & node limited search, searchmoves
+- Several workarounds for pondering under cutechess 0.8.0 beta
 
 Internal:
-- Implemention of "moves [ depth <ply> ]" command.
-- Mate distance pruning.
-- Basic killers.
-- Basic cut node reductions.
-- Simple lazy move generation in scout.
-- Faster evaluation weight tuning using multiprocessing.
-- Faster evaluation weight tuning using quadratic fit before bailing out.
-- General code cleanup, such as the removal of needless SAN output code.
+- Implemention of "moves [ depth <ply> ]" command
+- Mate distance pruning
+- Basic killers
+- Basic cut node reductions
+- Simple lazy move generation in scout
+- Faster evaluation weight tuning using multiprocessing
+- Faster evaluation weight tuning using quadratic fit before bailing out
+- General code cleanup, such as the removal of needless SAN output code
 
 ------------------------------------------------------------------------
 

@@ -162,7 +162,7 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
         #define cutPv() (self->pv.len = pvIndex)
         int eval = evaluate(board(self));
 
-        if (!inRoot && (repetition(self) || eval == 0))
+        if (!inRoot && (eval == 0 || repetition(self)))
                 return cutPv(), drawScore(self);
 
         struct ttSlot slot = ttRead(self);

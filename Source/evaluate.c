@@ -503,8 +503,7 @@ int evaluate(Board_t self)
         int nrEffectivePieces = 2 + nrQueens + nrRooks + nrEffectiveBishops + nrKnights + nrPawns;
 
         if (nrEffectivePieces == 2)
-                //wiloScore = 0; // Insufficient mating material (KK)
-                return 0;
+                return 0; // Insufficient mating material (KK)
 
         if (nrEffectivePieces == 3) {
                 if (nrQueens(side) + nrRooks(side) > 0) {
@@ -518,8 +517,7 @@ int evaluate(Board_t self)
                 }
 
                 if (nrBishops + nrKnights > 0)
-                        //wiloScore = 0; // Insufficient mating material (KNK, KB...K of like-bishops)
-                        return 0;
+                        return 0; // Insufficient mating material (KNK, KB...K of like-bishops)
 
                 if (nrPawns > 0) { // KPK
                         int egtSide, wKing, wPawn, bKing;
@@ -538,7 +536,6 @@ int evaluate(Board_t self)
 
                         int egtScore = kpkProbe(egtSide, wKing, wPawn, bKing);
                         if (egtScore == 0)
-                                //wiloScore = 0;
                                 return 0;
                         else {
                                 wiloScore += egtScore * v[winBonus];
@@ -550,10 +547,10 @@ int evaluate(Board_t self)
 #if 0
         if (nrEffectivePieces == 4) {
                 if (nrKnights(xside) == 2)
-                        wiloScore = 0; // KKNN, draw if lone king is to move
+                        return 0; // KKNN, draw if lone king is to move
 
                 if (nrEffectiveBishops(side) == 1 && nrKnights(xside) == 1)
-                        wiloScore = 0; // KBKN, draw if bishop side is to move
+                        return 0; // KBKN, draw if bishop side is to move
         }
 #endif
 

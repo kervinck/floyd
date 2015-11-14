@@ -22,6 +22,8 @@ Internal:
 
 ------------------------------------------------------------------------
 
+|Todo| Pawn mobility
+
 Introduction of material table.
 
 |Todo| King safety [evaluate]
@@ -108,11 +110,11 @@ http://nvie.com/posts/a-successful-git-branching-model/
         Make release notes
         Merge into master
 
-|Todo| Basic history [search]
+|Todo| Basic history heuristic [search]
 
 |Todo| Basic counter move? [search]
 
-|Todo| Checks in qsearch, at least in PV
+|Todo| Checks in qsearch, at least in PV and after null move
 
 #define minDepth -7
 

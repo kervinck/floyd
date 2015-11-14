@@ -595,12 +595,12 @@ static bool allowNullMove(Board_t self)
 // Safe update from a possibly aborted PV
 static int updateBestAndPonderMove(Engine_t self)
 {
-        if (self->pv.len >= 1 && self->pv.v[0] != self->bestMove)
+        if (self->pv.len > 0 && self->pv.v[0] != self->bestMove)
                 self->ponderMove = 0;
         if (self->pv.len >= 3) // At least 3 to avoid pondering at game-end
                 self->ponderMove = self->pv.v[1];
 
-        if (self->pv.len >= 1)
+        if (self->pv.len > 0)
                 self->bestMove = self->pv.v[0];
 
         return !self->bestMove + !self->ponderMove; // 0, 1 or 2 halfmoves

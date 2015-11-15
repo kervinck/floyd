@@ -120,8 +120,8 @@ Hierarchy for source modules is as follows:
   |           `--- kpk.h                In-memory bitbase for King+Pawn vs King
   |                 `--- kpk.c
   +--- Board.h
-  |     +--- format.c                   Conversion to FEN and UCI/SAN
-  |     +--- parse.c                    Conversion from FEN and UCI/SAN
+  |     +--- format.c                   Conversion to FEN and UCI move notation
+  |     +--- parse.c                    Conversion from FEN and UCI move notation
   |     +--- moves.c                    Move generation, make and undo
   |     |     `--- zobrist.h
   |     |           `--- zobrish.c      Zobrist-Polyglot hash constants

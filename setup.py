@@ -1,9 +1,9 @@
 from distutils.core import setup, Extension
+import os
 
 floydModule = Extension(
         'floyd',
         sources = [
-                'Source/bench.c',
                 'Source/cplus.c',
                 'Source/evaluate.c',
                 'Source/floydmodule.c',
@@ -12,16 +12,16 @@ floydModule = Extension(
                 'Source/kpk.c',
                 'Source/parse.c',
                 'Source/search.c',
+                'Source/test.c',
                 'Source/ttable.c',
                 'Source/uci.c',
                 'Source/zobrist.c' ],
-        extra_compile_args = ['-std=c11', '-pedantic'],
         undef_macros = ['NDEBUG']
 )
 
 setup(
         name         = 'floyd',
-        version      = '0.1a',
+        version      = os.environ['floydVersion'],
         description  = 'Chess engine study',
         author       = 'Marcel van Kervinck',
         author_email = 'marcelk@bitpit.net',

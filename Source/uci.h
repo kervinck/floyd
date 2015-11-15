@@ -1,6 +1,8 @@
 
-bool uciSearchInfo(void *uciInfoData);
+searchInfo_fn uciSearchInfo;
 void uciMain(Engine_t engine);
 
-double uciBenchmark(Engine_t self, double time, searchInfo_fn *infoFunction, void *infoData);
+void uciBenchmark(Engine_t self, double time);
+void uciMoves(Board_t self, int depth);
+
 

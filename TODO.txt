@@ -1,85 +1,13 @@
 
-|Done| Add node count regression test 'make nodes'
+|Todo| Pawn mobility
 
-0 4667 4.667
-1 72022 15.4322
-2 276885 3.84445
-3 656101 2.36958
-4 1465726 2.23399
-5 4268470 2.91219
-6 12369825 2.89795
-7 41353130 3.34307
-8 145561974 3.51997
-
-0 4667 4.667
-1 72022 15.4322
-2 276885 3.84445
-3 656220 2.37001
-4 1476931 2.25066
-5 4500497 3.0472
-6 13429713 2.98405
-7 50237376 3.74076
-8 188069105 3.74361
-
-------------------------------------------------------------------------
-
-|Todo| Add __version__ to module
-
-|Todo| Introduce move flags
-
-|Todo| Run program through valgrind
-
-|Todo| Try null move threat extensions
-
-|Todo| Try MVA/LVA instead of fake-SEE
-
-|Todo| Try simple SEE
-
-|Todo| Win64 version from Makefile [win64]
-
-|Todo| Learn how to branch in git :-) [git]
-
-Also provide a source zip file on the download page.
-http://nvie.com/posts/a-successful-git-branching-model/
-
-|Todo| Scale passers with material [evaluate]
+|Todo| Introduction of material table.
 
 |Todo| King safety [evaluate]
 
-|Todo| Remove evaluate.h [cleanup]
-
-|Todo| Basic killers [search]
-
-|Todo| Basic history [search]
-
-|Todo| Basic counter move? [search]
-
-|Todo| Checks in qsearch, at least in PV
-
-#define minDepth -7
-
-|Todo| Granularity of win32 clock too low? [win32]
-
-|Todo| Enable test before install [build]
-
-|Todo| Preserve parameter order in vector.json [tuning]
-
-|Todo| Multicore support for tuning [speed]
+|Todo| Rooks and queens on open files [evaluate]
 
 |Todo| Left-right location parameters [evaluate]
-
-|Todo| Before breaking out the tune loop, do a quadratic fit on the
-       nearest 3 points and probe the bottom [tune]
-
-|Todo| Experiment: tune each bishop square [evaluate]
-
-|Todo| Expand board control. Include mobility [evaluate]
-
-|Todo| Add white/black testing [qa,evaluate]
-
-|Todo| Add left/right testing [qa,evaluate]
-
-|Todo| Terminology: coefficient or parameter [qa]
 
 |Todo| Check Rebel evaluation features [evaluate]
 
@@ -93,6 +21,85 @@ Go through eval_comp forwards and backwards again and
 take many things.
 
 |Todo| LittleChessEvaluationCompendium.pdf [evaluate]
+
+|Todo| Chess programming wiki [evaluate]
+
+https://chessprogramming.wikispaces.com/Evaluation
+
+|Todo| Experiment: tune each bishop square [evaluate]
+
+|Todo| Expand board control. Include mobility [evaluate]
+
+|Todo| Add white/black testing [qa,evaluate]
+
+|Todo| Add left/right testing [qa,evaluate]
+
+|Todo| Introduce move flags for 32 bit
+
+- Simplify UCI move formatting
+
+|Todo| Extend move flags
+
+- Extend flags beyond 
+
+Concept choice: keep flags with move or in seperate table?
+
+          search                     board
++------------+------------+------------+-------------+
+| SEE/killer |   history  | properties |     move    |
++------------+------------+------------+-------------+
+      16            16           16           16
+
+        moveList[i] += self->history[moveList[i] & moveMask]
+
+1. Sort a long key.
+        - Makes everyone migrate to Move_t
+        + Can use standard qsort
+2. Sort only the scores, with back reference to the move (index)
+3. Sort through a history table, requires modified qsort
+4. Hide all in a move picker object
+5. Place scores at index+256
+        - Doesn't work with qsort
+
+Desirable properties
+- generateMoves still generates ints (32bit)
+- can use stdlib qsort
+
+|Todo| Win64 version from Makefile [win64]
+
+Joost: Intel C compiler versie 15
+https://software.intel.com/en-us/qualify-for-free-software
+
+|Todo| Learn how to branch in git :-) [git]
+
+Make Docs/branching.txt
+
+http://nvie.com/posts/a-successful-git-branching-model/
+
+"master": releases
+"patch": for fixes on release. Short lived. Push into int and into master
+        Fixes on release give a new release
+"int": upcoming release branch, for integration testing
+        push into master and dev
+"dev": fast-paced changes
+        merge dev into int to start preparing next release
+        Then only allow fixes
+        Make release notes
+        Merge into master
+
+|Todo| Basic history heuristic [search]
+
+|Todo| Basic counter move? [search]
+
+|Todo| Checks in qsearch, at least in PV and after null move
+
+#define minDepth -7
+
+|Todo| Granularity of win32 clock too low? [win32]
+
+|Todo| Multicore support for tuning [speed]
+
+|Todo| Terminology: coefficient or parameter [qa]
 
 |Todo| Measure repeatibility of tuner [verification,tune]
 
@@ -133,10 +140,6 @@ https://en.wikipedia.org/wiki/Rosenbrock_function
 
 - also update chessmoves module for this
 
-|Todo| Export version string to Python [python]
-
-|Todo| In debugging mode give moves also in SAN for readability
-
 |Todo| Accept a lambda as value to `info' in search() [python]
 
 As a callback interface with the search info data
@@ -150,9 +153,13 @@ Then also cache evaluation in ttable
 floyd [ <uciCommand> <uciOption> ... ]
 
 eg.
-floyd go depth 8
+floyd 'debug on'
+floyd 'go depth 8'
 floyd help
 floyd bench
+
+Main obstacle is that the token scanner assumes there is always a
+whitespace or newline after each word.
 
 |Todo| Consider persistent alarm thread [speed]
 
@@ -168,9 +175,26 @@ Also recognize 50-move as a game during search.
 
 |Todo| Compile on FreeBSD [qa]
 
-|Todo| Pondering [uci]
+|Todo| eggs metadata [python]
 
-|Todo| Move generator test [qa]
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
 
-moves 5 (includes divide, no time info)
+|Todo| Some remaining failures in the mate5 test set:
+
+8/3N4/6p1/1p5p/5b1p/P2k2n1/1B6/3KQ3 w - - acn 138553; acs 0; bm Ba1; ce 32758; dm 5; pv Ba1 h3 Nf6 b4 Qe6 Bd2 Qd6+ Ke3 Qxg3#;
+2RR2bK/b1N4p/1pkNp1r1/p3p2r/6P1/n1p5/n5P1/6B1 w - - acn 330710; acs 1; bm g3; ce 32758; dm 5; pv g3 h6 Ncb5+ Kd5 Nxc3+ Nxc3 Nc4+ Ke4 Nd2#;
+6RQ/6pP/p5K1/1r2p2N/p3k3/R7/B7/B7 w - - acn 106602; acs 0; bm Qxg7 Rc3; ce 32758; dm 5; pv Rc3 Rb6+ Kg5 Rg6+ Kxg6 a3 Rd8 a5 Bb1#;
+
+|Todo| Best of <n> benchmark [qa]
+
+First verify that variance of the extreme is indeed better than
+the variance of the mean.
+
+See timing.log and timing3.log
+
+|Todo| Move logit() from evaluate to rootSearch [speed]
+
+|Todo| Null move for zugzwang
 

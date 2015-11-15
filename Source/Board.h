@@ -9,29 +9,8 @@
  *  Copyright (C) 2015, Marcel van Kervinck
  *  All rights reserved
  *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *  notice, this list of conditions and the following disclaimer.
- *
- *  2. Redistributions in binary form must reproduce the above copyright
- *  notice, this list of conditions and the following disclaimer in the
- *  documentation and/or other materials provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- *  COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- *  POSSIBILITY OF SUCH DAMAGE.
+ *  Please read the enclosed file `LICENSE' or retrieve this document
+ *  from https://marcelk.net/floyd/LICENSE for terms and conditions.
  */
 
 /*----------------------------------------------------------------------+
@@ -86,8 +65,7 @@ struct Board {
          *  Side data
          */
         struct side *side, *xside;
-        struct side whiteSide;
-        struct side blackSide;
+        struct side sides[2];
         int sideInfoPlyNumber; // for auto-update
 
         /*
@@ -218,26 +196,9 @@ void undoMove(Board_t self);
 void makeNullMove(Board_t self);
 
 /*
- *  Convert move to standard algebraic notation, without checkmark
- *  A movelist must be prepared by the caller for disambiguation,
- *  which may include the move itself.
- */
-char *moveToStandardAlgebraic(Board_t self, char moveString[maxMoveSize], int move, int xmoves[maxMoves], int xlen);
-
-/*
- *  Convert move to long algebraic notation, without checkmark
- */
-char *moveToLongAlgebraic(Board_t self, char moveString[maxMoveSize], int move);
-
-/*
  *  Convert move to computer notation (UCI)
  */
 char *moveToUci(Board_t self, char moveString[maxMoveSize], int move);
-
-/*
- *  Determine the check status for the current position ("", "+" or "#")
- */
-const char *getCheckMark(Board_t self);
 
 /*
  *  Parse move input, disambiguate abbreviated notations
@@ -260,6 +221,9 @@ extern bool isLegalMove(Board_t self, int move);
 
 // Is the move a pawn promotion?
 extern bool isPromotion(Board_t self, int from, int to);
+
+// Search tree to fixed depth for correctness testing
+extern long long moveTest(Board_t self, int depth);
 
 /*----------------------------------------------------------------------+
  |                                                                      |

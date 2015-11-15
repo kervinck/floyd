@@ -7,7 +7,7 @@ import numpy as np
 import sys
 
 with open(sys.argv[1], 'r') as fp:
-        vector = json.load(fp)
+        vector = {item[0]:item[1] for item in json.load(fp)}
 
 def pawn(fileIndex, rankIndex, xKing):
         if rankIndex in [0, 7]:

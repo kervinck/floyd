@@ -51,7 +51,6 @@
 // Other modules
 #include "Board.h"
 #include "Engine.h"
-#include "evaluate.h"
 #include "uci.h"
 
 /*----------------------------------------------------------------------+
@@ -72,6 +71,7 @@ PyDoc_STRVAR(evaluate_doc,
 static PyObject *
 floydmodule_evaluate(PyObject *self, PyObject *args)
 {
+        unused(self);
         char *fen;
 
         if (!PyArg_ParseTuple(args, "s", &fen))
@@ -103,6 +103,7 @@ PyDoc_STRVAR(setCoefficient_doc,
 static PyObject *
 floydmodule_setCoefficient(PyObject *self, PyObject *args)
 {
+        unused(self);
         int coef, newValue;
 
         if (!PyArg_ParseTuple(args, "ii", &coef, &newValue))
@@ -143,15 +144,10 @@ PyDoc_STRVAR(search_doc,
 //      "       'xboard': Write XBoard info lines to stdout\n"
 );
 
-// Suppress search info
-static bool emptyInfoFunction(void *infoData)
-{
-        return false;
-}
-
 static PyObject *
 floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
 {
+        unused(self);
         char *fen;
         int depth = maxDepth;
         double movetime = 0.0;
@@ -180,7 +176,7 @@ floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
         if (movetime < 0.0)
                 return PyErr_Format(PyExc_ValueError, "Invalid movetime (%g)", movetime);
 
-        searchInfo_fn *infoFunction = emptyInfoFunction;
+        searchInfo_fn *infoFunction = noInfoFunction;
         void *infoData = &engine;
         if (info != null) {
                 if (!strcmp(info, "uci"))
@@ -189,7 +185,16 @@ floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
                         return PyErr_Format(PyExc_ValueError, "Invalid info type (%s)", info);
         }
 
-        rootSearch(&engine, depth, 0.0, movetime, infoFunction, infoData);
+        engine.target.depth = depth;
+        engine.target.nodeCount = maxLongLong;
+        engine.target.scores = (intPair) {{ -maxInt, maxInt }};;
+        engine.target.time = 0.0;
+        engine.target.maxTime = movetime;
+        engine.pondering = false;
+        engine.moveReady = false;
+        engine.infoFunction = infoFunction;
+        engine.infoData = infoData;
+        rootSearch(&engine);
 
         PyObject *result = PyTuple_New(2);
         if (!result)
@@ -221,6 +226,7 @@ floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
         freeList(engine.board.undoStack);
         freeList(engine.searchMoves);
         freeList(engine.pv);
+        freeList(engine.killers);
         free(engine.tt.slots);
 
         return result;
@@ -231,10 +237,10 @@ floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
  +----------------------------------------------------------------------*/
 
 static PyMethodDef floydMethods[] = {
-	{ "evaluate",       floydmodule_evaluate,            METH_VARARGS,               evaluate_doc },
-	{ "setCoefficient", floydmodule_setCoefficient,      METH_VARARGS,               setCoefficient_doc },
-	{ "search",         (PyCFunction)floydmodule_search, METH_VARARGS|METH_KEYWORDS, search_doc },
-	{ null, }
+        { "evaluate",       floydmodule_evaluate,            METH_VARARGS,               evaluate_doc },
+        { "setCoefficient", floydmodule_setCoefficient,      METH_VARARGS,               setCoefficient_doc },
+        { "search",         (PyCFunction)floydmodule_search, METH_VARARGS|METH_KEYWORDS, search_doc },
+        { null, null, 0, null }
 };
 
 /*----------------------------------------------------------------------+
@@ -245,7 +251,13 @@ PyMODINIT_FUNC
 initfloyd(void)
 {
         // Create the module and add the functions
-	Py_InitModule3("floyd", floydMethods, floyd_doc);
+        PyObject *module = Py_InitModule3("floyd", floydMethods, floyd_doc);
+        if (!module)
+                return;
+
+        PyObject *versionString = PyString_FromString(quote2(floydVersion));
+        if (versionString)
+                PyModule_AddObject(module, "__version__", versionString);
 }
 
 /*----------------------------------------------------------------------+

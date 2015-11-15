@@ -9,29 +9,8 @@
  *  Copyright (C) 2015, Marcel van Kervinck
  *  All rights reserved
  *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *  notice, this list of conditions and the following disclaimer.
- *
- *  2. Redistributions in binary form must reproduce the above copyright
- *  notice, this list of conditions and the following disclaimer in the
- *  documentation and/or other materials provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- *  COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- *  POSSIBILITY OF SUCH DAMAGE.
+ *  Please read the enclosed file `LICENSE' or retrieve this document
+ *  from https://marcelk.net/floyd/LICENSE for terms and conditions.
  */
 
 /*----------------------------------------------------------------------+
@@ -270,11 +249,10 @@ extern int generateMoves(Board_t self, int moveList[maxMoves])
                                 dir -= dirs; // pick next
                                 dir &= dirs;
                                 to = from + kingStep[dir];
-                                if (self->squares[to] != empty
-                                 && pieceColor(self->squares[to]) == sideToMove(self))
-                                        continue;
-                                if (self->xside->attacks[to] == 0)
-                                        pushMove(self, from, to);
+                                if (self->squares[to] == empty
+                                 || pieceColor(self->squares[to]) != sideToMove(self))
+                                        if (self->xside->attacks[to] == 0)
+                                                pushMove(self, from, to);
                         } while (dirs -= dir); // remove and go to next
                         break;
 
@@ -301,10 +279,9 @@ extern int generateMoves(Board_t self, int moveList[maxMoves])
                                 dir -= dirs; // pick next
                                 dir &= dirs;
                                 to = from + knightJump[dir];
-                                if (self->squares[to] != empty
-                                 && pieceColor(self->squares[to]) == sideToMove(self))
-                                        continue;
-                                pushMove(self, from, to);
+                                if (self->squares[to] == empty
+                                 || pieceColor(self->squares[to]) != sideToMove(self))
+                                        pushMove(self, from, to);
                         } while (dirs -= dir); // remove and go to next
                         break;
 
@@ -330,7 +307,7 @@ extern int generateMoves(Board_t self, int moveList[maxMoves])
                                 to += stepN;
                                 if (self->squares[to] == empty) {
                                         pushMove(self, from, to);
-                                        if (self->blackSide.attacks[to+stepS])
+                                        if (self->sides[black].attacks[to+stepS])
                                                 self->movePtr[-1] |= specialMoveFlag;
                                 }
                         }
@@ -358,7 +335,7 @@ extern int generateMoves(Board_t self, int moveList[maxMoves])
                                 to += stepS;
                                 if (self->squares[to] == empty) {
                                         pushMove(self, from, to);
-                                        if (self->whiteSide.attacks[to+stepN])
+                                        if (self->sides[white].attacks[to+stepN])
                                                 self->movePtr[-1] |= specialMoveFlag;
                                 }
                         }
@@ -499,7 +476,7 @@ extern void makeMove(Board_t self, int move)
                                 self->hash ^= hashEnPassant(to);
                         } else {
                                 push(from, self->squares[from]); // White promotes
-                                int promoPiece = whiteQueen + (move >> promotionBits);
+                                int promoPiece = whiteQueen + ((move >> promotionBits) & 3);
                                 self->squares[from] = promoPiece;
                                 self->hash ^= zobristPiece[whitePawn][from]
                                             ^ zobristPiece[promoPiece][from];
@@ -522,7 +499,7 @@ extern void makeMove(Board_t self, int move)
                                 self->hash ^= hashEnPassant(to);
                         } else {
                                 push(from, self->squares[from]); // Black promotes
-                                int promoPiece = blackQueen + (move >> promotionBits);
+                                int promoPiece = blackQueen + ((move >> promotionBits) & 3);
                                 self->squares[from] = promoPiece;
                                 self->hash ^= zobristPiece[blackPawn][from]
                                             ^ zobristPiece[promoPiece][from];
@@ -623,11 +600,11 @@ extern void updateSideInfo(Board_t self)
         if (self->sideInfoPlyNumber == self->plyNumber)
                 return;
 
-        memset(&self->whiteSide, 0, sizeof self->whiteSide);
-        memset(&self->blackSide, 0, sizeof self->blackSide);
+        memset(&self->sides[white], 0, sizeof self->sides[white]);
+        memset(&self->sides[black], 0, sizeof self->sides[black]);
 
-        self->side  = (sideToMove(self) == white) ? &self->whiteSide : &self->blackSide;
-        self->xside = (sideToMove(self) == white) ? &self->blackSide : &self->whiteSide;
+        self->side  = (sideToMove(self) == white) ? &self->sides[white] : &self->sides[black];
+        self->xside = (sideToMove(self) == white) ? &self->sides[black] : &self->sides[white];
 
         for (int from=0; from<boardSize; from++) {
                 int piece = self->squares[from];
@@ -643,9 +620,9 @@ extern void updateSideInfo(Board_t self)
                                 dir -= dirs; // pick next
                                 dir &= dirs;
                                 int to = from + kingStep[dir];
-                                self->whiteSide.attacks[to] += attackKing;
+                                self->sides[white].attacks[to] += attackKing;
                         } while (dirs -= dir); // remove and go to next
-                        self->whiteSide.king = from;
+                        self->sides[white].king = from;
                         break;
 
                 case blackKing:
@@ -655,33 +632,33 @@ extern void updateSideInfo(Board_t self)
                                 dir -= dirs; // pick next
                                 dir &= dirs;
                                 int to = from + kingStep[dir];
-                                self->blackSide.attacks[to] += attackKing;
+                                self->sides[black].attacks[to] += attackKing;
                         } while (dirs -= dir); // remove and go to next
-                        self->blackSide.king = from;
+                        self->sides[black].king = from;
                         break;
 
                 case whiteQueen:
-                        updateSliderAttacks(self, from, dirsQueen, &self->whiteSide, attackQueen);
+                        updateSliderAttacks(self, from, dirsQueen, &self->sides[white], attackQueen);
                         break;
 
                 case blackQueen:
-                        updateSliderAttacks(self, from, dirsQueen, &self->blackSide, attackQueen);
+                        updateSliderAttacks(self, from, dirsQueen, &self->sides[black], attackQueen);
                         break;
 
                 case whiteRook:
-                        updateSliderAttacks(self, from, dirsRook, &self->whiteSide, attackRook);
+                        updateSliderAttacks(self, from, dirsRook, &self->sides[white], attackRook);
                         break;
 
                 case blackRook:
-                        updateSliderAttacks(self, from, dirsRook, &self->blackSide, attackRook);
+                        updateSliderAttacks(self, from, dirsRook, &self->sides[black], attackRook);
                         break;
 
                 case whiteBishop:
-                        updateSliderAttacks(self, from, dirsBishop, &self->whiteSide, attackMinor);
+                        updateSliderAttacks(self, from, dirsBishop, &self->sides[white], attackMinor);
                         break;
 
                 case blackBishop:
-                        updateSliderAttacks(self, from, dirsBishop, &self->blackSide, attackMinor);
+                        updateSliderAttacks(self, from, dirsBishop, &self->sides[black], attackMinor);
                         break;
 
                 case whiteKnight:
@@ -691,7 +668,7 @@ extern void updateSideInfo(Board_t self)
                                 dir -= dirs; // pick next
                                 dir &= dirs;
                                 int to = from + knightJump[dir];
-                                self->whiteSide.attacks[to] += attackMinor;
+                                self->sides[white].attacks[to] += attackMinor;
                         } while (dirs -= dir); // remove and go to next
                         break;
 
@@ -702,22 +679,22 @@ extern void updateSideInfo(Board_t self)
                                 dir -= dirs; // pick next
                                 dir &= dirs;
                                 int to = from + knightJump[dir];
-                                self->blackSide.attacks[to] += attackMinor;
+                                self->sides[black].attacks[to] += attackMinor;
                         } while (dirs -= dir); // remove and go to next
                         break;
 
                 case whitePawn:
                         if (file(from) != fileH)
-                                self->whiteSide.attacks[from+stepNE] += attackPawn;
+                                self->sides[white].attacks[from+stepNE] += attackPawn;
                         if (file(from) != fileA)
-                                self->whiteSide.attacks[from+stepNW] += attackPawn;
+                                self->sides[white].attacks[from+stepNW] += attackPawn;
                         break;
 
                 case blackPawn:
                         if (file(from) != fileH)
-                                self->blackSide.attacks[from+stepSE] = attackPawn;
+                                self->sides[black].attacks[from+stepSE] = attackPawn;
                         if (file(from) != fileA)
-                                self->blackSide.attacks[from+stepSW] = attackPawn;
+                                self->sides[black].attacks[from+stepSW] = attackPawn;
                         break;
                 }
         }
@@ -825,6 +802,26 @@ void normalizeEnPassantStatus(Board_t self)
 
         self->hash ^= hashEnPassant(square);
         self->enPassantPawn = 0;
+}
+
+/*----------------------------------------------------------------------+
+ |      moveTest                                                        |
+ +----------------------------------------------------------------------*/
+
+long long moveTest(Board_t self, int depth)
+{
+        if (depth <= 0)
+                return 1;
+        long long total = 0;
+        int moveList[maxMoves];
+        int nrMoves = generateMoves(self, moveList);
+        for (int i=0; i<nrMoves; i++) {
+                makeMove(self, moveList[i]);
+                if (wasLegalMove(self))
+                        total += moveTest(self, depth - 1);
+                undoMove(self);
+        }
+        return total;
 }
 
 /*----------------------------------------------------------------------+

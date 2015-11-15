@@ -9,29 +9,8 @@
  *  Copyright (C) 2015, Marcel van Kervinck
  *  All rights reserved
  *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *  notice, this list of conditions and the following disclaimer.
- *
- *  2. Redistributions in binary form must reproduce the above copyright
- *  notice, this list of conditions and the following disclaimer in the
- *  documentation and/or other materials provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- *  COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- *  POSSIBILITY OF SUCH DAMAGE.
+ *  Please read the enclosed file `LICENSE' or retrieve this document
+ *  from https://marcelk.net/floyd/LICENSE for terms and conditions.
  */
 
 /*----------------------------------------------------------------------+
@@ -39,8 +18,13 @@
  +----------------------------------------------------------------------*/
 
 #define maxDepth 120
+#define nrKillers 5
+#define newKillerIndex 2
 
 typedef struct Engine *Engine_t;
+
+// Callback interface for handling of search progress
+typedef void searchInfo_fn(void *infoData);
 
 /*
  *  Transposition table
@@ -53,6 +37,12 @@ enum {
         minMate = -32000, minEval = -29999, minDtz  = -31000,
         maxMate =  32000, maxEval =  29999, maxDtz  =  31000,
 };
+#define isDrawScore(score)     ((score) == 0)
+#define isWinScore(score)      ((score) > maxEval)
+#define isLossScore(score)     ((score) < minEval)
+#define isMateWinScore(score)  ((score) >= maxDtz)
+#define isMateLossScore(score) ((score) <= minDtz)
+#define isMateScore(score)     (abs(score) >= maxDtz)
 
 struct ttSlot {
         uint64_t key;
@@ -71,6 +61,10 @@ struct ttSlot {
         };
 };
 
+typedef Tuple(int, nrKillers) killersTuple;
+
+#define ply(self) (board(self)->plyNumber - (self)->rootPlyNumber)
+
 /*
  *  Chess engine
  */
@@ -78,8 +72,8 @@ struct Engine {
         struct Board board;
 
         int rootPlyNumber;
-        intList searchMoves; // root moves to search, empty means all
-        volatile bool stopFlag;
+        intList searchMoves;    // root moves to search, empty means all
+        bool mateStop;          // stops the search once the shortest mate is found
 
         // transposition table
         struct {
@@ -90,6 +84,8 @@ struct Engine {
                 uint64_t baseHash; // For fast clearing
         } tt;
 
+        List(killersTuple) killers;
+
         // last search result
         struct {
                 uint64_t lastSearched;
@@ -99,9 +95,23 @@ struct Engine {
                 int ponderMove;
                 intList pv;
                 double seconds;
-                long long nodeCount;
+                volatile long long nodeCount;
         };
 
+        struct {
+                double time;
+                double maxTime;
+                int depth;
+                long long nodeCount; // also used to abort the search
+                intPair scores;
+        } target;
+
+        searchInfo_fn *infoFunction;
+        void *infoData;
+
+        volatile bool pondering;
+        volatile bool moveReady;
+        xAlarm_t alarmHandle;
         void *abortTarget;
 };
 
@@ -113,8 +123,13 @@ struct Engine {
  */
 #define board(engine) (&(engine)->board)
 
-// Callback interface for handling of search progress
-typedef bool searchInfo_fn(void *infoData);
+/*----------------------------------------------------------------------+
+ |      Data                                                            |
+ +----------------------------------------------------------------------*/
+
+extern int globalVector[];
+extern const int vectorLen;
+extern const char * const vectorLabels[];
 
 /*----------------------------------------------------------------------+
  |      Functions                                                       |
@@ -123,12 +138,14 @@ typedef bool searchInfo_fn(void *infoData);
 /*
  *  Search
  */
+void rootSearch(Engine_t self);
+searchInfo_fn noInfoFunction;
+void abortSearch(void *engine);
 
-void rootSearch(Engine_t self,
-                int depth,
-                double targetTime, double alarmTime,
-                searchInfo_fn *infoFunction, void *infoData);
-void abortSearch(Engine_t self);
+/*
+ *  Evaluate
+ */
+int evaluate(Board_t self);
 
 /*
  *  Transposition table
@@ -139,6 +156,11 @@ int ttWrite(Engine_t self, struct ttSlot slot, int depth, int score, int alpha, 
 struct ttSlot ttRead(Engine_t self);
 void ttClearFast(Engine_t self);
 double ttCalcLoad(Engine_t self);
+
+/*
+ *  Time control
+ */
+void setTimeTargets(Engine_t self, double time, double inc, int movestogo, double movetime);
 
 /*----------------------------------------------------------------------+
  |                                                                      |

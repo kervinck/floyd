@@ -9,29 +9,8 @@
  *  Copyright (C) 2015, Marcel van Kervinck
  *  All rights reserved
  *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *  notice, this list of conditions and the following disclaimer.
- *
- *  2. Redistributions in binary form must reproduce the above copyright
- *  notice, this list of conditions and the following disclaimer in the
- *  documentation and/or other materials provided with the distribution.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- *  COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- *  POSSIBILITY OF SUCH DAMAGE.
+ *  Please read the enclosed file `LICENSE' or retrieve this document
+ *  from https://marcelk.net/floyd/LICENSE for terms and conditions.
  */
 
 /*----------------------------------------------------------------------+
@@ -66,50 +45,14 @@
  |      Exceptions                                                      |
  +----------------------------------------------------------------------*/
 
-err_t err_free(err_t err)
+err_t freeErr(err_t err)
 {
         if (err->argc >= 0) {
-#if 0
-                for (int i=0; i<=err->argc; i++) {
-                        xUnlink(err->argv[i]);
-                }
-#endif
+                //for (int i=0; i<=err->argc; i++)
+                        //xUnlink(err->argv[i]);
                 free(err);
         }
         return OK;
-}
-
-/*----------------------------------------------------------------------+
- |      Main support                                                    |
- +----------------------------------------------------------------------*/
-
-int errExitMain(err_t err)
-{
-        if (err == OK) {
-                return 0;
-        } else {
-                (void) fprintf(stderr, "[%s:%s:%d] Error: %s\n",
-                        err->file,
-                        err->function,
-                        err->line,
-                        err->format);
-
-                (void) err_free(err);
-
-                return EXIT_FAILURE;
-        }
-}
-
-void errAbort(err_t err)
-{
-        (void) errExitMain(err);
-        abort();
-}
-
-void xAbort(int r, const char *function)
-{
-        fprintf(stderr, "*** System error: %s failed (%s)\n", function, strerror(r));
-        abort();
 }
 
 /*----------------------------------------------------------------------+
@@ -155,22 +98,25 @@ cleanup:
 /*
  *  Get wall time in seconds and subseconds
  */
+
+#if defined(WIN32)
 double xTime(void)
 {
-#if defined(WIN32)
         struct _timeb t;
         _ftime(&t);
         return t.time + t.millitm * 1e-3;
+}
 #endif
+
 #if defined(POSIX)
+double xTime(void)
+{
         struct timeval tv;
         int r = gettimeofday(&tv, null);
-        if (r == 0)
-                return tv.tv_sec + tv.tv_usec * 1e-6;
-        else
-                return -1.0;
-#endif
+        if (r == -1) xAbort(errno, "gettimeofday");
+        return tv.tv_sec + tv.tv_usec * 1e-6;
 }
+#endif
 
 /*----------------------------------------------------------------------+
  |      stringCopy                                                      |
@@ -178,63 +124,69 @@ double xTime(void)
 
 char *stringCopy(char *s, const char *t)
 {
-        while ((*s = *t)) {
-                s++;
-                t++;
-        }
+        while ((*s = *t))
+                s++, t++;
         return s; // give pointer to terminating zero for easy concatenation
 }
 
 /*----------------------------------------------------------------------+
- |      readline                                                        |
+ |      compareInt                                                      |
  +----------------------------------------------------------------------*/
 
-int readLine(void *fpPointer, char **pLine, int *pSize)
+int compareInt(const void *ap, const void *bp)
+{
+        const int *a = ap, *b = bp;
+        if (*a > *b) return 1;
+        if (*a < *b) return -1;
+        return 0;
+}
+
+/*----------------------------------------------------------------------+
+ |      readLine                                                        |
+ +----------------------------------------------------------------------*/
+
+int readLine(void *fpPointer, charList *lineBuffer)
 {
         FILE *fp = fpPointer;
-        char *line = *pLine;
-        int size = *pSize;
-        int len = 0;
+        lineBuffer->len = 0;
+        int c;
 
-        for (;;) {
-                /*
-                 *  Ensure there is enough space for the next character and a terminator
-                 */
-                if (len + 1 >= size) {
-                        int newsize = (size > 0) ? (2 * size) : 128;
-                        char *newline = realloc(line, newsize);
+        do {
+                c = getc(fp);
+                if (c != EOF)        pushList(*lineBuffer, c);
+                else if (ferror(fp)) xAbort(errno, "getc");
+                else                 break;
+        } while (c != '\n');
 
-                        if (newline == NULL) {
-                                fprintf(stderr, "*** Error: %s\n", strerror(errno));
-                                exit(EXIT_FAILURE);
-                        }
+        pushList(*lineBuffer, '\0');
+        return lineBuffer->len-1;
+}
 
-                        line = newline;
-                        size = newsize;
-                }
+/*----------------------------------------------------------------------+
+ |      Main support                                                    |
+ +----------------------------------------------------------------------*/
 
-                /*
-                 *  Process next character from file
-                 */
-                int c = getc(fp);
-                if (c == EOF) {
-                        if (ferror(fp)) {
-                                fprintf(stderr, "*** Error: %s\n", strerror(errno));
-                                exit(EXIT_FAILURE);
-                        } else {
-                                break;
-                        }
-                }
-                line[len++] = c;
+int errExitMain(err_t err)
+{
+        if (err != OK) {
+                fprintf(stderr, "Error: %s, file %s, function %s, line %d.\n",
+                        err->format, err->file, err->function, err->line);
+                freeErr(err);
+                return EXIT_FAILURE;
+        } else
+                return 0;
+}
 
-                if (c == '\n') break; // End of line found
-        }
+void errAbort(err_t err)
+{
+        errExitMain(err);
+        abort();
+}
 
-        line[len] = '\0';
-        *pLine = line;
-        *pSize = size;
-
-        return len;
+void xAbort(int r, const char *function)
+{
+        fprintf(stderr, "System error: %s failed (%s)\n", function, strerror(r));
+        abort();
 }
 
 /*----------------------------------------------------------------------+
@@ -319,7 +271,6 @@ void joinThread(xThread_t thread)
         cAbort(r, "pthread_join");
 }
 #endif
-
 
 /*----------------------------------------------------------------------+
  |      Alarms (Windows)                                                |

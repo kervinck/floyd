@@ -1,0 +1,23 @@
+Top 20 things that chess engines better leave behind in the 90s:
+
+20. Integrated GUI
+19. Integrated voice output
+18. Curses display
+17. ANSI colors
+16. Input prompt
+15. Readline support
+14. Line wrapping and terminal width sensing
+13. Logging facilities
+12. PGN (both input and output)
+11. SAN (both input and output)
+10. Conversion of evalution values into emoticons
+9. Roman numerals (1890s that is)
+8. Input validation for conditions that won't cause a crash
+7. Recovery from system failures (instead report what happened and abort)
+6. Integrated scripting or macro expansion systems
+5. Checking of system or library compliancy to their specification
+4. Nalimov tables
+3. Configuration files (worse if they are in XML)
+2. Xboard protocol
+1. Auto232 autoplayer interface
+

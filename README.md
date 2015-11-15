@@ -3,7 +3,7 @@ Floyd study engine
 
 `floyd' is a chess engine study by Marcel van Kervinck.
 
-FLoyd is not a stand-alone chess program. It can be loaded as an engine
+Floyd is not a stand-alone chess program. It can be loaded as an engine
 in chess GUIs such as Winboard, Arena, XBoard, Shredder and others.
 
 In addition to the UCI interface, a Python interface is
@@ -41,8 +41,8 @@ Command interface
 $ make
 $ ./floyd 
 
-Floyd Chess Program - Version 0.1a
-Copyright (C)1998-2015 by Marcel van Kervinck
+Floyd Chess Engine - Version 0.x
+Copyright (C) 2015, Marcel van Kervinck
 All rights reserved
 
 Type "help" for more information, or "quit" to leave.
@@ -70,21 +70,22 @@ Supported UCI commands are:
         Always show a final result using `bestmove'. (But: see `infinite')
         Command options are:
           searchmoves <move> ...  Only search these moves
-          ponder                  Start search in ponder mode // TODO: not implemented
+          ponder                  Start search in ponder mode
           wtime <millis>          Time remaining on White's clock
           btime <millis>          Time remaining on Black's clock
           winc <millis>           White's increment after each move
           binc <millis>           Black's increment after each move
           movestogo <nrMoves>     Moves to go until next time control
           depth <ply>             Search no deeper than <ply> halfmoves
-          nodes <nrNodes>         Search no more than <nrNodes> nodes // TODO: not implemented
-          mate <nrMoves>          Search for a mate in <nrMoves> moves // TODO: not implemented
+          nodes <nrNodes>         Search no more than <nrNodes> nodes
+          mate <nrMoves>          Search for a mate in <nrMoves> moves or less
           movetime <millis>       Search no longer than this time
           infinite                Postpone `bestmove' result until `stop'
+         (Note: In Floyd `ponder' and `infinite' behave the same.)
   ponderhit
         Opponent has played the ponder move. Continue searching in own time.
   stop
-        Stop any search. In `infinite' mode also show the `bestmove' result.
+        Immediately stop any active `go' command and show its `bestmove' result.
   quit
         Terminate engine.
 
@@ -95,7 +96,7 @@ Extra commands:
         Show evaluation.
   bench [ movetime <millis> ]
         Speed test using 40 standard positions. Default `movetime' is 1000.
-  moves [ depth <ply> ] // TODO: not implemented
+  moves [ depth <ply> ]
         Move generation test. Default `depth' is 1.
 
 Unknown commands and options are silently ignored, except in debug mode.
@@ -110,17 +111,17 @@ Hierarchy for source modules is as follows:
  floydmodule.c                          Python interface to search and evaluate
   +--- uci.h
   |     +--- uci.c                      UCI driver
-  |     `--- bench.c                    Built-in speed benchmark
+  |     `--- test.c                     Built-in speed benchmark and self test
   +--- Engine.h
-  |     +--- search.c                   PVS, scout, quiescence search, "SEE"
+  |     +--- search.c                   PVS, scout, quiescence search, SEE
   |     +--- ttable.c                   Transposition table
   |     `--- evaluate.c                 Position evaluation
   |           +--- vector.h             Evaluation features and weights
   |           `--- kpk.h                In-memory bitbase for King+Pawn vs King
   |                 `--- kpk.c
   +--- Board.h
-  |     +--- format.c                   Conversion to FEN and UCI/SAN
-  |     +--- parse.c                    Conversion from FEN and UCI/SAN
+  |     +--- format.c                   Conversion to FEN and UCI move notation
+  |     +--- parse.c                    Conversion from FEN and UCI move notation
   |     +--- moves.c                    Move generation, make and undo
   |     |     `--- zobrist.h
   |     |           `--- zobrish.c      Zobrist-Polyglot hash constants

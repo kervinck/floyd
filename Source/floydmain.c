@@ -59,6 +59,7 @@ int main(void)
         freeList(engine.board.undoStack);
         freeList(engine.searchMoves);
         freeList(engine.pv);
+        freeList(engine.killers);
         free(engine.tt.slots);
 
         return 0;

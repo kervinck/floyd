@@ -1,28 +1,4 @@
 
-|Todo| Release as 0.7
-
-Changes:
-- Strength increase of about 150 elo at fast time controls
-- Slightly improved pawn and passer evaluation
-- Stopping of search after having established the shortest mate
-- Full UCI support: pondering, mate & node limited search, searchmoves
-- Some workarounds for pondering under cutechess 0.8.0 beta
-- Note about Arena 3.5: This Arena version suffers from a severe UCI bug
-  which causes time forfeits when playing ponder-on games. This bug in
-  Arena was also reported using many other engines and is still unsolved.
-
-Under the hood:
-- Implemention of "moves [ depth <ply> ]" command
-- Mate distance pruning
-- Simple killers
-- Simple cut node reductions
-- Simple lazy move generation in scout
-- Faster evaluation tuning using multiprocessing
-- Faster evaluation tuning using quadratic fitting
-- General code cleanup, such as the removal of needless SAN output code
-
-------------------------------------------------------------------------
-
 |Todo| Pawn mobility
 
 |Todo| Introduction of material table.

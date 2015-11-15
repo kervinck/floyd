@@ -1,13 +1,13 @@
 + echo '*** Version:'
 *** Version:
-+ echo xd0881bd5
-xd0881bd5
++ echo 0.7
+0.7
 + echo
 
 + echo '*** Fingerprint date:'
 *** Fingerprint date:
 + date
-Sat Nov 14 18:54:18 CET 2015
+Sun Nov 15 12:26:07 CET 2015
 + echo
 
 + echo '*** System information:'
@@ -25,11 +25,11 @@ Darwin beobook3 14.5.0 Darwin Kernel Version 14.5.0: Tue Sep  1 21:23:09 PDT 201
 + echo '*** Last git commit:'
 *** Last git commit:
 + git log -1
-commit 40c55c580aa7308429538d9d0a793c70e5d282d6
+commit 285a507553274e2a3bdb4763849d1244bbd8cf2a
 Author: Marcel van Kervinck <marcelk@bitpit.net>
-Date:   Sat Nov 14 14:19:48 2015 +0100
+Date:   Sun Nov 15 11:58:55 2015 +0100
 
-    Experimentally revert some workarounds [qa]
+    Prepare for release [rel]
 + echo
 
 + echo '*** Git status:'
@@ -37,35 +37,34 @@ Date:   Sat Nov 14 14:19:48 2015 +0100
 + git status
 On branch dev
 Your branch is up-to-date with 'origin/dev'.
-Changes to be committed:
-  (use "git reset HEAD <file>..." to unstage)
-
-	modified:   Docs/fingerprint
-	modified:   Source/evaluate.c
-	modified:   Source/search.c
-	modified:   Source/vector.h
-	modified:   TODO.txt
-
 Untracked files:
   (use "git add <file>..." to include in what will be committed)
 
 	.DS_Store
+	Data/Logfile001.log
 	Data/ccrl-shuffled-10M.epd.bz2
+	Data/hvs-varied.bin
 	Data/timing.log
 	Data/timing3.log
+	Logfile001.log
+	a30.at
+	arena.at
 	crun
 	fingerprint
 	floyd0.5.w64.exe
 	games.pgn
 	prun
+	xrun
+	xrun.pgn
 
+nothing added to commit but untracked files present (use "git add" to track)
 + echo
 
 + echo '*** Todo list:'
 *** Todo list:
 + make todo
 + wc -l
-      89
+      90
 + echo
 
 + echo '*** Line count:'
@@ -84,7 +83,7 @@ Total                           21            986           1246           3298
 + echo '*** Build:'
 *** Build:
 + make clean
-env floydVersion=xd0881bd5 python setup.py clean --all
+env floydVersion=0.7 python setup.py clean --all
 running clean
 'build/lib.macosx-10.10-x86_64-2.7' does not exist -- can't clean it
 'build/bdist.macosx-10.10-x86_64' does not exist -- can't clean it
@@ -92,30 +91,30 @@ running clean
 rm -f floyd floyd.w32.exe floyd-pgo[12] *.gcda module
 rm -rf build
 + make floyd
-cc -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xd0881bd5 -o floyd Source/cplus.c Source/evaluate.c Source/floydmain.c Source/format.c Source/kpk.c Source/moves.c Source/parse.c Source/search.c Source/test.c Source/ttable.c Source/uci.c Source/zobrist.c 
+cc -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=0.7 -o floyd Source/cplus.c Source/evaluate.c Source/floydmain.c Source/format.c Source/kpk.c Source/moves.c Source/parse.c Source/search.c Source/test.c Source/ttable.c Source/uci.c Source/zobrist.c 
 + make module
-env CC="cc" CFLAGS="-std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xd0881bd5" floydVersion="xd0881bd5" python setup.py build
+env CC="cc" CFLAGS="-std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=0.7" floydVersion="0.7" python setup.py build
 running build
 running build_ext
 building 'floyd' extension
 creating build
 creating build/temp.macosx-10.10-x86_64-2.7
 creating build/temp.macosx-10.10-x86_64-2.7/Source
-cc -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xd0881bd5 -UNDEBUG -I/opt/local/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/cplus.c -o build/temp.macosx-10.10-x86_64-2.7/Source/cplus.o
-cc -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xd0881bd5 -UNDEBUG -I/opt/local/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/evaluate.c -o build/temp.macosx-10.10-x86_64-2.7/Source/evaluate.o
-cc -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xd0881bd5 -UNDEBUG -I/opt/local/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/floydmodule.c -o build/temp.macosx-10.10-x86_64-2.7/Source/floydmodule.o
-cc -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xd0881bd5 -UNDEBUG -I/opt/local/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/format.c -o build/temp.macosx-10.10-x86_64-2.7/Source/format.o
-cc -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xd0881bd5 -UNDEBUG -I/opt/local/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/moves.c -o build/temp.macosx-10.10-x86_64-2.7/Source/moves.o
-cc -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xd0881bd5 -UNDEBUG -I/opt/local/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/kpk.c -o build/temp.macosx-10.10-x86_64-2.7/Source/kpk.o
-cc -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xd0881bd5 -UNDEBUG -I/opt/local/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/parse.c -o build/temp.macosx-10.10-x86_64-2.7/Source/parse.o
-cc -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xd0881bd5 -UNDEBUG -I/opt/local/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/search.c -o build/temp.macosx-10.10-x86_64-2.7/Source/search.o
-cc -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xd0881bd5 -UNDEBUG -I/opt/local/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/test.c -o build/temp.macosx-10.10-x86_64-2.7/Source/test.o
-cc -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xd0881bd5 -UNDEBUG -I/opt/local/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/ttable.c -o build/temp.macosx-10.10-x86_64-2.7/Source/ttable.o
-cc -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xd0881bd5 -UNDEBUG -I/opt/local/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/uci.c -o build/temp.macosx-10.10-x86_64-2.7/Source/uci.o
-cc -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xd0881bd5 -UNDEBUG -I/opt/local/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/zobrist.c -o build/temp.macosx-10.10-x86_64-2.7/Source/zobrist.o
+cc -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=0.7 -UNDEBUG -I/opt/local/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/cplus.c -o build/temp.macosx-10.10-x86_64-2.7/Source/cplus.o
+cc -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=0.7 -UNDEBUG -I/opt/local/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/evaluate.c -o build/temp.macosx-10.10-x86_64-2.7/Source/evaluate.o
+cc -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=0.7 -UNDEBUG -I/opt/local/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/floydmodule.c -o build/temp.macosx-10.10-x86_64-2.7/Source/floydmodule.o
+cc -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=0.7 -UNDEBUG -I/opt/local/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/format.c -o build/temp.macosx-10.10-x86_64-2.7/Source/format.o
+cc -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=0.7 -UNDEBUG -I/opt/local/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/moves.c -o build/temp.macosx-10.10-x86_64-2.7/Source/moves.o
+cc -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=0.7 -UNDEBUG -I/opt/local/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/kpk.c -o build/temp.macosx-10.10-x86_64-2.7/Source/kpk.o
+cc -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=0.7 -UNDEBUG -I/opt/local/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/parse.c -o build/temp.macosx-10.10-x86_64-2.7/Source/parse.o
+cc -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=0.7 -UNDEBUG -I/opt/local/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/search.c -o build/temp.macosx-10.10-x86_64-2.7/Source/search.o
+cc -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=0.7 -UNDEBUG -I/opt/local/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/test.c -o build/temp.macosx-10.10-x86_64-2.7/Source/test.o
+cc -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=0.7 -UNDEBUG -I/opt/local/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/ttable.c -o build/temp.macosx-10.10-x86_64-2.7/Source/ttable.o
+cc -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=0.7 -UNDEBUG -I/opt/local/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/uci.c -o build/temp.macosx-10.10-x86_64-2.7/Source/uci.o
+cc -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=0.7 -UNDEBUG -I/opt/local/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/zobrist.c -o build/temp.macosx-10.10-x86_64-2.7/Source/zobrist.o
 creating build/lib.macosx-10.10-x86_64-2.7
-cc -bundle -undefined dynamic_lookup -isysroot / -L/opt/local/lib -Wl,-headerpad_max_install_names -L/opt/local/lib/db48 -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xd0881bd5 build/temp.macosx-10.10-x86_64-2.7/Source/cplus.o build/temp.macosx-10.10-x86_64-2.7/Source/evaluate.o build/temp.macosx-10.10-x86_64-2.7/Source/floydmodule.o build/temp.macosx-10.10-x86_64-2.7/Source/format.o build/temp.macosx-10.10-x86_64-2.7/Source/moves.o build/temp.macosx-10.10-x86_64-2.7/Source/kpk.o build/temp.macosx-10.10-x86_64-2.7/Source/parse.o build/temp.macosx-10.10-x86_64-2.7/Source/search.o build/temp.macosx-10.10-x86_64-2.7/Source/test.o build/temp.macosx-10.10-x86_64-2.7/Source/ttable.o build/temp.macosx-10.10-x86_64-2.7/Source/uci.o build/temp.macosx-10.10-x86_64-2.7/Source/zobrist.o -o build/lib.macosx-10.10-x86_64-2.7/floyd.so
-env floydVersion="xd0881bd5" python setup.py install --home=build && touch module
+cc -bundle -undefined dynamic_lookup -isysroot / -L/opt/local/lib -Wl,-headerpad_max_install_names -L/opt/local/lib/db48 -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=0.7 build/temp.macosx-10.10-x86_64-2.7/Source/cplus.o build/temp.macosx-10.10-x86_64-2.7/Source/evaluate.o build/temp.macosx-10.10-x86_64-2.7/Source/floydmodule.o build/temp.macosx-10.10-x86_64-2.7/Source/format.o build/temp.macosx-10.10-x86_64-2.7/Source/moves.o build/temp.macosx-10.10-x86_64-2.7/Source/kpk.o build/temp.macosx-10.10-x86_64-2.7/Source/parse.o build/temp.macosx-10.10-x86_64-2.7/Source/search.o build/temp.macosx-10.10-x86_64-2.7/Source/test.o build/temp.macosx-10.10-x86_64-2.7/Source/ttable.o build/temp.macosx-10.10-x86_64-2.7/Source/uci.o build/temp.macosx-10.10-x86_64-2.7/Source/zobrist.o -o build/lib.macosx-10.10-x86_64-2.7/floyd.so
+env floydVersion="0.7" python setup.py install --home=build && touch module
 running install
 running build
 running build_ext
@@ -124,15 +123,15 @@ creating build/lib
 creating build/lib/python
 copying build/lib.macosx-10.10-x86_64-2.7/floyd.so -> build/lib/python
 running install_egg_info
-Writing build/lib/python/floyd-xd0881bd5-py2.7.egg-info
+Writing build/lib/python/floyd-0.7-py2.7.egg-info
 + make floyd-pgo2
-gcc-mp-4.8 -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xd0881bd5 -DNDEBUG -o floyd-pgo1 Source/cplus.c Source/evaluate.c Source/floydmain.c Source/format.c Source/kpk.c Source/moves.c Source/parse.c Source/search.c Source/test.c Source/ttable.c Source/uci.c Source/zobrist.c  -fprofile-generate
+gcc-mp-4.8 -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=0.7 -DNDEBUG -o floyd-pgo1 Source/cplus.c Source/evaluate.c Source/floydmain.c Source/format.c Source/kpk.c Source/moves.c Source/parse.c Source/search.c Source/test.c Source/ttable.c Source/uci.c Source/zobrist.c  -fprofile-generate
 echo bench | ./floyd-pgo1 | grep result
-result nps 507881
-gcc-mp-4.8 -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xd0881bd5 -DNDEBUG -o floyd-pgo2 Source/cplus.c Source/evaluate.c Source/floydmain.c Source/format.c Source/kpk.c Source/moves.c Source/parse.c Source/search.c Source/test.c Source/ttable.c Source/uci.c Source/zobrist.c  -fprofile-use
+result nps 484312
+gcc-mp-4.8 -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=0.7 -DNDEBUG -o floyd-pgo2 Source/cplus.c Source/evaluate.c Source/floydmain.c Source/format.c Source/kpk.c Source/moves.c Source/parse.c Source/search.c Source/test.c Source/ttable.c Source/uci.c Source/zobrist.c  -fprofile-use
 rm -f *.gcda
 + make floyd.w32.exe
-/usr/local/gcc-4.8.0-qt-4.8.4-for-mingw32/win32-gcc/bin/i586-mingw32-gcc -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xd0881bd5 -Wno-format  -o floyd.w32.exe Source/cplus.c Source/evaluate.c Source/floydmain.c Source/format.c Source/kpk.c Source/moves.c Source/parse.c Source/search.c Source/test.c Source/ttable.c Source/uci.c Source/zobrist.c
+/usr/local/gcc-4.8.0-qt-4.8.4-for-mingw32/win32-gcc/bin/i586-mingw32-gcc -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=0.7 -Wno-format  -o floyd.w32.exe Source/cplus.c Source/evaluate.c Source/floydmain.c Source/format.c Source/kpk.c Source/moves.c Source/parse.c Source/search.c Source/test.c Source/ttable.c Source/uci.c Source/zobrist.c
 + echo
 
 + echo '*** Help text:'
@@ -140,7 +139,7 @@ rm -f *.gcda
 + echo help
 + ./floyd
 
-Floyd Chess Engine - Version xd0881bd5
+Floyd Chess Engine - Version 0.7
 Copyright (C) 2015, Marcel van Kervinck
 All rights reserved
 
@@ -228,58 +227,58 @@ test result OK passed 21 total 21
 + echo bench
 + ./floyd
 
-Floyd Chess Engine - Version xd0881bd5
+Floyd Chess Engine - Version 0.7
 Copyright (C) 2015, Marcel van Kervinck
 All rights reserved
 
 Type "help" for more information, or "quit" to leave.
 
 egt class KPK check OK
-time 1004 nps 455251 fen r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -
-time 1004 nps 552108 fen 4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -
-time 1005 nps 485185 fen 3rk2r/1pq1bpp1/p1n1p1n1/3pP3/3P2P1/1PPQNNB1/5P2/R3R1K1 b k -
-time 1004 nps 667227 fen 7k/8/1p1Q2pp/1p3b2/3p3P/P3q3/BP4PK/8 b - -
-time 1003 nps 462660 fen 2r1rnk1/4qppp/p3b3/1p4P1/4p2P/2N1PN2/PP1Q1P2/1KR4R w - -
-time 1005 nps 512887 fen 2rk3r/p2n1pp1/bqn1p2p/1p1pP3/3P1N1P/bP1BBN2/P3QPP1/2R1R1K1 w - -
-time 1002 nps 572420 fen 1nr2rk1/p3Qppp/1p2p1n1/8/3P4/2N2N2/PP3PPP/2R2RK1 b - -
-time 1001 nps 784827 fen 3nr1k1/1p1r3p/pR1pNpp1/3P4/4P3/3P3P/6P1/1R5K b - -
-time 1003 nps 505279 fen 4r1k1/pp3ppp/3n4/2n1r3/2P2NP1/4KB2/PP2P2P/R5R1 w - -
-time 1003 nps 884168 fen 8/p5pk/1p6/5R1p/P7/5PPK/5r2/8 b - -
-time 1004 nps 769423 fen 8/2Q2p2/5qpk/4p3/8/5P1P/6K1/8 w - -
-time 1003 nps 602935 fen 5rk1/1pr2bbp/pNp1n1p1/2P1p3/1PBpP3/1N5P/1P3PP1/3RR1K1 b - -
-time 1004 nps 708569 fen 8/1b3pk1/rp5p/6p1/6B1/1R4P1/4P2P/4K3 w - -
-time 1004 nps 554911 fen r1bqk2r/pp2ppbp/3p1np1/8/2PQP3/2N5/PP2BPPP/R1B1K2R w KQkq -
-time 1003 nps 628318 fen 8/1b4pk/7q/p3pP2/1p2P3/1Pp5/2P1Q3/5BK1 b - -
-time 1002 nps 515522 fen r2qkb1r/2p2ppp/p1p5/3pP3/4n1b1/3Q1N2/PPP2PPP/RNB2RK1 w kq -
-time 1005 nps 613635 fen 4r1k1/pp2pp1n/3p2p1/6Bp/2rN1P1P/q1P5/2PQ2P1/1K1RR3 b - -
-time 1002 nps 531213 fen rnbq1rk1/pp3pbp/2pp1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - -
-time 1004 nps 713844 fen 8/8/p3k1p1/Bb5p/1P5P/5P2/1r4P1/3R2K1 b - -
-time 1004 nps 716742 fen 4k3/q4p2/2n1p1p1/p1Np4/3P1QP1/PP3P2/6K1/8 b - -
-time 1003 nps 848011 fen 3bn3/4k3/2p3p1/ppN2P2/P5P1/1P1KB3/8/8 b - -
-time 1000 nps 547382 fen r1b1r1k1/5pbp/pp1p1np1/2qPn3/P1p1P3/2N1BPN1/1P1QB1PP/R1R4K b - -
-time 1005 nps 610373 fen r1q1rnk1/p1p2pp1/bp2p2p/n2pP3/Q1PP1N1B/P1PB1P2/6PP/R4RK1 w - d6
-time 1003 nps 613347 fen r3r1k1/1bpnqppp/1p1p4/p2Pp3/1PP1P3/P5P1/1BQ2PBP/1R1R2K1 b - -
-time 1000 nps 886254 fen 1r6/4Pk2/1p1p1P2/p7/8/1P1K2p1/P7/5R2 b - -
-time 1005 nps 540212 fen 1rbqk2r/2pp1ppp/p1n2n2/1pb1p3/P3P3/1B3N2/1PPP1PPP/RNBQ1RK1 w k -
-time 1002 nps 704317 fen r4bk1/6pp/1B2n3/4P3/pp6/1P2N1P1/P5KP/3R4 w - -
-time 1004 nps 461238 fen r1bqkb1r/pp1n1ppp/2n5/2ppP3/3P1P2/5N2/PP4PP/RNBQKB1R w KQkq -
-time 1000 nps 631556 fen r1qr2k1/2p2pPp/p3n3/1p6/8/4BQ2/PP3PPP/R2R2K1 w - -
-time 1001 nps 798623 fen 4r3/1p4k1/p1p1P1pp/3p4/1P1N4/P6B/7P/4K3 w - -
-time 1003 nps 606931 fen 8/R4pk1/4pbq1/8/2P4p/5Q2/8/5K2 b - -
-time 1004 nps 697457 fen 4k3/R4pp1/P7/4P2p/5P2/3p2P1/r7/4K3 w - -
-time 1004 nps 571267 fen 2r3k1/1p4p1/p3bp2/8/N3Pb1p/2R4P/1PP1Q1P1/2q3BK b - -
-time 1004 nps 486140 fen rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -
-time 1005 nps 1344234 fen 8/6N1/8/1k4K1/3n4/8/5P2/8 b - -
-time 1002 nps 552081 fen rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -
-time 1005 nps 859418 fen 8/PRn5/3k4/r4p2/5PB1/8/5P2/6K1 w - -
-time 1004 nps 908461 fen r5k1/4Rpp1/3p3p/2pP4/p1P3P1/1P6/P4PP1/5K2 w - -
-time 1005 nps 956297 fen 5n2/2k1KB2/7P/8/3n1P2/8/p1N5/8 w - -
-time 1003 nps 529911 fen rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -
-result nps 659775
+time 1003 nps 418108 fen r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -
+time 1004 nps 502808 fen 4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -
+time 1005 nps 463704 fen 3rk2r/1pq1bpp1/p1n1p1n1/3pP3/3P2P1/1PPQNNB1/5P2/R3R1K1 b k -
+time 1002 nps 626342 fen 7k/8/1p1Q2pp/1p3b2/3p3P/P3q3/BP4PK/8 b - -
+time 1005 nps 447421 fen 2r1rnk1/4qppp/p3b3/1p4P1/4p2P/2N1PN2/PP1Q1P2/1KR4R w - -
+time 1000 nps 490065 fen 2rk3r/p2n1pp1/bqn1p2p/1p1pP3/3P1N1P/bP1BBN2/P3QPP1/2R1R1K1 w - -
+time 1002 nps 591377 fen 1nr2rk1/p3Qppp/1p2p1n1/8/3P4/2N2N2/PP3PPP/2R2RK1 b - -
+time 1005 nps 822511 fen 3nr1k1/1p1r3p/pR1pNpp1/3P4/4P3/3P3P/6P1/1R5K b - -
+time 1001 nps 509732 fen 4r1k1/pp3ppp/3n4/2n1r3/2P2NP1/4KB2/PP2P2P/R5R1 w - -
+time 1000 nps 836564 fen 8/p5pk/1p6/5R1p/P7/5PPK/5r2/8 b - -
+time 1005 nps 704507 fen 8/2Q2p2/5qpk/4p3/8/5P1P/6K1/8 w - -
+time 1002 nps 568357 fen 5rk1/1pr2bbp/pNp1n1p1/2P1p3/1PBpP3/1N5P/1P3PP1/3RR1K1 b - -
+time 1005 nps 650768 fen 8/1b3pk1/rp5p/6p1/6B1/1R4P1/4P2P/4K3 w - -
+time 1003 nps 522037 fen r1bqk2r/pp2ppbp/3p1np1/8/2PQP3/2N5/PP2BPPP/R1B1K2R w KQkq -
+time 1004 nps 605519 fen 8/1b4pk/7q/p3pP2/1p2P3/1Pp5/2P1Q3/5BK1 b - -
+time 1005 nps 486685 fen r2qkb1r/2p2ppp/p1p5/3pP3/4n1b1/3Q1N2/PPP2PPP/RNB2RK1 w kq -
+time 1003 nps 572957 fen 4r1k1/pp2pp1n/3p2p1/6Bp/2rN1P1P/q1P5/2PQ2P1/1K1RR3 b - -
+time 1002 nps 508333 fen rnbq1rk1/pp3pbp/2pp1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - -
+time 1004 nps 675923 fen 8/8/p3k1p1/Bb5p/1P5P/5P2/1r4P1/3R2K1 b - -
+time 1003 nps 658151 fen 4k3/q4p2/2n1p1p1/p1Np4/3P1QP1/PP3P2/6K1/8 b - -
+time 1003 nps 788369 fen 3bn3/4k3/2p3p1/ppN2P2/P5P1/1P1KB3/8/8 b - -
+time 1002 nps 498693 fen r1b1r1k1/5pbp/pp1p1np1/2qPn3/P1p1P3/2N1BPN1/1P1QB1PP/R1R4K b - -
+time 1000 nps 578811 fen r1q1rnk1/p1p2pp1/bp2p2p/n2pP3/Q1PP1N1B/P1PB1P2/6PP/R4RK1 w - d6
+time 1005 nps 562502 fen r3r1k1/1bpnqppp/1p1p4/p2Pp3/1PP1P3/P5P1/1BQ2PBP/1R1R2K1 b - -
+time 1003 nps 819468 fen 1r6/4Pk2/1p1p1P2/p7/8/1P1K2p1/P7/5R2 b - -
+time 1005 nps 520574 fen 1rbqk2r/2pp1ppp/p1n2n2/1pb1p3/P3P3/1B3N2/1PPP1PPP/RNBQ1RK1 w k -
+time 1001 nps 646974 fen r4bk1/6pp/1B2n3/4P3/pp6/1P2N1P1/P5KP/3R4 w - -
+time 1002 nps 438504 fen r1bqkb1r/pp1n1ppp/2n5/2ppP3/3P1P2/5N2/PP4PP/RNBQKB1R w KQkq -
+time 1004 nps 588862 fen r1qr2k1/2p2pPp/p3n3/1p6/8/4BQ2/PP3PPP/R2R2K1 w - -
+time 1000 nps 754826 fen 4r3/1p4k1/p1p1P1pp/3p4/1P1N4/P6B/7P/4K3 w - -
+time 1001 nps 565979 fen 8/R4pk1/4pbq1/8/2P4p/5Q2/8/5K2 b - -
+time 1001 nps 666224 fen 4k3/R4pp1/P7/4P2p/5P2/3p2P1/r7/4K3 w - -
+time 1003 nps 515543 fen 2r3k1/1p4p1/p3bp2/8/N3Pb1p/2R4P/1PP1Q1P1/2q3BK b - -
+time 1003 nps 444846 fen rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -
+time 1005 nps 1279157 fen 8/6N1/8/1k4K1/3n4/8/5P2/8 b - -
+time 1002 nps 523536 fen rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -
+time 1004 nps 810158 fen 8/PRn5/3k4/r4p2/5PB1/8/5P2/6K1 w - -
+time 1003 nps 832856 fen r5k1/4Rpp1/3p3p/2pP4/p1P3P1/1P6/P4PP1/5K2 w - -
+time 1004 nps 916394 fen 5n2/2k1KB2/7P/8/3n1P2/8/p1N5/8 w - -
+time 1003 nps 510884 fen rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -
+result nps 623161
 + echo bench
 + wine ./floyd.w32.exe
 
-Floyd Chess Engine - Version xd0881bd5
+Floyd Chess Engine - Version 0.7
 Copyright (C) 2015, Marcel van Kervinck
 All rights reserved
 
@@ -287,202 +286,202 @@ Type "help" for more information, or "quit" to leave.
 
 egt class KPK check OK
 fixme:ole:RemUnknown_QueryInterface No interface for iid {00000019-0000-0000-c000-000000000046}
-time 1002 nps 332223 fen r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -
-time 1003 nps 423299 fen 4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -
-time 1002 nps 374451 fen 3rk2r/1pq1bpp1/p1n1p1n1/3pP3/3P2P1/1PPQNNB1/5P2/R3R1K1 b k -
-time 1002 nps 486671 fen 7k/8/1p1Q2pp/1p3b2/3p3P/P3q3/BP4PK/8 b - -
-time 1000 nps 339030 fen 2r1rnk1/4qppp/p3b3/1p4P1/4p2P/2N1PN2/PP1Q1P2/1KR4R w - -
-time 1001 nps 388855 fen 2rk3r/p2n1pp1/bqn1p2p/1p1pP3/3P1N1P/bP1BBN2/P3QPP1/2R1R1K1 w - -
-time 1001 nps 483976 fen 1nr2rk1/p3Qppp/1p2p1n1/8/3P4/2N2N2/PP3PPP/2R2RK1 b - -
-time 1001 nps 615389 fen 3nr1k1/1p1r3p/pR1pNpp1/3P4/4P3/3P3P/6P1/1R5K b - -
-time 1001 nps 397694 fen 4r1k1/pp3ppp/3n4/2n1r3/2P2NP1/4KB2/PP2P2P/R5R1 w - -
-time 1002 nps 658155 fen 8/p5pk/1p6/5R1p/P7/5PPK/5r2/8 b - -
-time 1001 nps 564631 fen 8/2Q2p2/5qpk/4p3/8/5P1P/6K1/8 w - -
-time 1002 nps 443400 fen 5rk1/1pr2bbp/pNp1n1p1/2P1p3/1PBpP3/1N5P/1P3PP1/3RR1K1 b - -
-time 1001 nps 506802 fen 8/1b3pk1/rp5p/6p1/6B1/1R4P1/4P2P/4K3 w - -
-time 1001 nps 399758 fen r1bqk2r/pp2ppbp/3p1np1/8/2PQP3/2N5/PP2BPPP/R1B1K2R w KQkq -
-time 1001 nps 475795 fen 8/1b4pk/7q/p3pP2/1p2P3/1Pp5/2P1Q3/5BK1 b - -
-time 1001 nps 401430 fen r2qkb1r/2p2ppp/p1p5/3pP3/4n1b1/3Q1N2/PPP2PPP/RNB2RK1 w kq -
-time 1002 nps 461967 fen 4r1k1/pp2pp1n/3p2p1/6Bp/2rN1P1P/q1P5/2PQ2P1/1K1RR3 b - -
-time 1002 nps 413778 fen rnbq1rk1/pp3pbp/2pp1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - -
-time 1001 nps 515900 fen 8/8/p3k1p1/Bb5p/1P5P/5P2/1r4P1/3R2K1 b - -
-time 1001 nps 525243 fen 4k3/q4p2/2n1p1p1/p1Np4/3P1QP1/PP3P2/6K1/8 b - -
-time 1000 nps 631954 fen 3bn3/4k3/2p3p1/ppN2P2/P5P1/1P1KB3/8/8 b - -
-time 1001 nps 419074 fen r1b1r1k1/5pbp/pp1p1np1/2qPn3/P1p1P3/2N1BPN1/1P1QB1PP/R1R4K b - -
-time 1001 nps 456091 fen r1q1rnk1/p1p2pp1/bp2p2p/n2pP3/Q1PP1N1B/P1PB1P2/6PP/R4RK1 w - d6
-time 1000 nps 436873 fen r3r1k1/1bpnqppp/1p1p4/p2Pp3/1PP1P3/P5P1/1BQ2PBP/1R1R2K1 b - -
-time 1003 nps 629154 fen 1r6/4Pk2/1p1p1P2/p7/8/1P1K2p1/P7/5R2 b - -
-time 1001 nps 396654 fen 1rbqk2r/2pp1ppp/p1n2n2/1pb1p3/P3P3/1B3N2/1PPP1PPP/RNBQ1RK1 w k -
-time 1001 nps 511570 fen r4bk1/6pp/1B2n3/4P3/pp6/1P2N1P1/P5KP/3R4 w - -
-time 1001 nps 326021 fen r1bqkb1r/pp1n1ppp/2n5/2ppP3/3P1P2/5N2/PP4PP/RNBQKB1R w KQkq -
-time 1027 nps 435754 fen r1qr2k1/2p2pPp/p3n3/1p6/8/4BQ2/PP3PPP/R2R2K1 w - -
-time 1001 nps 530609 fen 4r3/1p4k1/p1p1P1pp/3p4/1P1N4/P6B/7P/4K3 w - -
-time 1001 nps 420440 fen 8/R4pk1/4pbq1/8/2P4p/5Q2/8/5K2 b - -
-time 1001 nps 499291 fen 4k3/R4pp1/P7/4P2p/5P2/3p2P1/r7/4K3 w - -
-time 1000 nps 378049 fen 2r3k1/1p4p1/p3bp2/8/N3Pb1p/2R4P/1PP1Q1P1/2q3BK b - -
-time 1000 nps 344028 fen rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -
-time 1000 nps 947888 fen 8/6N1/8/1k4K1/3n4/8/5P2/8 b - -
-time 1001 nps 401008 fen rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -
-time 1001 nps 594697 fen 8/PRn5/3k4/r4p2/5PB1/8/5P2/6K1 w - -
-time 1001 nps 638575 fen r5k1/4Rpp1/3p3p/2pP4/p1P3P1/1P6/P4PP1/5K2 w - -
-time 1000 nps 689993 fen 5n2/2k1KB2/7P/8/3n1P2/8/p1N5/8 w - -
-time 1001 nps 390105 fen rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -
-result nps 482116
+time 1002 nps 322629 fen r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -
+time 1002 nps 396083 fen 4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -
+time 1002 nps 349724 fen 3rk2r/1pq1bpp1/p1n1p1n1/3pP3/3P2P1/1PPQNNB1/5P2/R3R1K1 b k -
+time 1002 nps 433659 fen 7k/8/1p1Q2pp/1p3b2/3p3P/P3q3/BP4PK/8 b - -
+time 1001 nps 306075 fen 2r1rnk1/4qppp/p3b3/1p4P1/4p2P/2N1PN2/PP1Q1P2/1KR4R w - -
+time 1001 nps 358515 fen 2rk3r/p2n1pp1/bqn1p2p/1p1pP3/3P1N1P/bP1BBN2/P3QPP1/2R1R1K1 w - -
+time 1001 nps 429941 fen 1nr2rk1/p3Qppp/1p2p1n1/8/3P4/2N2N2/PP3PPP/2R2RK1 b - -
+time 1001 nps 548475 fen 3nr1k1/1p1r3p/pR1pNpp1/3P4/4P3/3P3P/6P1/1R5K b - -
+time 1000 nps 361593 fen 4r1k1/pp3ppp/3n4/2n1r3/2P2NP1/4KB2/PP2P2P/R5R1 w - -
+time 1002 nps 588820 fen 8/p5pk/1p6/5R1p/P7/5PPK/5r2/8 b - -
+time 1000 nps 512325 fen 8/2Q2p2/5qpk/4p3/8/5P1P/6K1/8 w - -
+time 1003 nps 403041 fen 5rk1/1pr2bbp/pNp1n1p1/2P1p3/1PBpP3/1N5P/1P3PP1/3RR1K1 b - -
+time 1006 nps 440070 fen 8/1b3pk1/rp5p/6p1/6B1/1R4P1/4P2P/4K3 w - -
+time 1001 nps 368583 fen r1bqk2r/pp2ppbp/3p1np1/8/2PQP3/2N5/PP2BPPP/R1B1K2R w KQkq -
+time 1001 nps 436056 fen 8/1b4pk/7q/p3pP2/1p2P3/1Pp5/2P1Q3/5BK1 b - -
+time 1002 nps 363758 fen r2qkb1r/2p2ppp/p1p5/3pP3/4n1b1/3Q1N2/PPP2PPP/RNB2RK1 w kq -
+time 1002 nps 424194 fen 4r1k1/pp2pp1n/3p2p1/6Bp/2rN1P1P/q1P5/2PQ2P1/1K1RR3 b - -
+time 1001 nps 368414 fen rnbq1rk1/pp3pbp/2pp1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - -
+time 1000 nps 478722 fen 8/8/p3k1p1/Bb5p/1P5P/5P2/1r4P1/3R2K1 b - -
+time 1002 nps 503926 fen 4k3/q4p2/2n1p1p1/p1Np4/3P1QP1/PP3P2/6K1/8 b - -
+time 1000 nps 584648 fen 3bn3/4k3/2p3p1/ppN2P2/P5P1/1P1KB3/8/8 b - -
+time 1002 nps 400665 fen r1b1r1k1/5pbp/pp1p1np1/2qPn3/P1p1P3/2N1BPN1/1P1QB1PP/R1R4K b - -
+time 1001 nps 424615 fen r1q1rnk1/p1p2pp1/bp2p2p/n2pP3/Q1PP1N1B/P1PB1P2/6PP/R4RK1 w - d6
+time 1000 nps 409985 fen r3r1k1/1bpnqppp/1p1p4/p2Pp3/1PP1P3/P5P1/1BQ2PBP/1R1R2K1 b - -
+time 1000 nps 589404 fen 1r6/4Pk2/1p1p1P2/p7/8/1P1K2p1/P7/5R2 b - -
+time 1002 nps 362383 fen 1rbqk2r/2pp1ppp/p1n2n2/1pb1p3/P3P3/1B3N2/1PPP1PPP/RNBQ1RK1 w k -
+time 1002 nps 465648 fen r4bk1/6pp/1B2n3/4P3/pp6/1P2N1P1/P5KP/3R4 w - -
+time 1001 nps 301379 fen r1bqkb1r/pp1n1ppp/2n5/2ppP3/3P1P2/5N2/PP4PP/RNBQKB1R w KQkq -
+time 1029 nps 422737 fen r1qr2k1/2p2pPp/p3n3/1p6/8/4BQ2/PP3PPP/R2R2K1 w - -
+time 1001 nps 527262 fen 4r3/1p4k1/p1p1P1pp/3p4/1P1N4/P6B/7P/4K3 w - -
+time 1000 nps 407362 fen 8/R4pk1/4pbq1/8/2P4p/5Q2/8/5K2 b - -
+time 1001 nps 483028 fen 4k3/R4pp1/P7/4P2p/5P2/3p2P1/r7/4K3 w - -
+time 1001 nps 366700 fen 2r3k1/1p4p1/p3bp2/8/N3Pb1p/2R4P/1PP1Q1P1/2q3BK b - -
+time 1002 nps 320961 fen rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -
+time 1001 nps 905008 fen 8/6N1/8/1k4K1/3n4/8/5P2/8 b - -
+time 1002 nps 391721 fen rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -
+time 1001 nps 581427 fen 8/PRn5/3k4/r4p2/5PB1/8/5P2/6K1 w - -
+time 1001 nps 638029 fen r5k1/4Rpp1/3p3p/2pP4/p1P3P1/1P6/P4PP1/5K2 w - -
+time 1000 nps 669505 fen 5n2/2k1KB2/7P/8/3n1P2/8/p1N5/8 w - -
+time 1001 nps 365957 fen rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -
+result nps 450279
 + echo
 
 + echo '*** Game playing:'
 *** Game playing:
 + cutechess-cli -concurrency 4 -rounds 50 -repeat -each tc=10+0.15 -openings file=Data/book-6000-openings.pgn -engine cmd=./floyd-pgo2 proto=uci -engine cmd=floyd0.6 proto=uci
-Started game 1 of 50 (Floyd xd0881bd5 vs Floyd 0.6)
-Started game 3 of 50 (Floyd xd0881bd5 vs Floyd 0.6)
-Started game 2 of 50 (Floyd 0.6 vs Floyd xd0881bd5)
-Started game 4 of 50 (Floyd 0.6 vs Floyd xd0881bd5)
-Finished game 2 (Floyd 0.6 vs Floyd xd0881bd5): 1/2-1/2 {Draw by 3-fold repetition}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 0 - 0 - 1  [0.500] 1
-Started game 5 of 50 (Floyd xd0881bd5 vs Floyd 0.6)
-Finished game 4 (Floyd 0.6 vs Floyd xd0881bd5): 1-0 {White mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 0 - 1 - 1  [0.250] 2
-Started game 6 of 50 (Floyd 0.6 vs Floyd xd0881bd5)
-Finished game 1 (Floyd xd0881bd5 vs Floyd 0.6): 1-0 {White mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 1 - 1 - 1  [0.500] 3
-Started game 7 of 50 (Floyd xd0881bd5 vs Floyd 0.6)
-Finished game 3 (Floyd xd0881bd5 vs Floyd 0.6): 1-0 {White mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 2 - 1 - 1  [0.625] 4
-Started game 8 of 50 (Floyd 0.6 vs Floyd xd0881bd5)
-Finished game 6 (Floyd 0.6 vs Floyd xd0881bd5): 0-1 {Black mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 3 - 1 - 1  [0.700] 5
-Started game 9 of 50 (Floyd xd0881bd5 vs Floyd 0.6)
-Finished game 7 (Floyd xd0881bd5 vs Floyd 0.6): 0-1 {Black mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 3 - 2 - 1  [0.583] 6
-Started game 10 of 50 (Floyd 0.6 vs Floyd xd0881bd5)
-Finished game 5 (Floyd xd0881bd5 vs Floyd 0.6): 1/2-1/2 {Draw by fifty moves rule}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 3 - 2 - 2  [0.571] 7
-Started game 11 of 50 (Floyd xd0881bd5 vs Floyd 0.6)
-Finished game 8 (Floyd 0.6 vs Floyd xd0881bd5): 1/2-1/2 {Draw by fifty moves rule}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 3 - 2 - 3  [0.562] 8
-Started game 12 of 50 (Floyd 0.6 vs Floyd xd0881bd5)
-Finished game 10 (Floyd 0.6 vs Floyd xd0881bd5): 0-1 {Black mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 4 - 2 - 3  [0.611] 9
-Started game 13 of 50 (Floyd xd0881bd5 vs Floyd 0.6)
-Finished game 9 (Floyd xd0881bd5 vs Floyd 0.6): 1-0 {White mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 5 - 2 - 3  [0.650] 10
-Started game 14 of 50 (Floyd 0.6 vs Floyd xd0881bd5)
-Finished game 14 (Floyd 0.6 vs Floyd xd0881bd5): 0-1 {Black mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 6 - 2 - 3  [0.682] 11
-Started game 15 of 50 (Floyd xd0881bd5 vs Floyd 0.6)
-Finished game 13 (Floyd xd0881bd5 vs Floyd 0.6): 1-0 {White mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 7 - 2 - 3  [0.708] 12
-Started game 16 of 50 (Floyd 0.6 vs Floyd xd0881bd5)
-Finished game 11 (Floyd xd0881bd5 vs Floyd 0.6): 0-1 {Black mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 7 - 3 - 3  [0.654] 13
-Started game 17 of 50 (Floyd xd0881bd5 vs Floyd 0.6)
-Finished game 12 (Floyd 0.6 vs Floyd xd0881bd5): 0-1 {Black mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 8 - 3 - 3  [0.679] 14
-Started game 18 of 50 (Floyd 0.6 vs Floyd xd0881bd5)
-Finished game 15 (Floyd xd0881bd5 vs Floyd 0.6): 1/2-1/2 {Draw by 3-fold repetition}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 8 - 3 - 4  [0.667] 15
-Started game 19 of 50 (Floyd xd0881bd5 vs Floyd 0.6)
-Finished game 17 (Floyd xd0881bd5 vs Floyd 0.6): 1-0 {White mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 9 - 3 - 4  [0.688] 16
-Started game 20 of 50 (Floyd 0.6 vs Floyd xd0881bd5)
-Finished game 16 (Floyd 0.6 vs Floyd xd0881bd5): 0-1 {Black mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 10 - 3 - 4  [0.706] 17
-Started game 21 of 50 (Floyd xd0881bd5 vs Floyd 0.6)
-Finished game 18 (Floyd 0.6 vs Floyd xd0881bd5): 0-1 {Black mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 11 - 3 - 4  [0.722] 18
-Started game 22 of 50 (Floyd 0.6 vs Floyd xd0881bd5)
-Finished game 19 (Floyd xd0881bd5 vs Floyd 0.6): 1-0 {White mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 12 - 3 - 4  [0.737] 19
-Started game 23 of 50 (Floyd xd0881bd5 vs Floyd 0.6)
-Finished game 20 (Floyd 0.6 vs Floyd xd0881bd5): 0-1 {Black mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 13 - 3 - 4  [0.750] 20
-Started game 24 of 50 (Floyd 0.6 vs Floyd xd0881bd5)
-Finished game 21 (Floyd xd0881bd5 vs Floyd 0.6): 1-0 {White mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 14 - 3 - 4  [0.762] 21
-Started game 25 of 50 (Floyd xd0881bd5 vs Floyd 0.6)
-Finished game 22 (Floyd 0.6 vs Floyd xd0881bd5): 0-1 {Black mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 15 - 3 - 4  [0.773] 22
-Started game 26 of 50 (Floyd 0.6 vs Floyd xd0881bd5)
-Finished game 25 (Floyd xd0881bd5 vs Floyd 0.6): 1-0 {White mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 16 - 3 - 4  [0.783] 23
-Started game 27 of 50 (Floyd xd0881bd5 vs Floyd 0.6)
-Finished game 23 (Floyd xd0881bd5 vs Floyd 0.6): 1/2-1/2 {Draw by fifty moves rule}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 16 - 3 - 5  [0.771] 24
-Started game 28 of 50 (Floyd 0.6 vs Floyd xd0881bd5)
-Finished game 24 (Floyd 0.6 vs Floyd xd0881bd5): 0-1 {Black mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 17 - 3 - 5  [0.780] 25
-Started game 29 of 50 (Floyd xd0881bd5 vs Floyd 0.6)
-Finished game 26 (Floyd 0.6 vs Floyd xd0881bd5): 0-1 {Black mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 18 - 3 - 5  [0.788] 26
-Started game 30 of 50 (Floyd 0.6 vs Floyd xd0881bd5)
-Finished game 28 (Floyd 0.6 vs Floyd xd0881bd5): 0-1 {Black mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 19 - 3 - 5  [0.796] 27
-Started game 31 of 50 (Floyd xd0881bd5 vs Floyd 0.6)
-Finished game 27 (Floyd xd0881bd5 vs Floyd 0.6): 0-1 {Black mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 19 - 4 - 5  [0.768] 28
-Started game 32 of 50 (Floyd 0.6 vs Floyd xd0881bd5)
-Finished game 29 (Floyd xd0881bd5 vs Floyd 0.6): 1/2-1/2 {Draw by 3-fold repetition}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 19 - 4 - 6  [0.759] 29
-Started game 33 of 50 (Floyd xd0881bd5 vs Floyd 0.6)
-Finished game 30 (Floyd 0.6 vs Floyd xd0881bd5): 0-1 {Black mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 20 - 4 - 6  [0.767] 30
-Started game 34 of 50 (Floyd 0.6 vs Floyd xd0881bd5)
-Finished game 31 (Floyd xd0881bd5 vs Floyd 0.6): 1/2-1/2 {Draw by 3-fold repetition}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 20 - 4 - 7  [0.758] 31
-Started game 35 of 50 (Floyd xd0881bd5 vs Floyd 0.6)
-Finished game 32 (Floyd 0.6 vs Floyd xd0881bd5): 0-1 {Black mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 21 - 4 - 7  [0.766] 32
-Started game 36 of 50 (Floyd 0.6 vs Floyd xd0881bd5)
-Finished game 33 (Floyd xd0881bd5 vs Floyd 0.6): 0-1 {Black mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 21 - 5 - 7  [0.742] 33
-Started game 37 of 50 (Floyd xd0881bd5 vs Floyd 0.6)
-Finished game 34 (Floyd 0.6 vs Floyd xd0881bd5): 1-0 {White mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 21 - 6 - 7  [0.721] 34
-Started game 38 of 50 (Floyd 0.6 vs Floyd xd0881bd5)
-Finished game 35 (Floyd xd0881bd5 vs Floyd 0.6): 1-0 {White mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 22 - 6 - 7  [0.729] 35
-Started game 39 of 50 (Floyd xd0881bd5 vs Floyd 0.6)
-Finished game 37 (Floyd xd0881bd5 vs Floyd 0.6): 1-0 {White mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 23 - 6 - 7  [0.736] 36
-Started game 40 of 50 (Floyd 0.6 vs Floyd xd0881bd5)
-Finished game 36 (Floyd 0.6 vs Floyd xd0881bd5): 1-0 {White mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 23 - 7 - 7  [0.716] 37
-Started game 41 of 50 (Floyd xd0881bd5 vs Floyd 0.6)
-Finished game 39 (Floyd xd0881bd5 vs Floyd 0.6): 1-0 {White mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 24 - 7 - 7  [0.724] 38
-Started game 42 of 50 (Floyd 0.6 vs Floyd xd0881bd5)
-Finished game 40 (Floyd 0.6 vs Floyd xd0881bd5): 1/2-1/2 {Draw by 3-fold repetition}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 24 - 7 - 8  [0.718] 39
-Started game 43 of 50 (Floyd xd0881bd5 vs Floyd 0.6)
-Finished game 38 (Floyd 0.6 vs Floyd xd0881bd5): 1/2-1/2 {Draw by insufficient mating material}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 24 - 7 - 9  [0.713] 40
-Started game 44 of 50 (Floyd 0.6 vs Floyd xd0881bd5)
-Finished game 41 (Floyd xd0881bd5 vs Floyd 0.6): 1-0 {White mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 25 - 7 - 9  [0.720] 41
-Started game 45 of 50 (Floyd xd0881bd5 vs Floyd 0.6)
-Finished game 42 (Floyd 0.6 vs Floyd xd0881bd5): 0-1 {Black mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 26 - 7 - 9  [0.726] 42
-Started game 46 of 50 (Floyd 0.6 vs Floyd xd0881bd5)
-Finished game 43 (Floyd xd0881bd5 vs Floyd 0.6): 1-0 {White mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 27 - 7 - 9  [0.733] 43
-Started game 47 of 50 (Floyd xd0881bd5 vs Floyd 0.6)
-Finished game 45 (Floyd xd0881bd5 vs Floyd 0.6): 1-0 {White mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 28 - 7 - 9  [0.739] 44
-Started game 48 of 50 (Floyd 0.6 vs Floyd xd0881bd5)
-Finished game 44 (Floyd 0.6 vs Floyd xd0881bd5): 0-1 {Black mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 29 - 7 - 9  [0.744] 45
-Started game 49 of 50 (Floyd xd0881bd5 vs Floyd 0.6)
-Finished game 46 (Floyd 0.6 vs Floyd xd0881bd5): 0-1 {Black mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 30 - 7 - 9  [0.750] 46
-Started game 50 of 50 (Floyd 0.6 vs Floyd xd0881bd5)
-Finished game 47 (Floyd xd0881bd5 vs Floyd 0.6): 0-1 {Black mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 30 - 8 - 9  [0.734] 47
-Finished game 48 (Floyd 0.6 vs Floyd xd0881bd5): 0-1 {Black mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 31 - 8 - 9  [0.740] 48
-Finished game 49 (Floyd xd0881bd5 vs Floyd 0.6): 1-0 {White mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 32 - 8 - 9  [0.745] 49
-Finished game 50 (Floyd 0.6 vs Floyd xd0881bd5): 0-1 {Black mates}
-Score of Floyd xd0881bd5 vs Floyd 0.6: 33 - 8 - 9  [0.750] 50
+Started game 1 of 50 (Floyd 0.7 vs Floyd 0.6)
+Started game 3 of 50 (Floyd 0.7 vs Floyd 0.6)
+Started game 2 of 50 (Floyd 0.6 vs Floyd 0.7)
+Started game 4 of 50 (Floyd 0.6 vs Floyd 0.7)
+Finished game 3 (Floyd 0.7 vs Floyd 0.6): 1-0 {White mates}
+Score of Floyd 0.7 vs Floyd 0.6: 1 - 0 - 0  [1.000] 1
+Started game 5 of 50 (Floyd 0.7 vs Floyd 0.6)
+Finished game 1 (Floyd 0.7 vs Floyd 0.6): 1-0 {White mates}
+Score of Floyd 0.7 vs Floyd 0.6: 2 - 0 - 0  [1.000] 2
+Started game 6 of 50 (Floyd 0.6 vs Floyd 0.7)
+Finished game 4 (Floyd 0.6 vs Floyd 0.7): 1/2-1/2 {Draw by insufficient mating material}
+Score of Floyd 0.7 vs Floyd 0.6: 2 - 0 - 1  [0.833] 3
+Started game 7 of 50 (Floyd 0.7 vs Floyd 0.6)
+Finished game 2 (Floyd 0.6 vs Floyd 0.7): 1/2-1/2 {Draw by insufficient mating material}
+Score of Floyd 0.7 vs Floyd 0.6: 2 - 0 - 2  [0.750] 4
+Started game 8 of 50 (Floyd 0.6 vs Floyd 0.7)
+Finished game 7 (Floyd 0.7 vs Floyd 0.6): 1-0 {White mates}
+Score of Floyd 0.7 vs Floyd 0.6: 3 - 0 - 2  [0.800] 5
+Started game 9 of 50 (Floyd 0.7 vs Floyd 0.6)
+Finished game 6 (Floyd 0.6 vs Floyd 0.7): 0-1 {Black mates}
+Score of Floyd 0.7 vs Floyd 0.6: 4 - 0 - 2  [0.833] 6
+Started game 10 of 50 (Floyd 0.6 vs Floyd 0.7)
+Finished game 5 (Floyd 0.7 vs Floyd 0.6): 1-0 {White mates}
+Score of Floyd 0.7 vs Floyd 0.6: 5 - 0 - 2  [0.857] 7
+Started game 11 of 50 (Floyd 0.7 vs Floyd 0.6)
+Finished game 8 (Floyd 0.6 vs Floyd 0.7): 1/2-1/2 {Draw by fifty moves rule}
+Score of Floyd 0.7 vs Floyd 0.6: 5 - 0 - 3  [0.812] 8
+Started game 12 of 50 (Floyd 0.6 vs Floyd 0.7)
+Finished game 11 (Floyd 0.7 vs Floyd 0.6): 1/2-1/2 {Draw by 3-fold repetition}
+Score of Floyd 0.7 vs Floyd 0.6: 5 - 0 - 4  [0.778] 9
+Started game 13 of 50 (Floyd 0.7 vs Floyd 0.6)
+Finished game 10 (Floyd 0.6 vs Floyd 0.7): 0-1 {Black mates}
+Score of Floyd 0.7 vs Floyd 0.6: 6 - 0 - 4  [0.800] 10
+Started game 14 of 50 (Floyd 0.6 vs Floyd 0.7)
+Finished game 9 (Floyd 0.7 vs Floyd 0.6): 1-0 {White mates}
+Score of Floyd 0.7 vs Floyd 0.6: 7 - 0 - 4  [0.818] 11
+Started game 15 of 50 (Floyd 0.7 vs Floyd 0.6)
+Finished game 12 (Floyd 0.6 vs Floyd 0.7): 1/2-1/2 {Draw by 3-fold repetition}
+Score of Floyd 0.7 vs Floyd 0.6: 7 - 0 - 5  [0.792] 12
+Started game 16 of 50 (Floyd 0.6 vs Floyd 0.7)
+Finished game 14 (Floyd 0.6 vs Floyd 0.7): 1-0 {White mates}
+Score of Floyd 0.7 vs Floyd 0.6: 7 - 1 - 5  [0.731] 13
+Started game 17 of 50 (Floyd 0.7 vs Floyd 0.6)
+Finished game 15 (Floyd 0.7 vs Floyd 0.6): 1-0 {White mates}
+Score of Floyd 0.7 vs Floyd 0.6: 8 - 1 - 5  [0.750] 14
+Started game 18 of 50 (Floyd 0.6 vs Floyd 0.7)
+Finished game 13 (Floyd 0.7 vs Floyd 0.6): 1-0 {White mates}
+Score of Floyd 0.7 vs Floyd 0.6: 9 - 1 - 5  [0.767] 15
+Started game 19 of 50 (Floyd 0.7 vs Floyd 0.6)
+Finished game 17 (Floyd 0.7 vs Floyd 0.6): 1-0 {White mates}
+Score of Floyd 0.7 vs Floyd 0.6: 10 - 1 - 5  [0.781] 16
+Started game 20 of 50 (Floyd 0.6 vs Floyd 0.7)
+Finished game 16 (Floyd 0.6 vs Floyd 0.7): 0-1 {Black mates}
+Score of Floyd 0.7 vs Floyd 0.6: 11 - 1 - 5  [0.794] 17
+Started game 21 of 50 (Floyd 0.7 vs Floyd 0.6)
+Finished game 18 (Floyd 0.6 vs Floyd 0.7): 0-1 {Black mates}
+Score of Floyd 0.7 vs Floyd 0.6: 12 - 1 - 5  [0.806] 18
+Started game 22 of 50 (Floyd 0.6 vs Floyd 0.7)
+Finished game 19 (Floyd 0.7 vs Floyd 0.6): 1/2-1/2 {Draw by insufficient mating material}
+Score of Floyd 0.7 vs Floyd 0.6: 12 - 1 - 6  [0.789] 19
+Started game 23 of 50 (Floyd 0.7 vs Floyd 0.6)
+Finished game 21 (Floyd 0.7 vs Floyd 0.6): 1-0 {White mates}
+Score of Floyd 0.7 vs Floyd 0.6: 13 - 1 - 6  [0.800] 20
+Started game 24 of 50 (Floyd 0.6 vs Floyd 0.7)
+Finished game 22 (Floyd 0.6 vs Floyd 0.7): 0-1 {Black mates}
+Score of Floyd 0.7 vs Floyd 0.6: 14 - 1 - 6  [0.810] 21
+Started game 25 of 50 (Floyd 0.7 vs Floyd 0.6)
+Finished game 20 (Floyd 0.6 vs Floyd 0.7): 0-1 {Black mates}
+Score of Floyd 0.7 vs Floyd 0.6: 15 - 1 - 6  [0.818] 22
+Started game 26 of 50 (Floyd 0.6 vs Floyd 0.7)
+Finished game 23 (Floyd 0.7 vs Floyd 0.6): 1-0 {White mates}
+Score of Floyd 0.7 vs Floyd 0.6: 16 - 1 - 6  [0.826] 23
+Started game 27 of 50 (Floyd 0.7 vs Floyd 0.6)
+Finished game 24 (Floyd 0.6 vs Floyd 0.7): 0-1 {Black mates}
+Score of Floyd 0.7 vs Floyd 0.6: 17 - 1 - 6  [0.833] 24
+Started game 28 of 50 (Floyd 0.6 vs Floyd 0.7)
+Finished game 26 (Floyd 0.6 vs Floyd 0.7): 1/2-1/2 {Draw by 3-fold repetition}
+Score of Floyd 0.7 vs Floyd 0.6: 17 - 1 - 7  [0.820] 25
+Started game 29 of 50 (Floyd 0.7 vs Floyd 0.6)
+Finished game 25 (Floyd 0.7 vs Floyd 0.6): 1-0 {White mates}
+Score of Floyd 0.7 vs Floyd 0.6: 18 - 1 - 7  [0.827] 26
+Started game 30 of 50 (Floyd 0.6 vs Floyd 0.7)
+Finished game 27 (Floyd 0.7 vs Floyd 0.6): 1-0 {White mates}
+Score of Floyd 0.7 vs Floyd 0.6: 19 - 1 - 7  [0.833] 27
+Started game 31 of 50 (Floyd 0.7 vs Floyd 0.6)
+Finished game 28 (Floyd 0.6 vs Floyd 0.7): 0-1 {Black mates}
+Score of Floyd 0.7 vs Floyd 0.6: 20 - 1 - 7  [0.839] 28
+Started game 32 of 50 (Floyd 0.6 vs Floyd 0.7)
+Finished game 29 (Floyd 0.7 vs Floyd 0.6): 1/2-1/2 {Draw by 3-fold repetition}
+Score of Floyd 0.7 vs Floyd 0.6: 20 - 1 - 8  [0.828] 29
+Started game 33 of 50 (Floyd 0.7 vs Floyd 0.6)
+Finished game 31 (Floyd 0.7 vs Floyd 0.6): 0-1 {Black mates}
+Score of Floyd 0.7 vs Floyd 0.6: 20 - 2 - 8  [0.800] 30
+Started game 34 of 50 (Floyd 0.6 vs Floyd 0.7)
+Finished game 30 (Floyd 0.6 vs Floyd 0.7): 0-1 {Black mates}
+Score of Floyd 0.7 vs Floyd 0.6: 21 - 2 - 8  [0.806] 31
+Started game 35 of 50 (Floyd 0.7 vs Floyd 0.6)
+Finished game 32 (Floyd 0.6 vs Floyd 0.7): 0-1 {Black mates}
+Score of Floyd 0.7 vs Floyd 0.6: 22 - 2 - 8  [0.812] 32
+Started game 36 of 50 (Floyd 0.6 vs Floyd 0.7)
+Finished game 33 (Floyd 0.7 vs Floyd 0.6): 0-1 {Black mates}
+Score of Floyd 0.7 vs Floyd 0.6: 22 - 3 - 8  [0.788] 33
+Started game 37 of 50 (Floyd 0.7 vs Floyd 0.6)
+Finished game 35 (Floyd 0.7 vs Floyd 0.6): 1-0 {White mates}
+Score of Floyd 0.7 vs Floyd 0.6: 23 - 3 - 8  [0.794] 34
+Started game 38 of 50 (Floyd 0.6 vs Floyd 0.7)
+Finished game 34 (Floyd 0.6 vs Floyd 0.7): 0-1 {Black mates}
+Score of Floyd 0.7 vs Floyd 0.6: 24 - 3 - 8  [0.800] 35
+Started game 39 of 50 (Floyd 0.7 vs Floyd 0.6)
+Finished game 36 (Floyd 0.6 vs Floyd 0.7): 0-1 {Black mates}
+Score of Floyd 0.7 vs Floyd 0.6: 25 - 3 - 8  [0.806] 36
+Started game 40 of 50 (Floyd 0.6 vs Floyd 0.7)
+Finished game 37 (Floyd 0.7 vs Floyd 0.6): 1-0 {White mates}
+Score of Floyd 0.7 vs Floyd 0.6: 26 - 3 - 8  [0.811] 37
+Started game 41 of 50 (Floyd 0.7 vs Floyd 0.6)
+Finished game 38 (Floyd 0.6 vs Floyd 0.7): 1-0 {White mates}
+Score of Floyd 0.7 vs Floyd 0.6: 26 - 4 - 8  [0.789] 38
+Started game 42 of 50 (Floyd 0.6 vs Floyd 0.7)
+Finished game 40 (Floyd 0.6 vs Floyd 0.7): 1/2-1/2 {Draw by 3-fold repetition}
+Score of Floyd 0.7 vs Floyd 0.6: 26 - 4 - 9  [0.782] 39
+Started game 43 of 50 (Floyd 0.7 vs Floyd 0.6)
+Finished game 39 (Floyd 0.7 vs Floyd 0.6): 1/2-1/2 {Draw by 3-fold repetition}
+Score of Floyd 0.7 vs Floyd 0.6: 26 - 4 - 10  [0.775] 40
+Started game 44 of 50 (Floyd 0.6 vs Floyd 0.7)
+Finished game 41 (Floyd 0.7 vs Floyd 0.6): 0-1 {Black mates}
+Score of Floyd 0.7 vs Floyd 0.6: 26 - 5 - 10  [0.756] 41
+Started game 45 of 50 (Floyd 0.7 vs Floyd 0.6)
+Finished game 43 (Floyd 0.7 vs Floyd 0.6): 1-0 {White mates}
+Score of Floyd 0.7 vs Floyd 0.6: 27 - 5 - 10  [0.762] 42
+Started game 46 of 50 (Floyd 0.6 vs Floyd 0.7)
+Finished game 44 (Floyd 0.6 vs Floyd 0.7): 0-1 {Black mates}
+Score of Floyd 0.7 vs Floyd 0.6: 28 - 5 - 10  [0.767] 43
+Started game 47 of 50 (Floyd 0.7 vs Floyd 0.6)
+Finished game 42 (Floyd 0.6 vs Floyd 0.7): 1-0 {White mates}
+Score of Floyd 0.7 vs Floyd 0.6: 28 - 6 - 10  [0.750] 44
+Started game 48 of 50 (Floyd 0.6 vs Floyd 0.7)
+Finished game 45 (Floyd 0.7 vs Floyd 0.6): 1-0 {White mates}
+Score of Floyd 0.7 vs Floyd 0.6: 29 - 6 - 10  [0.756] 45
+Started game 49 of 50 (Floyd 0.7 vs Floyd 0.6)
+Finished game 47 (Floyd 0.7 vs Floyd 0.6): 1-0 {White mates}
+Score of Floyd 0.7 vs Floyd 0.6: 30 - 6 - 10  [0.761] 46
+Started game 50 of 50 (Floyd 0.6 vs Floyd 0.7)
+Finished game 49 (Floyd 0.7 vs Floyd 0.6): 0-1 {Black mates}
+Score of Floyd 0.7 vs Floyd 0.6: 30 - 7 - 10  [0.745] 47
+Finished game 48 (Floyd 0.6 vs Floyd 0.7): 0-1 {Black mates}
+Score of Floyd 0.7 vs Floyd 0.6: 31 - 7 - 10  [0.750] 48
+Finished game 46 (Floyd 0.6 vs Floyd 0.7): 1/2-1/2 {Draw by fifty moves rule}
+Score of Floyd 0.7 vs Floyd 0.6: 31 - 7 - 11  [0.745] 49
+Finished game 50 (Floyd 0.6 vs Floyd 0.7): 0-1 {Black mates}
+Score of Floyd 0.7 vs Floyd 0.6: 32 - 7 - 11  [0.750] 50
 ELO difference: 191
 Finished match
 + echo
@@ -795,10 +794,10 @@ test result OK passed 251 total 276
 test result OK passed 252 total 277
 test result OK passed 253 total 278
 test result OK passed 254 total 279
-test result FAILED passed 254 total 280
-test result OK passed 255 total 281
-test result OK passed 256 total 282
-test result OK passed 257 total 283
+test result OK passed 255 total 280
+test result OK passed 256 total 281
+test result OK passed 257 total 282
+test result FAILED passed 257 total 283
 test result OK passed 258 total 284
 test result OK passed 259 total 285
 test result OK passed 260 total 286
@@ -823,7 +822,7 @@ test result OK passed 272 total 300
 + head -100 Data/qmate.epd
 + time python Tools/epdtest.py 10
 + grep result
-       95.82 real        95.67 user         0.14 sys
+       99.11 real        98.81 user         0.20 sys
 test result OK passed 1 total 1
 test result OK passed 2 total 2
 test result OK passed 3 total 3
@@ -931,53 +930,53 @@ test result OK passed 97 total 100
 + echo bench movetime 10000
 + ./floyd-pgo2
 
-Floyd Chess Engine - Version xd0881bd5
+Floyd Chess Engine - Version 0.7
 Copyright (C) 2015, Marcel van Kervinck
 All rights reserved
 
 Type "help" for more information, or "quit" to leave.
 
 egt class KPK check OK
-time 10003 nps 493584 fen r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -
-time 10002 nps 587189 fen 4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -
-time 10000 nps 550680 fen 3rk2r/1pq1bpp1/p1n1p1n1/3pP3/3P2P1/1PPQNNB1/5P2/R3R1K1 b k -
-time 10004 nps 750709 fen 7k/8/1p1Q2pp/1p3b2/3p3P/P3q3/BP4PK/8 b - -
-time 10004 nps 515094 fen 2r1rnk1/4qppp/p3b3/1p4P1/4p2P/2N1PN2/PP1Q1P2/1KR4R w - -
-time 10004 nps 530369 fen 2rk3r/p2n1pp1/bqn1p2p/1p1pP3/3P1N1P/bP1BBN2/P3QPP1/2R1R1K1 w - -
-time 10000 nps 672874 fen 1nr2rk1/p3Qppp/1p2p1n1/8/3P4/2N2N2/PP3PPP/2R2RK1 b - -
-time 10005 nps 929362 fen 3nr1k1/1p1r3p/pR1pNpp1/3P4/4P3/3P3P/6P1/1R5K b - -
-time 10000 nps 603712 fen 4r1k1/pp3ppp/3n4/2n1r3/2P2NP1/4KB2/PP2P2P/R5R1 w - -
-time 10003 nps 1033540 fen 8/p5pk/1p6/5R1p/P7/5PPK/5r2/8 b - -
-time 10005 nps 894687 fen 8/2Q2p2/5qpk/4p3/8/5P1P/6K1/8 w - -
-time 10001 nps 677269 fen 5rk1/1pr2bbp/pNp1n1p1/2P1p3/1PBpP3/1N5P/1P3PP1/3RR1K1 b - -
-time 10004 nps 883699 fen 8/1b3pk1/rp5p/6p1/6B1/1R4P1/4P2P/4K3 w - -
-time 10000 nps 553900 fen r1bqk2r/pp2ppbp/3p1np1/8/2PQP3/2N5/PP2BPPP/R1B1K2R w KQkq -
-time 10001 nps 739706 fen 8/1b4pk/7q/p3pP2/1p2P3/1Pp5/2P1Q3/5BK1 b - -
-time 10002 nps 563583 fen r2qkb1r/2p2ppp/p1p5/3pP3/4n1b1/3Q1N2/PPP2PPP/RNB2RK1 w kq -
-time 10003 nps 653399 fen 4r1k1/pp2pp1n/3p2p1/6Bp/2rN1P1P/q1P5/2PQ2P1/1K1RR3 b - -
-time 10005 nps 568092 fen rnbq1rk1/pp3pbp/2pp1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - -
-time 10003 nps 814496 fen 8/8/p3k1p1/Bb5p/1P5P/5P2/1r4P1/3R2K1 b - -
-time 10004 nps 746256 fen 4k3/q4p2/2n1p1p1/p1Np4/3P1QP1/PP3P2/6K1/8 b - -
-time 10003 nps 934563 fen 3bn3/4k3/2p3p1/ppN2P2/P5P1/1P1KB3/8/8 b - -
-time 10003 nps 595450 fen r1b1r1k1/5pbp/pp1p1np1/2qPn3/P1p1P3/2N1BPN1/1P1QB1PP/R1R4K b - -
-time 10005 nps 674327 fen r1q1rnk1/p1p2pp1/bp2p2p/n2pP3/Q1PP1N1B/P1PB1P2/6PP/R4RK1 w - d6
-time 10004 nps 654731 fen r3r1k1/1bpnqppp/1p1p4/p2Pp3/1PP1P3/P5P1/1BQ2PBP/1R1R2K1 b - -
-time 10004 nps 887096 fen 1r6/4Pk2/1p1p1P2/p7/8/1P1K2p1/P7/5R2 b - -
-time 10003 nps 560605 fen 1rbqk2r/2pp1ppp/p1n2n2/1pb1p3/P3P3/1B3N2/1PPP1PPP/RNBQ1RK1 w k -
-time 10000 nps 780319 fen r4bk1/6pp/1B2n3/4P3/pp6/1P2N1P1/P5KP/3R4 w - -
-time 10002 nps 486584 fen r1bqkb1r/pp1n1ppp/2n5/2ppP3/3P1P2/5N2/PP4PP/RNBQKB1R w KQkq -
-time 10003 nps 654714 fen r1qr2k1/2p2pPp/p3n3/1p6/8/4BQ2/PP3PPP/R2R2K1 w - -
-time 10005 nps 876441 fen 4r3/1p4k1/p1p1P1pp/3p4/1P1N4/P6B/7P/4K3 w - -
-time 10004 nps 678102 fen 8/R4pk1/4pbq1/8/2P4p/5Q2/8/5K2 b - -
-time 10001 nps 820894 fen 4k3/R4pp1/P7/4P2p/5P2/3p2P1/r7/4K3 w - -
-time 10001 nps 614227 fen 2r3k1/1p4p1/p3bp2/8/N3Pb1p/2R4P/1PP1Q1P1/2q3BK b - -
-time 10001 nps 500989 fen rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -
-time 10003 nps 1621131 fen 8/6N1/8/1k4K1/3n4/8/5P2/8 b - -
-time 10002 nps 576029 fen rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -
-time 10003 nps 910776 fen 8/PRn5/3k4/r4p2/5PB1/8/5P2/6K1 w - -
-time 10004 nps 1043254 fen r5k1/4Rpp1/3p3p/2pP4/p1P3P1/1P6/P4PP1/5K2 w - -
-time 10003 nps 920697 fen 5n2/2k1KB2/7P/8/3n1P2/8/p1N5/8 w - -
-time 10003 nps 553599 fen rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -
-result nps 727676
+time 10005 nps 460420 fen r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -
+time 10003 nps 543799 fen 4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -
+time 10001 nps 505653 fen 3rk2r/1pq1bpp1/p1n1p1n1/3pP3/3P2P1/1PPQNNB1/5P2/R3R1K1 b k -
+time 10004 nps 693387 fen 7k/8/1p1Q2pp/1p3b2/3p3P/P3q3/BP4PK/8 b - -
+time 10003 nps 475660 fen 2r1rnk1/4qppp/p3b3/1p4P1/4p2P/2N1PN2/PP1Q1P2/1KR4R w - -
+time 10004 nps 493493 fen 2rk3r/p2n1pp1/bqn1p2p/1p1pP3/3P1N1P/bP1BBN2/P3QPP1/2R1R1K1 w - -
+time 10004 nps 627366 fen 1nr2rk1/p3Qppp/1p2p1n1/8/3P4/2N2N2/PP3PPP/2R2RK1 b - -
+time 10003 nps 874425 fen 3nr1k1/1p1r3p/pR1pNpp1/3P4/4P3/3P3P/6P1/1R5K b - -
+time 10004 nps 561275 fen 4r1k1/pp3ppp/3n4/2n1r3/2P2NP1/4KB2/PP2P2P/R5R1 w - -
+time 10000 nps 966423 fen 8/p5pk/1p6/5R1p/P7/5PPK/5r2/8 b - -
+time 10005 nps 818298 fen 8/2Q2p2/5qpk/4p3/8/5P1P/6K1/8 w - -
+time 10004 nps 635420 fen 5rk1/1pr2bbp/pNp1n1p1/2P1p3/1PBpP3/1N5P/1P3PP1/3RR1K1 b - -
+time 10004 nps 819698 fen 8/1b3pk1/rp5p/6p1/6B1/1R4P1/4P2P/4K3 w - -
+time 10005 nps 515786 fen r1bqk2r/pp2ppbp/3p1np1/8/2PQP3/2N5/PP2BPPP/R1B1K2R w KQkq -
+time 10001 nps 690862 fen 8/1b4pk/7q/p3pP2/1p2P3/1Pp5/2P1Q3/5BK1 b - -
+time 10000 nps 533799 fen r2qkb1r/2p2ppp/p1p5/3pP3/4n1b1/3Q1N2/PPP2PPP/RNB2RK1 w kq -
+time 10003 nps 609470 fen 4r1k1/pp2pp1n/3p2p1/6Bp/2rN1P1P/q1P5/2PQ2P1/1K1RR3 b - -
+time 10000 nps 520083 fen rnbq1rk1/pp3pbp/2pp1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - -
+time 10002 nps 755184 fen 8/8/p3k1p1/Bb5p/1P5P/5P2/1r4P1/3R2K1 b - -
+time 10002 nps 698781 fen 4k3/q4p2/2n1p1p1/p1Np4/3P1QP1/PP3P2/6K1/8 b - -
+time 10001 nps 877798 fen 3bn3/4k3/2p3p1/ppN2P2/P5P1/1P1KB3/8/8 b - -
+time 10003 nps 559453 fen r1b1r1k1/5pbp/pp1p1np1/2qPn3/P1p1P3/2N1BPN1/1P1QB1PP/R1R4K b - -
+time 10004 nps 624242 fen r1q1rnk1/p1p2pp1/bp2p2p/n2pP3/Q1PP1N1B/P1PB1P2/6PP/R4RK1 w - d6
+time 10005 nps 608790 fen r3r1k1/1bpnqppp/1p1p4/p2Pp3/1PP1P3/P5P1/1BQ2PBP/1R1R2K1 b - -
+time 10002 nps 822099 fen 1r6/4Pk2/1p1p1P2/p7/8/1P1K2p1/P7/5R2 b - -
+time 10001 nps 524887 fen 1rbqk2r/2pp1ppp/p1n2n2/1pb1p3/P3P3/1B3N2/1PPP1PPP/RNBQ1RK1 w k -
+time 10002 nps 720224 fen r4bk1/6pp/1B2n3/4P3/pp6/1P2N1P1/P5KP/3R4 w - -
+time 10002 nps 448906 fen r1bqkb1r/pp1n1ppp/2n5/2ppP3/3P1P2/5N2/PP4PP/RNBQKB1R w KQkq -
+time 10001 nps 612670 fen r1qr2k1/2p2pPp/p3n3/1p6/8/4BQ2/PP3PPP/R2R2K1 w - -
+time 10004 nps 805816 fen 4r3/1p4k1/p1p1P1pp/3p4/1P1N4/P6B/7P/4K3 w - -
+time 10003 nps 629583 fen 8/R4pk1/4pbq1/8/2P4p/5Q2/8/5K2 b - -
+time 10004 nps 759389 fen 4k3/R4pp1/P7/4P2p/5P2/3p2P1/r7/4K3 w - -
+time 10004 nps 582333 fen 2r3k1/1p4p1/p3bp2/8/N3Pb1p/2R4P/1PP1Q1P1/2q3BK b - -
+time 10002 nps 478356 fen rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -
+time 10004 nps 1535976 fen 8/6N1/8/1k4K1/3n4/8/5P2/8 b - -
+time 10003 nps 538658 fen rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -
+time 10000 nps 839283 fen 8/PRn5/3k4/r4p2/5PB1/8/5P2/6K1 w - -
+time 10003 nps 981876 fen r5k1/4Rpp1/3p3p/2pP4/p1P3P1/1P6/P4PP1/5K2 w - -
+time 10000 nps 829416 fen 5n2/2k1KB2/7P/8/3n1P2/8/p1N5/8 w - -
+time 10004 nps 517703 fen rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -
+result nps 677416
 + echo
 

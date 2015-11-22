@@ -211,10 +211,9 @@ void uciMain(Engine_t self)
                                 for (int n=1; n>0; line+=n) {
                                         int moves[maxMoves], move;
                                         int nrMoves = generateMoves(board(self), moves);
-                                        n = parseMove(board(self), line, moves, nrMoves, &move);
+                                        n = parseUciMove(board(self), line, moves, nrMoves, &move);
                                         if (n > 0) makeMove(board(self), move);
-                                        if (debug && n == -1) printf("info string Illegal move\n");
-                                        if (debug && n == -2) printf("info string Ambiguous move\n");
+                                        else if (debug) printf("info string Illegal move\n");
                                 }
                         }
 
@@ -264,10 +263,9 @@ void uciMain(Engine_t self)
                                         for (int n=1; n>0; line+=n) {
                                                 int moves[maxMoves], move;
                                                 int nrMoves = generateMoves(board(self), moves);
-                                                n = parseMove(board(self), line, moves, nrMoves, &move);
+                                                n = parseUciMove(board(self), line, moves, nrMoves, &move);
                                                 if (n > 0) pushList(self->searchMoves, move);
-                                                if (debug && n == -1) printf("info string Illegal move\n");
-                                                if (debug && n == -2) printf("info string Ambiguous move\n");
+                                                else if (debug) printf("info string Illegal move\n");
                                         }
                                 else skipOneToken("Option");
 

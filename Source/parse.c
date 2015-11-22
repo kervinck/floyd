@@ -46,15 +46,10 @@
  |      Data                                                            |
  +----------------------------------------------------------------------*/
 
-static const char pieceToChar[] = {
-        [empty] = '\0',
-        [whiteKing]   = 'K', [whiteQueen]  = 'Q', [whiteRook] = 'R',
-        [whiteBishop] = 'B', [whiteKnight] = 'N', [whitePawn] = 'P',
-        [blackKing]   = 'k', [blackQueen]  = 'q', [blackRook] = 'r',
-        [blackBishop] = 'b', [blackKnight] = 'n', [blackPawn] = 'p',
+static const int promotionFlags[] = {
+        ['q'] = queenPromotionFlags,  ['r'] = rookPromotionFlags,
+        ['b'] = bishopPromotionFlags, ['n'] = knightPromotionFlags,
 };
-
-static const char promotionPieceToChar[] = { 'Q', 'R', 'B', 'N' };
 
 /*----------------------------------------------------------------------+
  |      Functions                                                       |
@@ -206,161 +201,56 @@ static int parseCastling(const char *line, int *len)
         return nrOh;
 }
 
-static bool isPieceChar(int c)
+extern int parseUciMove(Board_t self, const char *line, int xMoves[maxMoves], int xlen, int *move)
 {
-        const char *s = strchr("KQRBNP", c);
-        return (s != NULL) && (*s != '\0');
-}
-
-extern int parseMove(Board_t self, const char *line, int xMoves[maxMoves], int xlen, int *move)
-{
-        /*
-         *  Phase 1: extract as many as possible move elements from input
-         */
-
         int ix = 0; // index into line
+        int rawMove = 0;
 
-        /*
-         *  The line elements for move disambiguation
-         *  Capture and checkmarks will be swallowed and are not checked
-         *  for correctness either
-         */
-        char fromPiece = 0;
-        char fromFile = 0;
-        char fromRank = 0;
-        char toPiece = 0;
-        char toFile = 0;
-        char toRank = 0;
-        char promotionPiece = 0;
-
-        while (isspace(line[ix]))       // Skip white spaces
+        while (isspace(line[ix])) // Skip white space
                 ix++;
 
         int castleLen;
         int nrOh = parseCastling(&line[ix], &castleLen);
 
-        if (nrOh == 2) {                // King side castling
-                fromPiece = 'K';
-                fromFile = 'e';
-                toFile = 'g';
+        if (nrOh == 2) { // King-side castling
+                int rank = (sideToMove(self) == white) ? rank1 : rank8;
+                rawMove = move(square(fileE, rank), square(fileG, rank));
                 ix += castleLen;
-        } else if (nrOh == 3) {         // Queen side castling
-                fromPiece = 'K';
-                fromFile = 'e';
-                toFile = 'c';
+        } else if (nrOh == 3) { // Queen-side castling
+                int rank = (sideToMove(self) == white) ? rank1 : rank8;
+                rawMove = move(square(fileE, rank), square(fileC, rank));
                 ix += castleLen;
-        } else {                        // Regular move
-                if (isPieceChar(line[ix])) {
-                        fromPiece = line[ix++];
-                        if (line[ix] == '/') ix++; // ICS madness
-                }
+        } else { // Regular move
+                if ('a' > line[ix+0] || line[ix+0] > 'h'
+                 || '1' > line[ix+1] || line[ix+1] > '8'
+                 || 'a' > line[ix+2] || line[ix+2] > 'h'
+                 || '1' > line[ix+3] || line[ix+3] > '8')
+                        return 0;
 
-                if ('a' <= line[ix] && line[ix] <= 'h')
-                        toFile = line[ix++];
+                int fromFile = charToFile(line[ix++]);
+                int fromRank = charToRank(line[ix++]);
+                int toFile   = charToFile(line[ix++]);
+                int toRank   = charToRank(line[ix++]);
 
-                if ('1' <= line[ix] && line[ix] <= '8')
-                        toRank = line[ix++];
+                rawMove = move(square(fromFile, fromRank), square(toFile, toRank));
 
-                switch (line[ix]) {
-                case 'x': case ':':
-                        if (isPieceChar(line[++ix]))
-                                toPiece = line[ix++];
-                        break;
-                case '-':
-                        ix++;
-                }
-
-                if ('a' <= line[ix] && line[ix] <= 'h') {
-                        fromFile = toFile;
-                        fromRank = toRank;
-                        toFile = line[ix++];
-                        toRank = 0;
-                }
-
-                if ('1' <= line[ix] && line[ix] <= '8') {
-                        if (toRank) fromRank = toRank;
-                        toRank = line[ix++];
-                }
-
-                if (line[ix] == '=')
-                        ix++;
-
-                if (isPieceChar(toupper(line[ix])))
-                        promotionPiece = toupper(line[ix++]);
+                if (line[ix] == 'q' || line[ix] == 'r'
+                 || line[ix] == 'b' || line[ix] == 'n')
+                        rawMove += promotionFlags[(int)line[ix++]];
         }
 
-        while (line[ix] == '+' || line[ix] == '#' || line[ix] == '!' || line[ix] == '?')
-                ix++;
-
-        /*
-         *  Phase 2: Reject if it still doesn't look anything like a move
-         */
-
-        if (isalnum(line[ix]) || line[ix] == '-' || line[ix] == '=')
+        if (!isspace(line[ix]) && line[ix] != '\0')
                 return 0; // Reject garbage following the move
 
-        if (!fromPiece && !toPiece && !promotionPiece) {
-                if (!fromFile && !toFile) return 0;             // Reject "", "3", "34"
-                if (fromRank && !toRank) return 0;              // Reject "3a", "a3b"
-                if (toFile && !toRank && !fromFile) return 0;   // Reject "a"
-        }
-
-        /*
-         *  Phase 3: Search for a unique legal matching move
-         */
-
-        int nrMatches = 0;
-        int matchedMove = 0;
-        int precedence = -1; // -1 no move, 0 regular move, 1 pawn move, 2 queen promotion
-
+        // Find matching move from move list and verify its legality
         for (int i=0; i<xlen; i++) {
                 int xMove = xMoves[i];
-                int xFrom = from(xMove);
-                int xTo = to(xMove);
-                int xPiece = self->squares[xFrom];
-                int xPromotionPiece = 0;
-                if (isPromotion(self, xFrom, xTo))
-                        xPromotionPiece = promotionPieceToChar[(xMove>>promotionBits)&3];
-
-                // Do all parsed elements match with this candidate move? And is it legal?
-                if ((fromPiece      && fromPiece != toupper(pieceToChar[xPiece]))
-                 || (fromFile       && fromFile  != fileToChar(file(xFrom)))
-                 || (fromRank       && fromRank  != rankToChar(rank(xFrom)))
-                 || (toPiece        && toPiece   != toupper(pieceToChar[self->squares[xTo]]))
-                 || (toFile         && toFile    != fileToChar(file(xTo)))
-                 || (toRank         && toRank    != rankToChar(rank(xTo)))
-                 || (promotionPiece && promotionPiece != xPromotionPiece)
-                 || !isLegalMove(self, xMove))
-                        continue; // no match
-
-                int xPrecedence = 0;
-                if (xPiece == whitePawn || xPiece == blackPawn)
-                        xPrecedence = (xPromotionPiece == 'Q') ? 2 : 1;
-
-                /*
-                 *  Clash with another match is not bad if the new candidate move
-                 *  is a pawn move and the previous one isn't.
-                 *  This is to accept "bxc3" in the presence "Nb1xc3", for example.
-                 *  Same logic to prefer queening if the promoted piece is not given.
-                 */
-                if (precedence < xPrecedence)
-                        nrMatches = 0;
-
-                if (precedence <= xPrecedence) {
-                        matchedMove = xMove;
-                        precedence = xPrecedence;
-                        nrMatches++;
+                if ((xMove & ~specialMoveFlag) == rawMove && isLegalMove(self, xMove)) {
+                        *move = xMove;
+                        return ix;
                 }
         }
-
-        if (nrMatches == 0)
-                return -1; // Move not legal
-
-        if (nrMatches > 1)
-                return -2; // More than one legal move
-
-        *move = matchedMove;
-        return ix;
+        return 0;
 }
 
 /*----------------------------------------------------------------------+

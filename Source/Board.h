@@ -205,12 +205,10 @@ char *moveToUci(Board_t self, char moveString[maxMoveSize], int move);
 /*
  *  Parse move input, disambiguate abbreviated notations
  *  A movelist must be prepared by the caller for disambiguation.
- *  Return the length of the move on success, or <= 0 on failure:
- *   0 : Invalid move syntax
- *  -1 : Not a legal move in this position
- *  -2 : Ambiguous move
+ *  Return the length of the move on success, or 0 on failure
+ *  (invalid move syntax or not a legal move)
  */
-extern int parseMove(Board_t self, const char *line, int xmoves[maxMoves], int xlen, int *move);
+extern int parseUciMove(Board_t self, const char *line, int xmoves[maxMoves], int xlen, int *move);
 
 // Clear the ep flag if there are not legal moves
 extern void normalizeEnPassantStatus(Board_t self);

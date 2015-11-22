@@ -133,7 +133,7 @@ int ttWrite(Engine_t self, struct ttSlot slot, int depth, int score, int alpha, 
                          */
                         if (board(self)->halfmoveClock == 0 && score <= maxDtz)
                                 return score;
-                        slot.score += board(self)->plyNumber - self->rootPlyNumber;
+                        slot.score += ply(self);
                         slot.isWinLossScore = 1;
                         assert(slot.score < maxMate); // maxMate not in chess
                 }
@@ -144,7 +144,7 @@ int ttWrite(Engine_t self, struct ttSlot slot, int depth, int score, int alpha, 
                 if (score < minEval - 1) {
                         if (board(self)->halfmoveClock == 0 && score >= minDtz)
                                 return score;
-                        slot.score -= board(self)->plyNumber - self->rootPlyNumber;
+                        slot.score -= ply(self);
                         slot.isWinLossScore = 1;
                         assert(slot.score >= minMate);
                 }

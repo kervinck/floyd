@@ -64,7 +64,6 @@ struct Board {
         /*
          *  Side data
          */
-        struct side *side, *xside;
         struct side sides[2];
         int sideInfoPlyNumber; // for auto-update
 
@@ -102,6 +101,7 @@ enum castleFlag {
 };
 
 #define sideToMove(board) ((board)->plyNumber & 1)
+#define other(side) ((side) ^ 1)
 
 /*
  *  Moves
@@ -181,7 +181,9 @@ void makeMove(Board_t self, int move);
 static inline bool wasLegalMove(Board_t self)
 {
         updateSideInfo(self);
-        return self->side->attacks[self->xside->king] == 0;
+        int side = sideToMove(self);
+        int xking = self->sides[other(side)].king;
+        return self->sides[side].attacks[xking] == 0;
 }
 
 /*

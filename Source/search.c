@@ -458,7 +458,8 @@ static int staticMoveScore(Board_t self, int move)
         int piece = self->squares[from];
         int next = pieceValue[piece];
 
-        int attackers = self->side->attacks[to] - pieceAttack[next];
+        int side = sideToMove(self);
+        int attackers = self->sides[side].attacks[to] - pieceAttack[next];
         if (next == 1 && score >= 0) attackers -= attackPawn; // TODO: en passant?
 
         bool lastRank = (rank(to) == rank1 || rank(to) == rank8);
@@ -467,7 +468,7 @@ static int staticMoveScore(Board_t self, int move)
                 score += next - 1;
         }
 
-        int defenders = self->xside->attacks[to];
+        int defenders = self->sides[other(side)].attacks[to];
         if (defenders) score -= see(next, defenders, attackers, lastRank ? 8 : 0);
         return score;
 }

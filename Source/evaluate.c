@@ -42,7 +42,6 @@
 #define M_LN10 2.30258509299404568401799145468436421 // log(10)
 #endif
 
-#define other(side) ((side) ^ 1)
 #define flip(fileOrRank) ((fileOrRank) ^ 7)
 
 #define isKingFlankFile(file) (((file) ^ fileD) >> 2)

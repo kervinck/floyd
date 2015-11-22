@@ -31,7 +31,7 @@ make todo | wc -l # xtodo
 echo
 
 echo "*** Line count:"
-CountLoc Source # http://talkchess.com/forum/viewtopic.php?t=56201
+CountLoc -v -np Source # http://talkchess.com/forum/viewtopic.php?t=56201
 echo
 
 echo "*** Build:"

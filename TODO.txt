@@ -1,7 +1,32 @@
 
-|Todo| Pawn mobility
+|Todo| Calculate the impact of each parameter [tune]
 
-|Todo| Introduction of material table.
+Lazy method: set each to 0 and compute the delta of the residual
+
+|Todo| Log timestamp of most recent tune [tune]
+|Todo| Keep track of last non-zero delta for parameter ordering [tune]
+
+For example: (count, lastDelta, timestamp)
+
+Initial: (0, delta, t)
+Update:
+if newDelta < 0.0:
+        return (0, newDelta, tNow)
+else:
+        return (count+1, lastDelta, tNow)
+
+|Todo| Pawn mobility [evaluate]
+
+Can it move safely & how far
+
+|Todo| Pawn levers [evaluate]
+
+Can it come in contact with an enemy pawn?
+(This relation is mutal, so what is the point)
+
+|Todo| Introduction of material table [speed]
+
+Floyd is slow, but we should aim to keep it above 1Mnps
 
 |Todo| King safety [evaluate]
 
@@ -124,6 +149,9 @@ Observe variation of vector and residual
  - Stockfish 6
 
 |Todo| Consider gradient descent [tune]
+
+Or better:
+https://en.wikipedia.org/wiki/Conjugate_gradient_method
 
 |Todo| Test tuner on Rosenbrock function [tune]
 

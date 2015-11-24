@@ -672,9 +672,9 @@ extern void updateSideInfo(Board_t self)
 
                 case blackPawn:
                         if (file(from) != fileH)
-                                self->sides[black].attacks[from+stepSE] = attackPawn; // TODO: fix bug and retune
+                                self->sides[black].attacks[from+stepSE] += attackPawn;
                         if (file(from) != fileA)
-                                self->sides[black].attacks[from+stepSW] = attackPawn;
+                                self->sides[black].attacks[from+stepSW] += attackPawn;
                         break;
                 }
         }

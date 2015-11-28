@@ -1,8 +1,4 @@
 
-|Todo| Calculate the impact of each parameter [tune]
-
-Lazy method: set each to 0 and compute the delta of the residual
-
 |Todo| Log timestamp of most recent tune [tune]
 |Todo| Keep track of last non-zero delta for parameter ordering [tune]
 
@@ -213,3 +209,6 @@ See timing.log and timing3.log
 
 |Todo| Null move for zugzwang
 
+|Todo| Calculate the impact of each parameter [tune]
+
+Lazy method: set each to 0 and compute the delta of the residual

@@ -15,7 +15,7 @@
  *  Some naming conventions are:
  *
  *  Suffix '[A-H]' refers to the file when the player's king is on file E..H.
- *  Suffix '[A-H]X' refers to the file when the opponent king is on file E..H.
+ *  Suffix '[A-H]x' refers to the file when the opponent king is on file E..H.
  *  If the specified king is on A..D instead, the meansing is flipped
  *  (A<->H, B<->G, etc.).
  *
@@ -183,6 +183,7 @@
          *  Knights
          */
 
+        // Kings on same side
         P(knightByFile_0, -158), // fileA
         P(knightByFile_1, -203),
         P(knightByFile_2, -218),
@@ -190,6 +191,15 @@
         P(knightByFile_4, -86),
         P(knightByFile_5, -16),
         P(knightByFile_6, 28), // -fileH
+
+        // Opposite side kings
+        P(knightByFile_0x, -158), // fileA
+        P(knightByFile_1x, -203),
+        P(knightByFile_2x, -218),
+        P(knightByFile_3x, -153),
+        P(knightByFile_4x, -86),
+        P(knightByFile_5x, -16),
+        P(knightByFile_6x, 28), // -fileH
 
         P(knightByRank_0, -97), // rank1
         P(knightByRank_1, -173),

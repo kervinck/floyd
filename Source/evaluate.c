@@ -44,7 +44,7 @@
 
 #define flip(fileOrRank) ((fileOrRank) ^ 7)
 
-#define isKingFlankFile(file) (((file) ^ fileD) >> 2)
+#define isOnKingSide(square) ((file(square) ^ fileA) >> 2)
 
 enum vector {
         #define P(id, value) id
@@ -148,7 +148,7 @@ static int evaluatePawn(const int v[vectorLen],
                         int fileIndex, int side,
                         int king, int xking,
                         const double passerScaling[2]);
-static int evaluateKnight(const int v[vectorLen], int fileIndex, int rankIndex);
+static int evaluateKnight(const int v[vectorLen], int fileIndex, int rankIndex, bool xKings);
 static int evaluateBishop(const int v[vectorLen], int fileIndex, int rankIndex);
 static int evaluateRook(const int v[vectorLen], int fileIndex, int rankIndex);
 static int evaluateQueen(const int v[vectorLen], int fileIndex, int rankIndex);
@@ -188,6 +188,9 @@ int evaluate(Board_t self)
         // Update attack tables and king locations
         updateSideInfo(self);
 
+        bool xKings = (isOnKingSide(self->sides[white].king)
+                    != isOnKingSide(self->sides[black].king));
+
 #if 0
         char pawnSpan[2]; // 0 .. 8
         char pawnCenter[2]; // 0 .. 14  target for kings?
@@ -208,18 +211,9 @@ int evaluate(Board_t self)
                 int rank = rank(square);
 
                 // `fileIndex' and `rankIndex' are relative to the own king
-                int fileIndex, rankIndex;
                 int king = self->sides[side].king;
-
-                if (isKingFlankFile(file(king)))
-                        fileIndex = file ^ fileA;
-                else
-                        fileIndex = file ^ fileH;
-
-                if (side == white)
-                        rankIndex = rank ^ rank1;
-                else
-                        rankIndex = rank ^ rank8;
+                int fileIndex = file ^ (isOnKingSide(king) ? fileA : fileH);
+                int rankIndex = rank ^ (side == white      ? rank1 : rank8);
 
                 // 0 = light (h1) or 1 = dark squares
                 int squareColor = (file ^ rank ^ fileH ^ rank1) & 1;
@@ -242,7 +236,7 @@ int evaluate(Board_t self)
                 case whiteKnight: case blackKnight:
                         // TODO: separate feature extraction from evaluation
                         // (for example, pawn structure is not established here yet)
-                        e.knights[side] += evaluateKnight(v, fileIndex, rankIndex);
+                        e.knights[side] += evaluateKnight(v, fileIndex, rankIndex, xKings);
                         break;
                 case whitePawn: case blackPawn: {
                         int absFileIndex = file ^ fileA;
@@ -691,7 +685,7 @@ static int evaluatePawn(const int v[vectorLen],
  |      evaluateKnight                                                  |
  +----------------------------------------------------------------------*/
 
-static int evaluateKnight(const int v[vectorLen], int fileIndex, int rankIndex)
+static int evaluateKnight(const int v[vectorLen], int fileIndex, int rankIndex, bool xKings)
 {
         int knightScore = 0;
 
@@ -699,10 +693,11 @@ static int evaluateKnight(const int v[vectorLen], int fileIndex, int rankIndex)
          *  File and rank dependent scoring (7+7=14 degrees of freedom)
          */
 
+        int offset = xKings ? knightByFile_0x : knightByFile_0;
         if (fileIndex > 0)
-                knightScore -= v[knightByFile_0 + fileIndex - 1];
+                knightScore -= v[offset + fileIndex - 1];
         if (fileIndex < 7)
-                knightScore += v[knightByFile_0 + fileIndex];
+                knightScore += v[offset + fileIndex];
         if (rankIndex > 0)
                 knightScore -= v[knightByRank_0 + rankIndex - 1];
         if (rankIndex < 7)

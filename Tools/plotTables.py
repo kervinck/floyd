@@ -21,8 +21,9 @@ def pawn(fileIndex, rankIndex, xKing):
 
 def knight(fileIndex, rankIndex, xKing):
         value = 0
-        if fileIndex > 0: value -= vector['knightByFile_%d' % (fileIndex - 1)]
-        if fileIndex < 7: value += vector['knightByFile_%d' % (fileIndex)]
+        x = 'x' if xKing else ''
+        if fileIndex > 0: value -= vector['knightByFile_%d%s' % (fileIndex - 1, x)]
+        if fileIndex < 7: value += vector['knightByFile_%d%s' % (fileIndex, x)]
         if rankIndex > 0: value -= vector['knightByRank_%d' % (rankIndex - 1)]
         if rankIndex < 7: value += vector['knightByRank_%d' % (rankIndex)]
         return value

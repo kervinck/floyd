@@ -42,17 +42,18 @@
 
 static struct Engine engine;
 
-int main(void)
+int main(int argc, const char *argv[])
 {
-        printf("\nFloyd Chess Engine - Version "quote2(floydVersion)"\n"
-               "Copyright (C) 2015, Marcel van Kervinck\n"
-               "All rights reserved\n"
-               "\n"
-               "Type \"help\" for more information, or \"quit\" to leave.\n\n");
+        if (argc <= 1)
+                printf("\nFloyd Chess Engine - Version "quote2(floydVersion)"\n"
+                       "Copyright (C) 2015, Marcel van Kervinck\n"
+                       "All rights reserved\n"
+                       "\n"
+                       "Type \"help\" for more information, or \"quit\" to leave.\n\n");
 
         setupBoard(&engine.board, startpos); // be nice and allow `go' without `position'
 
-        uciMain(&engine);
+        uciMain(&engine, argv + 1);
 
         // TODO: move this to a destructor
         freeList(engine.board.hashHistory);

@@ -65,7 +65,7 @@ X"        Enable/disable debug mode and show its status."
 X"  setoption name <optionName> [ value <optionValue> ]"
 X"        Set option. The new value becomes active with the next `isready'."
 X"  isready"
-X"        Activate any changed options and reply 'isready' when done."
+X"        Activate any changed options and reply `readyok' when done."
 X"  ucinewgame"
 X"        A new game has started. (ignored)"
 X"  position [ startpos | fen <fenField> ... ] [ moves <move> ... ]"
@@ -124,22 +124,22 @@ static void updateOptions(Engine_t self,
  |      _scanToken                                                      |
  +----------------------------------------------------------------------*/
 
-// Token and (optional) value scanner
+// Token and optional value scanner
 static int _scanToken(char **line, const char *format, void *value)
 {
-        char next = 0;
+        char nextChar = 0;
         int n = 0;
         if (value)
-                sscanf(*line, format, value, &next, &n);
+                sscanf(*line, format, value, &nextChar, &n);
         else
-                sscanf(*line, format, &next, &n);
-        if (!isspace(next)) // space or newline
+                sscanf(*line, format, &nextChar, &n);
+        if (!isspace(nextChar)) // expect space or newline to follow
                 n = 0;
         *line += n;
         return n;
 }
-#define scan(tokens) _scanToken(&line, " " tokens "%c %n", null)
 #define scanValue(tokens, value) _scanToken(&line, " " tokens "%c %n", value)
+#define scan(tokens) scanValue(tokens, null)
 
 // For skipping unknown commands or options
 #define skipOneToken(type) Statement(\
@@ -154,7 +154,7 @@ static int _scanToken(char **line, const char *format, void *value)
  |      uciMain                                                         |
  +----------------------------------------------------------------------*/
 
-void uciMain(Engine_t self)
+void uciMain(Engine_t self, const char *argv[])
 {
         charList lineBuffer = emptyList;
         bool debug = false;
@@ -164,19 +164,27 @@ void uciMain(Engine_t self)
         // Prepare threading
         xThread_t searchThread = null;
 
-        // Process commands from stdin
-        while (fflush(stdout), readLine(stdin, &lineBuffer) > 0) {
+        // Process commands, first from arguments and then from stdin
+        for (;;) {
+                if (*argv != null) {
+                        lineBuffer.len = 0;
+                        for (const char *s=*argv++; *s; s++)
+                                pushList(lineBuffer, *s);
+                        pushList(lineBuffer, '\n');
+                } else if (readLine(stdin, &lineBuffer) == 0)
+                        break;
+
                 char *line = lineBuffer.v;
                 if (debug) printf("info string input %s", line);
 
                 if (scan("uci"))
                         printf("id name Floyd "quote2(floydVersion)"\n"
-                                "id author Marcel van Kervinck\n"
-                                "option name Hash type spin default %ld min 0 max %ld\n"
-                                "option name Clear Hash type button\n"
-                                "option name Ponder type check default true\n"
-                                "uciok\n",
-                               newOptions.Hash, maxHash);
+                               "id author Marcel van Kervinck\n"
+                               "option name Hash type spin default %ld min 0 max %ld\n"
+                               "option name Clear Hash type button\n"
+                               "option name Ponder type check default true\n"
+                               "uciok\n",
+                                newOptions.Hash, maxHash);
 
                 else if (scan("debug")) {
                         if (scan("on")) debug = true;
@@ -186,7 +194,7 @@ void uciMain(Engine_t self)
                 else if (scan("setoption")) {
                         if (scanValue("name Hash value %ld", &newOptions.Hash)) pass;
                         else if (scan("name Ponder value true")) pass;
-                        else if (scan("name Ponder value false")) pass;
+                        else if (scan("name Ponder value false")) pass; // just ignore it
                         else if (scan("name Clear Hash")) newOptions.ClearHash = !oldOptions.ClearHash;
                 }
                 else if (scan("isready")) {
@@ -315,6 +323,7 @@ void uciMain(Engine_t self)
                         skipOneToken("Command");
 
                 skipOtherTokens(); // For info when debugging
+                fflush(stdout);
         }
 
         searchThread = stopSearch(self, searchThread);

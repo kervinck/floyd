@@ -176,19 +176,6 @@ As a callback interface with the search info data
 
 Then also cache evaluation in ttable
 
-|Todo| Execute command line arguments as uci command [main,usability]
-
-floyd [ <uciCommand> <uciOption> ... ]
-
-eg.
-floyd 'debug on'
-floyd 'go depth 8'
-floyd help
-floyd bench
-
-Main obstacle is that the token scanner assumes there is always a
-whitespace or newline after each word.
-
 |Todo| Consider persistent alarm thread [speed]
 
 Profile first

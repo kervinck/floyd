@@ -715,6 +715,12 @@ static int evaluateKnight(const int v[vectorLen], int fileIndex, int rankIndex, 
 
 static int evaluateBishop(const int v[vectorLen], int fileIndex, int rankIndex)
 {
+        return v[bishopBySquare_0 + square(fileIndex, rankIndex)];
+}
+
+#if 0
+static int evaluateBishop(const int v[vectorLen], int fileIndex, int rankIndex)
+{
         int bishopScore = 0;
 
         if (rankIndex - fileIndex == 0)
@@ -740,6 +746,7 @@ static int evaluateBishop(const int v[vectorLen], int fileIndex, int rankIndex)
 
         return bishopScore;
 }
+#endif
 
 /*----------------------------------------------------------------------+
  |      evaluateRook                                                    |

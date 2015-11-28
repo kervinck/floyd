@@ -52,12 +52,12 @@ export PYTHONPATH:=build/lib/python:${PYTHONPATH}
 #-----------------------------------------------------------------------
 
 # Compile both as Python module and as native UCI engine
-all: module floyd
+all: .module floyd
 
 # Compile as Python module
-module: $(wildcard Source/*) Makefile versions.json
+.module: $(wildcard Source/*) Makefile versions.json
 	env CC="$(CC)" CFLAGS="$(CFLAGS)" floydVersion="$(floydVersion)" python setup.py build
-	env floydVersion="$(floydVersion)" python setup.py install --home=build && touch module
+	env floydVersion="$(floydVersion)" python setup.py install --home=build && touch .module
 
 # Compile as native UCI engine
 floyd: $(wildcard Source/*) Makefile versions.json
@@ -80,23 +80,23 @@ $(win32_exe): $(wildcard Source/*) Makefile versions.json
 	$(xcc_win32) $(CFLAGS) $(win32_flags) -o $@ $(uciSources)
 
 # Run 1 second position tests
-easy wac krk5 tt eg ece3: module
+easy wac krk5 tt eg ece3: .module
 	python Tools/epdtest.py 1 < Data/$@.epd
 
 # Run 10 second position tests
-hard draw nodraw bk: module
+hard draw nodraw bk: .module
 	python Tools/epdtest.py 10 < Data/$@.epd
 
 # Run 100 second position tests
-mate mated qmate: module
+mate mated qmate: .module
 	python Tools/epdtest.py 100 < Data/$@.epd
 
 # Run 1000 second position tests
-nolot: module
+nolot: .module
 	python Tools/epdtest.py 1000 < Data/$@.epd
 
 # Run node count regression test
-nodes: module
+nodes: .module
 	python Tools/nodetest.py 8 < Data/thousand.epd | awk '\
 	/ nodes / { n[$$5] += $$10; n[-1] += !$$5 }\
 	END       { for (d=0; n[d]; d++) print d, n[d], n[d] / n[d-1] }'
@@ -106,11 +106,11 @@ bench: floyd-pgo2
 	for N in 1 2 3; do echo bench | ./floyd-pgo2 | grep result; done
 
 # Calculate residual of evaluation function
-residual: module
+residual: .module
 	bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/tune.py -q Tuning/vector.json
 
 # Run one iteration of the evaluation tuner
-tune: module
+tune: .module
 	bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/tune.py -n 8 Tuning/vector.json
 
 # Plot evaluation tables for easy inspection
@@ -126,17 +126,17 @@ update: clean
 	[ -s vector.h.tmp ] && mv vector.h.tmp Source/vector.h
 
 # Install Python module for the current user
-install: module
+install: .module
 	env floydVersion=$(floydVersion) python setup.py install --user
 
 # Install Python module for all system users ('sudo make sysinstall')
-sysinstall: module
+sysinstall: .module
 	env floydVersion=$(floydVersion) python setup.py install
 
 # Remove compilation intermediates and results
 clean:
 	env floydVersion=$(floydVersion) python setup.py clean --all
-	rm -f floyd $(win32_exe) floyd-pgo[12] *.gcda module
+	rm -f floyd $(win32_exe) floyd-pgo[12] *.gcda .module
 	rm -rf build
 
 # Show all open to-do items

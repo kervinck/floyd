@@ -149,7 +149,7 @@ static int evaluatePawn(const int v[vectorLen],
                         int king, int xking,
                         const double passerScaling[2]);
 static int evaluateKnight(const int v[vectorLen], int fileIndex, int rankIndex, bool xKings);
-static int evaluateBishop(const int v[vectorLen], int fileIndex, int rankIndex);
+static int evaluateBishop(const int v[vectorLen], int fileIndex, int rankIndex, bool xKings);
 static int evaluateRook(const int v[vectorLen], int fileIndex, int rankIndex);
 static int evaluateQueen(const int v[vectorLen], int fileIndex, int rankIndex);
 static int evaluateKing(const int v[vectorLen], int fileIndex, int rankIndex);
@@ -210,7 +210,14 @@ int evaluate(Board_t self)
                 int file = file(square);
                 int rank = rank(square);
 
-                // `fileIndex' and `rankIndex' are relative to the own king
+                /*
+                 *  `fileIndex' and `rankIndex' are normalized as if the own king
+                 *  is White and located on the king side, meaning:
+                 *  - If the king is on file E..H, fileIndex 0 means `file A'
+                 *  - If the king is on file A..D, fileIndex 0 means `file H'
+                 *  - rankIndex 0 means `rank 1' for White and `rank 8' for Black.
+                 *  This scheme is independent of the definitions in geometry.h!
+                 */
                 int king = self->sides[side].king;
                 int fileIndex = file ^ (isOnKingSide(king) ? fileA : fileH);
                 int rankIndex = rank ^ (side == white      ? rank1 : rank8);
@@ -231,7 +238,7 @@ int evaluate(Board_t self)
                         e.rooks[side] += evaluateRook(v, fileIndex, rankIndex);
                         break;
                 case whiteBishop: case blackBishop:
-                        e.bishops[side] += evaluateBishop(v, fileIndex, rankIndex);
+                        e.bishops[side] += evaluateBishop(v, fileIndex, rankIndex, xKings);
                         break;
                 case whiteKnight: case blackKnight:
                         // TODO: separate feature extraction from evaluation
@@ -703,7 +710,6 @@ static int evaluateKnight(const int v[vectorLen], int fileIndex, int rankIndex, 
         if (rankIndex < 7)
                 knightScore += v[knightByRank_0 + rankIndex];
 
-        // TODO: relation to both kings
         // TODO: strong squares
 
         return knightScore;
@@ -713,9 +719,10 @@ static int evaluateKnight(const int v[vectorLen], int fileIndex, int rankIndex, 
  |      evaluateBishop                                                  |
  +----------------------------------------------------------------------*/
 
-static int evaluateBishop(const int v[vectorLen], int fileIndex, int rankIndex)
+static int evaluateBishop(const int v[vectorLen], int fileIndex, int rankIndex, bool xKings)
 {
-        return v[bishopBySquare_0 + square(fileIndex, rankIndex)];
+        int offset = xKings ? bishopBySquare_0x : bishopBySquare_0;
+        return v[offset + square(fileIndex, rankIndex)];
 }
 
 #if 0

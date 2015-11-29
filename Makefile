@@ -68,7 +68,7 @@ pgo: floyd-pgo1 floyd-pgo2
 
 floyd-pgo1: $(wildcard Source/*) Makefile versions.json
 	$(GCC) $(CFLAGS) -DNDEBUG -o $@ $(uciSources) $(LDFLAGS) -fprofile-generate
-	echo bench | ./$@ | grep result
+	./$@ bench quit | grep result
 
 floyd-pgo2: $(wildcard Source/*) Makefile versions.json floyd-pgo1
 	$(GCC) $(CFLAGS) -DNDEBUG -o $@ $(uciSources) $(LDFLAGS) -fprofile-use
@@ -103,7 +103,7 @@ nodes: .module
 
 # Run nodes per second benchmark 3 times
 bench: floyd-pgo2
-	for N in 1 2 3; do echo bench | ./floyd-pgo2 | grep result; done
+	for N in 1 2 3; do ./floyd-pgo2 bench quit | grep result; done
 
 # Calculate residual of evaluation function
 residual: .module
@@ -147,6 +147,14 @@ todo: # xtodo
 fingerprint: clean
 	@env floydVersion=$(floydVersion) sh -x Tools/fingerprint.sh 2>&1 | tee fingerprint
 	[ `uname -s` != 'Darwin' ] || opendiff Docs/fingerprint fingerprint
+
+# Shootout against last version, 1000 games 10+0.15
+shootout: floyd-pgo2
+	cutechess-cli -concurrency 4 -rounds 1000 -repeat -each tc=10+0.15 \
+	-openings file=Data/book-6000-openings.pgn order=random \
+	-resign movecount=1 score=500 \
+	-engine cmd=./floyd-pgo2 proto=uci \
+	-engine cmd=floyd0.7 proto=uci
 
 # Show simplified git log
 log:

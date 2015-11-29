@@ -30,7 +30,8 @@ def knight(fileIndex, rankIndex, xKing):
 
 def bishop(fileIndex, rankIndex, xKing):
         squareIndex = fileIndex * 8 + rankIndex
-        return vector['bishopBySquare_%d' % (squareIndex) ]
+        x = 'x' if xKing else ''
+        return vector['bishopBySquare_%d%s' % (squareIndex, x) ]
 
 def rook(fileIndex, rankIndex, xKing):
         value = 0

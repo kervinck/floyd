@@ -405,7 +405,8 @@ if __name__ == '__main__':
                         vector = [values[name] for name in names]
         except IOError as err:
                 print err
-                print 'continue'
+                print 'continuing'
+                writeVector(vector, deltas, filename)
 
         coefList = range(len(vector))
         if len(sys.argv) > argi:

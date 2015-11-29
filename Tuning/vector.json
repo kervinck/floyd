@@ -11,107 +11,107 @@
  ],
  [
   "winBonus",
-  3471,
+  3487,
   -1.0
  ],
  [
   "castleK",
-  -83,
+  -86,
   -1.0
  ],
  [
   "castleQ",
-  -75,
+  -83,
   -1.0
  ],
  [
   "castleKQ",
-  14,
+  15,
   -1.0
  ],
  [
   "queenValue",
-  7121,
+  7158,
   -1.0
  ],
  [
   "rookValue",
-  4023,
+  4054,
   -1.0
  ],
  [
   "bishopValue",
-  2284,
+  2293,
   -1.0
  ],
  [
   "knightValue",
-  2087,
+  2104,
   -1.0
  ],
  [
   "pawnValue1",
-  1069,
+  1057,
   -1.0
  ],
  [
   "pawnValue2",
-  1742,
+  1737,
   -1.0
  ],
  [
   "pawnValue3",
-  2387,
+  2388,
   -1.0
  ],
  [
   "pawnValue4",
-  3037,
+  3038,
   -1.0
  ],
  [
   "pawnValue5",
-  3683,
+  3687,
   -1.0
  ],
  [
   "pawnValue6",
-  4327,
+  4321,
   -1.0
  ],
  [
   "pawnValue7",
-  4948,
+  4945,
   -1.0
  ],
  [
   "pawnValue8",
-  5565,
+  5529,
   -1.0
  ],
  [
   "queenAndQueen",
-  -967,
+  -1000,
   -1.0
  ],
  [
   "queenAndRook",
-  -658,
+  -663,
   -1.0
  ],
  [
   "queenAndBishop",
-  26,
+  31,
   -1.0
  ],
  [
   "queenAndKnight",
-  -63,
+  -60,
   -1.0
  ],
  [
   "queenAndPawn_1",
-  -88,
+  -91,
   -1.0
  ],
  [
@@ -136,7 +136,7 @@
  ],
  [
   "rookAndPawn_1",
-  -54,
+  -55,
   -1.0
  ],
  [
@@ -146,12 +146,12 @@
  ],
  [
   "bishopAndBishop",
-  36,
+  39,
   -1.0
  ],
  [
   "bishopAndKnight",
-  -63,
+  -62,
   -1.0
  ],
  [
@@ -181,32 +181,32 @@
  ],
  [
   "queenVsRook",
-  -249,
+  -241,
   -1.0
  ],
  [
   "queenVsBishop",
-  85,
+  84,
   -1.0
  ],
  [
   "queenVsKnight",
-  -5,
+  -6,
   -1.0
  ],
  [
   "queenVsPawn_1",
-  27,
+  32,
   -1.0
  ],
  [
   "queenVsPawn_2",
-  -89,
+  -95,
   -1.0
  ],
  [
   "rookVsBishop",
-  5,
+  4,
   -1.0
  ],
  [
@@ -221,12 +221,12 @@
  ],
  [
   "rookVsPawn_2",
-  -28,
+  -30,
   -1.0
  ],
  [
   "bishopVsKnight",
-  7,
+  8,
   -1.0
  ],
  [
@@ -236,27 +236,27 @@
  ],
  [
   "bishopVsPawn_2",
-  -3,
+  -5,
   -1.0
  ],
  [
   "knightVsPawn_1",
-  0,
+  -1,
   -1.0
  ],
  [
   "knightVsPawn_2",
-  -17,
+  -18,
   -1.0
  ],
  [
   "controlCenter",
-  40,
+  39,
   -1.0
  ],
  [
   "controlExtendedCenter",
-  43,
+  41,
   -1.0
  ],
  [
@@ -271,7 +271,7 @@
  ],
  [
   "pawnByFile_1",
-  -20,
+  -18,
   -1.0
  ],
  [
@@ -281,7 +281,7 @@
  ],
  [
   "pawnByFile_3",
-  -124,
+  -123,
   -1.0
  ],
  [
@@ -291,197 +291,197 @@
  ],
  [
   "pawnByFile_5",
-  -74,
-  -1.0
- ],
- [
-  "pawnByFile_6",
-  23,
-  -1.0
- ],
- [
-  "pawnByRank_0",
-  -28,
-  -1.0
- ],
- [
-  "pawnByRank_1",
-  -65,
-  -1.0
- ],
- [
-  "pawnByRank_2",
-  -82,
-  -1.0
- ],
- [
-  "pawnByRank_3",
-  -43,
-  -1.0
- ],
- [
-  "pawnByRank_4",
-  70,
-  -1.0
- ],
- [
-  "doubledPawnA",
-  -204,
-  -1.0
- ],
- [
-  "doubledPawnB",
-  -115,
-  -1.0
- ],
- [
-  "doubledPawnC",
-  -160,
-  -1.0
- ],
- [
-  "doubledPawnD",
-  -120,
-  -1.0
- ],
- [
-  "doubledPawnE",
-  -101,
-  -1.0
- ],
- [
-  "doubledPawnF",
-  -41,
-  -1.0
- ],
- [
-  "doubledPawnG",
-  -14,
-  -1.0
- ],
- [
-  "doubledPawnH",
-  -221,
-  -1.0
- ],
- [
-  "backwardPawnA",
-  -8,
-  -1.0
- ],
- [
-  "backwardPawnB",
-  -45,
-  -1.0
- ],
- [
-  "backwardPawnC",
-  -55,
-  -1.0
- ],
- [
-  "backwardPawnD",
-  -100,
-  -1.0
- ],
- [
-  "backwardPawnE",
-  -85,
-  -1.0
- ],
- [
-  "backwardPawnF",
-  -33,
-  -1.0
- ],
- [
-  "backwardPawnG",
-  -15,
-  -1.0
- ],
- [
-  "backwardPawnH",
-  27,
-  -1.0
- ],
- [
-  "isolatedPawnClosedA",
-  45,
-  -1.0
- ],
- [
-  "isolatedPawnClosedB",
-  -84,
-  -1.0
- ],
- [
-  "isolatedPawnClosedC",
-  -55,
-  -1.0
- ],
- [
-  "isolatedPawnClosedD",
-  23,
-  -1.0
- ],
- [
-  "isolatedPawnClosedE",
-  -24,
-  -1.0
- ],
- [
-  "isolatedPawnClosedF",
-  -57,
-  -1.0
- ],
- [
-  "isolatedPawnClosedG",
-  -40,
-  -1.0
- ],
- [
-  "isolatedPawnClosedH",
-  4,
-  -1.0
- ],
- [
-  "isolatedPawnOpenA",
-  -8,
-  -1.0
- ],
- [
-  "isolatedPawnOpenB",
-  -49,
-  -1.0
- ],
- [
-  "isolatedPawnOpenC",
   -75,
   -1.0
  ],
  [
-  "isolatedPawnOpenD",
-  -122,
+  "pawnByFile_6",
+  24,
   -1.0
  ],
  [
-  "isolatedPawnOpenE",
+  "pawnByRank_0",
+  -31,
+  -1.0
+ ],
+ [
+  "pawnByRank_1",
+  -73,
+  -1.0
+ ],
+ [
+  "pawnByRank_2",
+  -89,
+  -1.0
+ ],
+ [
+  "pawnByRank_3",
+  -46,
+  -1.0
+ ],
+ [
+  "pawnByRank_4",
+  67,
+  -1.0
+ ],
+ [
+  "doubledPawnA",
+  -224,
+  -1.0
+ ],
+ [
+  "doubledPawnB",
+  -116,
+  -1.0
+ ],
+ [
+  "doubledPawnC",
+  -158,
+  -1.0
+ ],
+ [
+  "doubledPawnD",
+  -128,
+  -1.0
+ ],
+ [
+  "doubledPawnE",
+  -107,
+  -1.0
+ ],
+ [
+  "doubledPawnF",
+  -45,
+  -1.0
+ ],
+ [
+  "doubledPawnG",
+  -4,
+  -1.0
+ ],
+ [
+  "doubledPawnH",
+  -223,
+  -1.0
+ ],
+ [
+  "backwardPawnA",
+  -15,
+  -1.0
+ ],
+ [
+  "backwardPawnB",
+  -47,
+  -1.0
+ ],
+ [
+  "backwardPawnC",
+  -59,
+  -1.0
+ ],
+ [
+  "backwardPawnD",
   -105,
   -1.0
  ],
  [
+  "backwardPawnE",
+  -81,
+  -1.0
+ ],
+ [
+  "backwardPawnF",
+  -40,
+  -1.0
+ ],
+ [
+  "backwardPawnG",
+  -13,
+  -1.0
+ ],
+ [
+  "backwardPawnH",
+  28,
+  -1.0
+ ],
+ [
+  "isolatedPawnClosedA",
+  46,
+  -1.0
+ ],
+ [
+  "isolatedPawnClosedB",
+  -79,
+  -1.0
+ ],
+ [
+  "isolatedPawnClosedC",
+  -59,
+  -1.0
+ ],
+ [
+  "isolatedPawnClosedD",
+  7,
+  -1.0
+ ],
+ [
+  "isolatedPawnClosedE",
+  -26,
+  -1.0
+ ],
+ [
+  "isolatedPawnClosedF",
+  -48,
+  -1.0
+ ],
+ [
+  "isolatedPawnClosedG",
+  -56,
+  -1.0
+ ],
+ [
+  "isolatedPawnClosedH",
+  5,
+  -1.0
+ ],
+ [
+  "isolatedPawnOpenA",
+  0,
+  -1.0
+ ],
+ [
+  "isolatedPawnOpenB",
+  -54,
+  -1.0
+ ],
+ [
+  "isolatedPawnOpenC",
+  -73,
+  -1.0
+ ],
+ [
+  "isolatedPawnOpenD",
+  -125,
+  -1.0
+ ],
+ [
+  "isolatedPawnOpenE",
+  -115,
+  -1.0
+ ],
+ [
   "isolatedPawnOpenF",
-  -92,
+  -96,
   -1.0
  ],
  [
   "isolatedPawnOpenG",
-  -64,
+  -77,
   -1.0
  ],
  [
   "isolatedPawnOpenH",
-  26,
+  23,
   -1.0
  ],
  [
@@ -491,47 +491,47 @@
  ],
  [
   "sidePawnClosedB",
-  -26,
+  -24,
   -1.0
  ],
  [
   "sidePawnClosedC",
-  -5,
+  -7,
   -1.0
  ],
  [
   "sidePawnClosedD",
-  -27,
+  -33,
   -1.0
  ],
  [
   "sidePawnClosedE",
-  -13,
+  -14,
   -1.0
  ],
  [
   "sidePawnClosedF",
-  -1,
+  -2,
   -1.0
  ],
  [
   "sidePawnClosedG",
-  -22,
+  -24,
   -1.0
  ],
  [
   "sidePawnClosedH",
-  4,
+  3,
   -1.0
  ],
  [
   "sidePawnOpenA",
-  -10,
+  -8,
   -1.0
  ],
  [
   "sidePawnOpenB",
-  39,
+  37,
   -1.0
  ],
  [
@@ -541,17 +541,17 @@
  ],
  [
   "sidePawnOpenD",
-  -30,
+  -31,
   -1.0
  ],
  [
   "sidePawnOpenE",
-  -12,
+  -16,
   -1.0
  ],
  [
   "sidePawnOpenF",
-  8,
+  7,
   -1.0
  ],
  [
@@ -561,7 +561,7 @@
  ],
  [
   "sidePawnOpenH",
-  52,
+  53,
   -1.0
  ],
  [
@@ -571,32 +571,32 @@
  ],
  [
   "middlePawnClosedB",
-  -4,
+  -5,
   -1.0
  ],
  [
   "middlePawnClosedC",
-  10,
+  8,
   -1.0
  ],
  [
   "middlePawnClosedD",
-  -9,
+  -16,
   -1.0
  ],
  [
   "middlePawnClosedE",
-  19,
+  21,
   -1.0
  ],
  [
   "middlePawnClosedF",
-  10,
+  12,
   -1.0
  ],
  [
   "middlePawnClosedG",
-  -15,
+  -14,
   -1.0
  ],
  [
@@ -611,32 +611,32 @@
  ],
  [
   "middlePawnOpenB",
-  20,
+  21,
   -1.0
  ],
  [
   "middlePawnOpenC",
-  30,
+  17,
   -1.0
  ],
  [
   "middlePawnOpenD",
-  35,
+  36,
   -1.0
  ],
  [
   "middlePawnOpenE",
-  57,
+  52,
   -1.0
  ],
  [
   "middlePawnOpenF",
-  2,
+  -1,
   -1.0
  ],
  [
   "middlePawnOpenG",
-  2,
+  3,
   -1.0
  ],
  [
@@ -646,107 +646,107 @@
  ],
  [
   "duoPawnA",
-  -22,
+  -20,
   -1.0
  ],
  [
   "duoPawnB",
-  7,
+  9,
   -1.0
  ],
  [
   "duoPawnC",
-  -15,
+  -12,
   -1.0
  ],
  [
   "duoPawnD",
-  58,
+  60,
   -1.0
  ],
  [
   "duoPawnE",
-  42,
+  45,
   -1.0
  ],
  [
   "duoPawnF",
-  11,
+  10,
   -1.0
  ],
  [
   "duoPawnG",
-  52,
+  59,
   -1.0
  ],
  [
   "duoPawnH",
-  -70,
+  -73,
   -1.0
  ],
  [
   "passerA_0",
-  -84,
+  -85,
   -1.0
  ],
  [
   "passerB_0",
-  -9,
+  9,
   -1.0
  ],
  [
   "passerC_0",
-  13,
+  16,
   -1.0
  ],
  [
   "passerD_0",
-  -62,
+  -53,
   -1.0
  ],
  [
   "passerE_0",
-  38,
-  -1.0
- ],
- [
-  "passerF_0",
   52,
   -1.0
  ],
  [
+  "passerF_0",
+  64,
+  -1.0
+ ],
+ [
   "passerG_0",
-  11,
+  21,
   -1.0
  ],
  [
   "passerH_0",
-  48,
+  49,
   -1.0
  ],
  [
   "passerA_1",
-  97,
+  98,
   -1.0
  ],
  [
   "passerB_1",
-  32,
+  31,
   -1.0
  ],
  [
   "passerC_1",
-  -8,
+  -12,
   -1.0
  ],
  [
   "passerD_1",
-  3,
+  0,
   -1.0
  ],
  [
   "passerE_1",
-  -46,
+  -47,
   -1.0
  ],
  [
@@ -761,37 +761,37 @@
  ],
  [
   "passerH_1",
-  19,
+  17,
   -1.0
  ],
  [
   "passerA_2",
-  154,
+  152,
   -1.0
  ],
  [
   "passerB_2",
-  219,
+  217,
   -1.0
  ],
  [
   "passerC_2",
-  240,
+  249,
   -1.0
  ],
  [
   "passerD_2",
-  210,
+  215,
   -1.0
  ],
  [
   "passerE_2",
-  223,
+  227,
   -1.0
  ],
  [
   "passerF_2",
-  252,
+  251,
   -1.0
  ],
  [
@@ -801,62 +801,62 @@
  ],
  [
   "passerH_2",
-  144,
+  148,
   -1.0
  ],
  [
   "passerScalingOffset",
-  5050,
+  4856,
   -1.0
  ],
  [
   "passerAndQueen",
-  -492,
+  -430,
   -1.0
  ],
  [
   "passerAndRook",
-  -278,
+  -160,
   -1.0
  ],
  [
   "passerAndBishop",
-  146,
+  159,
   -1.0
  ],
  [
   "passerAndKnight",
-  -137,
+  -17,
   -1.0
  ],
  [
   "passerAndPawn",
-  -627,
+  -643,
   -1.0
  ],
  [
   "passerVsQueen",
-  1065,
+  1025,
   -1.0
  ],
  [
   "passerVsRook",
-  29,
+  33,
   -1.0
  ],
  [
   "passerVsBishop",
-  -613,
+  -736,
   -1.0
  ],
  [
   "passerVsKnight",
-  -409,
+  -521,
   -1.0
  ],
  [
   "passerVsPawn",
-  20,
+  52,
   -1.0
  ],
  [
@@ -931,122 +931,127 @@
  ],
  [
   "knightByRank_0",
-  -101,
+  -103,
   -1.0
  ],
  [
   "knightByRank_1",
-  -179,
+  -187,
   -1.0
  ],
  [
   "knightByRank_2",
-  -210,
+  -218,
   -1.0
  ],
  [
   "knightByRank_3",
-  -148,
+  -159,
   -1.0
  ],
  [
   "knightByRank_4",
-  -29,
+  -43,
   -1.0
  ],
  [
   "knightByRank_5",
-  114,
+  104,
   -1.0
  ],
  [
   "knightByRank_6",
-  188,
+  164,
+  -1.0
+ ],
+ [
+  "bishopBySquare_0",
+  -164,
   -1.0
  ],
  [
   "bishopBySquare_1",
-  5,
+  4,
   -1.0
  ],
  [
   "bishopBySquare_2",
-  -61,
+  -72,
   -1.0
  ],
  [
   "bishopBySquare_3",
-  43,
+  44,
   -1.0
  ],
  [
   "bishopBySquare_4",
-  -47,
+  -50,
   -1.0
  ],
  [
   "bishopBySquare_5",
-  7,
+  12,
   -1.0
  ],
  [
   "bishopBySquare_6",
-  -113,
+  -103,
   -1.0
  ],
  [
   "bishopBySquare_7",
-  6,
+  22,
   -1.0
  ],
  [
   "bishopBySquare_8",
-  -30,
+  -25,
   -1.0
  ],
  [
   "bishopBySquare_9",
-  -55,
+  -64,
   -1.0
  ],
  [
   "bishopBySquare_10",
-  55,
+  54,
   -1.0
  ],
  [
   "bishopBySquare_11",
-  -9,
+  -8,
   -1.0
  ],
  [
   "bishopBySquare_12",
-  3,
+  2,
   -1.0
  ],
  [
   "bishopBySquare_13",
-  66,
+  65,
   -1.0
  ],
  [
   "bishopBySquare_14",
-  47,
+  24,
   -1.0
  ],
  [
   "bishopBySquare_15",
-  50,
+  66,
   -1.0
  ],
  [
   "bishopBySquare_16",
-  -108,
+  -112,
   -1.0
  ],
  [
   "bishopBySquare_17",
-  41,
+  44,
   -1.0
  ],
  [
@@ -1056,67 +1061,67 @@
  ],
  [
   "bishopBySquare_19",
-  36,
+  41,
   -1.0
  ],
  [
   "bishopBySquare_20",
-  50,
-  -1.0
- ],
- [
-  "bishopBySquare_21",
   51,
   -1.0
  ],
  [
+  "bishopBySquare_21",
+  54,
+  -1.0
+ ],
+ [
   "bishopBySquare_22",
-  53,
+  34,
   -1.0
  ],
  [
   "bishopBySquare_23",
-  76,
+  73,
   -1.0
  ],
  [
   "bishopBySquare_24",
-  -119,
+  -110,
   -1.0
  ],
  [
   "bishopBySquare_25",
-  -56,
+  -52,
   -1.0
  ],
  [
   "bishopBySquare_26",
-  47,
+  51,
   -1.0
  ],
  [
   "bishopBySquare_27",
-  66,
+  63,
   -1.0
  ],
  [
   "bishopBySquare_28",
-  122,
+  120,
   -1.0
  ],
  [
   "bishopBySquare_29",
-  114,
+  104,
   -1.0
  ],
  [
   "bishopBySquare_30",
-  62,
+  76,
   -1.0
  ],
  [
   "bishopBySquare_31",
-  87,
+  92,
   -1.0
  ],
  [
@@ -1126,52 +1131,52 @@
  ],
  [
   "bishopBySquare_33",
-  0,
+  -3,
   -1.0
  ],
  [
   "bishopBySquare_34",
-  27,
+  25,
   -1.0
  ],
  [
   "bishopBySquare_35",
-  84,
+  78,
   -1.0
  ],
  [
   "bishopBySquare_36",
-  105,
+  98,
   -1.0
  ],
  [
   "bishopBySquare_37",
-  146,
+  144,
   -1.0
  ],
  [
   "bishopBySquare_38",
-  40,
+  65,
   -1.0
  ],
  [
   "bishopBySquare_39",
-  79,
+  93,
   -1.0
  ],
  [
   "bishopBySquare_40",
-  -89,
+  -87,
   -1.0
  ],
  [
   "bishopBySquare_41",
-  -22,
+  -27,
   -1.0
  ],
  [
   "bishopBySquare_42",
-  25,
+  29,
   -1.0
  ],
  [
@@ -1181,132 +1186,452 @@
  ],
  [
   "bishopBySquare_44",
-  123,
+  120,
   -1.0
  ],
  [
   "bishopBySquare_45",
-  156,
+  172,
   -1.0
  ],
  [
   "bishopBySquare_46",
-  100,
+  87,
   -1.0
  ],
  [
   "bishopBySquare_47",
-  82,
+  68,
   -1.0
  ],
  [
   "bishopBySquare_48",
-  -90,
+  -76,
   -1.0
  ],
  [
   "bishopBySquare_49",
-  33,
+  28,
   -1.0
  ],
  [
   "bishopBySquare_50",
-  19,
+  30,
   -1.0
  ],
  [
   "bishopBySquare_51",
-  26,
+  19,
   -1.0
  ],
  [
   "bishopBySquare_52",
-  16,
+  9,
   -1.0
  ],
  [
   "bishopBySquare_53",
-  167,
+  168,
   -1.0
  ],
  [
   "bishopBySquare_54",
-  7,
+  29,
   -1.0
  ],
  [
   "bishopBySquare_55",
-  80,
+  60,
   -1.0
  ],
  [
   "bishopBySquare_56",
-  -224,
+  -216,
   -1.0
  ],
  [
   "bishopBySquare_57",
-  -41,
+  -52,
   -1.0
  ],
  [
   "bishopBySquare_58",
-  6,
+  2,
   -1.0
  ],
  [
   "bishopBySquare_59",
-  61,
+  45,
   -1.0
  ],
  [
   "bishopBySquare_60",
-  27,
+  37,
   -1.0
  ],
  [
   "bishopBySquare_61",
-  171,
+  165,
   -1.0
  ],
  [
   "bishopBySquare_62",
-  -121,
+  -141,
   -1.0
  ],
  [
   "bishopBySquare_63",
+  -50,
+  -1.0
+ ],
+ [
+  "bishopBySquare_0x",
+  -129,
+  -1.0
+ ],
+ [
+  "bishopBySquare_1x",
+  -43,
+  -1.0
+ ],
+ [
+  "bishopBySquare_2x",
+  43,
+  -1.0
+ ],
+ [
+  "bishopBySquare_3x",
+  -1,
+  -1.0
+ ],
+ [
+  "bishopBySquare_4x",
+  29,
+  -1.0
+ ],
+ [
+  "bishopBySquare_5x",
+  161,
+  -1.0
+ ],
+ [
+  "bishopBySquare_6x",
+  -184,
+  -1.0
+ ],
+ [
+  "bishopBySquare_7x",
+  -43,
+  -1.0
+ ],
+ [
+  "bishopBySquare_8x",
+  -82,
+  -1.0
+ ],
+ [
+  "bishopBySquare_9x",
+  -134,
+  -1.0
+ ],
+ [
+  "bishopBySquare_10x",
+  -44,
+  -1.0
+ ],
+ [
+  "bishopBySquare_11x",
+  47,
+  -1.0
+ ],
+ [
+  "bishopBySquare_12x",
+  65,
+  -1.0
+ ],
+ [
+  "bishopBySquare_13x",
+  143,
+  -1.0
+ ],
+ [
+  "bishopBySquare_14x",
+  40,
+  -1.0
+ ],
+ [
+  "bishopBySquare_15x",
+  -24,
+  -1.0
+ ],
+ [
+  "bishopBySquare_16x",
+  -148,
+  -1.0
+ ],
+ [
+  "bishopBySquare_17x",
   -26,
   -1.0
  ],
  [
-  "rookByFile_0",
-  -74,
+  "bishopBySquare_18x",
+  -5,
   -1.0
  ],
  [
-  "rookByFile_1",
-  -77,
+  "bishopBySquare_19x",
+  14,
   -1.0
  ],
  [
-  "rookByFile_2",
-  -49,
+  "bishopBySquare_20x",
+  130,
   -1.0
  ],
  [
-  "rookByFile_3",
+  "bishopBySquare_21x",
+  159,
+  -1.0
+ ],
+ [
+  "bishopBySquare_22x",
+  87,
+  -1.0
+ ],
+ [
+  "bishopBySquare_23x",
+  31,
+  -1.0
+ ],
+ [
+  "bishopBySquare_24x",
+  -138,
+  -1.0
+ ],
+ [
+  "bishopBySquare_25x",
+  -57,
+  -1.0
+ ],
+ [
+  "bishopBySquare_26x",
+  60,
+  -1.0
+ ],
+ [
+  "bishopBySquare_27x",
+  40,
+  -1.0
+ ],
+ [
+  "bishopBySquare_28x",
+  90,
+  -1.0
+ ],
+ [
+  "bishopBySquare_29x",
+  188,
+  -1.0
+ ],
+ [
+  "bishopBySquare_30x",
+  79,
+  -1.0
+ ],
+ [
+  "bishopBySquare_31x",
+  110,
+  -1.0
+ ],
+ [
+  "bishopBySquare_32x",
+  -93,
+  -1.0
+ ],
+ [
+  "bishopBySquare_33x",
+  10,
+  -1.0
+ ],
+ [
+  "bishopBySquare_34x",
+  75,
+  -1.0
+ ],
+ [
+  "bishopBySquare_35x",
+  97,
+  -1.0
+ ],
+ [
+  "bishopBySquare_36x",
+  115,
+  -1.0
+ ],
+ [
+  "bishopBySquare_37x",
+  125,
+  -1.0
+ ],
+ [
+  "bishopBySquare_38x",
+  139,
+  -1.0
+ ],
+ [
+  "bishopBySquare_39x",
+  97,
+  -1.0
+ ],
+ [
+  "bishopBySquare_40x",
+  -117,
+  -1.0
+ ],
+ [
+  "bishopBySquare_41x",
+  42,
+  -1.0
+ ],
+ [
+  "bishopBySquare_42x",
+  86,
+  -1.0
+ ],
+ [
+  "bishopBySquare_43x",
+  100,
+  -1.0
+ ],
+ [
+  "bishopBySquare_44x",
+  91,
+  -1.0
+ ],
+ [
+  "bishopBySquare_45x",
+  85,
+  -1.0
+ ],
+ [
+  "bishopBySquare_46x",
+  94,
+  -1.0
+ ],
+ [
+  "bishopBySquare_47x",
+  132,
+  -1.0
+ ],
+ [
+  "bishopBySquare_48x",
+  -27,
+  -1.0
+ ],
+ [
+  "bishopBySquare_49x",
+  87,
+  -1.0
+ ],
+ [
+  "bishopBySquare_50x",
+  94,
+  -1.0
+ ],
+ [
+  "bishopBySquare_51x",
+  9,
+  -1.0
+ ],
+ [
+  "bishopBySquare_52x",
+  76,
+  -1.0
+ ],
+ [
+  "bishopBySquare_53x",
+  123,
+  -1.0
+ ],
+ [
+  "bishopBySquare_54x",
+  86,
+  -1.0
+ ],
+ [
+  "bishopBySquare_55x",
+  121,
+  -1.0
+ ],
+ [
+  "bishopBySquare_56x",
+  -147,
+  -1.0
+ ],
+ [
+  "bishopBySquare_57x",
+  28,
+  -1.0
+ ],
+ [
+  "bishopBySquare_58x",
+  13,
+  -1.0
+ ],
+ [
+  "bishopBySquare_59x",
+  20,
+  -1.0
+ ],
+ [
+  "bishopBySquare_60x",
+  15,
+  -1.0
+ ],
+ [
+  "bishopBySquare_61x",
   -10,
   -1.0
  ],
  [
+  "bishopBySquare_62x",
+  -66,
+  -1.0
+ ],
+ [
+  "bishopBySquare_63x",
+  -70,
+  -1.0
+ ],
+ [
+  "rookByFile_0",
+  -76,
+  -1.0
+ ],
+ [
+  "rookByFile_1",
+  -79,
+  -1.0
+ ],
+ [
+  "rookByFile_2",
+  -50,
+  -1.0
+ ],
+ [
+  "rookByFile_3",
+  -8,
+  -1.0
+ ],
+ [
   "rookByFile_4",
-  34,
+  40,
   -1.0
  ],
  [
   "rookByFile_5",
-  53,
+  56,
   -1.0
  ],
  [
@@ -1316,62 +1641,62 @@
  ],
  [
   "rookByRank_0",
-  -137,
+  -138,
   -1.0
  ],
  [
   "rookByRank_1",
-  -336,
+  -337,
   -1.0
  ],
  [
   "rookByRank_2",
-  -493,
+  -490,
   -1.0
  ],
  [
   "rookByRank_3",
-  -541,
+  -545,
   -1.0
  ],
  [
   "rookByRank_4",
-  -448,
+  -447,
   -1.0
  ],
  [
   "rookByRank_5",
-  -276,
+  -277,
   -1.0
  ],
  [
   "rookByRank_6",
-  -107,
+  -112,
   -1.0
  ],
  [
   "queenByFile_0",
-  -62,
+  -77,
   -1.0
  ],
  [
   "queenByFile_1",
-  -109,
+  -128,
   -1.0
  ],
  [
   "queenByFile_2",
-  -111,
+  -128,
   -1.0
  ],
  [
   "queenByFile_3",
-  -102,
+  -114,
   -1.0
  ],
  [
   "queenByFile_4",
-  -87,
+  -93,
   -1.0
  ],
  [
@@ -1381,52 +1706,52 @@
  ],
  [
   "queenByFile_6",
-  -51,
+  -48,
   -1.0
  ],
  [
   "queenByRank_0",
-  -152,
+  -162,
   -1.0
  ],
  [
   "queenByRank_1",
-  -264,
+  -280,
   -1.0
  ],
  [
   "queenByRank_2",
-  -360,
+  -377,
   -1.0
  ],
  [
   "queenByRank_3",
-  -412,
+  -428,
   -1.0
  ],
  [
   "queenByRank_4",
-  -358,
+  -373,
   -1.0
  ],
  [
   "queenByRank_5",
-  -212,
+  -227,
   -1.0
  ],
  [
   "queenByRank_6",
-  -140,
+  -144,
   -1.0
  ],
  [
   "kingByFile_0",
-  -5,
+  -6,
   -1.0
  ],
  [
   "kingByFile_1",
-  -26,
+  -27,
   -1.0
  ],
  [
@@ -1436,137 +1761,132 @@
  ],
  [
   "kingByRank_0",
-  -144,
+  -158,
   -1.0
  ],
  [
   "kingByRank_1",
-  -268,
+  -293,
   -1.0
  ],
  [
   "kingByRank_2",
-  -363,
+  -403,
   -1.0
  ],
  [
   "kingByRank_3",
-  -355,
+  -411,
   -1.0
  ],
  [
   "kingByRank_4",
-  -210,
+  -283,
   -1.0
  ],
  [
   "kingByRank_5",
-  27,
+  -41,
   -1.0
  ],
  [
   "kingByRank_6",
-  177,
+  135,
   -1.0
  ],
  [
   "drawOffset",
-  171,
+  214,
   -1.0
  ],
  [
   "drawQueen",
-  -2030,
+  -1998,
   -1.0
  ],
  [
   "drawRook",
-  119,
+  108,
   -1.0
  ],
  [
   "drawBishop",
-  -31,
+  -41,
   -1.0
  ],
  [
   "drawKnight",
-  -13,
+  -16,
   -1.0
  ],
  [
   "drawPawn",
-  -797,
+  -794,
   -1.0
  ],
  [
   "drawQueenEnding",
-  1439,
+  1340,
   -1.0
  ],
  [
   "drawRookEnding",
-  401,
+  382,
   -1.0
  ],
  [
   "drawKnightEnding",
-  566,
+  526,
   -1.0
  ],
  [
   "drawBishopEnding",
-  1520,
+  1483,
   -1.0
  ],
  [
   "drawPawnEnding",
-  -17553,
+  -17303,
   -1.0
  ],
  [
   "drawPawnless",
-  324,
+  306,
   -1.0
  ],
  [
   "drawQueenImbalance",
-  885,
+  875,
   -1.0
  ],
  [
   "drawRookImbalance",
-  274,
+  284,
   -1.0
  ],
  [
   "drawMinorImbalance",
-  74,
+  37,
   -1.0
  ],
  [
   "drawUnlikeBishops",
-  3686,
+  3725,
   -1.0
  ],
  [
   "drawUnlikeBishopsAndQueens",
-  -424,
+  -372,
   -1.0
  ],
  [
   "drawUnlikeBishopsAndRooks",
-  402,
+  415,
   -1.0
  ],
  [
   "drawUnlikeBishopsAndKnights",
-  977,
+  921,
   -1.0
- ],
- [
-  "bishopBySquare_0",
-  -160,
-  -1.3113592434166321e-09
  ]
 ]

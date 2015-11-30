@@ -13,8 +13,9 @@ def pawn(fileIndex, rankIndex, xKing):
         if rankIndex in [0, 7]:
                 return None
         value = 0
-        if fileIndex > 0: value -= vector['pawnByFile_%d' % (fileIndex - 1)]
-        if fileIndex < 7: value += vector['pawnByFile_%d' % (fileIndex)]
+        x = 'x' if xKing else ''
+        if fileIndex > 0: value -= vector['pawnByFile_%d%s' % (fileIndex - 1, x)]
+        if fileIndex < 7: value += vector['pawnByFile_%d%s' % (fileIndex, x)]
         if rankIndex > 1: value -= vector['pawnByRank_%d' % (rankIndex - 1 - 1)]
         if rankIndex < 6: value += vector['pawnByRank_%d' % (rankIndex - 1)]
         return value
@@ -29,22 +30,24 @@ def knight(fileIndex, rankIndex, xKing):
         return value
 
 def bishop(fileIndex, rankIndex, xKing):
-        squareIndex = fileIndex * 8 + rankIndex
         x = 'x' if xKing else ''
+        squareIndex = fileIndex * 8 + rankIndex
         return vector['bishopBySquare_%d%s' % (squareIndex, x) ]
 
 def rook(fileIndex, rankIndex, xKing):
         value = 0
-        if fileIndex > 0: value -= vector['rookByFile_%d' % (fileIndex - 1)]
-        if fileIndex < 7: value += vector['rookByFile_%d' % (fileIndex)]
+        x = 'x' if xKing else ''
+        if fileIndex > 0: value -= vector['rookByFile_%d%s' % (fileIndex - 1, x)]
+        if fileIndex < 7: value += vector['rookByFile_%d%s' % (fileIndex, x)]
         if rankIndex > 0: value -= vector['rookByRank_%d' % (rankIndex - 1)]
         if rankIndex < 7: value += vector['rookByRank_%d' % (rankIndex)]
         return value
 
 def queen(fileIndex, rankIndex, xKing):
         value = 0
-        if fileIndex > 0: value -= vector['queenByFile_%d' % (fileIndex - 1)]
-        if fileIndex < 7: value += vector['queenByFile_%d' % (fileIndex)]
+        x = 'x' if xKing else ''
+        if fileIndex > 0: value -= vector['queenByFile_%d%s' % (fileIndex - 1, x)]
+        if fileIndex < 7: value += vector['queenByFile_%d%s' % (fileIndex, x)]
         if rankIndex > 0: value -= vector['queenByRank_%d' % (rankIndex - 1)]
         if rankIndex < 7: value += vector['queenByRank_%d' % (rankIndex)]
         return value

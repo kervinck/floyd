@@ -94,13 +94,21 @@
          *  (Note that this is different from "tuning the differences between files")
          */
 
-        P(pawnByFile_0, -8), // "fileA"
+        P(pawnByFile_0, -8), // fileA
         P(pawnByFile_1, -18),
         P(pawnByFile_2, -90),
         P(pawnByFile_3, -123),
         P(pawnByFile_4, -139),
         P(pawnByFile_5, -75),
-        P(pawnByFile_6, 24), // "-fileH"
+        P(pawnByFile_6, 24), // -fileH
+
+        P(pawnByFile_0x, -8), // fileA
+        P(pawnByFile_1x, -18),
+        P(pawnByFile_2x, -90),
+        P(pawnByFile_3x, -123),
+        P(pawnByFile_4x, -139),
+        P(pawnByFile_5x, -75),
+        P(pawnByFile_6x, 24), // -fileH
 
         // 5 parameters for 6 pawn ranks
         P(pawnByRank_0, -31), // "rank2"
@@ -390,6 +398,14 @@
         P(rookByFile_5, 56),
         P(rookByFile_6, 91), // -fileH
 
+        P(rookByFile_0x, -76), // fileA
+        P(rookByFile_1x, -79),
+        P(rookByFile_2x, -50),
+        P(rookByFile_3x, -8),
+        P(rookByFile_4x, 40),
+        P(rookByFile_5x, 56),
+        P(rookByFile_6x, 91), // -fileH
+
         P(rookByRank_0, -138), // rank1
         P(rookByRank_1, -337),
         P(rookByRank_2, -490),
@@ -409,6 +425,14 @@
         P(queenByFile_4, -93),
         P(queenByFile_5, -72),
         P(queenByFile_6, -48), // -fileH
+
+        P(queenByFile_0x, -77), // fileA
+        P(queenByFile_1x, -128),
+        P(queenByFile_2x, -128),
+        P(queenByFile_3x, -114),
+        P(queenByFile_4x, -93),
+        P(queenByFile_5x, -72),
+        P(queenByFile_6x, -48), // -fileH
 
         P(queenByRank_0, -162), // rank1
         P(queenByRank_1, -280),

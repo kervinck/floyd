@@ -300,6 +300,41 @@
   -1.0
  ],
  [
+  "pawnByFile_0x",
+  -8,
+  -1.0
+ ],
+ [
+  "pawnByFile_1x",
+  -18,
+  -1.0
+ ],
+ [
+  "pawnByFile_2x",
+  -90,
+  -1.0
+ ],
+ [
+  "pawnByFile_3x",
+  -123,
+  -1.0
+ ],
+ [
+  "pawnByFile_4x",
+  -139,
+  -1.0
+ ],
+ [
+  "pawnByFile_5x",
+  -75,
+  -1.0
+ ],
+ [
+  "pawnByFile_6x",
+  24,
+  -1.0
+ ],
+ [
   "pawnByRank_0",
   -31,
   -1.0
@@ -966,132 +1001,132 @@
  ],
  [
   "bishopBySquare_0",
-  -164,
+  -175,
   -1.0
  ],
  [
   "bishopBySquare_1",
-  4,
+  15,
   -1.0
  ],
  [
   "bishopBySquare_2",
-  -72,
+  -88,
   -1.0
  ],
  [
   "bishopBySquare_3",
-  44,
+  53,
   -1.0
  ],
  [
   "bishopBySquare_4",
-  -50,
+  -77,
   -1.0
  ],
  [
   "bishopBySquare_5",
-  12,
+  -37,
   -1.0
  ],
  [
   "bishopBySquare_6",
-  -103,
+  -84,
   -1.0
  ],
  [
   "bishopBySquare_7",
-  22,
+  40,
   -1.0
  ],
  [
   "bishopBySquare_8",
-  -25,
+  -16,
   -1.0
  ],
  [
   "bishopBySquare_9",
-  -64,
+  -57,
   -1.0
  ],
  [
   "bishopBySquare_10",
-  54,
+  71,
   -1.0
  ],
  [
   "bishopBySquare_11",
-  -8,
+  -27,
   -1.0
  ],
  [
   "bishopBySquare_12",
-  2,
+  -8,
   -1.0
  ],
  [
   "bishopBySquare_13",
-  65,
-  -1.0
- ],
- [
-  "bishopBySquare_14",
-  24,
-  -1.0
- ],
- [
-  "bishopBySquare_15",
-  66,
-  -1.0
- ],
- [
-  "bishopBySquare_16",
-  -112,
-  -1.0
- ],
- [
-  "bishopBySquare_17",
-  44,
-  -1.0
- ],
- [
-  "bishopBySquare_18",
-  13,
-  -1.0
- ],
- [
-  "bishopBySquare_19",
   41,
   -1.0
  ],
  [
-  "bishopBySquare_20",
-  51,
+  "bishopBySquare_14",
+  20,
   -1.0
  ],
  [
-  "bishopBySquare_21",
-  54,
+  "bishopBySquare_15",
+  91,
   -1.0
  ],
  [
-  "bishopBySquare_22",
-  34,
-  -1.0
- ],
- [
-  "bishopBySquare_23",
-  73,
-  -1.0
- ],
- [
-  "bishopBySquare_24",
+  "bishopBySquare_16",
   -110,
   -1.0
  ],
  [
+  "bishopBySquare_17",
+  56,
+  -1.0
+ ],
+ [
+  "bishopBySquare_18",
+  19,
+  -1.0
+ ],
+ [
+  "bishopBySquare_19",
+  46,
+  -1.0
+ ],
+ [
+  "bishopBySquare_20",
+  26,
+  -1.0
+ ],
+ [
+  "bishopBySquare_21",
+  29,
+  -1.0
+ ],
+ [
+  "bishopBySquare_22",
+  20,
+  -1.0
+ ],
+ [
+  "bishopBySquare_23",
+  89,
+  -1.0
+ ],
+ [
+  "bishopBySquare_24",
+  -106,
+  -1.0
+ ],
+ [
   "bishopBySquare_25",
-  -52,
+  -56,
   -1.0
  ],
  [
@@ -1101,17 +1136,17 @@
  ],
  [
   "bishopBySquare_27",
-  63,
+  64,
   -1.0
  ],
  [
   "bishopBySquare_28",
-  120,
+  125,
   -1.0
  ],
  [
   "bishopBySquare_29",
-  104,
+  83,
   -1.0
  ],
  [
@@ -1121,242 +1156,242 @@
  ],
  [
   "bishopBySquare_31",
-  92,
+  84,
   -1.0
  ],
  [
   "bishopBySquare_32",
-  -111,
+  -118,
   -1.0
  ],
  [
   "bishopBySquare_33",
-  -3,
+  -4,
   -1.0
  ],
  [
   "bishopBySquare_34",
-  25,
+  10,
   -1.0
  ],
  [
   "bishopBySquare_35",
-  78,
+  71,
   -1.0
  ],
  [
   "bishopBySquare_36",
-  98,
+  88,
   -1.0
  ],
  [
   "bishopBySquare_37",
-  144,
+  155,
   -1.0
  ],
  [
   "bishopBySquare_38",
-  65,
+  29,
   -1.0
  ],
  [
   "bishopBySquare_39",
-  93,
+  89,
   -1.0
  ],
  [
   "bishopBySquare_40",
-  -87,
+  -83,
   -1.0
  ],
  [
   "bishopBySquare_41",
-  -27,
+  -49,
   -1.0
  ],
  [
   "bishopBySquare_42",
-  29,
+  16,
   -1.0
  ],
  [
   "bishopBySquare_43",
-  2,
+  -20,
   -1.0
  ],
  [
   "bishopBySquare_44",
-  120,
+  136,
   -1.0
  ],
  [
   "bishopBySquare_45",
-  172,
+  258,
   -1.0
  ],
  [
   "bishopBySquare_46",
-  87,
+  83,
   -1.0
  ],
  [
   "bishopBySquare_47",
-  68,
+  6,
   -1.0
  ],
  [
   "bishopBySquare_48",
-  -76,
+  -96,
   -1.0
  ],
  [
   "bishopBySquare_49",
-  28,
+  21,
   -1.0
  ],
  [
   "bishopBySquare_50",
-  30,
+  12,
   -1.0
  ],
  [
   "bishopBySquare_51",
-  19,
+  21,
   -1.0
  ],
  [
   "bishopBySquare_52",
-  9,
-  -1.0
- ],
- [
-  "bishopBySquare_53",
-  168,
-  -1.0
- ],
- [
-  "bishopBySquare_54",
-  29,
-  -1.0
- ],
- [
-  "bishopBySquare_55",
-  60,
-  -1.0
- ],
- [
-  "bishopBySquare_56",
-  -216,
-  -1.0
- ],
- [
-  "bishopBySquare_57",
-  -52,
-  -1.0
- ],
- [
-  "bishopBySquare_58",
-  2,
-  -1.0
- ],
- [
-  "bishopBySquare_59",
-  45,
-  -1.0
- ],
- [
-  "bishopBySquare_60",
-  37,
-  -1.0
- ],
- [
-  "bishopBySquare_61",
-  165,
-  -1.0
- ],
- [
-  "bishopBySquare_62",
-  -141,
-  -1.0
- ],
- [
-  "bishopBySquare_63",
-  -50,
-  -1.0
- ],
- [
-  "bishopBySquare_0x",
-  -129,
-  -1.0
- ],
- [
-  "bishopBySquare_1x",
-  -43,
-  -1.0
- ],
- [
-  "bishopBySquare_2x",
-  43,
-  -1.0
- ],
- [
-  "bishopBySquare_3x",
   -1,
   -1.0
  ],
  [
-  "bishopBySquare_4x",
-  29,
+  "bishopBySquare_53",
+  213,
   -1.0
  ],
  [
-  "bishopBySquare_5x",
-  161,
+  "bishopBySquare_54",
+  -30,
   -1.0
  ],
  [
-  "bishopBySquare_6x",
-  -184,
+  "bishopBySquare_55",
+  -1,
   -1.0
  ],
  [
-  "bishopBySquare_7x",
-  -43,
+  "bishopBySquare_56",
+  -244,
   -1.0
  ],
  [
-  "bishopBySquare_8x",
-  -82,
+  "bishopBySquare_57",
+  -75,
   -1.0
  ],
  [
-  "bishopBySquare_9x",
-  -134,
+  "bishopBySquare_58",
+  -1,
   -1.0
  ],
  [
-  "bishopBySquare_10x",
-  -44,
-  -1.0
- ],
- [
-  "bishopBySquare_11x",
+  "bishopBySquare_59",
   47,
   -1.0
  ],
  [
+  "bishopBySquare_60",
+  48,
+  -1.0
+ ],
+ [
+  "bishopBySquare_61",
+  198,
+  -1.0
+ ],
+ [
+  "bishopBySquare_62",
+  -172,
+  -1.0
+ ],
+ [
+  "bishopBySquare_63",
+  -26,
+  -1.0
+ ],
+ [
+  "bishopBySquare_0x",
+  -121,
+  -1.0
+ ],
+ [
+  "bishopBySquare_1x",
+  -35,
+  -1.0
+ ],
+ [
+  "bishopBySquare_2x",
+  44,
+  -1.0
+ ],
+ [
+  "bishopBySquare_3x",
+  4,
+  -1.0
+ ],
+ [
+  "bishopBySquare_4x",
+  34,
+  -1.0
+ ],
+ [
+  "bishopBySquare_5x",
+  165,
+  -1.0
+ ],
+ [
+  "bishopBySquare_6x",
+  -179,
+  -1.0
+ ],
+ [
+  "bishopBySquare_7x",
+  -53,
+  -1.0
+ ],
+ [
+  "bishopBySquare_8x",
+  -77,
+  -1.0
+ ],
+ [
+  "bishopBySquare_9x",
+  -129,
+  -1.0
+ ],
+ [
+  "bishopBySquare_10x",
+  -41,
+  -1.0
+ ],
+ [
+  "bishopBySquare_11x",
+  52,
+  -1.0
+ ],
+ [
   "bishopBySquare_12x",
-  65,
+  68,
   -1.0
  ],
  [
   "bishopBySquare_13x",
-  143,
+  148,
   -1.0
  ],
  [
   "bishopBySquare_14x",
-  40,
+  45,
   -1.0
  ],
  [
@@ -1366,112 +1401,112 @@
  ],
  [
   "bishopBySquare_16x",
-  -148,
+  -141,
   -1.0
  ],
  [
   "bishopBySquare_17x",
-  -26,
+  -22,
   -1.0
  ],
  [
   "bishopBySquare_18x",
-  -5,
+  -2,
   -1.0
  ],
  [
   "bishopBySquare_19x",
-  14,
+  19,
   -1.0
  ],
  [
   "bishopBySquare_20x",
-  130,
+  133,
   -1.0
  ],
  [
   "bishopBySquare_21x",
-  159,
+  162,
   -1.0
  ],
  [
   "bishopBySquare_22x",
-  87,
+  92,
   -1.0
  ],
  [
   "bishopBySquare_23x",
-  31,
+  36,
   -1.0
  ],
  [
   "bishopBySquare_24x",
-  -138,
+  -128,
   -1.0
  ],
  [
   "bishopBySquare_25x",
-  -57,
+  -35,
   -1.0
  ],
  [
   "bishopBySquare_26x",
-  60,
+  77,
   -1.0
  ],
  [
   "bishopBySquare_27x",
-  40,
+  56,
   -1.0
  ],
  [
   "bishopBySquare_28x",
-  90,
+  95,
   -1.0
  ],
  [
   "bishopBySquare_29x",
-  188,
+  190,
   -1.0
  ],
  [
   "bishopBySquare_30x",
-  79,
+  88,
   -1.0
  ],
  [
   "bishopBySquare_31x",
-  110,
+  120,
   -1.0
  ],
  [
   "bishopBySquare_32x",
-  -93,
+  -77,
   -1.0
  ],
  [
   "bishopBySquare_33x",
-  10,
+  21,
   -1.0
  ],
  [
   "bishopBySquare_34x",
-  75,
+  80,
   -1.0
  ],
  [
   "bishopBySquare_35x",
-  97,
+  100,
   -1.0
  ],
  [
   "bishopBySquare_36x",
-  115,
+  128,
   -1.0
  ],
  [
   "bishopBySquare_37x",
-  125,
+  132,
   -1.0
  ],
  [
@@ -1481,87 +1516,87 @@
  ],
  [
   "bishopBySquare_39x",
-  97,
+  105,
   -1.0
  ],
  [
   "bishopBySquare_40x",
-  -117,
+  -113,
   -1.0
  ],
  [
   "bishopBySquare_41x",
-  42,
+  44,
   -1.0
  ],
  [
   "bishopBySquare_42x",
-  86,
-  -1.0
- ],
- [
-  "bishopBySquare_43x",
-  100,
-  -1.0
- ],
- [
-  "bishopBySquare_44x",
   91,
   -1.0
  ],
  [
-  "bishopBySquare_45x",
-  85,
+  "bishopBySquare_43x",
+  113,
   -1.0
  ],
  [
-  "bishopBySquare_46x",
+  "bishopBySquare_44x",
   94,
   -1.0
  ],
  [
-  "bishopBySquare_47x",
-  132,
-  -1.0
- ],
- [
-  "bishopBySquare_48x",
-  -27,
-  -1.0
- ],
- [
-  "bishopBySquare_49x",
+  "bishopBySquare_45x",
   87,
   -1.0
  ],
  [
+  "bishopBySquare_46x",
+  99,
+  -1.0
+ ],
+ [
+  "bishopBySquare_47x",
+  139,
+  -1.0
+ ],
+ [
+  "bishopBySquare_48x",
+  -24,
+  -1.0
+ ],
+ [
+  "bishopBySquare_49x",
+  92,
+  -1.0
+ ],
+ [
   "bishopBySquare_50x",
-  94,
+  98,
   -1.0
  ],
  [
   "bishopBySquare_51x",
-  9,
+  14,
   -1.0
  ],
  [
   "bishopBySquare_52x",
-  76,
+  77,
   -1.0
  ],
  [
   "bishopBySquare_53x",
-  123,
+  128,
   -1.0
  ],
  [
   "bishopBySquare_54x",
-  86,
+  91,
   -1.0
  ],
  [
   "bishopBySquare_55x",
-  121,
+  126,
   -1.0
  ],
  [
@@ -1571,37 +1606,37 @@
  ],
  [
   "bishopBySquare_57x",
-  28,
+  32,
   -1.0
  ],
  [
   "bishopBySquare_58x",
-  13,
+  16,
   -1.0
  ],
  [
   "bishopBySquare_59x",
-  20,
+  21,
   -1.0
  ],
  [
   "bishopBySquare_60x",
-  15,
+  19,
   -1.0
  ],
  [
   "bishopBySquare_61x",
-  -10,
+  -6,
   -1.0
  ],
  [
   "bishopBySquare_62x",
-  -66,
+  -62,
   -1.0
  ],
  [
   "bishopBySquare_63x",
-  -70,
+  -65,
   -1.0
  ],
  [
@@ -1636,6 +1671,41 @@
  ],
  [
   "rookByFile_6",
+  91,
+  -1.0
+ ],
+ [
+  "rookByFile_0x",
+  -76,
+  -1.0
+ ],
+ [
+  "rookByFile_1x",
+  -79,
+  -1.0
+ ],
+ [
+  "rookByFile_2x",
+  -50,
+  -1.0
+ ],
+ [
+  "rookByFile_3x",
+  -8,
+  -1.0
+ ],
+ [
+  "rookByFile_4x",
+  40,
+  -1.0
+ ],
+ [
+  "rookByFile_5x",
+  56,
+  -1.0
+ ],
+ [
+  "rookByFile_6x",
   91,
   -1.0
  ],
@@ -1706,6 +1776,41 @@
  ],
  [
   "queenByFile_6",
+  -48,
+  -1.0
+ ],
+ [
+  "queenByFile_0x",
+  -77,
+  -1.0
+ ],
+ [
+  "queenByFile_1x",
+  -128,
+  -1.0
+ ],
+ [
+  "queenByFile_2x",
+  -128,
+  -1.0
+ ],
+ [
+  "queenByFile_3x",
+  -114,
+  -1.0
+ ],
+ [
+  "queenByFile_4x",
+  -93,
+  -1.0
+ ],
+ [
+  "queenByFile_5x",
+  -72,
+  -1.0
+ ],
+ [
+  "queenByFile_6x",
   -48,
   -1.0
  ],

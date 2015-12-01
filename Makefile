@@ -109,9 +109,17 @@ bench: floyd-pgo2
 residual: .module
 	bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/tune.py -q Tuning/vector.json
 
-# Run one iteration of the evaluation tuner
+# Run one standard iteration of the evaluation tuner
 tune: .module
 	bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/tune.py -n 8 Tuning/vector.json
+
+# Extended tuning (10M positions)
+xtune: .module
+	bzcat Data/ccrl-shuffled-10M.epd.bz2 | python Tools/tune.py -n 16 Tuning/vector.json
+
+# Deep tuning (1M positions at 2 ply)
+dtune: .module
+	bzcat Data/ccrl-shuffled-3M.epd.bz2 | head -1000000 | python Tools/tune.py -d 2 -n 16 Tuning/vector.json
 
 # Plot evaluation tables for easy inspection
 tables: Tuning/tables.png
@@ -148,9 +156,9 @@ fingerprint: clean
 	@env floydVersion=$(floydVersion) sh -x Tools/fingerprint.sh 2>&1 | tee fingerprint
 	[ `uname -s` != 'Darwin' ] || opendiff Docs/fingerprint fingerprint
 
-# Shootout against last version, 1000 games 10+0.15
+# Shootout against last version, 2000 games 10+0.15
 shootout: floyd-pgo2
-	cutechess-cli -concurrency 4 -rounds 1000 -repeat -each tc=10+0.15 \
+	cutechess-cli -concurrency 8 -rounds 2000 -repeat -each tc=10+0.15 \
 	-openings file=Data/book-6000-openings.pgn order=random \
 	-resign movecount=1 score=500 \
 	-engine cmd=./floyd-pgo2 proto=uci \

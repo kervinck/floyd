@@ -1,4 +1,19 @@
 
+|Todo| King safety [evaluate]
+
+|Todo| Left-right location parameters [evaluate]
+
+|Todo| Pawn mobility [evaluate]
+
+Can it move safely & how far
+
+|Todo| Pawn levers [evaluate]
+
+Can it come in contact with an enemy pawn?
+(This relation is mutal, so what is the point)
+
+|Todo| Rooks and queens on open files [evaluate]
+
 |Todo| Log timestamp of most recent tune [tune]
 |Todo| Keep track of last non-zero delta for parameter ordering [tune]
 
@@ -11,24 +26,9 @@ if newDelta < 0.0:
 else:
         return (count+1, lastDelta, tNow)
 
-|Todo| Pawn mobility [evaluate]
-
-Can it move safely & how far
-
-|Todo| Pawn levers [evaluate]
-
-Can it come in contact with an enemy pawn?
-(This relation is mutal, so what is the point)
-
 |Todo| Introduction of material table [speed]
 
 Floyd is slow, but we should aim to keep it above 1Mnps
-
-|Todo| King safety [evaluate]
-
-|Todo| Rooks and queens on open files [evaluate]
-
-|Todo| Left-right location parameters [evaluate]
 
 |Todo| Check Rebel evaluation features [evaluate]
 
@@ -46,8 +46,6 @@ take many things.
 |Todo| Chess programming wiki [evaluate]
 
 https://chessprogramming.wikispaces.com/Evaluation
-
-|Todo| Experiment: tune each bishop square [evaluate]
 
 |Todo| Expand board control. Include mobility [evaluate]
 

@@ -95,8 +95,8 @@ enum pieceColor { white = 0, black = 1 };
 
 enum castleFlag {
         castleFlagWhiteKside = 1 << 0,
-        castleFlagWhiteQside = 1 << 1,
-        castleFlagBlackKside = 1 << 2,
+        castleFlagBlackKside = 1 << 1,
+        castleFlagWhiteQside = 1 << 2,
         castleFlagBlackQside = 1 << 3
 };
 
@@ -136,6 +136,10 @@ enum moveFlags {
  +----------------------------------------------------------------------*/
 
 extern const char startpos[];
+
+// Expose these for use in evaluation (king safety)
+extern const unsigned char kingDirections[];
+extern const signed char kingStep[];
 
 /*----------------------------------------------------------------------+
  |      Functions                                                       |

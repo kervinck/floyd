@@ -73,6 +73,64 @@
         P(controlOutside, 32),
 
         /*
+         *  king safety
+         */
+
+        // scaling
+        P(safetyScalingOffset, 0),
+        P(safetyAndQueen,  0),
+        P(safetyAndRook,   0),
+        P(safetyAndBishop, 0),
+        P(safetyAndKnight, 0),
+        P(safetyAndPawn,   0),
+        P(safetyVsQueen,   0),
+        P(safetyVsRook,    0),
+        P(safetyVsBishop,  0),
+        P(safetyVsKnight,  0),
+        P(safetyVsPawn,    0),
+
+        // shelter
+        P(shelterPawn_0, 0), // rank3
+        P(shelterPawn_1, 0), // rank4
+        P(shelterPawn_2, 0), // rank5
+        P(shelterPawn_3, 0), // rank6
+        P(shelterPawn_4, 0), // rank7
+        P(shelterPawn_5, 0), // no pawn
+
+        P(shelterKing_0, 0), // fileA (fileH)
+        P(shelterKing_1, 0),
+        P(shelterKing_2, 0), // -fileD (-fileE)
+
+        P(shelterWalkingKing, 0), // rank2 or up
+        P(shelterCastled, 0), // fraction of 256
+
+        // attacks
+        P(attackSquares_0, 0), // 0 attacks
+        P(attackSquares_1, 0),
+        P(attackSquares_2, 0),
+        P(attackSquares_3, 0),
+        P(attackSquares_4, 0),
+        P(attackSquares_5, 0), // -(6 or more attacks)
+
+        P(attackByPawn_0, 0),
+        P(attackByPawn_1, 0),
+        P(attackByPawn_2, 0),
+        P(attackByMinor_0, 0),
+        P(attackByMinor_1, 0),
+        P(attackByMinor_2, 0),
+        P(attackByRook_0, 0),
+        P(attackByRook_1, 0),
+        P(attackByRook_2, 0),
+        P(attackByQueen, 0),
+        P(attackByKing, 0),
+
+        // TODO: pawn storm
+
+        // king mobility
+        P(mobilityKing_0, 0),
+        P(mobilityKing_1, 0),
+
+        /*
          *  The 8 coefficients for file scoring are built from 7 tunable
          *  parameters as given by:
          *
@@ -111,11 +169,11 @@
         P(pawnByFile_6x, -34), // -fileH
 
         // 5 parameters for 6 pawn ranks
-        P(pawnByRank_0, -34), // "rank2"
+        P(pawnByRank_0, -34), // rank2
         P(pawnByRank_1, -73),
         P(pawnByRank_2, -86),
         P(pawnByRank_3, -45),
-        P(pawnByRank_4, 64), // "-rank7"
+        P(pawnByRank_4, 64), // -rank7
 
         P(doubledPawnA, -229), P(doubledPawnB, -135), P(doubledPawnC, -179), P(doubledPawnD, -132),
         P(doubledPawnE, -121), P(doubledPawnF, -41), P(doubledPawnG, -8), P(doubledPawnH, -223),

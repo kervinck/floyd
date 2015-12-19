@@ -82,7 +82,7 @@ static const char castleFlagsClear[boardSize] = {
         [h1] = castleFlagWhiteKside,
 };
 
-static const signed char kingStep[] = { // Offsets for king moves
+const signed char kingStep[] = { // Offsets for king moves
         [1<<bitN] = stepN, [1<<bitNE] = stepNE,
         [1<<bitE] = stepE, [1<<bitSE] = stepSE,
         [1<<bitS] = stepS, [1<<bitSW] = stepSW,
@@ -133,7 +133,7 @@ static const signed char knightJump[] = { // Offsets for knight jumps
              +dir(sq,jumpSSW,bitSSW)   +   dir(sq,jumpSSE,bitSSE))
 
 // 8 bits per square representing which directions a king can step to
-static const unsigned char kingDirections[] = {
+const unsigned char kingDirections[] = {
         K(a1), K(a2), K(a3), K(a4), K(a5), K(a6), K(a7), K(a8),
         K(b1), K(b2), K(b3), K(b4), K(b5), K(b6), K(b7), K(b8),
         K(c1), K(c2), K(c3), K(c4), K(c5), K(c6), K(c7), K(c8),

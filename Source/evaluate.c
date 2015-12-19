@@ -72,7 +72,7 @@ struct evaluation {
          *  Accumulators
          */
         int material[2];
-        int safety[2];   // total king safety
+        int safety[2];
         int passers[2];  // passers, not scaled
         int control[2];  // control of each square
         int mobility[2]; // use extended attack maps
@@ -84,7 +84,9 @@ struct evaluation {
         int pawns[2];    // PST, doubled, grouped, mobile
         int others[2];
 
+        // TODO: move to material table
         double passerScaling[2];
+        double safetyScaling[2];
 };
 
 #define nrPawns(side)      (int)(((materialKey) >> (((side) << 2) + 0)) & 15)
@@ -133,6 +135,25 @@ int globalVector[] = {
         #undef P
 };
 
+static const int firstRank[] = { rank1, rank8 };
+
+/*
+ *  Center of the 3x3 square attack zone around the king
+ *  (so shifted for borders and corners: e1->e2, h1->g2, f2->f2, etc.)
+ */
+#define Z(sq) [sq] = square(file(sq)==fileA ? fileB : file(sq)==fileH ? fileG : file(sq),\
+                            rank(sq)==rank1 ? rank2 : rank(sq)==rank8 ? rank7 : rank(sq))
+static const int kingZoneCenter[] = {
+        Z(a1), Z(a2), Z(a3), Z(a4), Z(a5), Z(a6), Z(a7), Z(a8),
+        Z(b1), Z(b2), Z(b3), Z(b4), Z(b5), Z(b6), Z(b7), Z(b8),
+        Z(c1), Z(c2), Z(c3), Z(c4), Z(c5), Z(c6), Z(c7), Z(c8),
+        Z(d1), Z(d2), Z(d3), Z(d4), Z(d5), Z(d6), Z(d7), Z(d8),
+        Z(e1), Z(e2), Z(e3), Z(e4), Z(e5), Z(e6), Z(e7), Z(e8),
+        Z(f1), Z(f2), Z(f3), Z(f4), Z(f5), Z(f6), Z(f7), Z(f8),
+        Z(g1), Z(g2), Z(g3), Z(g4), Z(g5), Z(g6), Z(g7), Z(g8),
+        Z(h1), Z(h2), Z(h3), Z(h4), Z(h5), Z(h6), Z(h7), Z(h8),
+};
+
 /*----------------------------------------------------------------------+
  |      Functions                                                       |
  +----------------------------------------------------------------------*/
@@ -153,7 +174,7 @@ static int evaluateRook  (const int v[vectorLen], int fileIndex, int rankIndex, 
 static int evaluateQueen (const int v[vectorLen], int fileIndex, int rankIndex, bool oppKings);
 static int evaluateKing  (const int v[vectorLen], int fileIndex, int rankIndex);
 
-static int evaluateCastleFlags(const int v[vectorLen], int kSideFlag, int qSideFlag);
+static int shelterPenalty(const int v[vectorLen], int side, int file, const int maxPawnFromLastRank[][2]);
 
 /*----------------------------------------------------------------------+
  |      evaluate                                                        |
@@ -322,7 +343,7 @@ int evaluate(Board_t self)
                 if (nrPawns(side) > 0)
                         e.material[side] += v[pawnValue1 + nrPawns(side) - 1];
 
-                int x = v[passerScalingOffset]
+                e.passerScaling[side] = sigmoid(1e-3 * (v[passerScalingOffset]
                         + nrQueens(side)   * v[passerAndQueen]
                         + nrRooks(side)    * v[passerAndRook]
                         + nrBishops(side)  * v[passerAndBishop]
@@ -332,8 +353,19 @@ int evaluate(Board_t self)
                         + nrRooks(xside)   * v[passerVsRook]
                         + nrBishops(xside) * v[passerVsBishop]
                         + nrKnights(xside) * v[passerVsKnight]
-                        + nrPawns(xside)   * v[passerVsPawn];
-                e.passerScaling[side] = sigmoid(x * 1e-3);
+                        + nrPawns(xside)   * v[passerVsPawn]));
+
+                e.safetyScaling[side] = sigmoid(1e-3 * (v[safetyScalingOffset]
+                        + nrQueens(side)   * v[safetyAndQueen]
+                        + nrRooks(side)    * v[safetyAndRook]
+                        + nrBishops(side)  * v[safetyAndBishop]
+                        + nrKnights(side)  * v[safetyAndKnight]
+                        + nrPawns(side)    * v[safetyAndPawn]
+                        + nrQueens(xside)  * v[safetyVsQueen]
+                        + nrRooks(xside)   * v[safetyVsRook]
+                        + nrBishops(xside) * v[safetyVsBishop]
+                        + nrKnights(xside) * v[safetyVsKnight]
+                        + nrPawns(xside)   * v[safetyVsPawn]));
         }
 
         /*--------------------------------------------------------------+
@@ -391,16 +423,90 @@ int evaluate(Board_t self)
         }
 
         /*--------------------------------------------------------------+
-         |      Kings                                                   |
+         |      King safety                                             |
          +--------------------------------------------------------------*/
 
-        e.kings[white] += evaluateCastleFlags(v,
-                self->castleFlags & castleFlagWhiteKside,
-                self->castleFlags & castleFlagWhiteQside);
+        for (int side=white; side<=black; side++) {
+                int xside = other(side);
+                int king = self->sides[side].king;
+                int target = kingZoneCenter[king];
+                int canCastleK = self->castleFlags & (castleFlagWhiteKside << side);
+                int canCastleQ = self->castleFlags & (castleFlagWhiteQside << side);
 
-        e.kings[black] += evaluateCastleFlags(v,
-                self->castleFlags & castleFlagBlackKside,
-                self->castleFlags & castleFlagBlackQside);
+                // King shelter penalty
+                const int (*maxPawnFromLastRank)[2] = (const int(*)[2])
+                        ((side == white) ? e.maxPawnFromRank8 : e.maxPawnFromRank1);
+                int shelter = shelterPenalty(v, side, file(target), maxPawnFromLastRank);
+                int castled = shelter; // king can always stay where it is
+                if (canCastleK) {
+                        int kingSide = shelterPenalty(v, side, fileG, maxPawnFromLastRank);
+                        castled = min(castled, kingSide); // maybe the king-side shelter is better
+                }
+                if (canCastleQ) {
+                        int queenSide = shelterPenalty(v, side, fileC, maxPawnFromLastRank);
+                        castled = min(castled, queenSide); // or the queen-side shelter
+                }
+                // (1.0 - w)*A + w*B == A - w*(A - B)
+                shelter -= (v[shelterCastled] * (shelter - castled)) >> 8;
+                if (rank(king) != firstRank[side])
+                        shelter += v[shelterWalkingKing];
+
+                // Number of attacked king zone squares
+                unsigned char *attacks = &self->sides[xside].attacks[target];
+                int nrAttackedSquares = (attacks[-9] > 0) + (attacks[-8] > 0) + (attacks[-7] > 0)
+                                      + (attacks[-1] > 0) + (attacks[ 0] > 0) + (attacks[ 1] > 0)
+                                      + (attacks[ 7] > 0) + (attacks[ 8] > 0) + (attacks[ 9] > 0);
+                nrAttackedSquares = min(nrAttackedSquares, 6); // clip 7..9 at 6
+
+                // A measure of distinct pieces attacking the king zone
+                int attackers = attacks[-9] | attacks[-8] | attacks[-7]
+                              | attacks[-1] | attacks[ 0] | attacks[ 1]
+                              | attacks[ 7] | attacks[ 8] | attacks[ 9];
+                int nrAttackKings  = attackers & 1;
+                int nrAttackQueens = (attackers >> 1) & 1;
+                int nrAttackRooks  = (attackers >> 2) & 3;
+                int nrAttackMinors = (attackers >> 4) & 3;
+                int nrAttackPawns  = attackers >> 6;
+
+                // Safe squares for the king (0 or 1 is not good)
+                // TODO: should this be a part of safety scaling at all?
+                int kingMobility = 0;
+                int dirs = kingDirections[king];
+                int dir = 0;
+                do {
+                        dir = (dir - dirs) & dirs; // pick next
+                        int to = king + kingStep[dir];
+                        if ((self->squares[to] == empty || pieceColor(self->squares[to]) != side)
+                         && (self->sides[xside].attacks[to] == 0)
+                         && (++kingMobility >= 2))
+                                break;
+                } while (dirs -= dir); // remove and go to next
+
+                // Lump it together in an attack score
+                int attack = 0;
+                if (nrAttackedSquares > 0) attack -= v[attackSquares_0 + nrAttackedSquares-1];
+                if (nrAttackedSquares < 6) attack += v[attackSquares_0 + nrAttackedSquares];
+                if (nrAttackKings  > 0) attack += v[attackByKing];
+                if (nrAttackQueens > 0) attack += v[attackByQueen];
+                if (nrAttackRooks  > 0) attack -= v[attackByRook_0  + nrAttackRooks-1];
+                if (nrAttackRooks  < 3) attack += v[attackByRook_0  + nrAttackRooks];
+                if (nrAttackMinors > 0) attack -= v[attackByMinor_0 + nrAttackMinors-1];
+                if (nrAttackMinors < 3) attack += v[attackByMinor_0 + nrAttackMinors];
+                if (nrAttackPawns  > 0) attack -= v[attackByPawn_0  + nrAttackPawns-1];
+                if (nrAttackPawns  < 3) attack += v[attackByPawn_0  + nrAttackPawns];
+                if (kingMobility < 2) attack += v[mobilityKing_0  + kingMobility];
+
+                // King safety is the (negative) scaled shelter and attack score
+                // TODO: maybe it is better to scale shelter and attack independently:
+                // - Small attacks should scale the same as shelter
+                // - Heavy attacks are always dangerous
+                e.safety[side] = -trunc(e.safetyScaling[side] * (shelter + attack));
+
+                // Castling capability intrinsic value
+                if (canCastleK | canCastleQ)
+                        e.kings[side] += !canCastleQ ? v[castleK] :
+                                         !canCastleK ? v[castleQ] : v[castleKQ];
+        }
 
         /*--------------------------------------------------------------+
          |      Draw rate prediction ("draw")                           |
@@ -431,6 +537,7 @@ int evaluate(Board_t self)
         if (nrPawns == 0)
                 drawScore += v[drawPawnless];
 
+        // Unlike bishops
         int wUnlikeL = nrBishopsL(white) > 0;
         int wUnlikeD = nrBishopsD(white) > 0;
         int bUnlikeL = nrBishopsL(black) > 0;
@@ -810,6 +917,23 @@ static int evaluateQueen(const int v[vectorLen], int fileIndex, int rankIndex, b
  |      evaluateKing                                                    |
  +----------------------------------------------------------------------*/
 
+static int shelterPenalty(const int v[vectorLen], int side, int file, const int maxPawnFromLastRank[][2])
+{
+        int sum = 0;
+        int absFileIndex = file ^ fileA;
+
+        for (int i=0; i<3; i++) {
+                int j = maxPawnFromLastRank[absFileIndex+i][side];
+                if (j < 6) sum += v[shelterPawn_5-j];
+        }
+
+        if (absFileIndex > 3) absFileIndex ^= 7;
+        if (absFileIndex > 0) sum -= v[shelterKing_0 + absFileIndex - 1];
+        if (absFileIndex < 3) sum += v[shelterKing_0 + absFileIndex];
+
+        return sum;
+}
+
 static int evaluateKing(const int v[vectorLen], int fileIndex, int rankIndex)
 {
         int kingScore = 0;
@@ -829,17 +953,6 @@ static int evaluateKing(const int v[vectorLen], int fileIndex, int rankIndex)
                 kingScore += v[kingByRank_0 + rankIndex];
 
         return kingScore;
-}
-
-static int evaluateCastleFlags(const int v[vectorLen], int kSideFlag, int qSideFlag)
-{
-        if (kSideFlag && qSideFlag)
-                return v[castleKQ];
-        if (kSideFlag)
-                return v[castleK];
-        if (qSideFlag)
-                return v[castleQ];
-        return 0;
 }
 
 /*----------------------------------------------------------------------+

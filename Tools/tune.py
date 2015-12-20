@@ -446,7 +446,8 @@ if __name__ == '__main__':
                         newValue, newResidual, active = tuneSingle(coef, tests, oldValue, bestResidual)
 
                         deltaResidual = newResidual - bestResidual
-                        deltas[coef] = deltaResidual
+                        alpha = 0.75
+                        deltas[coef] = alpha * deltaResidual + (1.0 - alpha) * deltas[coef]
 
                         if newValue != oldValue:
                                 print 'update id %s residual %.9f delta %.3e active %d oldValue %d newValue %d' % (

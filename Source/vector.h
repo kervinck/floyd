@@ -28,107 +28,107 @@
 
 // {
         P(eloDiff, 51),
-        P(tempo, 36),
-        P(winBonus, 3481),
+        P(tempo, 35),
+        P(winBonus, 3417),
 
-        P(castleK, -100),
-        P(castleQ, -82),
-        P(castleKQ, 2),
+        P(castleK, 6),
+        P(castleQ, -55),
+        P(castleKQ, 43),
 
-        P(queenValue, 7187),
-        P(rookValue, 4074),
-        P(bishopValue, 2285),
-        P(knightValue, 2103),
-        P(pawnValue1, 1047), P(pawnValue2, 1713), P(pawnValue3, 2362), P(pawnValue4, 3023),
-        P(pawnValue5, 3683), P(pawnValue6, 4330), P(pawnValue7, 4962), P(pawnValue8, 5564),
+        P(queenValue, 7169),
+        P(rookValue, 4195),
+        P(bishopValue, 2317),
+        P(knightValue, 2141),
+        P(pawnValue1, 1068), P(pawnValue2, 1723), P(pawnValue3, 2358), P(pawnValue4, 3016),
+        P(pawnValue5, 3679), P(pawnValue6, 4345), P(pawnValue7, 4965), P(pawnValue8, 5566),
 
-        P(queenAndQueen, -988),
-        P(queenAndRook, -663),
-        P(queenAndBishop, 38),
-        P(queenAndKnight, -62),
-        P(queenAndPawn_1, -96), P(queenAndPawn_2, -86),
-        P(rookAndRook, -312),
-        P(rookAndBishop, -137),
-        P(rookAndKnight, -166),
-        P(rookAndPawn_1, -56), P(rookAndPawn_2, -62),
-        P(bishopAndBishop, 49),
-        P(bishopAndKnight, -56),
+        P(queenAndQueen, -952),
+        P(queenAndRook, -661),
+        P(queenAndBishop, 35),
+        P(queenAndKnight, -65),
+        P(queenAndPawn_1, -111), P(queenAndPawn_2, -85),
+        P(rookAndRook, -313),
+        P(rookAndBishop, -131),
+        P(rookAndKnight, -164),
+        P(rookAndPawn_1, -61), P(rookAndPawn_2, -62),
+        P(bishopAndBishop, 65),
+        P(bishopAndKnight, -20),
         P(bishopAndPawn_1, -56), P(bishopAndPawn_2, -19),
-        P(knightAndKnight, -90),
-        P(knightAndPawn_1, -27), P(knightAndPawn_2, -1),
+        P(knightAndKnight, -73),
+        P(knightAndPawn_1, -27), P(knightAndPawn_2, -2),
 
-        P(queenVsRook, -238),
-        P(queenVsBishop, 83),
-        P(queenVsKnight, -8),
-        P(queenVsPawn_1, 43), P(queenVsPawn_2, -107),
+        P(queenVsRook, -262),
+        P(queenVsBishop, 92),
+        P(queenVsKnight, -11),
+        P(queenVsPawn_1, 53), P(queenVsPawn_2, -108),
         P(rookVsBishop, 4),
-        P(rookVsKnight, 26),
-        P(rookVsPawn_1, -22), P(rookVsPawn_2, -31),
+        P(rookVsKnight, 25),
+        P(rookVsPawn_1, -22), P(rookVsPawn_2, -34),
         P(bishopVsKnight, 6),
         P(bishopVsPawn_1, -11), P(bishopVsPawn_2, -5),
-        P(knightVsPawn_1, -1), P(knightVsPawn_2, -18),
+        P(knightVsPawn_1, -1), P(knightVsPawn_2, -19),
 
-        P(controlCenter, 36),
+        P(controlCenter, 38),
         P(controlExtendedCenter, 41),
-        P(controlOutside, 32),
+        P(controlOutside, 27),
 
         /*
          *  king safety
          */
 
         // scaling
-        P(safetyScalingOffset, 0),
-        P(safetyAndQueen,  0),
-        P(safetyAndRook,   0),
-        P(safetyAndBishop, 0),
-        P(safetyAndKnight, 0),
-        P(safetyAndPawn,   0),
-        P(safetyVsQueen,   0),
-        P(safetyVsRook,    0),
-        P(safetyVsBishop,  0),
-        P(safetyVsKnight,  0),
-        P(safetyVsPawn,    0),
+        P(safetyScalingOffset, -3525),
+        P(safetyAndQueen, 1423),
+        P(safetyAndRook, 1255),
+        P(safetyAndBishop, 485),
+        P(safetyAndKnight, 352),
+        P(safetyAndPawn, -1229),
+        P(safetyVsQueen, 15960),
+        P(safetyVsRook, -1077),
+        P(safetyVsBishop, -1478),
+        P(safetyVsKnight, -1119),
+        P(safetyVsPawn, -782),
 
         // shelter
-        P(shelterPawn_0, 0), // rank3
-        P(shelterPawn_1, 0), // rank4
-        P(shelterPawn_2, 0), // rank5
-        P(shelterPawn_3, 0), // rank6
-        P(shelterPawn_4, 0), // rank7
-        P(shelterPawn_5, 0), // no pawn
+        P(shelterPawn_0, 60), // rank3
+        P(shelterPawn_1, 227), // rank4
+        P(shelterPawn_2, 189), // rank5
+        P(shelterPawn_3, 50), // rank6
+        P(shelterPawn_4, -158), // rank7
+        P(shelterPawn_5, 184), // no pawn
 
-        P(shelterKing_0, 0), // fileA (fileH)
-        P(shelterKing_1, 0),
-        P(shelterKing_2, 0), // -fileD (-fileE)
+        P(shelterKing_0, 148), // fileA (fileH)
+        P(shelterKing_1, -9),
+        P(shelterKing_2, -24), // -fileD (-fileE)
 
-        P(shelterWalkingKing, 0), // rank2 or up
-        P(shelterCastled, 0), // fraction of 256
+        P(shelterWalkingKing, -11), // rank2 or up
+        P(shelterCastled, -117), // fraction of 256
 
         // attacks
-        P(attackSquares_0, 0), // 0 attacks
-        P(attackSquares_1, 0),
-        P(attackSquares_2, 0),
-        P(attackSquares_3, 0),
-        P(attackSquares_4, 0),
-        P(attackSquares_5, 0), // -(6 or more attacks)
+        P(attackSquares_0, 96), // 0 attacks
+        P(attackSquares_1, 50),
+        P(attackSquares_2, -49),
+        P(attackSquares_3, -157),
+        P(attackSquares_4, -198),
+        P(attackSquares_5, -166), // -(6 or more attacks)
 
-        P(attackByPawn_0, 0),
-        P(attackByPawn_1, 0),
-        P(attackByPawn_2, 0),
-        P(attackByMinor_0, 0),
-        P(attackByMinor_1, 0),
-        P(attackByMinor_2, 0),
-        P(attackByRook_0, 0),
-        P(attackByRook_1, 0),
-        P(attackByRook_2, 0),
-        P(attackByQueen, 0),
-        P(attackByKing, 0),
+        P(attackByPawn_0, 10),
+        P(attackByPawn_1, 32),
+        P(attackByPawn_2, -61),
+        P(attackByMinor_0, -114),
+        P(attackByMinor_1, 4),
+        P(attackByMinor_2, -331),
+        P(attackByRook_0, -57),
+        P(attackByRook_1, 59),
+        P(attackByRook_2, -288),
+        P(attackByQueen, 163),
+        P(attackByKing, -201),
 
         // TODO: pawn storm
 
         // king mobility
-        P(mobilityKing_0, 0),
-        P(mobilityKing_1, 0),
+        P(mobilityKing_0, 62),
+        P(mobilityKing_1, 49),
 
         /*
          *  The 8 coefficients for file scoring are built from 7 tunable
@@ -152,91 +152,91 @@
          *  (Note that this is different from "tuning the differences between files")
          */
 
-        P(pawnByFile_0, -1), // fileA
-        P(pawnByFile_1, -9),
-        P(pawnByFile_2, -78),
-        P(pawnByFile_3, -104),
-        P(pawnByFile_4, -117),
-        P(pawnByFile_5, -63),
+        P(pawnByFile_0, 0), // fileA
+        P(pawnByFile_1, -7),
+        P(pawnByFile_2, -66),
+        P(pawnByFile_3, -103),
+        P(pawnByFile_4, -115),
+        P(pawnByFile_5, -59),
         P(pawnByFile_6, 26), // -fileH
 
         P(pawnByFile_0x, -68), // fileA
-        P(pawnByFile_1x, -86),
-        P(pawnByFile_2x, -138),
-        P(pawnByFile_3x, -172),
-        P(pawnByFile_4x, -158),
-        P(pawnByFile_5x, -109),
+        P(pawnByFile_1x, -101),
+        P(pawnByFile_2x, -122),
+        P(pawnByFile_3x, -175),
+        P(pawnByFile_4x, -166),
+        P(pawnByFile_5x, -117),
         P(pawnByFile_6x, -34), // -fileH
 
         // 5 parameters for 6 pawn ranks
-        P(pawnByRank_0, -34), // rank2
-        P(pawnByRank_1, -73),
-        P(pawnByRank_2, -86),
-        P(pawnByRank_3, -45),
-        P(pawnByRank_4, 64), // -rank7
+        P(pawnByRank_0, -49), // rank2
+        P(pawnByRank_1, -89),
+        P(pawnByRank_2, -92),
+        P(pawnByRank_3, -35),
+        P(pawnByRank_4, 69), // -rank7
 
-        P(doubledPawnA, -229), P(doubledPawnB, -135), P(doubledPawnC, -179), P(doubledPawnD, -132),
-        P(doubledPawnE, -121), P(doubledPawnF, -41), P(doubledPawnG, -8), P(doubledPawnH, -223),
+        P(doubledPawnA, -221), P(doubledPawnB, -140), P(doubledPawnC, -175), P(doubledPawnD, -123),
+        P(doubledPawnE, -125), P(doubledPawnF, -41), P(doubledPawnG, -44), P(doubledPawnH, -211),
 
-        P(backwardPawnA, 4), P(backwardPawnB, -40), P(backwardPawnC, -51), P(backwardPawnD, -96),
-        P(backwardPawnE, -102), P(backwardPawnF, -53), P(backwardPawnG, -29), P(backwardPawnH, 7),
+        P(backwardPawnA, 0), P(backwardPawnB, -36), P(backwardPawnC, -53), P(backwardPawnD, -106),
+        P(backwardPawnE, -104), P(backwardPawnF, -48), P(backwardPawnG, -29), P(backwardPawnH, 4),
 
-        P(isolatedPawnClosedA, 46), P(isolatedPawnClosedB, -52),
-        P(isolatedPawnClosedC, -20), P(isolatedPawnClosedD, 21),
-        P(isolatedPawnClosedE, -33), P(isolatedPawnClosedF, -75),
-        P(isolatedPawnClosedG, -82), P(isolatedPawnClosedH, 10),
+        P(isolatedPawnClosedA, 48), P(isolatedPawnClosedB, -53),
+        P(isolatedPawnClosedC, -11), P(isolatedPawnClosedD, 19),
+        P(isolatedPawnClosedE, -62), P(isolatedPawnClosedF, -80),
+        P(isolatedPawnClosedG, -93), P(isolatedPawnClosedH, -6),
 
-        P(isolatedPawnOpenA, 13), P(isolatedPawnOpenB, -28),
-        P(isolatedPawnOpenC, -75), P(isolatedPawnOpenD, -135),
-        P(isolatedPawnOpenE, -126), P(isolatedPawnOpenF, -79),
-        P(isolatedPawnOpenG, -54), P(isolatedPawnOpenH, 19),
+        P(isolatedPawnOpenA, 12), P(isolatedPawnOpenB, -7),
+        P(isolatedPawnOpenC, -79), P(isolatedPawnOpenD, -136),
+        P(isolatedPawnOpenE, -119), P(isolatedPawnOpenF, -69),
+        P(isolatedPawnOpenG, -51), P(isolatedPawnOpenH, 30),
 
-        P(sidePawnClosedA, -7), P(sidePawnClosedB, 3),
-        P(sidePawnClosedC, 41), P(sidePawnClosedD, -7),
-        P(sidePawnClosedE, -10), P(sidePawnClosedF, -15),
-        P(sidePawnClosedG, -45), P(sidePawnClosedH, 31),
+        P(sidePawnClosedA, 24), P(sidePawnClosedB, 16),
+        P(sidePawnClosedC, 49), P(sidePawnClosedD, -2),
+        P(sidePawnClosedE, -15), P(sidePawnClosedF, -12),
+        P(sidePawnClosedG, -54), P(sidePawnClosedH, 9),
 
-        P(sidePawnOpenA, -23), P(sidePawnOpenB, 44),
-        P(sidePawnOpenC, 5), P(sidePawnOpenD, -41),
-        P(sidePawnOpenE, -24), P(sidePawnOpenF, 10),
-        P(sidePawnOpenG, 30), P(sidePawnOpenH, 49),
+        P(sidePawnOpenA, 1), P(sidePawnOpenB, 44),
+        P(sidePawnOpenC, 2), P(sidePawnOpenD, -38),
+        P(sidePawnOpenE, -17), P(sidePawnOpenF, 10),
+        P(sidePawnOpenG, 31), P(sidePawnOpenH, 29),
 
-        P(middlePawnClosedA, 0), P(middlePawnClosedB, -2),
-        P(middlePawnClosedC, 59), P(middlePawnClosedD, 16),
-        P(middlePawnClosedE, 8), P(middlePawnClosedF, 1),
-        P(middlePawnClosedG, -22), P(middlePawnClosedH, 0),
+        P(middlePawnClosedA, 0), P(middlePawnClosedB, -3),
+        P(middlePawnClosedC, 72), P(middlePawnClosedD, 17),
+        P(middlePawnClosedE, 5), P(middlePawnClosedF, 0),
+        P(middlePawnClosedG, -42), P(middlePawnClosedH, 0),
 
-        P(middlePawnOpenA, 0), P(middlePawnOpenB, 0),
-        P(middlePawnOpenC, 25), P(middlePawnOpenD, 22),
-        P(middlePawnOpenE, 33), P(middlePawnOpenF, -9),
-        P(middlePawnOpenG, -4), P(middlePawnOpenH, 0),
+        P(middlePawnOpenA, 0), P(middlePawnOpenB, -6),
+        P(middlePawnOpenC, 29), P(middlePawnOpenD, 36),
+        P(middlePawnOpenE, 45), P(middlePawnOpenF, -19),
+        P(middlePawnOpenG, -13), P(middlePawnOpenH, 0),
 
-        P(duoPawnA, -19), P(duoPawnB, 5),
-        P(duoPawnC, -26), P(duoPawnD, 61),
-        P(duoPawnE, 37), P(duoPawnF, 18),
-        P(duoPawnG, 57), P(duoPawnH, -70),
+        P(duoPawnA, -6), P(duoPawnB, 3),
+        P(duoPawnC, -18), P(duoPawnD, 66),
+        P(duoPawnE, 35), P(duoPawnF, -1),
+        P(duoPawnG, 47), P(duoPawnH, -76),
 
         // Quadratic polynomials for passers
-        P(passerA_0, -87), P(passerB_0, -22), P(passerC_0, 7), P(passerD_0, -43),
-        P(passerE_0, 68), P(passerF_0, 70), P(passerG_0, 49), P(passerH_0, 48),
+        P(passerA_0, -82), P(passerB_0, 7), P(passerC_0, 5), P(passerD_0, 12),
+        P(passerE_0, 73), P(passerF_0, 80), P(passerG_0, 31), P(passerH_0, 21),
 
-        P(passerA_1, 80), P(passerB_1, 12), P(passerC_1, -29), P(passerD_1, -5),
-        P(passerE_1, -51), P(passerF_1, -55), P(passerG_1, 2), P(passerH_1, 32),
+        P(passerA_1, 82), P(passerB_1, 9), P(passerC_1, -29), P(passerD_1, -10),
+        P(passerE_1, -50), P(passerF_1, -55), P(passerG_1, 18), P(passerH_1, 47),
 
-        P(passerA_2, 159), P(passerB_2, 217), P(passerC_2, 247), P(passerD_2, 211),
-        P(passerE_2, 243), P(passerF_2, 276), P(passerG_2, 222), P(passerH_2, 166),
+        P(passerA_2, 172), P(passerB_2, 224), P(passerC_2, 250), P(passerD_2, 212),
+        P(passerE_2, 255), P(passerF_2, 272), P(passerG_2, 218), P(passerH_2, 166),
 
-        P(passerScalingOffset, 4782),
-        P(passerAndQueen, -124),
-        P(passerAndRook, -56),
-        P(passerAndBishop, 192),
-        P(passerAndKnight, 79),
+        P(passerScalingOffset, 4708),
+        P(passerAndQueen, -79),
+        P(passerAndRook, -35),
+        P(passerAndBishop, 402),
+        P(passerAndKnight, 80),
         P(passerAndPawn, -653),
-        P(passerVsQueen, 1035),
-        P(passerVsRook, -51),
-        P(passerVsBishop, -861),
-        P(passerVsKnight, -570),
-        P(passerVsPawn, 55),
+        P(passerVsQueen, 869),
+        P(passerVsRook, -71),
+        P(passerVsBishop, -873),
+        P(passerVsKnight, -571),
+        P(passerVsPawn, 45),
 
 #if 0
         P(drawBlockedA, 0), P(drawBlockedB, 0), P(drawBlockedC, 0), P(drawBlockedD, 0),
@@ -250,29 +250,29 @@
          */
 
         // Kings on same side
-        P(knightByFile_0, -177), // fileA
-        P(knightByFile_1, -220),
-        P(knightByFile_2, -233),
-        P(knightByFile_3, -168),
-        P(knightByFile_4, -101),
+        P(knightByFile_0, -192), // fileA
+        P(knightByFile_1, -218),
+        P(knightByFile_2, -234),
+        P(knightByFile_3, -164),
+        P(knightByFile_4, -102),
         P(knightByFile_5, -31),
-        P(knightByFile_6, 21), // -fileH
+        P(knightByFile_6, 24), // -fileH
 
         // Opposite side kings
-        P(knightByFile_0x, -102), // fileA
-        P(knightByFile_1x, -135),
-        P(knightByFile_2x, -118),
-        P(knightByFile_3x, -28),
+        P(knightByFile_0x, -99), // fileA
+        P(knightByFile_1x, -144),
+        P(knightByFile_2x, -106),
+        P(knightByFile_3x, -29),
         P(knightByFile_4x, 51),
-        P(knightByFile_5x, 128),
-        P(knightByFile_6x, 106), // -fileH
+        P(knightByFile_5x, 147),
+        P(knightByFile_6x, 102), // -fileH
 
-        P(knightByRank_0, -109), // rank1
-        P(knightByRank_1, -193),
+        P(knightByRank_0, -122), // rank1
+        P(knightByRank_1, -196),
         P(knightByRank_2, -220),
-        P(knightByRank_3, -155),
-        P(knightByRank_4, -34),
-        P(knightByRank_5, 118),
+        P(knightByRank_3, -154),
+        P(knightByRank_4, -47),
+        P(knightByRank_5, 90),
         P(knightByRank_6, 184), // -rank8
 
         /*
@@ -299,222 +299,222 @@
         P(bishopByRank_5, 30),
         P(bishopByRank_6, 9), // -rank8
 #else
-       P(bishopBySquare_0, -184),
-        P(bishopBySquare_1, 9),
-        P(bishopBySquare_2, -89),
-        P(bishopBySquare_3, 53),
-        P(bishopBySquare_4, -72),
-        P(bishopBySquare_5, -34),
-        P(bishopBySquare_6, -75),
-        P(bishopBySquare_7, 53),
+       P(bishopBySquare_0, -174),
+        P(bishopBySquare_1, -21),
+        P(bishopBySquare_2, -95),
+        P(bishopBySquare_3, 57),
+        P(bishopBySquare_4, -48),
+        P(bishopBySquare_5, -39),
+        P(bishopBySquare_6, -55),
+        P(bishopBySquare_7, 137),
 
-        P(bishopBySquare_8, -34),
-        P(bishopBySquare_9, -61),
-        P(bishopBySquare_10, 69),
-        P(bishopBySquare_11, -21),
-        P(bishopBySquare_12, -1),
-        P(bishopBySquare_13, 58),
-        P(bishopBySquare_14, 40),
-        P(bishopBySquare_15, 110),
+        P(bishopBySquare_8, -83),
+        P(bishopBySquare_9, -53),
+        P(bishopBySquare_10, 78),
+        P(bishopBySquare_11, -17),
+        P(bishopBySquare_12, 16),
+        P(bishopBySquare_13, 35),
+        P(bishopBySquare_14, 127),
+        P(bishopBySquare_15, 104),
 
         P(bishopBySquare_16, -121),
-        P(bishopBySquare_17, 48),
-        P(bishopBySquare_18, 12),
-        P(bishopBySquare_19, 41),
-        P(bishopBySquare_20, 38),
-        P(bishopBySquare_21, 43),
-        P(bishopBySquare_22, 31),
-        P(bishopBySquare_23, 100),
+        P(bishopBySquare_17, 30),
+        P(bishopBySquare_18, 11),
+        P(bishopBySquare_19, 24),
+        P(bishopBySquare_20, 51),
+        P(bishopBySquare_21, 33),
+        P(bishopBySquare_22, 25),
+        P(bishopBySquare_23, 71),
 
-        P(bishopBySquare_24, -114),
-        P(bishopBySquare_25, -62),
-        P(bishopBySquare_26, 47),
-        P(bishopBySquare_27, 73),
-        P(bishopBySquare_28, 140),
-        P(bishopBySquare_29, 95),
-        P(bishopBySquare_30, 81),
-        P(bishopBySquare_31, 80),
+        P(bishopBySquare_24, -103),
+        P(bishopBySquare_25, -74),
+        P(bishopBySquare_26, 37),
+        P(bishopBySquare_27, 66),
+        P(bishopBySquare_28, 111),
+        P(bishopBySquare_29, 81),
+        P(bishopBySquare_30, 96),
+        P(bishopBySquare_31, 54),
 
-        P(bishopBySquare_32, -117),
-        P(bishopBySquare_33, -12),
-        P(bishopBySquare_34, 6),
-        P(bishopBySquare_35, 67),
-        P(bishopBySquare_36, 87),
-        P(bishopBySquare_37, 149),
-        P(bishopBySquare_38, 28),
-        P(bishopBySquare_39, 84),
+        P(bishopBySquare_32, -68),
+        P(bishopBySquare_33, 1),
+        P(bishopBySquare_34, 3),
+        P(bishopBySquare_35, 45),
+        P(bishopBySquare_36, 57),
+        P(bishopBySquare_37, 110),
+        P(bishopBySquare_38, 14),
+        P(bishopBySquare_39, 65),
 
-        P(bishopBySquare_40, -88),
-        P(bishopBySquare_41, -47),
-        P(bishopBySquare_42, 15),
-        P(bishopBySquare_43, -26),
-        P(bishopBySquare_44, 122),
-        P(bishopBySquare_45, 242),
+        P(bishopBySquare_40, -80),
+        P(bishopBySquare_41, -4),
+        P(bishopBySquare_42, 47),
+        P(bishopBySquare_43, -29),
+        P(bishopBySquare_44, 103),
+        P(bishopBySquare_45, 226),
         P(bishopBySquare_46, 74),
-        P(bishopBySquare_47, 2),
+        P(bishopBySquare_47, -69),
 
-        P(bishopBySquare_48, -88),
-        P(bishopBySquare_49, 21),
-        P(bishopBySquare_50, 11),
-        P(bishopBySquare_51, 13),
-        P(bishopBySquare_52, -14),
-        P(bishopBySquare_53, 185),
-        P(bishopBySquare_54, -51),
-        P(bishopBySquare_55, -6),
+        P(bishopBySquare_48, -60),
+        P(bishopBySquare_49, 22),
+        P(bishopBySquare_50, 7),
+        P(bishopBySquare_51, 8),
+        P(bishopBySquare_52, -15),
+        P(bishopBySquare_53, 131),
+        P(bishopBySquare_54, -169),
+        P(bishopBySquare_55, -16),
 
-        P(bishopBySquare_56, -239),
-        P(bishopBySquare_57, -73),
-        P(bishopBySquare_58, -6),
-        P(bishopBySquare_59, 35),
-        P(bishopBySquare_60, 29),
-        P(bishopBySquare_61, 180),
-        P(bishopBySquare_62, -187),
-        P(bishopBySquare_63, -48),
+        P(bishopBySquare_56, -209),
+        P(bishopBySquare_57, -63),
+        P(bishopBySquare_58, -1),
+        P(bishopBySquare_59, 40),
+        P(bishopBySquare_60, -19),
+        P(bishopBySquare_61, 121),
+        P(bishopBySquare_62, -251),
+        P(bishopBySquare_63, -125),
 
-        P(bishopBySquare_0x, -140),
-        P(bishopBySquare_1x, -50),
-        P(bishopBySquare_2x, 21),
-        P(bishopBySquare_3x, -18),
-        P(bishopBySquare_4x, 2),
-        P(bishopBySquare_5x, 117),
-        P(bishopBySquare_6x, -210),
-        P(bishopBySquare_7x, -91),
+        P(bishopBySquare_0x, -130),
+        P(bishopBySquare_1x, -60),
+        P(bishopBySquare_2x, 1),
+        P(bishopBySquare_3x, -50),
+        P(bishopBySquare_4x, 8),
+        P(bishopBySquare_5x, 27),
+        P(bishopBySquare_6x, -250),
+        P(bishopBySquare_7x, -241),
 
-        P(bishopBySquare_8x, -93),
-        P(bishopBySquare_9x, -109),
-        P(bishopBySquare_10x, -34),
-        P(bishopBySquare_11x, 27),
-        P(bishopBySquare_12x, 41),
-        P(bishopBySquare_13x, 120),
-        P(bishopBySquare_14x, 16),
-        P(bishopBySquare_15x, -24),
+        P(bishopBySquare_8x, -50),
+        P(bishopBySquare_9x, -49),
+        P(bishopBySquare_10x, -50),
+        P(bishopBySquare_11x, 54),
+        P(bishopBySquare_12x, -1),
+        P(bishopBySquare_13x, 92),
+        P(bishopBySquare_14x, -12),
+        P(bishopBySquare_15x, -212),
 
-        P(bishopBySquare_16x, -145),
-        P(bishopBySquare_17x, -24),
-        P(bishopBySquare_18x, 13),
-        P(bishopBySquare_19x, 23),
-        P(bishopBySquare_20x, 121),
-        P(bishopBySquare_21x, 153),
-        P(bishopBySquare_22x, 82),
-        P(bishopBySquare_23x, 28),
+        P(bishopBySquare_16x, -102),
+        P(bishopBySquare_17x, -20),
+        P(bishopBySquare_18x, 20),
+        P(bishopBySquare_19x, 24),
+        P(bishopBySquare_20x, 58),
+        P(bishopBySquare_21x, 97),
+        P(bishopBySquare_22x, 31),
+        P(bishopBySquare_23x, 23),
 
-        P(bishopBySquare_24x, -124),
-        P(bishopBySquare_25x, -37),
-        P(bishopBySquare_26x, 55),
-        P(bishopBySquare_27x, 62),
-        P(bishopBySquare_28x, 110),
-        P(bishopBySquare_29x, 183),
-        P(bishopBySquare_30x, 94),
-        P(bishopBySquare_31x, 122),
+        P(bishopBySquare_24x, -84),
+        P(bishopBySquare_25x, -38),
+        P(bishopBySquare_26x, 72),
+        P(bishopBySquare_27x, 41),
+        P(bishopBySquare_28x, 86),
+        P(bishopBySquare_29x, 152),
+        P(bishopBySquare_30x, 56),
+        P(bishopBySquare_31x, 171),
 
-        P(bishopBySquare_32x, -80),
-        P(bishopBySquare_33x, 34),
-        P(bishopBySquare_34x, 75),
-        P(bishopBySquare_35x, 113),
-        P(bishopBySquare_36x, 155),
-        P(bishopBySquare_37x, 151),
-        P(bishopBySquare_38x, 141),
-        P(bishopBySquare_39x, 91),
+        P(bishopBySquare_32x, -115),
+        P(bishopBySquare_33x, 60),
+        P(bishopBySquare_34x, 85),
+        P(bishopBySquare_35x, 88),
+        P(bishopBySquare_36x, 154),
+        P(bishopBySquare_37x, 126),
+        P(bishopBySquare_38x, 64),
+        P(bishopBySquare_39x, 122),
 
-        P(bishopBySquare_40x, -112),
-        P(bishopBySquare_41x, 59),
-        P(bishopBySquare_42x, 111),
-        P(bishopBySquare_43x, 135),
-        P(bishopBySquare_44x, 136),
-        P(bishopBySquare_45x, 117),
-        P(bishopBySquare_46x, 117),
-        P(bishopBySquare_47x, 134),
+        P(bishopBySquare_40x, -92),
+        P(bishopBySquare_41x, 115),
+        P(bishopBySquare_42x, 98),
+        P(bishopBySquare_43x, 130),
+        P(bishopBySquare_44x, 125),
+        P(bishopBySquare_45x, 56),
+        P(bishopBySquare_46x, 88),
+        P(bishopBySquare_47x, 114),
 
-        P(bishopBySquare_48x, -7),
-        P(bishopBySquare_49x, 100),
-        P(bishopBySquare_50x, 116),
-        P(bishopBySquare_51x, 63),
+        P(bishopBySquare_48x, -20),
+        P(bishopBySquare_49x, 105),
+        P(bishopBySquare_50x, 105),
+        P(bishopBySquare_51x, 102),
         P(bishopBySquare_52x, 100),
-        P(bishopBySquare_53x, 149),
-        P(bishopBySquare_54x, 114),
-        P(bishopBySquare_55x, 126),
+        P(bishopBySquare_53x, 120),
+        P(bishopBySquare_54x, 91),
+        P(bishopBySquare_55x, 131),
 
-        P(bishopBySquare_56x, -111),
-        P(bishopBySquare_57x, 54),
-        P(bishopBySquare_58x, 41),
-        P(bishopBySquare_59x, 61),
-        P(bishopBySquare_60x, 63),
-        P(bishopBySquare_61x, 24),
-        P(bishopBySquare_62x, -38),
-        P(bishopBySquare_63x, -39),
+        P(bishopBySquare_56x, -69),
+        P(bishopBySquare_57x, 133),
+        P(bishopBySquare_58x, 11),
+        P(bishopBySquare_59x, 133),
+        P(bishopBySquare_60x, 104),
+        P(bishopBySquare_61x, 51),
+        P(bishopBySquare_62x, -48),
+        P(bishopBySquare_63x, -8),
 #endif
 
         /*
          *  Rooks
          */
 
-        P(rookByFile_0, -71), // fileA
+        P(rookByFile_0, -68), // fileA
         P(rookByFile_1, -89),
-        P(rookByFile_2, -58),
-        P(rookByFile_3, -11),
-        P(rookByFile_4, 35),
-        P(rookByFile_5, 52),
-        P(rookByFile_6, 104), // -fileH
+        P(rookByFile_2, -57),
+        P(rookByFile_3, -10),
+        P(rookByFile_4, 36),
+        P(rookByFile_5, 51),
+        P(rookByFile_6, 101), // -fileH
 
-        P(rookByFile_0x, -82), // fileA
-        P(rookByFile_1x, -51),
-        P(rookByFile_2x, -40),
-        P(rookByFile_3x, -25),
-        P(rookByFile_4x, 22),
-        P(rookByFile_5x, 55),
-        P(rookByFile_6x, 70), // -fileH
+        P(rookByFile_0x, -84), // fileA
+        P(rookByFile_1x, -56),
+        P(rookByFile_2x, -47),
+        P(rookByFile_3x, -34),
+        P(rookByFile_4x, 10),
+        P(rookByFile_5x, 45),
+        P(rookByFile_6x, 64), // -fileH
 
-        P(rookByRank_0, -140), // rank1
-        P(rookByRank_1, -337),
-        P(rookByRank_2, -491),
-        P(rookByRank_3, -546),
-        P(rookByRank_4, -449),
-        P(rookByRank_5, -281),
-        P(rookByRank_6, -114), // -rank8
+        P(rookByRank_0, -141), // rank1
+        P(rookByRank_1, -320),
+        P(rookByRank_2, -474),
+        P(rookByRank_3, -532),
+        P(rookByRank_4, -439),
+        P(rookByRank_5, -279),
+        P(rookByRank_6, -115), // -rank8
 
         /*
          *  Queens
          */
 
-        P(queenByFile_0, -87), // fileA
+        P(queenByFile_0, -88), // fileA
         P(queenByFile_1, -147),
-        P(queenByFile_2, -151),
+        P(queenByFile_2, -162),
         P(queenByFile_3, -139),
-        P(queenByFile_4, -128),
+        P(queenByFile_4, -120),
         P(queenByFile_5, -104),
-        P(queenByFile_6, -69), // -fileH
+        P(queenByFile_6, -53), // -fileH
 
-        P(queenByFile_0x, 17), // fileA
-        P(queenByFile_1x, 5),
-        P(queenByFile_2x, -4),
-        P(queenByFile_3x, 21),
-        P(queenByFile_4x, 66),
-        P(queenByFile_5x, 110),
-        P(queenByFile_6x, 79), // -fileH
+        P(queenByFile_0x, -11), // fileA
+        P(queenByFile_1x, -13),
+        P(queenByFile_2x, 1),
+        P(queenByFile_3x, 15),
+        P(queenByFile_4x, 74),
+        P(queenByFile_5x, 107),
+        P(queenByFile_6x, 102), // -fileH
 
-        P(queenByRank_0, -164), // rank1
-        P(queenByRank_1, -284),
-        P(queenByRank_2, -382),
-        P(queenByRank_3, -435),
-        P(queenByRank_4, -383),
-        P(queenByRank_5, -239),
-        P(queenByRank_6, -148), // -rank8
+        P(queenByRank_0, -167), // rank1
+        P(queenByRank_1, -276),
+        P(queenByRank_2, -369),
+        P(queenByRank_3, -425),
+        P(queenByRank_4, -361),
+        P(queenByRank_5, -256),
+        P(queenByRank_6, -145), // -rank8
 
         /*
          *  Kings
          */
 
-        P(kingByFile_0, 1), // fileD
-        P(kingByFile_1, -19),
-        P(kingByFile_2, 11), // -fileH
+        P(kingByFile_0, -2), // fileD
+        P(kingByFile_1, 22),
+        P(kingByFile_2, 28), // -fileH
 
-        P(kingByRank_0, -163), // rank1
-        P(kingByRank_1, -299),
+        P(kingByRank_0, -179), // rank1
+        P(kingByRank_1, -315),
         P(kingByRank_2, -404),
-        P(kingByRank_3, -406),
-        P(kingByRank_4, -264),
-        P(kingByRank_5, -18),
-        P(kingByRank_6, 157), // -rank8
+        P(kingByRank_3, -410),
+        P(kingByRank_4, -282),
+        P(kingByRank_5, -17),
+        P(kingByRank_6, 168), // -rank8
 
 #if 0
         P(attackForceQueen, 0),  P(attackForceQueenX, 0),
@@ -531,27 +531,27 @@
 #endif
 
         // Drawness. Positive is more drawish. Negative is more sharp
-        P(drawOffset, 221),
-        P(drawQueen, -1937),
-        P(drawRook, 103),
-        P(drawBishop, -25),
-        P(drawKnight, -7),
-        P(drawPawn, -795),
-        P(drawQueenEnding, 1312),
-        P(drawRookEnding, 399),
-        P(drawKnightEnding, 511),
-        P(drawBishopEnding, 1450),
-        P(drawPawnEnding, -14802),
-        P(drawPawnless, 292),
+        P(drawOffset, 218),
+        P(drawQueen, -1853),
+        P(drawRook, 106),
+        P(drawBishop, -37),
+        P(drawKnight, -16),
+        P(drawPawn, -794),
+        P(drawQueenEnding, 1359),
+        P(drawRookEnding, 373),
+        P(drawKnightEnding, 500),
+        P(drawBishopEnding, 1407),
+        P(drawPawnEnding, -15802),
+        P(drawPawnless, 312),
 
-        P(drawQueenImbalance, 829),
-        P(drawRookImbalance, 263),
-        P(drawMinorImbalance, 52),
+        P(drawQueenImbalance, 847),
+        P(drawRookImbalance, 325),
+        P(drawMinorImbalance, 31),
 
-        P(drawUnlikeBishops, 3764),
-        P(drawUnlikeBishopsAndQueens, -389),
-        P(drawUnlikeBishopsAndRooks, 397),
-        P(drawUnlikeBishopsAndKnights, 878),
+        P(drawUnlikeBishops, 3771),
+        P(drawUnlikeBishopsAndQueens, -857),
+        P(drawUnlikeBishopsAndRooks, 403),
+        P(drawUnlikeBishopsAndKnights, 795),
         // TODO: pawn and pawn block square colors
 
 

@@ -174,7 +174,7 @@ static int evaluateRook  (const int v[vectorLen], int fileIndex, int rankIndex, 
 static int evaluateQueen (const int v[vectorLen], int fileIndex, int rankIndex, bool oppKings);
 static int evaluateKing  (const int v[vectorLen], int fileIndex, int rankIndex);
 
-static int shelterPenalty(const int v[vectorLen], int side, int file, const int maxPawnFromLastRank[][2]);
+static int shelterPenalty(const int v[vectorLen], int side, int file, const int maxPawnFromLast[][2]);
 
 /*----------------------------------------------------------------------+
  |      evaluate                                                        |
@@ -434,16 +434,15 @@ int evaluate(Board_t self)
                 int canCastleQ = self->castleFlags & (castleFlagWhiteQside << side);
 
                 // King shelter penalty
-                const int (*maxPawnFromLastRank)[2] = (const int(*)[2])
-                        ((side == white) ? e.maxPawnFromRank8 : e.maxPawnFromRank1);
-                int shelter = shelterPenalty(v, side, file(target), maxPawnFromLastRank);
+                void *maxPawnFromLast = (side == white) ? e.maxPawnFromRank8 : e.maxPawnFromRank1;
+                int shelter = shelterPenalty(v, side, file(target), maxPawnFromLast);
                 int castled = shelter; // king can always stay where it is
                 if (canCastleK) {
-                        int kingSide = shelterPenalty(v, side, fileG, maxPawnFromLastRank);
+                        int kingSide = shelterPenalty(v, side, fileG, maxPawnFromLast);
                         castled = min(castled, kingSide); // maybe the king-side shelter is better
                 }
                 if (canCastleQ) {
-                        int queenSide = shelterPenalty(v, side, fileC, maxPawnFromLastRank);
+                        int queenSide = shelterPenalty(v, side, fileC, maxPawnFromLast);
                         castled = min(castled, queenSide); // or the queen-side shelter
                 }
                 // (1.0 - w)*A + w*B == A - w*(A - B)
@@ -917,13 +916,13 @@ static int evaluateQueen(const int v[vectorLen], int fileIndex, int rankIndex, b
  |      evaluateKing                                                    |
  +----------------------------------------------------------------------*/
 
-static int shelterPenalty(const int v[vectorLen], int side, int file, const int maxPawnFromLastRank[][2])
+static int shelterPenalty(const int v[vectorLen], int side, int file, const int maxPawnFromLast[][2])
 {
         int sum = 0;
         int absFileIndex = file ^ fileA;
 
         for (int i=0; i<3; i++) {
-                int j = maxPawnFromLastRank[absFileIndex+i][side];
+                int j = maxPawnFromLast[absFileIndex+i][side];
                 if (j < 6) sum += v[shelterPawn_5-j];
         }
 

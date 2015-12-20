@@ -430,23 +430,16 @@ int evaluate(Board_t self)
                 int xside = other(side);
                 int king = self->sides[side].king;
                 int target = kingZoneCenter[king];
-                int canCastleK = self->castleFlags & (castleFlagWhiteKside << side);
-                int canCastleQ = self->castleFlags & (castleFlagWhiteQside << side);
+                int kFlag = self->castleFlags & (castleFlagWhiteKside << side);
+                int qFlag = self->castleFlags & (castleFlagWhiteQside << side);
 
                 // King shelter penalty
                 void *maxPawnFromLast = (side == white) ? e.maxPawnFromRank8 : e.maxPawnFromRank1;
                 int shelter = shelterPenalty(v, side, file(target), maxPawnFromLast);
-                int castled = shelter; // king can always stay where it is
-                if (canCastleK) {
-                        int kingSide = shelterPenalty(v, side, fileG, maxPawnFromLast);
-                        castled = min(castled, kingSide); // maybe the king-side shelter is better
-                }
-                if (canCastleQ) {
-                        int queenSide = shelterPenalty(v, side, fileC, maxPawnFromLast);
-                        castled = min(castled, queenSide); // or the queen-side shelter
-                }
-                // (1.0 - w)*A + w*B == A - w*(A - B)
-                shelter -= (v[shelterCastled] * (shelter - castled)) >> 8;
+                int kShelter = kFlag ? shelterPenalty(v, side, fileG, maxPawnFromLast) : shelter;
+                int qShelter = qFlag ? shelterPenalty(v, side, fileC, maxPawnFromLast) : shelter;
+                int best = min(shelter, min(kShelter, qShelter)); 
+                shelter -= (v[shelterCastled] * (shelter - best)) >> 8; // (1-w)*S + w*B == A - w*(S-B)
                 if (rank(king) != firstRank[side])
                         shelter += v[shelterWalkingKing];
 
@@ -502,9 +495,9 @@ int evaluate(Board_t self)
                 e.safety[side] = -trunc(e.safetyScaling[side] * (shelter + attack));
 
                 // Castling capability intrinsic value
-                if (canCastleK | canCastleQ)
-                        e.kings[side] += !canCastleQ ? v[castleK] :
-                                         !canCastleK ? v[castleQ] : v[castleKQ];
+                if (kFlag | qFlag)
+                        e.kings[side] += !qFlag ? v[castleK] :
+                                         !kFlag ? v[castleQ] : v[castleKQ];
         }
 
         /*--------------------------------------------------------------+

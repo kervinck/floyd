@@ -47,6 +47,8 @@
 #define minLongLong (-maxLongLong - 1LL)
 
 #define ones(n) (~(~0ULL << (n)))
+#define bit(i) (1ULL << (i))
+#define bitTest(w,i) (((w) >> (i)) & 1)
 
 #define unused(a) ((void)(a))
 

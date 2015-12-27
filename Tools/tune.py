@@ -354,6 +354,7 @@ if __name__ == '__main__':
                 print '    -d <depth>     - search depth per position (default 0)'
                 print '    -s <steps>     - probe steps before window shrink (default 2)'
                 print '    -m <count>     - active positions before short-cut evaluation (default +Inf)'
+                #print '    -z             - calculate contribution per parameter'
                 print '    -q             - print the current residual and quit'
                 sys.exit(0)
 
@@ -437,11 +438,9 @@ if __name__ == '__main__':
         coefList = sorted(coefList, key=lambda x:deltas[x])
         while len(coefList) > 0 and not exhausted:
                 nrRounds += 1
-                print 'round %d count %d' % (nrRounds, len(coefList))
-                print
-
                 exhausted = True
-                for coef in coefList:
+                for index, coef in enumerate(coefList):
+                        print 'round %d count %d of %d' % (nrRounds, index + 1, len(coefList))
                         oldValue = vector[coef]
                         newValue, newResidual, active = tuneSingle(coef, tests, oldValue, bestResidual)
 

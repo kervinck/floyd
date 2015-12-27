@@ -113,6 +113,14 @@ residual: .module
 tune: .module
 	bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/tune.py -n 8 Tuning/vector.json
 
+# One standard iteration only for the parameters listed in `params'
+ptune: .module
+	bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/tune.py -n 8 Tuning/vector.json `grep -v "^#" params`
+
+# Coarse tuning (1M positions)
+ftune: .module
+	bzcat Data/ccrl-shuffled-3M.epd.bz2 | head -1000000 | python Tools/tune.py -n 8 Tuning/vector.json
+
 # Extended tuning (10M positions)
 xtune: .module
 	bzcat Data/ccrl-shuffled-10M.epd.bz2 | python Tools/tune.py -n 16 Tuning/vector.json

@@ -340,7 +340,7 @@ if __name__ == '__main__':
         # -- Step 0: Get vector definition from module
 
         vector, names = getVector()
-        deltas = [-1.0] * len(vector) # priority for new items
+        deltas = [None] * len(vector) # priority for new items
 
         # -- Step 1: Parse command line arguments
 
@@ -446,8 +446,11 @@ if __name__ == '__main__':
                         newValue, newResidual, active = tuneSingle(coef, tests, oldValue, bestResidual)
 
                         deltaResidual = newResidual - bestResidual
-                        alpha = 0.75
-                        deltas[coef] = alpha * deltaResidual + (1.0 - alpha) * deltas[coef]
+                        if deltas[coef] is None:
+                                deltas[coef] = deltaResidual
+                        else:
+                                alpha = 0.75
+                                deltas[coef] = alpha * deltaResidual + (1.0 - alpha) * deltas[coef]
 
                         if newValue != oldValue:
                                 print 'update id %s residual %.9f delta %.3e active %d oldValue %d newValue %d' % (

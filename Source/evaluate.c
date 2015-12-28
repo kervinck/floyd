@@ -727,7 +727,7 @@ static int evaluatePawnFile(const int v[vectorLen],
         int xControl = ((1 << minRank(-1, xside) | 1 << minRank(+1, xside)
                        | 1 << maxRank(-1, xside) | 1 << maxRank(+1, xside))
                        & pawnZone) >> 1;
-        int xPawns = (1 << minRank(0, xside) | 1 << maxRank(-1, xside)) & pawnZone;
+        int xPawns = (1 << minRank(0, xside) | 1 << maxRank(0, xside)) & pawnZone;
         int openFile = (maxRank(0, xside) <= frontPawn);
         bool isRammed = bitTest(xPawns, frontPawn+1);
         bool isDuo = bitTest(control, frontPawn + 1);

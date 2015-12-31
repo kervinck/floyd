@@ -115,7 +115,7 @@ tune: .module
 
 # One standard iteration only for the parameters listed in `params'
 ptune: .module
-	bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/tune.py -n 8 Tuning/vector.json `grep -v "^#" params`
+	bzcat Data/ccrl-shuffled-10M.epd.bz2 | head `head -1 params` | python Tools/tune.py -n 8 Tuning/vector.json `grep -v "^[#-]" params`
 
 # Coarse tuning (1M positions)
 ftune: .module

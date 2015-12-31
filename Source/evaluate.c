@@ -720,21 +720,24 @@ static int evaluatePawnFile(const int v[vectorLen],
         // Feature extraction
         int xside = other(side);
         int firstHelper = min(minRank(-1, side),  minRank(+1, side));
-        int pawnZone = 0xff & ~bit(7) & ~bit(0);
-        int control = ((1 << minRank(-1, side) | 1 << minRank(+1, side)
-                      | 1 << maxRank(-1, side) | 1 << maxRank(+1, side))
-                      & pawnZone) << 1;
-        int xControl = ((1 << minRank(-1, xside) | 1 << minRank(+1, xside)
-                       | 1 << maxRank(-1, xside) | 1 << maxRank(+1, xside))
-                       & pawnZone) >> 1;
-        int xPawns = (1 << minRank(0, xside) | 1 << maxRank(0, xside)) & pawnZone;
-        int openFile = (maxRank(0, xside) <= frontPawn);
-        bool isRammed = bitTest(xPawns, frontPawn+1);
-        bool isDuo = bitTest(control, frontPawn + 1);
-        bool stopSquareAttacked = bitTest(xControl, frontPawn + 1);
-        bool isDefended = bitTest(control, frontPawn);
-        bool canCapture = bitTest(xControl, frontPawn); // == isAttacked
-        bool isTrailing = firstHelper > frontPawn;
+        int lastSentry  = max(maxRank(-1, xside), maxRank(+1, xside));
+        int firstSentry = min(minRank(-1, xside), minRank(+1, xside));
+        int pawnZone = ones(8) & ~bit(7) & ~bit(0);
+        int helperW  = ((1 << minRank(-1, side))  | (1 << maxRank(-1, side)))  & pawnZone;
+        int helperE  = ((1 << minRank(+1, side))  | (1 << maxRank(+1, side)))  & pawnZone;
+        int sentryW  = ((1 << minRank(-1, xside)) | (1 << maxRank(-1, xside))) & pawnZone;
+        int sentryE  = ((1 << minRank(+1, xside)) | (1 << maxRank(+1, xside))) & pawnZone;
+        int xPawns   = ((1 << minRank( 0, xside)) | (1 << maxRank( 0, xside))) & pawnZone;
+        int frontSpan = (~0 << (frontPawn + 1)) & ones(8);
+        int helperControl = (helperW | helperE) << 1;
+        int sentryControl = (sentryW | sentryE) >> 1;
+        bool openFile = !(xPawns & frontSpan);
+        bool isRammed = bitTest(xPawns,        frontPawn + 1);
+        bool isDuo    = bitTest(helperControl, frontPawn + 1);
+        bool stopSquareAttacked = bitTest(sentryControl, frontPawn + 1);
+        bool isDefended = bitTest(helperControl, frontPawn);
+        bool canCapture = bitTest(sentryControl, frontPawn); // == isAttacked
+        bool isTrailing = (firstHelper > frontPawn);
 
         // Scoring
         int pawnScore = 0;
@@ -748,22 +751,34 @@ static int evaluatePawnFile(const int v[vectorLen],
         if (isDuo)              pawnScore += v[duoPawn_0      + frontPawn - 1];
         if (isTrailing)         pawnScore += v[trailingPawn_0 + frontPawn - 1];
 
-        //  Doubled pawn
+        //  Doubled
         if (backPawn < frontPawn)
                 pawnScore += v[doubledPawnA + fileIndex];
 
-        //  File and rank dependent scoring (7+5=12 degrees of freedom)
+        //  File and rank dependent scoring
         int offset = oppKings ? pawnByFile_0x : pawnByFile_0;
         if (fileIndex > 0) pawnScore -= v[offset + fileIndex - 1];
         if (fileIndex < 7) pawnScore += v[offset + fileIndex];
         if (frontPawn > 1) pawnScore -= v[pawnByRank_0 + frontPawn - 2];
         if (frontPawn < 6) pawnScore += v[pawnByRank_0 + frontPawn - 1];
 
-        // Backward pawn
-        if (isTrailing && stopSquareAttacked && !canCapture)
-                pawnScore += v[(openFile ? backwardPawnOpenA : backwardPawnClosedA) + fileIndex];
+        // Pawn mobility
+        if (!isRammed && !stopSquareAttacked)
+                pawnScore += v[mobilePawn_0 + frontPawn - 1];
 
-        // Rammed and weak?
+        // Backward
+        if (isTrailing && stopSquareAttacked && !canCapture) {
+                pawnScore += v[(openFile ? backwardPawnOpenA : backwardPawnClosedA) + fileIndex];
+                if (openFile) {
+                        if (frontPawn > 2) pawnScore -= v[backwardPawnOpenByRank_0 + frontPawn - 2];
+                        if (frontPawn < 6) pawnScore += v[backwardPawnOpenByRank_0 + frontPawn - 1];
+                } else {
+                        if (frontPawn > 2) pawnScore -= v[backwardPawnClosedByRank_0 + frontPawn - 2];
+                        if (frontPawn < 6) pawnScore += v[backwardPawnClosedByRank_0 + frontPawn - 1];
+                }
+        }
+
+        // Rammed and weak
         if (isTrailing && isRammed && !canCapture)
                 pawnScore += v[rammedWeakPawnA + fileIndex];
 
@@ -776,23 +791,61 @@ static int evaluatePawnFile(const int v[vectorLen],
         pawnScore += v[offsets[neighbours][openFile] + fileIndex];
 
         // Duo
-        if (isDuo)
-                pawnScore += v[duoPawnA + fileIndex];
+        if (isDuo) pawnScore += v[duoPawnA + fileIndex];
 
         // Passer
-        if (maxRank(-1, xside) <= frontPawn
-         && maxRank( 0, xside) <= frontPawn
-         && maxRank(+1, xside) <= frontPawn) {
+        if (openFile && lastSentry <= frontPawn) {
                 int nominal = v[passerA_0 + fileIndex]
                             + v[passerA_1 + fileIndex] * (frontPawn - 1)
                             + v[passerA_2 + fileIndex] * (frontPawn - 1) * (frontPawn - 2) / 4;
                 pawnScore += round(passerScaling[side] * nominal);
         }
 
+        // Candidate
+        if (openFile && lastSentry > frontPawn) {
+                int oneSentry = (sentryW ^ sentryE) >> 1;
+                int twoSentry = (sentryW & sentryE) >> 1;
+                int anyHelper = (helperW | helperE) << 1;
+                int twoHelper = (helperW & helperE) << 1;
+                int stoppedByOne = frontSpan & oneSentry & ~anyHelper;
+                int stoppedByTwo = frontSpan & twoSentry & ~twoHelper;
+                // TODO: scoring by square (no polynomials)
+                // TODO: scale by number of sentries to overcome (1,2,3-4)
+
+                if (!stoppedByOne && !stoppedByTwo) {
+                        assert(frontPawn < 6);
+                        int nominal = v[candidateByRank_0 + frontPawn - 1]
+                                    + v[candidateA + fileIndex];
+                        pawnScore += round(passerScaling[side] * nominal);
+                }
+        }
+
+#if 0
+        // Sneaker
+        if (isRammed && lastSentry <= frontPawn) {
+                // - - -   - - -
+                // - * -   - * -
+                // - O -   x O -
+                // - - -   x - -
+                // - - O   O - -
+                // - - -   x - -
+                // - - -   o - -
+                // - - -   x - -
+                int blockers = frontSpan & xPawns;
+                int blocker = blockers & -blockers;
+                if (blocker == blockers) { // only one blocker
+                        blocker -= 1; // ranks where we want to find a helper
+
+                        if (helperW & blocker)
+                        if (helperE & blocker)
+                }
+        }
+#endif
+
         // Can make a lever
-        int firstSentry = min(minRank(-1, xside), minRank(+1, xside));
         int firstXpawn = minRank(0, xside);
-        if (frontPawn+1 < firstSentry && firstSentry <= firstXpawn && firstXpawn < 7)
+        // TODO: use bitwise logic
+        if (frontPawn + 1 < firstSentry && firstSentry <= firstXpawn && firstXpawn < 7)
                 pawnScore += v[pawnLever_0 + firstSentry - frontPawn];
 
         return pawnScore;

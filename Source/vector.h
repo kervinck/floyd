@@ -178,6 +178,18 @@
         P(doubledPawnA, -213), P(doubledPawnB, -135), P(doubledPawnC, -181), P(doubledPawnD, -110),
         P(doubledPawnE, -118), P(doubledPawnF, -72), P(doubledPawnG, -60), P(doubledPawnH, -224),
 
+        P(backwardPawnClosedByRank_0, 5),
+        P(backwardPawnClosedByRank_1, 4),
+        P(backwardPawnClosedByRank_2, -1),
+        P(backwardPawnClosedByRank_3, 1),
+        P(backwardPawnClosedByRank_4, 0),
+
+        P(backwardPawnOpenByRank_0, 5),
+        P(backwardPawnOpenByRank_1, 6),
+        P(backwardPawnOpenByRank_2, 10),
+        P(backwardPawnOpenByRank_3, 39),
+        P(backwardPawnOpenByRank_4, 0),
+
         P(backwardPawnClosedA, 32),
         P(backwardPawnClosedB, 1),
         P(backwardPawnClosedC, 19),
@@ -301,6 +313,13 @@
         P(rammedPawn_4, 10),
         P(rammedPawn_5, 0),
 
+        P(mobilePawn_0, 4),
+        P(mobilePawn_1, -6),
+        P(mobilePawn_2, 9),
+        P(mobilePawn_3, 3),
+        P(mobilePawn_4, 3),
+        P(mobilePawn_5, 10),
+
         // Quadratic polynomials for passers
         P(passerA_0, -36), P(passerB_0, 37), P(passerC_0, 76), P(passerD_0, 73),
         P(passerE_0, 177), P(passerF_0, 125), P(passerG_0, 87), P(passerH_0, 99),
@@ -323,6 +342,20 @@
         P(passerVsKnight, -732),
         P(passerVsPawn, 72),
 
+        P(candidateByRank_0, 11),
+        P(candidateByRank_1, 17),
+        P(candidateByRank_2, 56),
+        P(candidateByRank_3, 112),
+        P(candidateByRank_4, 112),
+
+        P(candidateA, 79),
+        P(candidateB, -28),
+        P(candidateC, -9),
+        P(candidateD, -43),
+        P(candidateE, 9),
+        P(candidateF, 10),
+        P(candidateG, 0),
+        P(candidateH, 45),
 #if 0
         P(drawBlockedA, 0), P(drawBlockedB, 0), P(drawBlockedC, 0), P(drawBlockedD, 0),
         P(drawBlockedE, 0), P(drawBlockedF, 0), P(drawBlockedG, 0), P(drawBlockedH, 0),

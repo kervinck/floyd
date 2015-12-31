@@ -1,34 +1,69 @@
 
-|Todo| King safety [evaluate]
+|Todo| Principle component analysis [tune]
 
-|Todo| Left-right location parameters [evaluate]
+For decorrelation of parameters
+
+|Todo| Pawn levers [evaluate]
+
+|Todo| Candidate passer [evaluate]
+
+Sneaker (hidden passed pawn)
+
+        Passed pawn, if not blocked
+        Helper can sacrifice itself to make a passer
+
+|Todo| Remove "fileIndex" concept [qa]
 
 |Todo| Pawn mobility [evaluate]
 
 Can it move safely & how far
 
-|Todo| Pawn levers [evaluate]
+- Blocked by pawn
+- Blocked by pawn attack
 
-Can it come in contact with an enemy pawn?
-(This relation is mutal, so what is the point)
+- Blocked by own piece
+- Blocked by opponent piece
+- Blocked by opponent piece attack
+- Blocked by opponent while not defended by pawn
+
+|Todo| Piece vs pawn span
+
+bishopToSpan
+knightToSpan
+drawPawnSpan
+
+knightToPawnCenter
+kingToPawnCenter
+
+|Todo| Proximities
+
+Pawn center (rank, file)
+Opponent king
+Passers
+Weak pawn
+
+|Todo| Attacking a non-mobile pawn
 
 |Todo| Rooks and queens on open files [evaluate]
 
-|Todo| Log timestamp of most recent tune [tune]
-|Todo| Keep track of last non-zero delta for parameter ordering [tune]
+|Todo| Piece mobility [evaluate]
 
-For example: (count, lastDelta, timestamp)
+|Todo| Attack x piece matrix
 
-Initial: (0, delta, t)
-Update:
-if newDelta < 0.0:
-        return (0, newDelta, tNow)
-else:
-        return (count+1, lastDelta, tNow)
+|Todo| Threats
 
-|Todo| Introduction of material table [speed]
+Threat:
+ weaker attacks stronger piece or undefended piece
 
-Floyd is slow, but we should aim to keep it above 1Mnps
+1st threat
+2nd threat
+3rd threat
+
+|Todo| Outposts
+
+Isn't this simply "piece supported by own pawn"?
+ - Consider location. E.g. 3rd rank is probably not important
+ - Bonus per rank: 6p model
 
 |Todo| Check Rebel evaluation features [evaluate]
 
@@ -49,9 +84,18 @@ https://chessprogramming.wikispaces.com/Evaluation
 
 |Todo| Expand board control. Include mobility [evaluate]
 
+|Todo| Bring back the symmetry to reduce parameters
+|Todo| Simplify bishop tables again
+
 |Todo| Add white/black testing [qa,evaluate]
 
 |Todo| Add left/right testing [qa,evaluate]
+
+------------------------------------------------------------------------
+
+|Todo| Introduction of material table [speed]
+
+Floyd is slow, but we should aim to keep it above 1Mnps
 
 |Todo| Introduce move flags for 32 bit
 
@@ -59,7 +103,7 @@ https://chessprogramming.wikispaces.com/Evaluation
 
 |Todo| Extend move flags
 
-- Extend flags beyond 
+- Extend flags beyond
 
 Concept choice: keep flags with move or in seperate table?
 
@@ -123,10 +167,10 @@ http://nvie.com/posts/a-successful-git-branching-model/
 |Todo| Measure repeatibility of tuner [verification,tune]
 
 Tune with 10 different subsets of ccrl @ 1M
-Observe variation of vector and residual 
+Observe variation of vector and residual
 
 Tune with 10 different subsets of ccrl @ 100k
-Observe variation of vector and residual 
+Observe variation of vector and residual
 
 |Todo| Get residuals of some existing evaluations for comparison [evaluate]
 

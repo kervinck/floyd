@@ -16,7 +16,7 @@ import sys
 #-----------------------------------------------------------------------
 
 # Number of workers to launch (-n)
-cpu = 4
+cpu = 16
 
 # Search depth for evaluations. 0 means qSearch only (-d)
 depth = 0

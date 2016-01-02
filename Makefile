@@ -95,6 +95,13 @@ mate mated qmate: .module
 nolot: .module
 	python Tools/epdtest.py 1000 < Data/$@.epd
 
+# Run the Strategic Test Suite (https://sites.google.com/site/strategictestsuite/)
+sts: .module
+	@for STS in Data/STS/*.epd; do\
+	 printf "%-40s: " `basename $${STS}`;\
+	 python Tools/epdtest.py 0.15 < "$${STS}" | awk '/total 100$$/{print $$5}';\
+	done
+
 # Run node count regression test
 nodes: .module
 	python Tools/nodetest.py 8 < Data/thousand.epd | awk '\

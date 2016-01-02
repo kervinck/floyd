@@ -71,6 +71,10 @@ echo "*** Tactics:"
 make wac | grep result
 echo
 
+echo "*** Strategy:"
+make sts
+echo
+
 echo "*** Check mate:"
 head -100 Data/qmate.epd | time python Tools/epdtest.py 10 | grep result
 echo

@@ -109,12 +109,12 @@ void rootSearch(Engine_t self)
                         self->seconds = xTime() - startTime;
                         self->infoFunction(self->infoData);
                         updateBestAndPonderMove(self);
-                        self->moveReady = self->bestMove && (self->target.time > 0.0)
-                                        && (self->seconds >= 0.5 * self->target.time);
+                        bool moveReady = self->bestMove && (self->target.time > 0.0)
+                                      && (self->seconds >= 0.5 * self->target.time);
                         if (self->score <= self->target.scores.v[0]
                          || self->score >= self->target.scores.v[1]
                          || (isMateScore(self->score) && self->mateStop && self->depth > 0)
-                         || (self->moveReady && !self->pondering))
+                         || (moveReady && !self->pondering))
                                 break;
                 }
         } else { // except abort
@@ -125,7 +125,6 @@ void rootSearch(Engine_t self)
                 self->pv.len = min(self->pv.len, pvCut);
                 self->infoFunction(self->infoData);
         }
-        self->moveReady = true; // TODO: remove
 
         clearAlarm(self->alarmHandle);
         self->alarmHandle = null;
@@ -578,10 +577,10 @@ static bool allowNullMove(Board_t self)
 {
         static const int table[] = { // 1=slider, 2=white piece, 4=black piece
                 [empty] = 0,
-                [whiteKing]   = 0, [whiteQueen]  = 3, [whiteRook] = 3,
-                [whiteBishop] = 3, [whiteKnight] = 2, [whitePawn] = 0,
-                [blackKing]   = 0, [blackQueen]  = 5, [blackRook] = 5,
-                [blackBishop] = 5, [blackKnight] = 4, [blackPawn] = 0,
+                [whiteKing]   = 0,   [whiteQueen]  = 1+2, [whiteRook] = 1+2,
+                [whiteBishop] = 1+2, [whiteKnight] = 2,   [whitePawn] = 0,
+                [blackKing]   = 0,   [blackQueen]  = 1+4, [blackRook] = 1+4,
+                [blackBishop] = 1+4, [blackKnight] = 4,   [blackPawn] = 0,
         };
         int bits = 0;
         for (int i=0; i<boardSize; i++)

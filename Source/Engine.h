@@ -110,7 +110,6 @@ struct Engine {
         void *infoData;
 
         volatile bool pondering;
-        volatile bool moveReady;
         xAlarm_t alarmHandle;
         void *abortTarget;
 };

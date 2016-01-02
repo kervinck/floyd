@@ -246,7 +246,6 @@ void uciMain(Engine_t self, const char *argv[])
                         self->infoFunction = uciSearchInfo;
                         self->infoData = self;
                         self->pondering = false;
-                        self->moveReady = false;
 
                         self->target.depth = maxDepth;
                         self->target.nodeCount = maxLongLong;

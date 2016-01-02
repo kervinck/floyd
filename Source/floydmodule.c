@@ -191,7 +191,6 @@ floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
         engine.target.time = 0.0;
         engine.target.maxTime = movetime;
         engine.pondering = false;
-        engine.moveReady = false;
         engine.infoFunction = infoFunction;
         engine.infoData = infoData;
         rootSearch(&engine);

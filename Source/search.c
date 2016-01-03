@@ -203,10 +203,12 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                         moveToFront(moveList, nrMoves, self->pv.v[pvIndex]); // Follow the PV
                 else
                         pushList(self->pv, moveList[0]); // Expand the PV
-                int recapture = moveScore(moveList[0]) > 0 // TODO: && depth > 0
+                int recapture = moveScore(moveList[0]) > 0
                              && to(moveList[0]) == recaptureSquare(board(self));
                 makeMove(board(self), moveList[0]);
-                int extension = (check || recapture) + (nrMoves == 1 /* TODO: && (depth > 0 || check)*/);
+                //int extension = (check /*|| recapture*/) + (nrMoves == 1 /* TODO: && (depth > 0 || check)*/);
+                //int extension = (check || recapture);
+                int extension = check;
                 int newDepth = max(0, depth - 1 + extension);
                 int newAlpha = max(alpha, bestScore);
                 int score = -pvSearch(self, newDepth, -beta, -newAlpha, pvIndex + 1);
@@ -226,6 +228,7 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                              && to(moveList[i]) == recaptureSquare(board(self));
                 makeMove(board(self), moveList[i]);
                 int extension = (check || recapture);
+                //int extension = check;
                 int newDepth = max(0, depth - 1 + extension - reduction);
                 int newAlpha = max(alpha, bestScore);
                 int score = -scout(self, newDepth, -(newAlpha+1), 1);
@@ -570,9 +573,11 @@ static bool moveToFront(int moveList[], int nrMoves, int move)
                 return false;
 
         for (int i=0; i<nrMoves; i++) {
-                if ((moveList[i] & moveMask) == move) {
+                int longMove = moveList[i];
+                if ((longMove & moveMask) == move) {
                         memmove(&moveList[1], &moveList[0], i * sizeof(moveList[0]));
-                        moveList[0] = move;
+                        //moveList[0] = move;
+                        moveList[0] = longMove;
                         return true;
                 }
         }

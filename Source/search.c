@@ -45,6 +45,7 @@ struct Node {
 };
 
 #define moveMask ((int) ones(16))
+#define moveScore(longMove) ((longMove) >> 16) // Extract score from move list entry
 
 /*----------------------------------------------------------------------+
  |      Functions                                                       |
@@ -163,6 +164,7 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
         if (!inRoot && (eval == 0 || repetition(self)))
                 return cutPv(), drawScore(self);
 
+        // Transposition table pruning
         struct ttSlot slot = ttRead(self);
         if ((slot.depth >= depth || slot.isHardBound) && !inRoot)
                 if ((slot.isUpperBound && slot.score <= alpha)
@@ -171,18 +173,20 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                         return cutPv(), slot.score;
 
         int check = inCheck(board(self));
-        int moveFilter = minInt;
+        int moveFilter = minInt; // All moves
         int bestScore = minInt;
 
+        // Quiescence search
         if (depth == 0 && !check) {
                 bestScore = eval;
                 if (bestScore >= beta) {
                         self->pv.len = pvIndex;
                         return ttWrite(self, slot, depth, bestScore, alpha, beta);
                 }
-                moveFilter = 0;
+                moveFilter = 0; // Only good captures
         }
 
+        //  Generate moves
         int moveList[maxMoves];
         int nrMoves = self->searchMoves.len;
         if (inRoot && nrMoves > 0)
@@ -196,13 +200,13 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
         // Search the first move with open alpha-beta window
         if (nrMoves > 0) {
                 if (pvIndex < self->pv.len)
-                        moveToFront(moveList, nrMoves, self->pv.v[pvIndex]); // follow the pv
+                        moveToFront(moveList, nrMoves, self->pv.v[pvIndex]); // Follow the PV
                 else
-                        pushList(self->pv, moveList[0]); // expand the pv
-                int recapture = (moveList[0] >> 16) >= 1
+                        pushList(self->pv, moveList[0]); // Expand the PV
+                int recapture = moveScore(moveList[0]) > 0 // TODO: && depth > 0
                              && to(moveList[0]) == recaptureSquare(board(self));
                 makeMove(board(self), moveList[0]);
-                int extension = (check || recapture) + (nrMoves == 1);
+                int extension = (check || recapture) + (nrMoves == 1 /* TODO: && (depth > 0 || check)*/);
                 int newDepth = max(0, depth - 1 + extension);
                 int newAlpha = max(alpha, bestScore);
                 int score = -pvSearch(self, newDepth, -beta, -newAlpha, pvIndex + 1);
@@ -210,15 +214,15 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                         bestScore = score;
                         slot.move = moveList[0];
                 } else
-                        cutPv(); // quiescence
+                        cutPv(); // Quiescence
                 undoMove(board(self));
         } else
-                cutPv(); // game end or leaf node (horizon)
+                cutPv(); // Game end or leaf node (horizon)
 
-        // Search the others with zero window and reductions, research if needed
+        // Try the others with zero window and reductions, research if needed
         int reduction = min(2, depth / 5);
         for (int i=1; i<nrMoves && bestScore<beta; i++) {
-                int recapture = (moveList[i] >> 16) >= 1
+                int recapture = moveScore(moveList[i]) > 0 // TODO: && depth > 0
                              && to(moveList[i]) == recaptureSquare(board(self));
                 makeMove(board(self), moveList[i]);
                 int extension = (check || recapture);
@@ -226,9 +230,9 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                 int newAlpha = max(alpha, bestScore);
                 int score = -scout(self, newDepth, -(newAlpha+1), 1);
                 if (!isMateScore(score) && !isDrawScore(score))
-                        self->mateStop = false; // shortest mate not yet proven
+                        self->mateStop = false; // Shortest mate not yet proven
                 if (score > bestScore) {
-                        pushList(self->pv, 0); // separator
+                        pushList(self->pv, 0); // Separator
                         int pvLen = self->pv.len;
                         pushList(self->pv, moveList[i]);
                         int researchDepth = max(0, depth - 1 + extension);
@@ -240,12 +244,12 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                                         self->pv.v[pvIndex+j] = self->pv.v[pvLen+j];
                                 self->pv.len -= pvLen - pvIndex;
                         } else
-                                self->pv.len = pvLen - 1; // research failed, it happens
+                                self->pv.len = pvLen - 1; // The research failed, it happens
                 }
                 undoMove(board(self));
         }
 
-        if (bestScore == minInt)
+        if (bestScore == minInt) // No legal moves
                 bestScore = gameEndScore(self, check);
 
         return ttWrite(self, slot, depth, bestScore, alpha, beta);
@@ -265,31 +269,22 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
         if (repetition(self)) return drawScore(self);
         if (depth == 0) return qSearch(self, alpha);
         if (self->nodeCount >= self->target.nodeCount)
-                longjmp(self->abortTarget, 1); // raise abort
+                longjmp(self->abortTarget, 1); // Raise abort
 
         // Mate distance pruning
         int mateBound = maxMate - ply(self) - 2;
         if (alpha >= mateBound) return mateBound;
 
-        int check = inCheck(board(self));
+        // Transposition table pruning
         struct Node node;
         node.slot = ttRead(self);
-
-        // Internal iterative deepening
-#if 0
-        if (depth >= 3 && isCutNode(nodeType) && !node.slot.move) {
-                scout(self, depth - 2, alpha, nodeType);
-                node.slot = ttRead(self);
-        }
-#endif
-
-        // Transposition table pruning
         if (node.slot.depth >= depth || node.slot.isHardBound)
                 if ((node.slot.isUpperBound && node.slot.score <= alpha)
                  || (node.slot.isLowerBound && node.slot.score > alpha))
                         return node.slot.score;
 
         // Null move pruning
+        int check = inCheck(board(self));
         if (depth >= 2 && isCutNode(nodeType)
          && minEval <= alpha && alpha < maxEval
          && !check && allowNullMove(board(self))) {
@@ -307,10 +302,10 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
                 node.slot = ttRead(self);
         }
 
-        // Search deeper until all moves are exhausted or one fails high
+        // Recursively search all other moves until exhausted or one fails high
         int extension = check;
         int bestScore = minInt;
-        for (int j=0, move=makeFirstMove(self,&node); move; j++, move=makeNextMove(self,&node)) {
+        for (int move=makeFirstMove(self,&node), j=0; move; move=makeNextMove(self,&node), j++) {
                 int newDepth = max(0, depth - 1 + extension);
                 int reduction = (depth >= 4) && (j >= 1) && (move < 0) && isCutNode(nodeType);
                 int reducedDepth = max(0, newDepth - reduction);
@@ -319,14 +314,14 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
                         score = -scout(self, newDepth, -(alpha+1), nodeType+1);
                 undoMove(board(self));
                 bestScore = max(bestScore, score);
-                if (score > alpha) {
+                if (score > alpha) { // Fail high
                         node.slot.move = move;
                         if (j > 0) updateKillers(self, ply(self), move);
                         break;
                 }
         }
 
-        if (bestScore == minInt)
+        if (bestScore == minInt) // No legal moves
                 bestScore = gameEndScore(self, check);
 
         return ttWrite(self, node.slot, depth, bestScore, alpha, alpha+1);
@@ -338,21 +333,25 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
 
 static int qSearch(Engine_t self, int alpha)
 {
+        // Transposition table pruning
         struct ttSlot slot = ttRead(self);
         if ((slot.isUpperBound && slot.score <= alpha)
          || (slot.isLowerBound && slot.score > alpha))
                 return slot.score;
 
+        // Stand pat if evaluation is good and not in check
         int check = inCheck(board(self));
         int bestScore = check ? minInt : evaluate(board(self));
         if (bestScore > alpha)
                 return ttWrite(self, slot, 0, bestScore, alpha, alpha+1);
 
+        // Generate good captures, or all escapes when in check
         int moveList[maxMoves];
         int nrMoves = generateMoves(board(self), moveList);
         nrMoves = filterAndSort(board(self), moveList, nrMoves, check ? minInt : 0);
         moveToFront(moveList, nrMoves, slot.move);
 
+        // Try if any generated move can improve the result
         for (int i=0; i<nrMoves && bestScore<=alpha; i++) {
                 makeMove(board(self), moveList[i]);
                 if (wasLegalMove(board(self))) {
@@ -365,7 +364,7 @@ static int qSearch(Engine_t self, int alpha)
                 undoMove(board(self));
         }
 
-        if (bestScore == minInt)
+        if (bestScore == minInt) // No legal moves
                 bestScore = gameEndScore(self, check);
 
         return ttWrite(self, slot, 0, bestScore, alpha, alpha+1);
@@ -435,14 +434,14 @@ static int makeNextMove(Engine_t self, struct Node *node)
  +----------------------------------------------------------------------*/
 
 // Static Exchange Evaluation (SEE)
-static int see(int next, int attackers, int defenders, int pGain)
+static int see(int next, int attackers, int defenders, int prom)
 {
         if (!attackers) return 0;
         else if (attackers >= attackPawn)
-                           next += pGain - see(1 + pGain, defenders, attackers - attackPawn,  pGain);
-        else if (attackers >= attackMinor) next -= see(3, defenders, attackers - attackMinor, pGain);
-        else if (attackers >= attackRook)  next -= see(5, defenders, attackers - attackRook,  pGain);
-        else if (attackers >= attackQueen) next -= see(9, defenders, attackers - attackQueen, pGain);
+                             next += prom - see(1 + prom, defenders, attackers - attackPawn,  prom);
+        else if (attackers >= attackMinor) next -= see(3, defenders, attackers - attackMinor, prom);
+        else if (attackers >= attackRook)  next -= see(5, defenders, attackers - attackRook,  prom);
+        else if (attackers >= attackQueen) next -= see(9, defenders, attackers - attackQueen, prom);
         else /* attackers >= attackKing */ if (defenders) return 0;
         return max(0, next);
 }
@@ -533,8 +532,8 @@ static void killersToFront(Engine_t self, int ply, int moveList[], int nrMoves)
         while (self->killers.len <= ply) // Expand table when needed
                 pushList(self->killers, (killersTuple) {.v={0}});
 
-        int j=0;
-        while (j < nrMoves && moveList[j] >= (3 << 16)) j++;
+        int j = 0;
+        while (j < nrMoves && moveScore(moveList[j]) >= 3) j++;
 
         for (int i=nrKillers-1; i>=0; i--)
                 moveToFront(moveList+j, nrMoves-j, self->killers.v[ply].v[i]);

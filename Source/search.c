@@ -131,12 +131,12 @@ void rootSearch(Engine_t self)
 }
 
 /*----------------------------------------------------------------------+
- |      endScore / drawScore                                            |
+ |      gameEndScore / drawScore                                        |
  +----------------------------------------------------------------------*/
 
-static inline int endScore(Engine_t self, bool inCheck)
+static inline int gameEndScore(Engine_t self, bool check)
 {
-        return inCheck ? minMate + ply(self) : 0;
+        return check ? minMate + ply(self) : 0;
 }
 
 static inline int drawScore(Engine_t self)
@@ -151,7 +151,6 @@ static inline int drawScore(Engine_t self)
 
 // TODO: single-reply extensions
 // TODO: killers
-// TODO: recapture extension
 // TODO: end game extension
 // TODO: singular extension
 static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
@@ -172,7 +171,6 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                         return cutPv(), slot.score;
 
         int check = inCheck(board(self));
-        int extension = check;
         int moveFilter = minInt;
         int bestScore = minInt;
 
@@ -201,7 +199,10 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                         moveToFront(moveList, nrMoves, self->pv.v[pvIndex]); // follow the pv
                 else
                         pushList(self->pv, moveList[0]); // expand the pv
+                int recapture = (moveList[0] >> 16) >= 1
+                             && to(moveList[0]) == recaptureSquare(board(self));
                 makeMove(board(self), moveList[0]);
+                int extension = (check || recapture) + (nrMoves == 1);
                 int newDepth = max(0, depth - 1 + extension);
                 int newAlpha = max(alpha, bestScore);
                 int score = -pvSearch(self, newDepth, -beta, -newAlpha, pvIndex + 1);
@@ -215,9 +216,12 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                 cutPv(); // game end or leaf node (horizon)
 
         // Search the others with zero window and reductions, research if needed
-        int reduction = 2;
+        int reduction = min(2, depth / 5);
         for (int i=1; i<nrMoves && bestScore<beta; i++) {
+                int recapture = (moveList[i] >> 16) >= 1
+                             && to(moveList[i]) == recaptureSquare(board(self));
                 makeMove(board(self), moveList[i]);
+                int extension = (check || recapture);
                 int newDepth = max(0, depth - 1 + extension - reduction);
                 int newAlpha = max(alpha, bestScore);
                 int score = -scout(self, newDepth, -(newAlpha+1), 1);
@@ -242,7 +246,7 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
         }
 
         if (bestScore == minInt)
-                bestScore = endScore(self, check);
+                bestScore = gameEndScore(self, check);
 
         return ttWrite(self, slot, depth, bestScore, alpha, beta);
 }
@@ -272,10 +276,12 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
         node.slot = ttRead(self);
 
         // Internal iterative deepening
+#if 0
         if (depth >= 3 && isCutNode(nodeType) && !node.slot.move) {
                 scout(self, depth - 2, alpha, nodeType);
                 node.slot = ttRead(self);
         }
+#endif
 
         // Transposition table pruning
         if (node.slot.depth >= depth || node.slot.isHardBound)
@@ -295,7 +301,13 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
                         return ttWrite(self, node.slot, depth, score, alpha, alpha+1);
         }
 
-        // Search deeper until all moves exhausted or one fails high
+        // Internal iterative deepening
+        if (depth >= 3 && isCutNode(nodeType) && !node.slot.move) {
+                scout(self, depth - 2, alpha, nodeType);
+                node.slot = ttRead(self);
+        }
+
+        // Search deeper until all moves are exhausted or one fails high
         int extension = check;
         int bestScore = minInt;
         for (int j=0, move=makeFirstMove(self,&node); move; j++, move=makeNextMove(self,&node)) {
@@ -315,7 +327,7 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
         }
 
         if (bestScore == minInt)
-                bestScore = endScore(self, check);
+                bestScore = gameEndScore(self, check);
 
         return ttWrite(self, node.slot, depth, bestScore, alpha, alpha+1);
 }
@@ -354,7 +366,7 @@ static int qSearch(Engine_t self, int alpha)
         }
 
         if (bestScore == minInt)
-                bestScore = endScore(self, check);
+                bestScore = gameEndScore(self, check);
 
         return ttWrite(self, slot, 0, bestScore, alpha, alpha+1);
 }
@@ -629,7 +641,6 @@ void setTimeTargets(Engine_t self, double time, double inc, int movestogo, doubl
                 case 45: movestogo = min(movestogo, 2); break;
                 }
                 int mintogo = min(movestogo, (board(self)->halfmoveClock / 2 < 35) ? 3 : 1);
-
                 self->target.time = target(time, inc, movestogo);
                 double panicTime = target(time, inc, mintogo);
                 double flagTime = target(time, inc, 1);

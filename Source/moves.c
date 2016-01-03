@@ -431,7 +431,7 @@ extern void makeMove(Board_t self, int move)
                                                                         \
                 /* Update the undo stack */                             \
                 push(from, _piece);                                     \
-                push(to, _victim);                                      \
+                push(to, _victim); /* last for recaptureSquare */       \
                                                                         \
                 /* Make the simple move */                              \
                 self->squares[to] = _piece;                             \
@@ -522,8 +522,6 @@ extern void makeMove(Board_t self, int move)
         } else
                 self->halfmoveClock++; // Can overflow the byte, but don't worry
 
-        makeSimpleMove(from, to);
-
         int flagsToClear = (castleFlagsClear[from] | castleFlagsClear[to]) & self->castleFlags;
         if (flagsToClear) {
                 push(offsetof_castleFlags, self->castleFlags);
@@ -531,11 +529,28 @@ extern void makeMove(Board_t self, int move)
                 self->hash ^= hashCastleFlags(flagsToClear);
         }
 
+        // The real move always as last
+        makeSimpleMove(from, to);
         self->undoStack.len = sp - self->undoStack.v;
 
         // Finalize en passant (this is only safe after the update of self->undoStack.len)
         if (self->enPassantPawn)
                 normalizeEnPassantStatus(self);
+}
+
+/*----------------------------------------------------------------------+
+ |      recaptureSquare                                                 |
+ +----------------------------------------------------------------------*/
+
+extern int recaptureSquare(Board_t self)
+{
+        // Note: mild abuse of info pushed last on the undo stack
+        int ix = self->undoStack.len;
+        if (ix < 2) return -1;
+        int victim = self->undoStack.v[ix-2];
+        int square = self->undoStack.v[ix-1];
+        assert(square < boardSize);
+        return (victim == empty) ? -1 : square;
 }
 
 /*----------------------------------------------------------------------+

@@ -229,6 +229,9 @@ extern bool isPromotion(Board_t self, int from, int to);
 // Search tree to fixed depth for correctness testing
 extern long long moveTest(Board_t self, int depth);
 
+// Target square in case the last move was a capture, or -1 otherwise
+extern int recaptureSquare(Board_t self);
+
 /*----------------------------------------------------------------------+
  |                                                                      |
  +----------------------------------------------------------------------*/

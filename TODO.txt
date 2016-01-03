@@ -172,20 +172,6 @@ Observe variation of vector and residual
 Tune with 10 different subsets of ccrl @ 100k
 Observe variation of vector and residual
 
-|Todo| Get residuals of some existing evaluations for comparison [evaluate]
-
- - Crafty 24.1
- - Fruit 2.1
- - Giraffe
- - Gnucheese
- - Hiarcs 14
- - Junior 2011
- - Komodo x?
- - Rookie 3.9
- - Rybka 2.3.2a
- - Shredder 12
- - Stockfish 6
-
 |Todo| Consider gradient descent [tune]
 
 Or better:

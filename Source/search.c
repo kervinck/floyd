@@ -206,9 +206,9 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                 int recapture = moveScore(moveList[0]) > 0
                              && to(moveList[0]) == recaptureSquare(board(self));
                 makeMove(board(self), moveList[0]);
-                //int extension = (check /*|| recapture*/) + (nrMoves == 1 /* TODO: && (depth > 0 || check)*/);
+                int extension = (check || recapture) + (nrMoves == 1 && (depth > 0 || check));
                 //int extension = (check || recapture);
-                int extension = check;
+                //int extension = check;
                 int newDepth = max(0, depth - 1 + extension);
                 int newAlpha = max(alpha, bestScore);
                 int score = -pvSearch(self, newDepth, -beta, -newAlpha, pvIndex + 1);

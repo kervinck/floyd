@@ -1,4 +1,8 @@
 
+|Todo| Update copyright year
+
+Add 2016
+
 |Todo| Principle component analysis [tune]
 
 For decorrelation of parameters

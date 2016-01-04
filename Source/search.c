@@ -150,7 +150,6 @@ static inline int drawScore(Engine_t self)
  |      pvSearch                                                        |
  +----------------------------------------------------------------------*/
 
-// TODO: single-reply extensions
 // TODO: killers
 // TODO: end game extension
 // TODO: singular extension
@@ -186,37 +185,36 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                 moveFilter = 0; // Only good captures
         }
 
-        //  Generate moves
+        // Generate moves, or use the `searchmoves' list when specified
         int moveList[maxMoves];
-        int nrMoves = self->searchMoves.len;
-        if (inRoot && nrMoves > 0)
+        int nrMoves = generateMoves(board(self), moveList);
+        if (inRoot && self->searchMoves.len > 0) {
+                nrMoves = self->searchMoves.len;
                 memcpy(moveList, self->searchMoves.v, nrMoves * sizeof(int));
-        else
-                nrMoves = generateMoves(board(self), moveList);
+        }
         nrMoves = filterAndSort(board(self), moveList, nrMoves, moveFilter);
-        nrMoves = filterLegalMoves(board(self), moveList, nrMoves); // easier for PVS
+        nrMoves = filterLegalMoves(board(self), moveList, nrMoves); // Easier for PVS
         moveToFront(moveList, nrMoves, slot.move);
 
         // Search the first move with open alpha-beta window
         if (nrMoves > 0) {
+                int move = moveList[0];
                 if (pvIndex < self->pv.len)
                         moveToFront(moveList, nrMoves, self->pv.v[pvIndex]); // Follow the PV
                 else
-                        pushList(self->pv, moveList[0]); // Expand the PV
-                int recapture = moveScore(moveList[0]) > 0
-                             && to(moveList[0]) == recaptureSquare(board(self));
-                makeMove(board(self), moveList[0]);
-                int extension = (check || recapture) + (nrMoves == 1 && (depth > 0 || check));
-                //int extension = (check || recapture);
-                //int extension = check;
+                        pushList(self->pv, move); // Expand the PV
+                bool recapture = moveScore(move) > 0 && to(move) == recaptureSquare(board(self));
+                makeMove(board(self), move);
+                int extension = (check || recapture)
+                              + (nrMoves == 1 && (depth > 0 || check || recapture /* PV boost */));
                 int newDepth = max(0, depth - 1 + extension);
                 int newAlpha = max(alpha, bestScore);
                 int score = -pvSearch(self, newDepth, -beta, -newAlpha, pvIndex + 1);
                 if (score > bestScore) {
                         bestScore = score;
-                        slot.move = moveList[0];
+                        slot.move = move & moveMask;
                 } else
-                        cutPv(); // Quiescence
+                        cutPv(); // Quiescence (standing pat)
                 undoMove(board(self));
         } else
                 cutPv(); // Game end or leaf node (horizon)
@@ -224,11 +222,10 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
         // Try the others with zero window and reductions, research if needed
         int reduction = min(2, depth / 5);
         for (int i=1; i<nrMoves && bestScore<beta; i++) {
-                int recapture = moveScore(moveList[i]) > 0 // TODO: && depth > 0
-                             && to(moveList[i]) == recaptureSquare(board(self));
-                makeMove(board(self), moveList[i]);
+                int move = moveList[i];
+                bool recapture = moveScore(move) > 0 && to(move) == recaptureSquare(board(self));
+                makeMove(board(self), move);
                 int extension = (check || recapture);
-                //int extension = check;
                 int newDepth = max(0, depth - 1 + extension - reduction);
                 int newAlpha = max(alpha, bestScore);
                 int score = -scout(self, newDepth, -(newAlpha+1), 1);
@@ -237,12 +234,12 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                 if (score > bestScore) {
                         pushList(self->pv, 0); // Separator
                         int pvLen = self->pv.len;
-                        pushList(self->pv, moveList[i]);
+                        pushList(self->pv, move);
                         int researchDepth = max(0, depth - 1 + extension);
                         score = -pvSearch(self, researchDepth, -beta, -newAlpha, pvLen + 1);
                         if (score > bestScore) {
                                 bestScore = score;
-                                slot.move = moveList[i];
+                                slot.move = move & moveMask;
                                 for (int j=0; pvLen+j<self->pv.len; j++)
                                         self->pv.v[pvIndex+j] = self->pv.v[pvLen+j];
                                 self->pv.len -= pvLen - pvIndex;
@@ -318,7 +315,7 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
                 undoMove(board(self));
                 bestScore = max(bestScore, score);
                 if (score > alpha) { // Fail high
-                        node.slot.move = move;
+                        node.slot.move = move & moveMask;
                         if (j > 0) updateKillers(self, ply(self), move);
                         break;
                 }
@@ -362,7 +359,7 @@ static int qSearch(Engine_t self, int alpha)
                         int score = -qSearch(self, -(alpha+1));
                         bestScore = max(bestScore, score);
                         if (score > alpha)
-                                slot.move = moveList[i];
+                                slot.move = moveList[i] & moveMask;
                 }
                 undoMove(board(self));
         }

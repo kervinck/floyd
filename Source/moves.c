@@ -544,12 +544,11 @@ extern void makeMove(Board_t self, int move)
 
 extern int recaptureSquare(Board_t self)
 {
-        // Note: mild abuse of info pushed last on the undo stack
+        // Note: a mild abuse of info pushed last on the undo stack
         int ix = self->undoStack.len;
         if (ix < 2) return -1;
         int victim = self->undoStack.v[ix-2];
         int square = self->undoStack.v[ix-1];
-        assert(square < boardSize);
         return (victim == empty) ? -1 : square;
 }
 

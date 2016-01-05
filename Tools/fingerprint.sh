@@ -48,15 +48,8 @@ echo
 
 echo "*** Smoke tests:"
 make easy | grep result
-echo bench | ./floyd
+./floyd bench quit
 echo bench | wine ./floyd.w32.exe
-echo
-
-echo "*** Game playing:"
-cutechess-cli -concurrency 4 -rounds 50 -repeat -each tc=10+0.15\
-	-openings file=Data/book-6000-openings.pgn\
-	-engine cmd=./floyd-pgo2 proto=uci\
-	-engine cmd=floyd0.7 proto=uci
 echo
 
 echo "*** Node count and branching factor:"
@@ -65,6 +58,13 @@ echo
 
 echo "*** Evaluation residual:"
 make residual
+echo
+
+echo "*** Game playing:"
+cutechess-cli -concurrency 4 -rounds 50 -repeat -each tc=10+0.15\
+	-openings file=Data/book-6000-openings.pgn order=random\
+	-engine cmd=./floyd-pgo2 proto=uci\
+	-engine cmd=floyd0.7 proto=uci # user must have this version installed
 echo
 
 echo "*** Tactics:"

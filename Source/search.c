@@ -203,10 +203,11 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                         moveToFront(moveList, nrMoves, self->pv.v[pvIndex]); // Follow the PV
                 else
                         pushList(self->pv, move); // Expand the PV
+
                 bool recapture = moveScore(move) > 0 && to(move) == recaptureSquare(board(self));
                 makeMove(board(self), move);
                 int extension = (check || recapture)
-                              + (nrMoves == 1 && (depth > 0 || check || recapture /* PV boost */));
+                              + (nrMoves == 1 && (depth > 0 /*|| check || recapture / * PV boost */));
                 int newDepth = max(0, depth - 1 + extension);
                 int newAlpha = max(alpha, bestScore);
                 int score = -pvSearch(self, newDepth, -beta, -newAlpha, pvIndex + 1);
@@ -223,6 +224,7 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
         int reduction = min(2, depth / 5);
         for (int i=1; i<nrMoves && bestScore<beta; i++) {
                 int move = moveList[i];
+                // TODO: recapture only if it has the best SEE
                 bool recapture = moveScore(move) > 0 && to(move) == recaptureSquare(board(self));
                 makeMove(board(self), move);
                 int extension = (check || recapture);

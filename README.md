@@ -42,7 +42,7 @@ $ make
 $ ./floyd 
 
 Floyd Chess Engine - Version 0.x
-Copyright (C) 2015, Marcel van Kervinck
+Copyright (C) 2015-2016, Marcel van Kervinck
 All rights reserved
 
 Type "help" for more information, or "quit" to leave.

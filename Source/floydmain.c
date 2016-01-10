@@ -1,6 +1,6 @@
 
 /*
- *  Copyright (C) 2015, Marcel van Kervinck
+ *  Copyright (C) 2015-2016, Marcel van Kervinck
  *  All rights reserved
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -46,7 +46,7 @@ int main(int argc, const char *argv[])
 {
         if (argc <= 1)
                 printf("\nFloyd Chess Engine - Version "quote2(floydVersion)"\n"
-                       "Copyright (C) 2015, Marcel van Kervinck\n"
+                       "Copyright (C) 2015-2016, Marcel van Kervinck\n"
                        "All rights reserved\n"
                        "\n"
                        "Type \"help\" for more information, or \"quit\" to leave.\n\n");

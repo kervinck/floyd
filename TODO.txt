@@ -18,6 +18,8 @@ There must be a cleaner way
 
 |Todo| Rooks and queens on open files [evaluate]
 
+|Todo| Strong squares
+
 |Todo| Pawn levers [evaluate]
 
 |Todo| Drawness of blocked pawns [evaluate]
@@ -45,6 +47,9 @@ Can it move safely & how far
 - Blocked by opponent piece
 - Blocked by opponent piece attack
 - Blocked by opponent while not defended by pawn
+
+Board control: what can I drop on a square
+Mobility: what can I actually move to a square
 
 |Todo| Piece vs pawn span
 
@@ -108,6 +113,8 @@ https://chessprogramming.wikispaces.com/Evaluation
 |Todo| Add white/black testing [qa,evaluate]
 
 |Todo| Add left/right testing [qa,evaluate]
+
+|Todo| Use ABC as future queens-side king shelter instead of BCD
 
 ------------------------------------------------------------------------
 

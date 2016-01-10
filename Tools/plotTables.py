@@ -36,9 +36,9 @@ def bishop(fileIndex, rankIndex, xKing):
 
 def rook(fileIndex, rankIndex, xKing):
         value = 0
-        x = 'x' if xKing else ''
-        if fileIndex > 0: value -= vector['rookByFile_%d%s' % (fileIndex - 1, x)]
-        if fileIndex < 7: value += vector['rookByFile_%d%s' % (fileIndex, x)]
+        fileIndex = min(fileIndex, 7 - fileIndex)
+        if fileIndex > 0: value -= vector['rookByFile_%d' % (fileIndex - 1)]
+        if fileIndex < 3: value += vector['rookByFile_%d' % (fileIndex)]
         if rankIndex > 0: value -= vector['rookByRank_%d' % (rankIndex - 1)]
         if rankIndex < 7: value += vector['rookByRank_%d' % (rankIndex)]
         return value
@@ -106,8 +106,8 @@ def plotMap(ax, evaluate, xKing, title, scale=300):
                 ax.pcolor(X, Y, matrix, cmap=pyplot.cm.RdYlGn, vmin=-scale, vmax=scale)
         ax.axis([0, 8, 0, 8])
 
-        ax.plot(2 if xKing else 6, 7.75, 'o', color='black')
         if xKing is not None:
+                ax.plot(2 if xKing else 6, 7.75, 'o', color='black')
                 ax.plot(6, 0.25, 'o', color='white')
         ax.plot([4, 4], [0,8], color='grey', linestyle=':')
 
@@ -146,8 +146,7 @@ if __name__ == '__main__':
         plotMap(axes[0][3], knight, False, 'Knights')
         plotMap(axes[1][0], bishop, True,  'Bishops (%d = %.2fp)' % (bishopValue, bishopValue / pawnValue))
         plotMap(axes[1][1], bishop, False, 'Bishops')
-        plotMap(axes[1][2], rook,   True,  'Rooks (%d = %.2fp)' % (rookValue, rookValue / pawnValue))
-        plotMap(axes[1][3], rook,   False, 'Rooks')
+        plotMap(axes[1][2], rook,   None,  'Rooks (%d = %.2fp)' % (rookValue, rookValue / pawnValue))
         plotMap(axes[2][0], queen,  True,  'Queens (%d = %.2fp)' % (queenValue, queenValue / pawnValue))
         plotMap(axes[2][1], queen,  False, 'Queens')
         plotMap(axes[2][2], king,   None,  'King')

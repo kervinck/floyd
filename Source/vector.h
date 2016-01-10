@@ -566,21 +566,9 @@
          *  Rooks
          */
 
-        P(rookByFile_0, -64), // fileA
-        P(rookByFile_1, -85),
-        P(rookByFile_2, -57),
-        P(rookByFile_3, -9),
-        P(rookByFile_4, 39),
-        P(rookByFile_5, 57),
-        P(rookByFile_6, 109), // -fileH
-
-        P(rookByFile_0x, -85), // fileA
-        P(rookByFile_1x, -71),
-        P(rookByFile_2x, -77),
-        P(rookByFile_3x, -59),
-        P(rookByFile_4x, -5),
-        P(rookByFile_5x, 38),
-        P(rookByFile_6x, 66), // -fileH
+        P(rookByFile_0, -40), // fileA
+        P(rookByFile_1, -52),
+        P(rookByFile_2, -24), // -fileD
 
         P(rookByRank_0, -138), // rank1
         P(rookByRank_1, -318),
@@ -589,6 +577,16 @@
         P(rookByRank_4, -437),
         P(rookByRank_5, -284),
         P(rookByRank_6, -127), // -rank8
+
+        P(rookOnHalfOpen_0, 143), // fileA
+        P(rookOnHalfOpen_1, 75),
+        P(rookOnHalfOpen_2, 59),
+        P(rookOnHalfOpen_3, 94), // fileD
+
+        P(rookOnOpen_0, 82), // fileA
+        P(rookOnOpen_1, 60),
+        P(rookOnOpen_2, 40),
+        P(rookOnOpen_3, 43), // fileD
 
         /*
          *  Queens

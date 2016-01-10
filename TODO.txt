@@ -1,20 +1,36 @@
 
-|Todo| Update copyright year
+|Todo| Clearer handling of minmovetime [timecontrol]
 
-Add 2016
+Now we increase safety to 20 s when increment is (almost) 0.
+This is double indirect:
+1. Associating "inc=0" with "minmovetime"
+2. Putting the solution in "safety", instead of elsewhere
+There must be a cleaner way
 
-|Todo| Principle component analysis [tune]
-
-For decorrelation of parameters
-
-|Todo| Pawn levers [evaluate]
-
-|Todo| Candidate passer [evaluate]
-
-Sneaker (hidden passed pawn)
+|Todo| Sneaker (hidden passed pawn)
 
         Passed pawn, if not blocked
         Helper can sacrifice itself to make a passer
+
+|Todo| Blocking of passers
+
+|Todo| Rooks and queens before and behind passers
+
+|Todo| Rooks and queens on open files [evaluate]
+
+|Todo| Pawn levers [evaluate]
+
+|Todo| Drawness of blocked pawns [evaluate]
+
+|Todo| Undrawness of material advantage
+
+Instead of just "phase"
+
+|Todo| Candidate passer [evaluate]
+
+Two types:
+1. Floyd type: check that the helpers are on the right spot
+2. Fruit type: just see if the helpers outnumber the sentries
 
 |Todo| Remove "fileIndex" concept [qa]
 
@@ -47,8 +63,6 @@ Passers
 Weak pawn
 
 |Todo| Attacking a non-mobile pawn
-
-|Todo| Rooks and queens on open files [evaluate]
 
 |Todo| Piece mobility [evaluate]
 
@@ -96,6 +110,23 @@ https://chessprogramming.wikispaces.com/Evaluation
 |Todo| Add left/right testing [qa,evaluate]
 
 ------------------------------------------------------------------------
+
+|Todo| Train specific exchange compensations
+
+R vs B
+R vs B+P
+R vs B+PP
+R vs N
+R vs N+P
+R vs N+PP
++with or without bishop pair
+
+More complex:
+RP vs NN
+Q vs RR
+
+
+|Todo| Basic history heuristic [search]
 
 |Todo| Introduction of material table [speed]
 
@@ -153,8 +184,6 @@ http://nvie.com/posts/a-successful-git-branching-model/
         Then only allow fixes
         Make release notes
         Merge into master
-
-|Todo| Basic history heuristic [search]
 
 |Todo| Basic counter move? [search]
 
@@ -244,3 +273,14 @@ See timing.log and timing3.log
 |Todo| Calculate the impact of each parameter [tune]
 
 Lazy method: set each to 0 and compute the delta of the residual
+
+|Todo| Auto jitter monitoring [timecontrol]
+
+Keep track of maximum jitter in a session, and use that instead of the
+2.5 seconds safety margin. Then see if we can reduce 2.5 to 0.5 with this
+and gain some fake elo at ultra fast tc.
+
+|Todo| Principle component analysis [tune]
+
+For decorrelation of parameters
+

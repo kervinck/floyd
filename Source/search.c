@@ -203,6 +203,7 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                         moveToFront(moveList, nrMoves, self->pv.v[pvIndex]); // Follow the PV
                 else
                         pushList(self->pv, move); // Expand the PV
+
                 bool recapture = moveScore(move) > 0 && to(move) == recaptureSquare(board(self));
                 makeMove(board(self), move);
                 int extension = (check || recapture) + (nrMoves == 1 && (depth > 0));
@@ -624,9 +625,9 @@ static int updateBestAndPonderMove(Engine_t self)
 
 static double target(double time, double inc, int movestogo)
 {
-        double safety = 2.5;
+        double safety = (inc < 0.05) ? 20.0 : 2.5;
         double target = (time + (movestogo - 1) * inc - safety) / movestogo;
-        return max(target, 0.03);
+        return max(target, 0.05);
 }
 
 void setTimeTargets(Engine_t self, double time, double inc, int movestogo, double movetime)
@@ -640,7 +641,7 @@ void setTimeTargets(Engine_t self, double time, double inc, int movestogo, doubl
                 case 35: movestogo = min(movestogo, 3); break;
                 case 45: movestogo = min(movestogo, 2); break;
                 }
-                int mintogo = min(movestogo, (board(self)->halfmoveClock / 2 < 35) ? 3 : 1);
+                int mintogo = max(1, movestogo / 5); // Upto 5 times the target
                 self->target.time = target(time, inc, movestogo);
                 double panicTime = target(time, inc, mintogo);
                 double flagTime = target(time, inc, 1);

@@ -1,13 +1,13 @@
 + echo '*** Version:'
 *** Version:
-+ echo xd79a7ffb
-xd79a7ffb
++ echo x12d5dc80
+x12d5dc80
 + echo
 
 + echo '*** Fingerprint date:'
 *** Fingerprint date:
 + date
-Sun Jan 10 01:57:46 CET 2016
+Sat Jan 16 22:00:02 CET 2016
 + echo
 
 + echo '*** System information:'
@@ -25,13 +25,13 @@ Darwin beobook3 14.5.0 Darwin Kernel Version 14.5.0: Tue Sep  1 21:23:09 PDT 201
 + echo '*** Last git commit:'
 *** Last git commit:
 + git log -1
-commit 95666162b4b8b3dd6db26afeb1367389e4eeafb3
+commit afa0e952e11cf113aa912cd1f7b046e92ac248b2
 Author: Marcel van Kervinck <marcelk@bitpit.net>
-Date:   Sun Jan 10 01:38:16 2016 +0100
+Date:   Sat Jan 16 11:34:55 2016 +0100
 
-    Longer tuning (10M) [xd79a7ffb,evaluate]
+    Tuning [x12d5dc80,evaluate]
     
-    vector filename 'Tuning/vector.json' residual 0.318370761 positions 3000000 depth 0
+    vector filename 'Tuning/vector.json' residual 0.317948538 positions 3000000 depth 0
 + echo
 
 + echo '*** Git status:'
@@ -52,7 +52,7 @@ nothing added to commit but untracked files present (use "git add" to track)
 *** Todo list:
 + make todo
 + wc -l
-     102
+     107
 + echo
 
 + echo '*** Line count:'
@@ -62,16 +62,16 @@ CountLoc v1.6.2, (c) 2015 mar
 -------------------------------------------------------------------------------
 Type                      Files       Blank     Comment Punctuation        Code
 -------------------------------------------------------------------------------
-C source                     13         782         962         414        2869
-C/C++ header                  8         237         317          24         787
+C source                     13         774         953         414        2847
+C/C++ header                  8         238         317          24         784
 -------------------------------------------------------------------------------
-Total                        21        1019        1279         438        3656
+Total                        21        1012        1270         438        3631
 + echo
 
 + echo '*** Build:'
 *** Build:
 + make clean
-env floydVersion=xd79a7ffb python setup.py clean --all
+env floydVersion=x12d5dc80 python setup.py clean --all
 running clean
 'build/lib.macosx-10.10-x86_64-2.7' does not exist -- can't clean it
 'build/bdist.macosx-10.10-x86_64' does not exist -- can't clean it
@@ -79,17 +79,17 @@ running clean
 rm -f floyd floyd.w32.exe floyd-pgo[12] *.gcda .module
 rm -rf build
 + make floyd
-cc -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xd79a7ffb -o floyd Source/cplus.c Source/evaluate.c Source/floydmain.c Source/format.c Source/kpk.c Source/moves.c Source/parse.c Source/search.c Source/test.c Source/ttable.c Source/uci.c Source/zobrist.c 
+cc -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=x12d5dc80 -o floyd Source/cplus.c Source/evaluate.c Source/floydmain.c Source/format.c Source/kpk.c Source/moves.c Source/parse.c Source/search.c Source/test.c Source/ttable.c Source/uci.c Source/zobrist.c 
 + make module
 make[1]: *** No rule to make target `module'.  Stop.
 + make floyd-pgo2
-gcc-mp-4.8 -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xd79a7ffb -DNDEBUG -o floyd-pgo1 Source/cplus.c Source/evaluate.c Source/floydmain.c Source/format.c Source/kpk.c Source/moves.c Source/parse.c Source/search.c Source/test.c Source/ttable.c Source/uci.c Source/zobrist.c  -fprofile-generate
+gcc-mp-4.8 -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=x12d5dc80 -DNDEBUG -o floyd-pgo1 Source/cplus.c Source/evaluate.c Source/floydmain.c Source/format.c Source/kpk.c Source/moves.c Source/parse.c Source/search.c Source/test.c Source/ttable.c Source/uci.c Source/zobrist.c  -fprofile-generate
 ./floyd-pgo1 bench quit | grep result
-result nps 461999
-gcc-mp-4.8 -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xd79a7ffb -DNDEBUG -o floyd-pgo2 Source/cplus.c Source/evaluate.c Source/floydmain.c Source/format.c Source/kpk.c Source/moves.c Source/parse.c Source/search.c Source/test.c Source/ttable.c Source/uci.c Source/zobrist.c  -fprofile-use
+result nps 445332
+gcc-mp-4.8 -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=x12d5dc80 -DNDEBUG -o floyd-pgo2 Source/cplus.c Source/evaluate.c Source/floydmain.c Source/format.c Source/kpk.c Source/moves.c Source/parse.c Source/search.c Source/test.c Source/ttable.c Source/uci.c Source/zobrist.c  -fprofile-use
 rm -f *.gcda
 + make floyd.w32.exe
-/usr/local/gcc-4.8.0-qt-4.8.4-for-mingw32/win32-gcc/bin/i586-mingw32-gcc -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xd79a7ffb -Wno-format  -o floyd.w32.exe Source/cplus.c Source/evaluate.c Source/floydmain.c Source/format.c Source/kpk.c Source/moves.c Source/parse.c Source/search.c Source/test.c Source/ttable.c Source/uci.c Source/zobrist.c
+/usr/local/gcc-4.8.0-qt-4.8.4-for-mingw32/win32-gcc/bin/i586-mingw32-gcc -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=x12d5dc80 -Wno-format  -o floyd.w32.exe Source/cplus.c Source/evaluate.c Source/floydmain.c Source/format.c Source/kpk.c Source/moves.c Source/parse.c Source/search.c Source/test.c Source/ttable.c Source/uci.c Source/zobrist.c
 + echo
 
 + echo '*** Help text:'
@@ -97,7 +97,7 @@ rm -f *.gcda
 + echo help
 + ./floyd
 
-Floyd Chess Engine - Version xd79a7ffb
+Floyd Chess Engine - Version x12d5dc80
 Copyright (C) 2015-2016, Marcel van Kervinck
 All rights reserved
 
@@ -184,51 +184,51 @@ test result OK passed 20 total 20
 test result OK passed 21 total 21
 + ./floyd bench quit
 egt class KPK check OK
-time 1005 nps 417936 fen r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -
-time 1004 nps 465471 fen 4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -
-time 1003 nps 450433 fen 3rk2r/1pq1bpp1/p1n1p1n1/3pP3/3P2P1/1PPQNNB1/5P2/R3R1K1 b k -
-time 1003 nps 556933 fen 7k/8/1p1Q2pp/1p3b2/3p3P/P3q3/BP4PK/8 b - -
-time 1003 nps 426782 fen 2r1rnk1/4qppp/p3b3/1p4P1/4p2P/2N1PN2/PP1Q1P2/1KR4R w - -
-time 1003 nps 416845 fen 2rk3r/p2n1pp1/bqn1p2p/1p1pP3/3P1N1P/bP1BBN2/P3QPP1/2R1R1K1 w - -
-time 1003 nps 546344 fen 1nr2rk1/p3Qppp/1p2p1n1/8/3P4/2N2N2/PP3PPP/2R2RK1 b - -
-time 1003 nps 736920 fen 3nr1k1/1p1r3p/pR1pNpp1/3P4/4P3/3P3P/6P1/1R5K b - -
-time 1003 nps 479102 fen 4r1k1/pp3ppp/3n4/2n1r3/2P2NP1/4KB2/PP2P2P/R5R1 w - -
-time 1003 nps 794080 fen 8/p5pk/1p6/5R1p/P7/5PPK/5r2/8 b - -
-time 1003 nps 734149 fen 8/2Q2p2/5qpk/4p3/8/5P1P/6K1/8 w - -
-time 1003 nps 500105 fen 5rk1/1pr2bbp/pNp1n1p1/2P1p3/1PBpP3/1N5P/1P3PP1/3RR1K1 b - -
-time 1003 nps 624271 fen 8/1b3pk1/rp5p/6p1/6B1/1R4P1/4P2P/4K3 w - -
-time 1003 nps 469525 fen r1bqk2r/pp2ppbp/3p1np1/8/2PQP3/2N5/PP2BPPP/R1B1K2R w KQkq -
-time 1003 nps 575279 fen 8/1b4pk/7q/p3pP2/1p2P3/1Pp5/2P1Q3/5BK1 b - -
-time 1003 nps 460626 fen r2qkb1r/2p2ppp/p1p5/3pP3/4n1b1/3Q1N2/PPP2PPP/RNB2RK1 w kq -
-time 1003 nps 494342 fen 4r1k1/pp2pp1n/3p2p1/6Bp/2rN1P1P/q1P5/2PQ2P1/1K1RR3 b - -
-time 1003 nps 447376 fen rnbq1rk1/pp3pbp/2pp1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - -
-time 1003 nps 612544 fen 8/8/p3k1p1/Bb5p/1P5P/5P2/1r4P1/3R2K1 b - -
-time 1003 nps 609240 fen 4k3/q4p2/2n1p1p1/p1Np4/3P1QP1/PP3P2/6K1/8 b - -
-time 1003 nps 739737 fen 3bn3/4k3/2p3p1/ppN2P2/P5P1/1P1KB3/8/8 b - -
-time 1003 nps 466916 fen r1b1r1k1/5pbp/pp1p1np1/2qPn3/P1p1P3/2N1BPN1/1P1QB1PP/R1R4K b - -
-time 1003 nps 506350 fen r1q1rnk1/p1p2pp1/bp2p2p/n2pP3/Q1PP1N1B/P1PB1P2/6PP/R4RK1 w - d6
-time 1002 nps 478100 fen r3r1k1/1bpnqppp/1p1p4/p2Pp3/1PP1P3/P5P1/1BQ2PBP/1R1R2K1 b - -
-time 1000 nps 779251 fen 1r6/4Pk2/1p1p1P2/p7/8/1P1K2p1/P7/5R2 b - -
-time 1000 nps 426241 fen 1rbqk2r/2pp1ppp/p1n2n2/1pb1p3/P3P3/1B3N2/1PPP1PPP/RNBQ1RK1 w k -
-time 1000 nps 600284 fen r4bk1/6pp/1B2n3/4P3/pp6/1P2N1P1/P5KP/3R4 w - -
-time 1001 nps 388823 fen r1bqkb1r/pp1n1ppp/2n5/2ppP3/3P1P2/5N2/PP4PP/RNBQKB1R w KQkq -
-time 1005 nps 559634 fen r1qr2k1/2p2pPp/p3n3/1p6/8/4BQ2/PP3PPP/R2R2K1 w - -
-time 1000 nps 693278 fen 4r3/1p4k1/p1p1P1pp/3p4/1P1N4/P6B/7P/4K3 w - -
-time 1000 nps 523968 fen 8/R4pk1/4pbq1/8/2P4p/5Q2/8/5K2 b - -
-time 1003 nps 627253 fen 4k3/R4pp1/P7/4P2p/5P2/3p2P1/r7/4K3 w - -
-time 1003 nps 442134 fen 2r3k1/1p4p1/p3bp2/8/N3Pb1p/2R4P/1PP1Q1P1/2q3BK b - -
-time 1003 nps 423821 fen rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -
-time 1001 nps 1168789 fen 8/6N1/8/1k4K1/3n4/8/5P2/8 b - -
-time 1005 nps 468652 fen rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -
-time 1002 nps 757285 fen 8/PRn5/3k4/r4p2/5PB1/8/5P2/6K1 w - -
-time 1000 nps 777421 fen r5k1/4Rpp1/3p3p/2pP4/p1P3P1/1P6/P4PP1/5K2 w - -
-time 1003 nps 891324 fen 5n2/2k1KB2/7P/8/3n1P2/8/p1N5/8 w - -
-time 1003 nps 442039 fen rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -
-result nps 574422
+time 1002 nps 400741 fen r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -
+time 1005 nps 466932 fen 4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -
+time 1002 nps 422690 fen 3rk2r/1pq1bpp1/p1n1p1n1/3pP3/3P2P1/1PPQNNB1/5P2/R3R1K1 b k -
+time 1004 nps 541887 fen 7k/8/1p1Q2pp/1p3b2/3p3P/P3q3/BP4PK/8 b - -
+time 1004 nps 421497 fen 2r1rnk1/4qppp/p3b3/1p4P1/4p2P/2N1PN2/PP1Q1P2/1KR4R w - -
+time 1002 nps 386887 fen 2rk3r/p2n1pp1/bqn1p2p/1p1pP3/3P1N1P/bP1BBN2/P3QPP1/2R1R1K1 w - -
+time 1002 nps 529654 fen 1nr2rk1/p3Qppp/1p2p1n1/8/3P4/2N2N2/PP3PPP/2R2RK1 b - -
+time 1002 nps 725274 fen 3nr1k1/1p1r3p/pR1pNpp1/3P4/4P3/3P3P/6P1/1R5K b - -
+time 1002 nps 453178 fen 4r1k1/pp3ppp/3n4/2n1r3/2P2NP1/4KB2/PP2P2P/R5R1 w - -
+time 1002 nps 764180 fen 8/p5pk/1p6/5R1p/P7/5PPK/5r2/8 b - -
+time 1002 nps 760330 fen 8/2Q2p2/5qpk/4p3/8/5P1P/6K1/8 w - -
+time 1002 nps 507198 fen 5rk1/1pr2bbp/pNp1n1p1/2P1p3/1PBpP3/1N5P/1P3PP1/3RR1K1 b - -
+time 1002 nps 630160 fen 8/1b3pk1/rp5p/6p1/6B1/1R4P1/4P2P/4K3 w - -
+time 1002 nps 438769 fen r1bqk2r/pp2ppbp/3p1np1/8/2PQP3/2N5/PP2BPPP/R1B1K2R w KQkq -
+time 1002 nps 569613 fen 8/1b4pk/7q/p3pP2/1p2P3/1Pp5/2P1Q3/5BK1 b - -
+time 1001 nps 445305 fen r2qkb1r/2p2ppp/p1p5/3pP3/4n1b1/3Q1N2/PPP2PPP/RNB2RK1 w kq -
+time 1002 nps 504934 fen 4r1k1/pp2pp1n/3p2p1/6Bp/2rN1P1P/q1P5/2PQ2P1/1K1RR3 b - -
+time 1002 nps 450167 fen rnbq1rk1/pp3pbp/2pp1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - -
+time 1002 nps 625466 fen 8/8/p3k1p1/Bb5p/1P5P/5P2/1r4P1/3R2K1 b - -
+time 1004 nps 603081 fen 4k3/q4p2/2n1p1p1/p1Np4/3P1QP1/PP3P2/6K1/8 b - -
+time 1000 nps 748884 fen 3bn3/4k3/2p3p1/ppN2P2/P5P1/1P1KB3/8/8 b - -
+time 1001 nps 479210 fen r1b1r1k1/5pbp/pp1p1np1/2qPn3/P1p1P3/2N1BPN1/1P1QB1PP/R1R4K b - -
+time 1002 nps 503211 fen r1q1rnk1/p1p2pp1/bp2p2p/n2pP3/Q1PP1N1B/P1PB1P2/6PP/R4RK1 w - d6
+time 1002 nps 531232 fen r3r1k1/1bpnqppp/1p1p4/p2Pp3/1PP1P3/P5P1/1BQ2PBP/1R1R2K1 b - -
+time 1002 nps 760306 fen 1r6/4Pk2/1p1p1P2/p7/8/1P1K2p1/P7/5R2 b - -
+time 1002 nps 449367 fen 1rbqk2r/2pp1ppp/p1n2n2/1pb1p3/P3P3/1B3N2/1PPP1PPP/RNBQ1RK1 w k -
+time 1002 nps 588439 fen r4bk1/6pp/1B2n3/4P3/pp6/1P2N1P1/P5KP/3R4 w - -
+time 1001 nps 378058 fen r1bqkb1r/pp1n1ppp/2n5/2ppP3/3P1P2/5N2/PP4PP/RNBQKB1R w KQkq -
+time 1002 nps 560305 fen r1qr2k1/2p2pPp/p3n3/1p6/8/4BQ2/PP3PPP/R2R2K1 w - -
+time 1002 nps 703667 fen 4r3/1p4k1/p1p1P1pp/3p4/1P1N4/P6B/7P/4K3 w - -
+time 1002 nps 524313 fen 8/R4pk1/4pbq1/8/2P4p/5Q2/8/5K2 b - -
+time 1002 nps 672808 fen 4k3/R4pp1/P7/4P2p/5P2/3p2P1/r7/4K3 w - -
+time 1002 nps 478161 fen 2r3k1/1p4p1/p3bp2/8/N3Pb1p/2R4P/1PP1Q1P1/2q3BK b - -
+time 1002 nps 417518 fen rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -
+time 1001 nps 1164443 fen 8/6N1/8/1k4K1/3n4/8/5P2/8 b - -
+time 1004 nps 448326 fen rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -
+time 1001 nps 763468 fen 8/PRn5/3k4/r4p2/5PB1/8/5P2/6K1 w - -
+time 1000 nps 719974 fen r5k1/4Rpp1/3p3p/2pP4/p1P3P1/1P6/P4PP1/5K2 w - -
+time 1005 nps 876269 fen 5n2/2k1KB2/7P/8/3n1P2/8/p1N5/8 w - -
+time 1004 nps 440672 fen rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -
+result nps 571377
 + echo bench
 + wine ./floyd.w32.exe
 
-Floyd Chess Engine - Version xd79a7ffb
+Floyd Chess Engine - Version x12d5dc80
 Copyright (C) 2015-2016, Marcel van Kervinck
 All rights reserved
 
@@ -236,47 +236,47 @@ Type "help" for more information, or "quit" to leave.
 
 egt class KPK check OK
 fixme:ole:RemUnknown_QueryInterface No interface for iid {00000019-0000-0000-c000-000000000046}
-time 1003 nps 319019 fen r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -
-time 1001 nps 346662 fen 4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -
-time 1001 nps 332869 fen 3rk2r/1pq1bpp1/p1n1p1n1/3pP3/3P2P1/1PPQNNB1/5P2/R3R1K1 b k -
-time 1002 nps 410758 fen 7k/8/1p1Q2pp/1p3b2/3p3P/P3q3/BP4PK/8 b - -
-time 1001 nps 309826 fen 2r1rnk1/4qppp/p3b3/1p4P1/4p2P/2N1PN2/PP1Q1P2/1KR4R w - -
-time 1001 nps 315585 fen 2rk3r/p2n1pp1/bqn1p2p/1p1pP3/3P1N1P/bP1BBN2/P3QPP1/2R1R1K1 w - -
-time 1001 nps 432395 fen 1nr2rk1/p3Qppp/1p2p1n1/8/3P4/2N2N2/PP3PPP/2R2RK1 b - -
-time 1002 nps 550431 fen 3nr1k1/1p1r3p/pR1pNpp1/3P4/4P3/3P3P/6P1/1R5K b - -
-time 1001 nps 368093 fen 4r1k1/pp3ppp/3n4/2n1r3/2P2NP1/4KB2/PP2P2P/R5R1 w - -
-time 1000 nps 596395 fen 8/p5pk/1p6/5R1p/P7/5PPK/5r2/8 b - -
-time 1001 nps 553677 fen 8/2Q2p2/5qpk/4p3/8/5P1P/6K1/8 w - -
-time 1001 nps 390550 fen 5rk1/1pr2bbp/pNp1n1p1/2P1p3/1PBpP3/1N5P/1P3PP1/3RR1K1 b - -
-time 1002 nps 478876 fen 8/1b3pk1/rp5p/6p1/6B1/1R4P1/4P2P/4K3 w - -
-time 1002 nps 350029 fen r1bqk2r/pp2ppbp/3p1np1/8/2PQP3/2N5/PP2BPPP/R1B1K2R w KQkq -
-time 1002 nps 432472 fen 8/1b4pk/7q/p3pP2/1p2P3/1Pp5/2P1Q3/5BK1 b - -
-time 1002 nps 345080 fen r2qkb1r/2p2ppp/p1p5/3pP3/4n1b1/3Q1N2/PPP2PPP/RNB2RK1 w kq -
-time 1001 nps 378369 fen 4r1k1/pp2pp1n/3p2p1/6Bp/2rN1P1P/q1P5/2PQ2P1/1K1RR3 b - -
-time 1002 nps 358665 fen rnbq1rk1/pp3pbp/2pp1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - -
-time 1001 nps 463485 fen 8/8/p3k1p1/Bb5p/1P5P/5P2/1r4P1/3R2K1 b - -
-time 1000 nps 468718 fen 4k3/q4p2/2n1p1p1/p1Np4/3P1QP1/PP3P2/6K1/8 b - -
-time 1002 nps 569980 fen 3bn3/4k3/2p3p1/ppN2P2/P5P1/1P1KB3/8/8 b - -
-time 1002 nps 347043 fen r1b1r1k1/5pbp/pp1p1np1/2qPn3/P1p1P3/2N1BPN1/1P1QB1PP/R1R4K b - -
-time 1001 nps 377188 fen r1q1rnk1/p1p2pp1/bp2p2p/n2pP3/Q1PP1N1B/P1PB1P2/6PP/R4RK1 w - d6
-time 1002 nps 366495 fen r3r1k1/1bpnqppp/1p1p4/p2Pp3/1PP1P3/P5P1/1BQ2PBP/1R1R2K1 b - -
-time 1001 nps 580084 fen 1r6/4Pk2/1p1p1P2/p7/8/1P1K2p1/P7/5R2 b - -
-time 1002 nps 323355 fen 1rbqk2r/2pp1ppp/p1n2n2/1pb1p3/P3P3/1B3N2/1PPP1PPP/RNBQ1RK1 w k -
-time 1001 nps 456774 fen r4bk1/6pp/1B2n3/4P3/pp6/1P2N1P1/P5KP/3R4 w - -
-time 1035 nps 297112 fen r1bqkb1r/pp1n1ppp/2n5/2ppP3/3P1P2/5N2/PP4PP/RNBQKB1R w KQkq -
-time 1001 nps 422021 fen r1qr2k1/2p2pPp/p3n3/1p6/8/4BQ2/PP3PPP/R2R2K1 w - -
-time 1001 nps 527281 fen 4r3/1p4k1/p1p1P1pp/3p4/1P1N4/P6B/7P/4K3 w - -
-time 1001 nps 382626 fen 8/R4pk1/4pbq1/8/2P4p/5Q2/8/5K2 b - -
-time 1001 nps 491135 fen 4k3/R4pp1/P7/4P2p/5P2/3p2P1/r7/4K3 w - -
-time 1002 nps 332311 fen 2r3k1/1p4p1/p3bp2/8/N3Pb1p/2R4P/1PP1Q1P1/2q3BK b - -
-time 1001 nps 333953 fen rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -
-time 1001 nps 889561 fen 8/6N1/8/1k4K1/3n4/8/5P2/8 b - -
-time 1001 nps 364322 fen rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -
-time 1001 nps 561392 fen 8/PRn5/3k4/r4p2/5PB1/8/5P2/6K1 w - -
-time 1002 nps 595378 fen r5k1/4Rpp1/3p3p/2pP4/p1P3P1/1P6/P4PP1/5K2 w - -
-time 1001 nps 676040 fen 5n2/2k1KB2/7P/8/3n1P2/8/p1N5/8 w - -
-time 1001 nps 346530 fen rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -
-result nps 435930
+time 1002 nps 291732 fen r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -
+time 1002 nps 346294 fen 4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -
+time 1002 nps 316685 fen 3rk2r/1pq1bpp1/p1n1p1n1/3pP3/3P2P1/1PPQNNB1/5P2/R3R1K1 b k -
+time 1001 nps 419412 fen 7k/8/1p1Q2pp/1p3b2/3p3P/P3q3/BP4PK/8 b - -
+time 1001 nps 335210 fen 2r1rnk1/4qppp/p3b3/1p4P1/4p2P/2N1PN2/PP1Q1P2/1KR4R w - -
+time 1001 nps 305106 fen 2rk3r/p2n1pp1/bqn1p2p/1p1pP3/3P1N1P/bP1BBN2/P3QPP1/2R1R1K1 w - -
+time 1001 nps 407009 fen 1nr2rk1/p3Qppp/1p2p1n1/8/3P4/2N2N2/PP3PPP/2R2RK1 b - -
+time 1001 nps 541685 fen 3nr1k1/1p1r3p/pR1pNpp1/3P4/4P3/3P3P/6P1/1R5K b - -
+time 1001 nps 344412 fen 4r1k1/pp3ppp/3n4/2n1r3/2P2NP1/4KB2/PP2P2P/R5R1 w - -
+time 1002 nps 573714 fen 8/p5pk/1p6/5R1p/P7/5PPK/5r2/8 b - -
+time 1001 nps 546326 fen 8/2Q2p2/5qpk/4p3/8/5P1P/6K1/8 w - -
+time 1000 nps 370266 fen 5rk1/1pr2bbp/pNp1n1p1/2P1p3/1PBpP3/1N5P/1P3PP1/3RR1K1 b - -
+time 1001 nps 457387 fen 8/1b3pk1/rp5p/6p1/6B1/1R4P1/4P2P/4K3 w - -
+time 1000 nps 332059 fen r1bqk2r/pp2ppbp/3p1np1/8/2PQP3/2N5/PP2BPPP/R1B1K2R w KQkq -
+time 1001 nps 403377 fen 8/1b4pk/7q/p3pP2/1p2P3/1Pp5/2P1Q3/5BK1 b - -
+time 1001 nps 321635 fen r2qkb1r/2p2ppp/p1p5/3pP3/4n1b1/3Q1N2/PPP2PPP/RNB2RK1 w kq -
+time 1001 nps 381132 fen 4r1k1/pp2pp1n/3p2p1/6Bp/2rN1P1P/q1P5/2PQ2P1/1K1RR3 b - -
+time 1001 nps 342707 fen rnbq1rk1/pp3pbp/2pp1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - -
+time 1001 nps 460497 fen 8/8/p3k1p1/Bb5p/1P5P/5P2/1r4P1/3R2K1 b - -
+time 1002 nps 454448 fen 4k3/q4p2/2n1p1p1/p1Np4/3P1QP1/PP3P2/6K1/8 b - -
+time 1001 nps 556447 fen 3bn3/4k3/2p3p1/ppN2P2/P5P1/1P1KB3/8/8 b - -
+time 1000 nps 364096 fen r1b1r1k1/5pbp/pp1p1np1/2qPn3/P1p1P3/2N1BPN1/1P1QB1PP/R1R4K b - -
+time 1002 nps 380830 fen r1q1rnk1/p1p2pp1/bp2p2p/n2pP3/Q1PP1N1B/P1PB1P2/6PP/R4RK1 w - d6
+time 1001 nps 385850 fen r3r1k1/1bpnqppp/1p1p4/p2Pp3/1PP1P3/P5P1/1BQ2PBP/1R1R2K1 b - -
+time 1001 nps 567569 fen 1r6/4Pk2/1p1p1P2/p7/8/1P1K2p1/P7/5R2 b - -
+time 1001 nps 341142 fen 1rbqk2r/2pp1ppp/p1n2n2/1pb1p3/P3P3/1B3N2/1PPP1PPP/RNBQ1RK1 w k -
+time 1001 nps 430969 fen r4bk1/6pp/1B2n3/4P3/pp6/1P2N1P1/P5KP/3R4 w - -
+time 1028 nps 288319 fen r1bqkb1r/pp1n1ppp/2n5/2ppP3/3P1P2/5N2/PP4PP/RNBQKB1R w KQkq -
+time 1002 nps 414161 fen r1qr2k1/2p2pPp/p3n3/1p6/8/4BQ2/PP3PPP/R2R2K1 w - -
+time 1001 nps 525505 fen 4r3/1p4k1/p1p1P1pp/3p4/1P1N4/P6B/7P/4K3 w - -
+time 1002 nps 370667 fen 8/R4pk1/4pbq1/8/2P4p/5Q2/8/5K2 b - -
+time 1001 nps 489444 fen 4k3/R4pp1/P7/4P2p/5P2/3p2P1/r7/4K3 w - -
+time 1001 nps 335663 fen 2r3k1/1p4p1/p3bp2/8/N3Pb1p/2R4P/1PP1Q1P1/2q3BK b - -
+time 1002 nps 309973 fen rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -
+time 1001 nps 803019 fen 8/6N1/8/1k4K1/3n4/8/5P2/8 b - -
+time 1001 nps 324357 fen rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -
+time 1001 nps 548927 fen 8/PRn5/3k4/r4p2/5PB1/8/5P2/6K1 w - -
+time 1001 nps 504108 fen r5k1/4Rpp1/3p3p/2pP4/p1P3P1/1P6/P4PP1/5K2 w - -
+time 1002 nps 656483 fen 5n2/2k1KB2/7P/8/3n1P2/8/p1N5/8 w - -
+time 1002 nps 340642 fen rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -
+result nps 422142
 + echo
 
 + echo '*** Node count and branching factor:'
@@ -285,21 +285,21 @@ result nps 435930
 python Tools/nodetest.py 7 < Data/thousand.epd | awk '\
 	/ nodes / { n[$5] += $10; n[-1] += !$5 }\
 	END       { for (d=0; n[d]; d++) print d, n[d], n[d] / n[d-1] }'
-0 6355 6.355
-1 85793 13.5001
-2 445509 5.19284
-3 2149228 4.82421
-4 8323565 3.87282
-5 18632156 2.23848
-6 50620932 2.71686
-7 142911815 2.82318
+0 6302 6.302
+1 87142 13.8277
+2 449469 5.15789
+3 2140963 4.76332
+4 8360246 3.9049
+5 18468026 2.20903
+6 49699309 2.6911
+7 138358618 2.78391
 + echo
 
 + echo '*** Evaluation residual:'
 *** Evaluation residual:
 + make residual
 bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/tune.py -q Tuning/vector.json
-vector filename 'Tuning/vector.json' residual 0.318370761 positions 3000000 depth 0
+vector filename 'Tuning/vector.json' residual 0.317948538 positions 3000000 depth 0
 
 + echo
 
@@ -307,157 +307,157 @@ vector filename 'Tuning/vector.json' residual 0.318370761 positions 3000000 dept
 *** Game playing:
 + cutechess-cli -concurrency 4 -rounds 50 -repeat -each tc=10+0.15 -openings file=Data/book-6000-openings.pgn order=random -engine cmd=./floyd-pgo2 proto=uci -engine cmd=floyd0.7 proto=uci
 Indexing opening suite...
-Started game 1 of 50 (Floyd xd79a7ffb vs Floyd 0.7)
-Started game 2 of 50 (Floyd 0.7 vs Floyd xd79a7ffb)
-Started game 3 of 50 (Floyd xd79a7ffb vs Floyd 0.7)
-Started game 4 of 50 (Floyd 0.7 vs Floyd xd79a7ffb)
-Finished game 4 (Floyd 0.7 vs Floyd xd79a7ffb): 0-1 {Black mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 1 - 0 - 0  [1.000] 1
-Started game 5 of 50 (Floyd xd79a7ffb vs Floyd 0.7)
-Finished game 3 (Floyd xd79a7ffb vs Floyd 0.7): 1-0 {White mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 2 - 0 - 0  [1.000] 2
-Started game 6 of 50 (Floyd 0.7 vs Floyd xd79a7ffb)
-Finished game 1 (Floyd xd79a7ffb vs Floyd 0.7): 1/2-1/2 {Draw by 3-fold repetition}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 2 - 0 - 1  [0.833] 3
-Started game 7 of 50 (Floyd xd79a7ffb vs Floyd 0.7)
-Finished game 2 (Floyd 0.7 vs Floyd xd79a7ffb): 0-1 {Black mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 3 - 0 - 1  [0.875] 4
-Started game 8 of 50 (Floyd 0.7 vs Floyd xd79a7ffb)
-Finished game 7 (Floyd xd79a7ffb vs Floyd 0.7): 1-0 {White mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 4 - 0 - 1  [0.900] 5
-Started game 9 of 50 (Floyd xd79a7ffb vs Floyd 0.7)
-Finished game 6 (Floyd 0.7 vs Floyd xd79a7ffb): 0-1 {Black mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 5 - 0 - 1  [0.917] 6
-Started game 10 of 50 (Floyd 0.7 vs Floyd xd79a7ffb)
-Finished game 8 (Floyd 0.7 vs Floyd xd79a7ffb): 1-0 {White mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 5 - 1 - 1  [0.786] 7
-Started game 11 of 50 (Floyd xd79a7ffb vs Floyd 0.7)
-Finished game 5 (Floyd xd79a7ffb vs Floyd 0.7): 1-0 {White mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 6 - 1 - 1  [0.812] 8
-Started game 12 of 50 (Floyd 0.7 vs Floyd xd79a7ffb)
-Finished game 10 (Floyd 0.7 vs Floyd xd79a7ffb): 0-1 {Black mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 7 - 1 - 1  [0.833] 9
-Started game 13 of 50 (Floyd xd79a7ffb vs Floyd 0.7)
-Finished game 9 (Floyd xd79a7ffb vs Floyd 0.7): 1/2-1/2 {Draw by 3-fold repetition}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 7 - 1 - 2  [0.800] 10
-Started game 14 of 50 (Floyd 0.7 vs Floyd xd79a7ffb)
-Finished game 11 (Floyd xd79a7ffb vs Floyd 0.7): 1-0 {White mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 8 - 1 - 2  [0.818] 11
-Started game 15 of 50 (Floyd xd79a7ffb vs Floyd 0.7)
-Finished game 12 (Floyd 0.7 vs Floyd xd79a7ffb): 0-1 {Black mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 9 - 1 - 2  [0.833] 12
-Started game 16 of 50 (Floyd 0.7 vs Floyd xd79a7ffb)
-Finished game 13 (Floyd xd79a7ffb vs Floyd 0.7): 1-0 {White mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 10 - 1 - 2  [0.846] 13
-Started game 17 of 50 (Floyd xd79a7ffb vs Floyd 0.7)
-Finished game 15 (Floyd xd79a7ffb vs Floyd 0.7): 0-1 {Black mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 10 - 2 - 2  [0.786] 14
-Started game 18 of 50 (Floyd 0.7 vs Floyd xd79a7ffb)
-Finished game 16 (Floyd 0.7 vs Floyd xd79a7ffb): 0-1 {Black mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 11 - 2 - 2  [0.800] 15
-Started game 19 of 50 (Floyd xd79a7ffb vs Floyd 0.7)
-Finished game 14 (Floyd 0.7 vs Floyd xd79a7ffb): 0-1 {Black mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 12 - 2 - 2  [0.812] 16
-Started game 20 of 50 (Floyd 0.7 vs Floyd xd79a7ffb)
-Finished game 17 (Floyd xd79a7ffb vs Floyd 0.7): 1-0 {White mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 13 - 2 - 2  [0.824] 17
-Started game 21 of 50 (Floyd xd79a7ffb vs Floyd 0.7)
-Finished game 18 (Floyd 0.7 vs Floyd xd79a7ffb): 0-1 {Black mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 14 - 2 - 2  [0.833] 18
-Started game 22 of 50 (Floyd 0.7 vs Floyd xd79a7ffb)
-Finished game 19 (Floyd xd79a7ffb vs Floyd 0.7): 1/2-1/2 {Draw by 3-fold repetition}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 14 - 2 - 3  [0.816] 19
-Started game 23 of 50 (Floyd xd79a7ffb vs Floyd 0.7)
-Finished game 21 (Floyd xd79a7ffb vs Floyd 0.7): 1-0 {White mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 15 - 2 - 3  [0.825] 20
-Started game 24 of 50 (Floyd 0.7 vs Floyd xd79a7ffb)
-Finished game 22 (Floyd 0.7 vs Floyd xd79a7ffb): 1/2-1/2 {Draw by 3-fold repetition}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 15 - 2 - 4  [0.810] 21
-Started game 25 of 50 (Floyd xd79a7ffb vs Floyd 0.7)
-Finished game 23 (Floyd xd79a7ffb vs Floyd 0.7): 1/2-1/2 {Draw by 3-fold repetition}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 15 - 2 - 5  [0.795] 22
-Started game 26 of 50 (Floyd 0.7 vs Floyd xd79a7ffb)
-Finished game 24 (Floyd 0.7 vs Floyd xd79a7ffb): 1/2-1/2 {Draw by 3-fold repetition}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 15 - 2 - 6  [0.783] 23
-Started game 27 of 50 (Floyd xd79a7ffb vs Floyd 0.7)
-Finished game 20 (Floyd 0.7 vs Floyd xd79a7ffb): 1/2-1/2 {Draw by fifty moves rule}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 15 - 2 - 7  [0.771] 24
-Started game 28 of 50 (Floyd 0.7 vs Floyd xd79a7ffb)
-Finished game 26 (Floyd 0.7 vs Floyd xd79a7ffb): 0-1 {Black mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 16 - 2 - 7  [0.780] 25
-Started game 29 of 50 (Floyd xd79a7ffb vs Floyd 0.7)
-Finished game 25 (Floyd xd79a7ffb vs Floyd 0.7): 1-0 {White mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 17 - 2 - 7  [0.788] 26
-Started game 30 of 50 (Floyd 0.7 vs Floyd xd79a7ffb)
-Finished game 27 (Floyd xd79a7ffb vs Floyd 0.7): 0-1 {Black mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 17 - 3 - 7  [0.759] 27
-Started game 31 of 50 (Floyd xd79a7ffb vs Floyd 0.7)
-Finished game 28 (Floyd 0.7 vs Floyd xd79a7ffb): 0-1 {Black mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 18 - 3 - 7  [0.768] 28
-Started game 32 of 50 (Floyd 0.7 vs Floyd xd79a7ffb)
-Finished game 31 (Floyd xd79a7ffb vs Floyd 0.7): 1-0 {White mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 19 - 3 - 7  [0.776] 29
-Started game 33 of 50 (Floyd xd79a7ffb vs Floyd 0.7)
-Finished game 30 (Floyd 0.7 vs Floyd xd79a7ffb): 0-1 {Black mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 20 - 3 - 7  [0.783] 30
-Started game 34 of 50 (Floyd 0.7 vs Floyd xd79a7ffb)
-Finished game 29 (Floyd xd79a7ffb vs Floyd 0.7): 1-0 {White mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 21 - 3 - 7  [0.790] 31
-Started game 35 of 50 (Floyd xd79a7ffb vs Floyd 0.7)
-Finished game 32 (Floyd 0.7 vs Floyd xd79a7ffb): 0-1 {Black mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 22 - 3 - 7  [0.797] 32
-Started game 36 of 50 (Floyd 0.7 vs Floyd xd79a7ffb)
-Finished game 33 (Floyd xd79a7ffb vs Floyd 0.7): 1-0 {White mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 23 - 3 - 7  [0.803] 33
-Started game 37 of 50 (Floyd xd79a7ffb vs Floyd 0.7)
-Finished game 34 (Floyd 0.7 vs Floyd xd79a7ffb): 1-0 {White mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 23 - 4 - 7  [0.779] 34
-Started game 38 of 50 (Floyd 0.7 vs Floyd xd79a7ffb)
-Finished game 36 (Floyd 0.7 vs Floyd xd79a7ffb): 1-0 {White mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 23 - 5 - 7  [0.757] 35
-Started game 39 of 50 (Floyd xd79a7ffb vs Floyd 0.7)
-Finished game 35 (Floyd xd79a7ffb vs Floyd 0.7): 0-1 {Black mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 23 - 6 - 7  [0.736] 36
-Started game 40 of 50 (Floyd 0.7 vs Floyd xd79a7ffb)
-Finished game 37 (Floyd xd79a7ffb vs Floyd 0.7): 1-0 {White mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 24 - 6 - 7  [0.743] 37
-Started game 41 of 50 (Floyd xd79a7ffb vs Floyd 0.7)
-Finished game 38 (Floyd 0.7 vs Floyd xd79a7ffb): 1/2-1/2 {Draw by fifty moves rule}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 24 - 6 - 8  [0.737] 38
-Started game 42 of 50 (Floyd 0.7 vs Floyd xd79a7ffb)
-Finished game 39 (Floyd xd79a7ffb vs Floyd 0.7): 1-0 {White mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 25 - 6 - 8  [0.744] 39
-Started game 43 of 50 (Floyd xd79a7ffb vs Floyd 0.7)
-Finished game 41 (Floyd xd79a7ffb vs Floyd 0.7): 1-0 {White mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 26 - 6 - 8  [0.750] 40
-Started game 44 of 50 (Floyd 0.7 vs Floyd xd79a7ffb)
-Finished game 40 (Floyd 0.7 vs Floyd xd79a7ffb): 1/2-1/2 {Draw by insufficient mating material}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 26 - 6 - 9  [0.744] 41
-Started game 45 of 50 (Floyd xd79a7ffb vs Floyd 0.7)
-Finished game 42 (Floyd 0.7 vs Floyd xd79a7ffb): 1/2-1/2 {Draw by insufficient mating material}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 26 - 6 - 10  [0.738] 42
-Started game 46 of 50 (Floyd 0.7 vs Floyd xd79a7ffb)
-Finished game 44 (Floyd 0.7 vs Floyd xd79a7ffb): 1/2-1/2 {Draw by 3-fold repetition}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 26 - 6 - 11  [0.733] 43
-Started game 47 of 50 (Floyd xd79a7ffb vs Floyd 0.7)
-Finished game 45 (Floyd xd79a7ffb vs Floyd 0.7): 1-0 {White mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 27 - 6 - 11  [0.739] 44
-Started game 48 of 50 (Floyd 0.7 vs Floyd xd79a7ffb)
-Finished game 46 (Floyd 0.7 vs Floyd xd79a7ffb): 0-1 {Black mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 28 - 6 - 11  [0.744] 45
-Started game 49 of 50 (Floyd xd79a7ffb vs Floyd 0.7)
-Finished game 43 (Floyd xd79a7ffb vs Floyd 0.7): 1/2-1/2 {Draw by fifty moves rule}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 28 - 6 - 12  [0.739] 46
-Started game 50 of 50 (Floyd 0.7 vs Floyd xd79a7ffb)
-Finished game 47 (Floyd xd79a7ffb vs Floyd 0.7): 1/2-1/2 {Draw by 3-fold repetition}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 28 - 6 - 13  [0.734] 47
-Finished game 49 (Floyd xd79a7ffb vs Floyd 0.7): 1-0 {White mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 29 - 6 - 13  [0.740] 48
-Finished game 48 (Floyd 0.7 vs Floyd xd79a7ffb): 1-0 {White mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 29 - 7 - 13  [0.724] 49
-Finished game 50 (Floyd 0.7 vs Floyd xd79a7ffb): 1-0 {White mates}
-Score of Floyd xd79a7ffb vs Floyd 0.7: 29 - 8 - 13  [0.710] 50
-ELO difference: 156
+Started game 2 of 50 (Floyd 0.7 vs Floyd x12d5dc80)
+Started game 1 of 50 (Floyd x12d5dc80 vs Floyd 0.7)
+Started game 3 of 50 (Floyd x12d5dc80 vs Floyd 0.7)
+Started game 4 of 50 (Floyd 0.7 vs Floyd x12d5dc80)
+Finished game 1 (Floyd x12d5dc80 vs Floyd 0.7): 1-0 {White mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 1 - 0 - 0  [1.000] 1
+Started game 5 of 50 (Floyd x12d5dc80 vs Floyd 0.7)
+Finished game 3 (Floyd x12d5dc80 vs Floyd 0.7): 1/2-1/2 {Draw by 3-fold repetition}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 1 - 0 - 1  [0.750] 2
+Started game 6 of 50 (Floyd 0.7 vs Floyd x12d5dc80)
+Finished game 2 (Floyd 0.7 vs Floyd x12d5dc80): 1-0 {White mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 1 - 1 - 1  [0.500] 3
+Started game 7 of 50 (Floyd x12d5dc80 vs Floyd 0.7)
+Finished game 4 (Floyd 0.7 vs Floyd x12d5dc80): 1-0 {White mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 1 - 2 - 1  [0.375] 4
+Started game 8 of 50 (Floyd 0.7 vs Floyd x12d5dc80)
+Finished game 6 (Floyd 0.7 vs Floyd x12d5dc80): 0-1 {Black mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 2 - 2 - 1  [0.500] 5
+Started game 9 of 50 (Floyd x12d5dc80 vs Floyd 0.7)
+Finished game 5 (Floyd x12d5dc80 vs Floyd 0.7): 0-1 {Black mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 2 - 3 - 1  [0.417] 6
+Started game 10 of 50 (Floyd 0.7 vs Floyd x12d5dc80)
+Finished game 7 (Floyd x12d5dc80 vs Floyd 0.7): 1-0 {White mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 3 - 3 - 1  [0.500] 7
+Started game 11 of 50 (Floyd x12d5dc80 vs Floyd 0.7)
+Finished game 8 (Floyd 0.7 vs Floyd x12d5dc80): 1-0 {White mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 3 - 4 - 1  [0.438] 8
+Started game 12 of 50 (Floyd 0.7 vs Floyd x12d5dc80)
+Finished game 11 (Floyd x12d5dc80 vs Floyd 0.7): 1-0 {White mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 4 - 4 - 1  [0.500] 9
+Started game 13 of 50 (Floyd x12d5dc80 vs Floyd 0.7)
+Finished game 10 (Floyd 0.7 vs Floyd x12d5dc80): 1-0 {White mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 4 - 5 - 1  [0.450] 10
+Started game 14 of 50 (Floyd 0.7 vs Floyd x12d5dc80)
+Finished game 9 (Floyd x12d5dc80 vs Floyd 0.7): 1-0 {White mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 5 - 5 - 1  [0.500] 11
+Started game 15 of 50 (Floyd x12d5dc80 vs Floyd 0.7)
+Finished game 12 (Floyd 0.7 vs Floyd x12d5dc80): 0-1 {Black mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 6 - 5 - 1  [0.542] 12
+Started game 16 of 50 (Floyd 0.7 vs Floyd x12d5dc80)
+Finished game 15 (Floyd x12d5dc80 vs Floyd 0.7): 0-1 {Black mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 6 - 6 - 1  [0.500] 13
+Started game 17 of 50 (Floyd x12d5dc80 vs Floyd 0.7)
+Finished game 16 (Floyd 0.7 vs Floyd x12d5dc80): 1-0 {White mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 6 - 7 - 1  [0.464] 14
+Started game 18 of 50 (Floyd 0.7 vs Floyd x12d5dc80)
+Finished game 13 (Floyd x12d5dc80 vs Floyd 0.7): 0-1 {Black mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 6 - 8 - 1  [0.433] 15
+Started game 19 of 50 (Floyd x12d5dc80 vs Floyd 0.7)
+Finished game 14 (Floyd 0.7 vs Floyd x12d5dc80): 0-1 {Black mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 7 - 8 - 1  [0.469] 16
+Started game 20 of 50 (Floyd 0.7 vs Floyd x12d5dc80)
+Finished game 19 (Floyd x12d5dc80 vs Floyd 0.7): 1-0 {White mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 8 - 8 - 1  [0.500] 17
+Started game 21 of 50 (Floyd x12d5dc80 vs Floyd 0.7)
+Finished game 20 (Floyd 0.7 vs Floyd x12d5dc80): 1-0 {White mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 8 - 9 - 1  [0.472] 18
+Started game 22 of 50 (Floyd 0.7 vs Floyd x12d5dc80)
+Finished game 18 (Floyd 0.7 vs Floyd x12d5dc80): 0-1 {Black mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 9 - 9 - 1  [0.500] 19
+Started game 23 of 50 (Floyd x12d5dc80 vs Floyd 0.7)
+Finished game 17 (Floyd x12d5dc80 vs Floyd 0.7): 1/2-1/2 {Draw by insufficient mating material}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 9 - 9 - 2  [0.500] 20
+Started game 24 of 50 (Floyd 0.7 vs Floyd x12d5dc80)
+Finished game 23 (Floyd x12d5dc80 vs Floyd 0.7): 1-0 {White mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 10 - 9 - 2  [0.524] 21
+Started game 25 of 50 (Floyd x12d5dc80 vs Floyd 0.7)
+Finished game 22 (Floyd 0.7 vs Floyd x12d5dc80): 1/2-1/2 {Draw by fifty moves rule}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 10 - 9 - 3  [0.523] 22
+Started game 26 of 50 (Floyd 0.7 vs Floyd x12d5dc80)
+Finished game 24 (Floyd 0.7 vs Floyd x12d5dc80): 0-1 {Black mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 11 - 9 - 3  [0.543] 23
+Started game 27 of 50 (Floyd x12d5dc80 vs Floyd 0.7)
+Finished game 21 (Floyd x12d5dc80 vs Floyd 0.7): 1/2-1/2 {Draw by 3-fold repetition}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 11 - 9 - 4  [0.542] 24
+Started game 28 of 50 (Floyd 0.7 vs Floyd x12d5dc80)
+Finished game 27 (Floyd x12d5dc80 vs Floyd 0.7): 1-0 {White mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 12 - 9 - 4  [0.560] 25
+Started game 29 of 50 (Floyd x12d5dc80 vs Floyd 0.7)
+Finished game 25 (Floyd x12d5dc80 vs Floyd 0.7): 1-0 {White mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 13 - 9 - 4  [0.577] 26
+Started game 30 of 50 (Floyd 0.7 vs Floyd x12d5dc80)
+Finished game 26 (Floyd 0.7 vs Floyd x12d5dc80): 1-0 {White mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 13 - 10 - 4  [0.556] 27
+Started game 31 of 50 (Floyd x12d5dc80 vs Floyd 0.7)
+Finished game 29 (Floyd x12d5dc80 vs Floyd 0.7): 1-0 {White mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 14 - 10 - 4  [0.571] 28
+Started game 32 of 50 (Floyd 0.7 vs Floyd x12d5dc80)
+Finished game 28 (Floyd 0.7 vs Floyd x12d5dc80): 1-0 {White mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 14 - 11 - 4  [0.552] 29
+Started game 33 of 50 (Floyd x12d5dc80 vs Floyd 0.7)
+Finished game 30 (Floyd 0.7 vs Floyd x12d5dc80): 0-1 {Black mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 15 - 11 - 4  [0.567] 30
+Started game 34 of 50 (Floyd 0.7 vs Floyd x12d5dc80)
+Finished game 31 (Floyd x12d5dc80 vs Floyd 0.7): 0-1 {Black mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 15 - 12 - 4  [0.548] 31
+Started game 35 of 50 (Floyd x12d5dc80 vs Floyd 0.7)
+Finished game 34 (Floyd 0.7 vs Floyd x12d5dc80): 0-1 {Black mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 16 - 12 - 4  [0.562] 32
+Started game 36 of 50 (Floyd 0.7 vs Floyd x12d5dc80)
+Finished game 33 (Floyd x12d5dc80 vs Floyd 0.7): 1-0 {White mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 17 - 12 - 4  [0.576] 33
+Started game 37 of 50 (Floyd x12d5dc80 vs Floyd 0.7)
+Finished game 32 (Floyd 0.7 vs Floyd x12d5dc80): 0-1 {Black mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 18 - 12 - 4  [0.588] 34
+Started game 38 of 50 (Floyd 0.7 vs Floyd x12d5dc80)
+Finished game 35 (Floyd x12d5dc80 vs Floyd 0.7): 1-0 {White mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 19 - 12 - 4  [0.600] 35
+Started game 39 of 50 (Floyd x12d5dc80 vs Floyd 0.7)
+Finished game 37 (Floyd x12d5dc80 vs Floyd 0.7): 1/2-1/2 {Draw by 3-fold repetition}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 19 - 12 - 5  [0.597] 36
+Started game 40 of 50 (Floyd 0.7 vs Floyd x12d5dc80)
+Finished game 36 (Floyd 0.7 vs Floyd x12d5dc80): 1-0 {White mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 19 - 13 - 5  [0.581] 37
+Started game 41 of 50 (Floyd x12d5dc80 vs Floyd 0.7)
+Finished game 38 (Floyd 0.7 vs Floyd x12d5dc80): 0-1 {Black mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 20 - 13 - 5  [0.592] 38
+Started game 42 of 50 (Floyd 0.7 vs Floyd x12d5dc80)
+Finished game 39 (Floyd x12d5dc80 vs Floyd 0.7): 1/2-1/2 {Draw by fifty moves rule}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 20 - 13 - 6  [0.590] 39
+Started game 43 of 50 (Floyd x12d5dc80 vs Floyd 0.7)
+Finished game 40 (Floyd 0.7 vs Floyd x12d5dc80): 0-1 {Black mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 21 - 13 - 6  [0.600] 40
+Started game 44 of 50 (Floyd 0.7 vs Floyd x12d5dc80)
+Finished game 42 (Floyd 0.7 vs Floyd x12d5dc80): 1-0 {White mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 21 - 14 - 6  [0.585] 41
+Started game 45 of 50 (Floyd x12d5dc80 vs Floyd 0.7)
+Finished game 41 (Floyd x12d5dc80 vs Floyd 0.7): 0-1 {Black mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 21 - 15 - 6  [0.571] 42
+Started game 46 of 50 (Floyd 0.7 vs Floyd x12d5dc80)
+Finished game 43 (Floyd x12d5dc80 vs Floyd 0.7): 1-0 {White mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 22 - 15 - 6  [0.581] 43
+Started game 47 of 50 (Floyd x12d5dc80 vs Floyd 0.7)
+Finished game 44 (Floyd 0.7 vs Floyd x12d5dc80): 1/2-1/2 {Draw by 3-fold repetition}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 22 - 15 - 7  [0.580] 44
+Started game 48 of 50 (Floyd 0.7 vs Floyd x12d5dc80)
+Finished game 45 (Floyd x12d5dc80 vs Floyd 0.7): 1-0 {White mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 23 - 15 - 7  [0.589] 45
+Started game 49 of 50 (Floyd x12d5dc80 vs Floyd 0.7)
+Finished game 48 (Floyd 0.7 vs Floyd x12d5dc80): 1/2-1/2 {Draw by 3-fold repetition}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 23 - 15 - 8  [0.587] 46
+Started game 50 of 50 (Floyd 0.7 vs Floyd x12d5dc80)
+Finished game 46 (Floyd 0.7 vs Floyd x12d5dc80): 0-1 {Black mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 24 - 15 - 8  [0.596] 47
+Finished game 47 (Floyd x12d5dc80 vs Floyd 0.7): 1-0 {White mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 25 - 15 - 8  [0.604] 48
+Finished game 49 (Floyd x12d5dc80 vs Floyd 0.7): 1-0 {White mates}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 26 - 15 - 8  [0.612] 49
+Finished game 50 (Floyd 0.7 vs Floyd x12d5dc80): 1/2-1/2 {Draw by insufficient mating material}
+Score of Floyd x12d5dc80 vs Floyd 0.7: 26 - 15 - 9  [0.610] 50
+ELO difference: 78
 Finished match
 + echo
 
@@ -494,57 +494,57 @@ test result OK passed 25 total 26
 test result OK passed 26 total 27
 test result OK passed 27 total 28
 test result OK passed 28 total 29
-test result OK passed 29 total 30
-test result OK passed 30 total 31
-test result OK passed 31 total 32
-test result OK passed 32 total 33
-test result OK passed 33 total 34
-test result OK passed 34 total 35
-test result OK passed 35 total 36
-test result OK passed 36 total 37
-test result OK passed 37 total 38
-test result OK passed 38 total 39
-test result OK passed 39 total 40
-test result FAILED passed 39 total 41
-test result OK passed 40 total 42
-test result OK passed 41 total 43
-test result OK passed 42 total 44
-test result OK passed 43 total 45
-test result OK passed 44 total 46
-test result OK passed 45 total 47
-test result OK passed 46 total 48
-test result OK passed 47 total 49
-test result OK passed 48 total 50
-test result OK passed 49 total 51
-test result OK passed 50 total 52
-test result OK passed 51 total 53
-test result OK passed 52 total 54
-test result OK passed 53 total 55
-test result OK passed 54 total 56
-test result OK passed 55 total 57
-test result OK passed 56 total 58
-test result OK passed 57 total 59
-test result OK passed 58 total 60
-test result OK passed 59 total 61
-test result OK passed 60 total 62
-test result OK passed 61 total 63
-test result OK passed 62 total 64
-test result OK passed 63 total 65
-test result OK passed 64 total 66
-test result OK passed 65 total 67
-test result OK passed 66 total 68
-test result OK passed 67 total 69
-test result OK passed 68 total 70
-test result FAILED passed 68 total 71
-test result OK passed 69 total 72
-test result OK passed 70 total 73
-test result OK passed 71 total 74
-test result OK passed 72 total 75
-test result OK passed 73 total 76
-test result OK passed 74 total 77
-test result OK passed 75 total 78
-test result OK passed 76 total 79
-test result FAILED passed 76 total 80
+test result FAILED passed 28 total 30
+test result OK passed 29 total 31
+test result OK passed 30 total 32
+test result OK passed 31 total 33
+test result OK passed 32 total 34
+test result OK passed 33 total 35
+test result OK passed 34 total 36
+test result OK passed 35 total 37
+test result OK passed 36 total 38
+test result OK passed 37 total 39
+test result OK passed 38 total 40
+test result FAILED passed 38 total 41
+test result OK passed 39 total 42
+test result OK passed 40 total 43
+test result OK passed 41 total 44
+test result OK passed 42 total 45
+test result OK passed 43 total 46
+test result OK passed 44 total 47
+test result OK passed 45 total 48
+test result OK passed 46 total 49
+test result OK passed 47 total 50
+test result OK passed 48 total 51
+test result OK passed 49 total 52
+test result OK passed 50 total 53
+test result OK passed 51 total 54
+test result OK passed 52 total 55
+test result OK passed 53 total 56
+test result OK passed 54 total 57
+test result OK passed 55 total 58
+test result OK passed 56 total 59
+test result OK passed 57 total 60
+test result OK passed 58 total 61
+test result OK passed 59 total 62
+test result OK passed 60 total 63
+test result OK passed 61 total 64
+test result OK passed 62 total 65
+test result OK passed 63 total 66
+test result OK passed 64 total 67
+test result OK passed 65 total 68
+test result OK passed 66 total 69
+test result OK passed 67 total 70
+test result FAILED passed 67 total 71
+test result OK passed 68 total 72
+test result OK passed 69 total 73
+test result OK passed 70 total 74
+test result OK passed 71 total 75
+test result OK passed 72 total 76
+test result OK passed 73 total 77
+test result OK passed 74 total 78
+test result OK passed 75 total 79
+test result OK passed 76 total 80
 test result OK passed 77 total 81
 test result OK passed 78 total 82
 test result OK passed 79 total 83
@@ -565,24 +565,24 @@ test result OK passed 92 total 97
 test result OK passed 93 total 98
 test result OK passed 94 total 99
 test result OK passed 95 total 100
-test result OK passed 96 total 101
-test result OK passed 97 total 102
-test result OK passed 98 total 103
-test result OK passed 99 total 104
-test result OK passed 100 total 105
-test result OK passed 101 total 106
-test result OK passed 102 total 107
-test result OK passed 103 total 108
-test result OK passed 104 total 109
-test result OK passed 105 total 110
-test result OK passed 106 total 111
-test result OK passed 107 total 112
-test result OK passed 108 total 113
-test result OK passed 109 total 114
-test result OK passed 110 total 115
-test result OK passed 111 total 116
-test result OK passed 112 total 117
-test result FAILED passed 112 total 118
+test result FAILED passed 95 total 101
+test result OK passed 96 total 102
+test result OK passed 97 total 103
+test result OK passed 98 total 104
+test result OK passed 99 total 105
+test result OK passed 100 total 106
+test result OK passed 101 total 107
+test result OK passed 102 total 108
+test result OK passed 103 total 109
+test result OK passed 104 total 110
+test result OK passed 105 total 111
+test result OK passed 106 total 112
+test result OK passed 107 total 113
+test result OK passed 108 total 114
+test result OK passed 109 total 115
+test result OK passed 110 total 116
+test result OK passed 111 total 117
+test result OK passed 112 total 118
 test result OK passed 113 total 119
 test result OK passed 114 total 120
 test result OK passed 115 total 121
@@ -660,105 +660,105 @@ test result OK passed 181 total 192
 test result FAILED passed 181 total 193
 test result OK passed 182 total 194
 test result OK passed 183 total 195
-test result OK passed 184 total 196
-test result OK passed 185 total 197
-test result OK passed 186 total 198
-test result OK passed 187 total 199
-test result FAILED passed 187 total 200
-test result OK passed 188 total 201
-test result OK passed 189 total 202
-test result OK passed 190 total 203
-test result OK passed 191 total 204
-test result OK passed 192 total 205
-test result OK passed 193 total 206
-test result OK passed 194 total 207
-test result OK passed 195 total 208
-test result OK passed 196 total 209
-test result FAILED passed 196 total 210
-test result OK passed 197 total 211
-test result OK passed 198 total 212
-test result FAILED passed 198 total 213
-test result OK passed 199 total 214
-test result OK passed 200 total 215
-test result OK passed 201 total 216
-test result OK passed 202 total 217
-test result OK passed 203 total 218
-test result OK passed 204 total 219
-test result OK passed 205 total 220
-test result FAILED passed 205 total 221
+test result FAILED passed 183 total 196
+test result OK passed 184 total 197
+test result OK passed 185 total 198
+test result OK passed 186 total 199
+test result FAILED passed 186 total 200
+test result OK passed 187 total 201
+test result OK passed 188 total 202
+test result OK passed 189 total 203
+test result OK passed 190 total 204
+test result OK passed 191 total 205
+test result OK passed 192 total 206
+test result OK passed 193 total 207
+test result OK passed 194 total 208
+test result OK passed 195 total 209
+test result FAILED passed 195 total 210
+test result OK passed 196 total 211
+test result OK passed 197 total 212
+test result FAILED passed 197 total 213
+test result OK passed 198 total 214
+test result OK passed 199 total 215
+test result OK passed 200 total 216
+test result OK passed 201 total 217
+test result OK passed 202 total 218
+test result OK passed 203 total 219
+test result OK passed 204 total 220
+test result OK passed 205 total 221
 test result FAILED passed 205 total 222
 test result OK passed 206 total 223
 test result OK passed 207 total 224
 test result OK passed 208 total 225
-test result OK passed 209 total 226
-test result OK passed 210 total 227
-test result OK passed 211 total 228
-test result FAILED passed 211 total 229
-test result FAILED passed 211 total 230
-test result OK passed 212 total 231
-test result OK passed 213 total 232
-test result OK passed 214 total 233
-test result OK passed 215 total 234
-test result OK passed 216 total 235
-test result OK passed 217 total 236
-test result FAILED passed 217 total 237
-test result FAILED passed 217 total 238
-test result OK passed 218 total 239
-test result OK passed 219 total 240
-test result FAILED passed 219 total 241
-test result OK passed 220 total 242
-test result OK passed 221 total 243
-test result OK passed 222 total 244
-test result OK passed 223 total 245
-test result OK passed 224 total 246
-test result OK passed 225 total 247
-test result OK passed 226 total 248
-test result OK passed 227 total 249
-test result OK passed 228 total 250
-test result OK passed 229 total 251
-test result FAILED passed 229 total 252
-test result OK passed 230 total 253
-test result OK passed 231 total 254
-test result OK passed 232 total 255
-test result FAILED passed 232 total 256
-test result FAILED passed 232 total 257
-test result OK passed 233 total 258
-test result OK passed 234 total 259
-test result OK passed 235 total 260
-test result OK passed 236 total 261
-test result OK passed 237 total 262
-test result OK passed 238 total 263
-test result OK passed 239 total 264
-test result FAILED passed 239 total 265
-test result OK passed 240 total 266
-test result OK passed 241 total 267
-test result OK passed 242 total 268
-test result OK passed 243 total 269
-test result OK passed 244 total 270
-test result OK passed 245 total 271
-test result OK passed 246 total 272
-test result OK passed 247 total 273
-test result OK passed 248 total 274
-test result OK passed 249 total 275
-test result OK passed 250 total 276
-test result OK passed 251 total 277
-test result OK passed 252 total 278
-test result OK passed 253 total 279
-test result OK passed 254 total 280
-test result OK passed 255 total 281
-test result OK passed 256 total 282
-test result FAILED passed 256 total 283
-test result OK passed 257 total 284
-test result OK passed 258 total 285
-test result OK passed 259 total 286
-test result OK passed 260 total 287
-test result OK passed 261 total 288
-test result OK passed 262 total 289
-test result OK passed 263 total 290
-test result FAILED passed 263 total 291
-test result OK passed 264 total 292
-test result FAILED passed 264 total 293
-test result FAILED passed 264 total 294
+test result FAILED passed 208 total 226
+test result OK passed 209 total 227
+test result OK passed 210 total 228
+test result FAILED passed 210 total 229
+test result FAILED passed 210 total 230
+test result OK passed 211 total 231
+test result OK passed 212 total 232
+test result OK passed 213 total 233
+test result OK passed 214 total 234
+test result OK passed 215 total 235
+test result OK passed 216 total 236
+test result FAILED passed 216 total 237
+test result FAILED passed 216 total 238
+test result OK passed 217 total 239
+test result OK passed 218 total 240
+test result FAILED passed 218 total 241
+test result OK passed 219 total 242
+test result OK passed 220 total 243
+test result OK passed 221 total 244
+test result OK passed 222 total 245
+test result OK passed 223 total 246
+test result OK passed 224 total 247
+test result OK passed 225 total 248
+test result OK passed 226 total 249
+test result OK passed 227 total 250
+test result OK passed 228 total 251
+test result FAILED passed 228 total 252
+test result OK passed 229 total 253
+test result OK passed 230 total 254
+test result OK passed 231 total 255
+test result FAILED passed 231 total 256
+test result FAILED passed 231 total 257
+test result OK passed 232 total 258
+test result OK passed 233 total 259
+test result OK passed 234 total 260
+test result OK passed 235 total 261
+test result OK passed 236 total 262
+test result OK passed 237 total 263
+test result OK passed 238 total 264
+test result FAILED passed 238 total 265
+test result OK passed 239 total 266
+test result OK passed 240 total 267
+test result OK passed 241 total 268
+test result OK passed 242 total 269
+test result OK passed 243 total 270
+test result OK passed 244 total 271
+test result OK passed 245 total 272
+test result OK passed 246 total 273
+test result OK passed 247 total 274
+test result OK passed 248 total 275
+test result OK passed 249 total 276
+test result OK passed 250 total 277
+test result OK passed 251 total 278
+test result OK passed 252 total 279
+test result OK passed 253 total 280
+test result OK passed 254 total 281
+test result OK passed 255 total 282
+test result FAILED passed 255 total 283
+test result OK passed 256 total 284
+test result OK passed 257 total 285
+test result OK passed 258 total 286
+test result OK passed 259 total 287
+test result OK passed 260 total 288
+test result OK passed 261 total 289
+test result OK passed 262 total 290
+test result FAILED passed 262 total 291
+test result OK passed 263 total 292
+test result FAILED passed 263 total 293
+test result OK passed 264 total 294
 test result OK passed 265 total 295
 test result OK passed 266 total 296
 test result FAILED passed 266 total 297
@@ -770,20 +770,20 @@ test result OK passed 269 total 300
 + echo '*** Strategy:'
 *** Strategy:
 + make sts
-01-Undermining.epd                      : 48
-02-Open_Files_and_Diagonals.epd         : 41
-03-Knight_Outposts.epd                  : 57
-04-Square_Vacancy.epd                   : 39
-05-Bishop_vs_Knight.epd                 : 55
-06-Re-Capturing.epd                     : 60
-07-Offering_of_Simplification.epd       : 40
-08-Advancement_of_fgh_Pawns.epd         : 35
-09-Advancement_of_abc_Pawns.epd         : 37
-10-Simplification.epd                   : 56
-11_Activity_of_the_King.epd             : 36
-12_Center_Control.epd                   : 51
-13_Pawn_Play_in_the_Center.epd          : 40
-14_Queens_and_Rooks_to_the_7th_Rank.epd : 58
+01-Undermining.epd                      : 54
+02-Open_Files_and_Diagonals.epd         : 43
+03-Knight_Outposts.epd                  : 53
+04-Square_Vacancy.epd                   : 44
+05-Bishop_vs_Knight.epd                 : 53
+06-Re-Capturing.epd                     : 54
+07-Offering_of_Simplification.epd       : 41
+08-Advancement_of_fgh_Pawns.epd         : 34
+09-Advancement_of_abc_Pawns.epd         : 42
+10-Simplification.epd                   : 54
+11_Activity_of_the_King.epd             : 32
+12_Center_Control.epd                   : 45
+13_Pawn_Play_in_the_Center.epd          : 50
+14_Queens_and_Rooks_to_the_7th_Rank.epd : 60
 + echo
 
 + echo '*** Check mate:'
@@ -791,7 +791,7 @@ test result OK passed 269 total 300
 + head -100 Data/qmate.epd
 + time python Tools/epdtest.py 10
 + grep result
-      104.35 real       104.25 user         0.08 sys
+      115.74 real       115.67 user         0.07 sys
 test result OK passed 1 total 1
 test result OK passed 2 total 2
 test result OK passed 3 total 3
@@ -808,51 +808,51 @@ test result OK passed 12 total 13
 test result OK passed 13 total 14
 test result OK passed 14 total 15
 test result OK passed 15 total 16
-test result FAILED passed 15 total 17
-test result OK passed 16 total 18
-test result OK passed 17 total 19
-test result OK passed 18 total 20
-test result OK passed 19 total 21
-test result OK passed 20 total 22
-test result OK passed 21 total 23
-test result FAILED passed 21 total 24
-test result OK passed 22 total 25
-test result OK passed 23 total 26
-test result OK passed 24 total 27
-test result OK passed 25 total 28
-test result OK passed 26 total 29
-test result OK passed 27 total 30
-test result OK passed 28 total 31
-test result OK passed 29 total 32
-test result OK passed 30 total 33
-test result OK passed 31 total 34
-test result FAILED passed 31 total 35
-test result OK passed 32 total 36
-test result FAILED passed 32 total 37
-test result OK passed 33 total 38
-test result OK passed 34 total 39
-test result OK passed 35 total 40
-test result OK passed 36 total 41
-test result OK passed 37 total 42
-test result OK passed 38 total 43
-test result OK passed 39 total 44
-test result OK passed 40 total 45
-test result OK passed 41 total 46
-test result OK passed 42 total 47
-test result OK passed 43 total 48
-test result OK passed 44 total 49
-test result OK passed 45 total 50
-test result OK passed 46 total 51
-test result OK passed 47 total 52
-test result OK passed 48 total 53
-test result OK passed 49 total 54
-test result OK passed 50 total 55
-test result OK passed 51 total 56
-test result OK passed 52 total 57
-test result OK passed 53 total 58
-test result OK passed 54 total 59
-test result OK passed 55 total 60
-test result OK passed 56 total 61
+test result OK passed 16 total 17
+test result OK passed 17 total 18
+test result OK passed 18 total 19
+test result OK passed 19 total 20
+test result OK passed 20 total 21
+test result OK passed 21 total 22
+test result OK passed 22 total 23
+test result FAILED passed 22 total 24
+test result OK passed 23 total 25
+test result OK passed 24 total 26
+test result OK passed 25 total 27
+test result OK passed 26 total 28
+test result OK passed 27 total 29
+test result OK passed 28 total 30
+test result OK passed 29 total 31
+test result OK passed 30 total 32
+test result OK passed 31 total 33
+test result OK passed 32 total 34
+test result FAILED passed 32 total 35
+test result OK passed 33 total 36
+test result FAILED passed 33 total 37
+test result OK passed 34 total 38
+test result OK passed 35 total 39
+test result OK passed 36 total 40
+test result OK passed 37 total 41
+test result OK passed 38 total 42
+test result OK passed 39 total 43
+test result OK passed 40 total 44
+test result OK passed 41 total 45
+test result OK passed 42 total 46
+test result OK passed 43 total 47
+test result OK passed 44 total 48
+test result OK passed 45 total 49
+test result OK passed 46 total 50
+test result OK passed 47 total 51
+test result OK passed 48 total 52
+test result OK passed 49 total 53
+test result OK passed 50 total 54
+test result OK passed 51 total 55
+test result OK passed 52 total 56
+test result OK passed 53 total 57
+test result OK passed 54 total 58
+test result OK passed 55 total 59
+test result OK passed 56 total 60
+test result FAILED passed 56 total 61
 test result OK passed 57 total 62
 test result OK passed 58 total 63
 test result OK passed 59 total 64
@@ -899,53 +899,53 @@ test result OK passed 94 total 100
 + echo bench movetime 10000
 + ./floyd-pgo2
 
-Floyd Chess Engine - Version xd79a7ffb
+Floyd Chess Engine - Version x12d5dc80
 Copyright (C) 2015-2016, Marcel van Kervinck
 All rights reserved
 
 Type "help" for more information, or "quit" to leave.
 
 egt class KPK check OK
-time 10001 nps 438609 fen r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -
-time 10005 nps 481972 fen 4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -
-time 10004 nps 479848 fen 3rk2r/1pq1bpp1/p1n1p1n1/3pP3/3P2P1/1PPQNNB1/5P2/R3R1K1 b k -
-time 10000 nps 621052 fen 7k/8/1p1Q2pp/1p3b2/3p3P/P3q3/BP4PK/8 b - -
-time 10005 nps 443308 fen 2r1rnk1/4qppp/p3b3/1p4P1/4p2P/2N1PN2/PP1Q1P2/1KR4R w - -
-time 10001 nps 439552 fen 2rk3r/p2n1pp1/bqn1p2p/1p1pP3/3P1N1P/bP1BBN2/P3QPP1/2R1R1K1 w - -
-time 10004 nps 570222 fen 1nr2rk1/p3Qppp/1p2p1n1/8/3P4/2N2N2/PP3PPP/2R2RK1 b - -
-time 10000 nps 825869 fen 3nr1k1/1p1r3p/pR1pNpp1/3P4/4P3/3P3P/6P1/1R5K b - -
-time 10000 nps 515851 fen 4r1k1/pp3ppp/3n4/2n1r3/2P2NP1/4KB2/PP2P2P/R5R1 w - -
-time 10005 nps 897754 fen 8/p5pk/1p6/5R1p/P7/5PPK/5r2/8 b - -
-time 10005 nps 887813 fen 8/2Q2p2/5qpk/4p3/8/5P1P/6K1/8 w - -
-time 10002 nps 543731 fen 5rk1/1pr2bbp/pNp1n1p1/2P1p3/1PBpP3/1N5P/1P3PP1/3RR1K1 b - -
-time 10003 nps 727807 fen 8/1b3pk1/rp5p/6p1/6B1/1R4P1/4P2P/4K3 w - -
-time 10005 nps 502959 fen r1bqk2r/pp2ppbp/3p1np1/8/2PQP3/2N5/PP2BPPP/R1B1K2R w KQkq -
-time 10005 nps 647125 fen 8/1b4pk/7q/p3pP2/1p2P3/1Pp5/2P1Q3/5BK1 b - -
-time 10004 nps 481090 fen r2qkb1r/2p2ppp/p1p5/3pP3/4n1b1/3Q1N2/PPP2PPP/RNB2RK1 w kq -
-time 10003 nps 520645 fen 4r1k1/pp2pp1n/3p2p1/6Bp/2rN1P1P/q1P5/2PQ2P1/1K1RR3 b - -
-time 10005 nps 476782 fen rnbq1rk1/pp3pbp/2pp1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - -
-time 10000 nps 713512 fen 8/8/p3k1p1/Bb5p/1P5P/5P2/1r4P1/3R2K1 b - -
-time 10005 nps 679864 fen 4k3/q4p2/2n1p1p1/p1Np4/3P1QP1/PP3P2/6K1/8 b - -
-time 10005 nps 840207 fen 3bn3/4k3/2p3p1/ppN2P2/P5P1/1P1KB3/8/8 b - -
-time 10003 nps 480768 fen r1b1r1k1/5pbp/pp1p1np1/2qPn3/P1p1P3/2N1BPN1/1P1QB1PP/R1R4K b - -
-time 10005 nps 555558 fen r1q1rnk1/p1p2pp1/bp2p2p/n2pP3/Q1PP1N1B/P1PB1P2/6PP/R4RK1 w - d6
-time 10005 nps 494917 fen r3r1k1/1bpnqppp/1p1p4/p2Pp3/1PP1P3/P5P1/1BQ2PBP/1R1R2K1 b - -
-time 10003 nps 815548 fen 1r6/4Pk2/1p1p1P2/p7/8/1P1K2p1/P7/5R2 b - -
-time 10005 nps 456575 fen 1rbqk2r/2pp1ppp/p1n2n2/1pb1p3/P3P3/1B3N2/1PPP1PPP/RNBQ1RK1 w k -
-time 10000 nps 671867 fen r4bk1/6pp/1B2n3/4P3/pp6/1P2N1P1/P5KP/3R4 w - -
-time 10005 nps 407254 fen r1bqkb1r/pp1n1ppp/2n5/2ppP3/3P1P2/5N2/PP4PP/RNBQKB1R w KQkq -
-time 10003 nps 602428 fen r1qr2k1/2p2pPp/p3n3/1p6/8/4BQ2/PP3PPP/R2R2K1 w - -
-time 10005 nps 761859 fen 4r3/1p4k1/p1p1P1pp/3p4/1P1N4/P6B/7P/4K3 w - -
-time 10005 nps 586191 fen 8/R4pk1/4pbq1/8/2P4p/5Q2/8/5K2 b - -
-time 10002 nps 733250 fen 4k3/R4pp1/P7/4P2p/5P2/3p2P1/r7/4K3 w - -
-time 10005 nps 532414 fen 2r3k1/1p4p1/p3bp2/8/N3Pb1p/2R4P/1PP1Q1P1/2q3BK b - -
-time 10005 nps 433819 fen rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -
-time 10003 nps 1519094 fen 8/6N1/8/1k4K1/3n4/8/5P2/8 b - -
-time 10005 nps 481267 fen rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -
-time 10004 nps 845686 fen 8/PRn5/3k4/r4p2/5PB1/8/5P2/6K1 w - -
-time 10005 nps 848487 fen r5k1/4Rpp1/3p3p/2pP4/p1P3P1/1P6/P4PP1/5K2 w - -
-time 10005 nps 921022 fen 5n2/2k1KB2/7P/8/3n1P2/8/p1N5/8 w - -
-time 10005 nps 451469 fen rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -
-result nps 633374
+time 10001 nps 445660 fen r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -
+time 10001 nps 486439 fen 4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -
+time 10005 nps 461532 fen 3rk2r/1pq1bpp1/p1n1p1n1/3pP3/3P2P1/1PPQNNB1/5P2/R3R1K1 b k -
+time 10004 nps 636047 fen 7k/8/1p1Q2pp/1p3b2/3p3P/P3q3/BP4PK/8 b - -
+time 10004 nps 448867 fen 2r1rnk1/4qppp/p3b3/1p4P1/4p2P/2N1PN2/PP1Q1P2/1KR4R w - -
+time 10005 nps 418208 fen 2rk3r/p2n1pp1/bqn1p2p/1p1pP3/3P1N1P/bP1BBN2/P3QPP1/2R1R1K1 w - -
+time 10005 nps 554566 fen 1nr2rk1/p3Qppp/1p2p1n1/8/3P4/2N2N2/PP3PPP/2R2RK1 b - -
+time 10001 nps 803909 fen 3nr1k1/1p1r3p/pR1pNpp1/3P4/4P3/3P3P/6P1/1R5K b - -
+time 10003 nps 489389 fen 4r1k1/pp3ppp/3n4/2n1r3/2P2NP1/4KB2/PP2P2P/R5R1 w - -
+time 10005 nps 901726 fen 8/p5pk/1p6/5R1p/P7/5PPK/5r2/8 b - -
+time 10003 nps 894300 fen 8/2Q2p2/5qpk/4p3/8/5P1P/6K1/8 w - -
+time 10003 nps 523617 fen 5rk1/1pr2bbp/pNp1n1p1/2P1p3/1PBpP3/1N5P/1P3PP1/3RR1K1 b - -
+time 10005 nps 706100 fen 8/1b3pk1/rp5p/6p1/6B1/1R4P1/4P2P/4K3 w - -
+time 10001 nps 475261 fen r1bqk2r/pp2ppbp/3p1np1/8/2PQP3/2N5/PP2BPPP/R1B1K2R w KQkq -
+time 10005 nps 664166 fen 8/1b4pk/7q/p3pP2/1p2P3/1Pp5/2P1Q3/5BK1 b - -
+time 10001 nps 446925 fen r2qkb1r/2p2ppp/p1p5/3pP3/4n1b1/3Q1N2/PPP2PPP/RNB2RK1 w kq -
+time 10005 nps 513143 fen 4r1k1/pp2pp1n/3p2p1/6Bp/2rN1P1P/q1P5/2PQ2P1/1K1RR3 b - -
+time 10000 nps 469850 fen rnbq1rk1/pp3pbp/2pp1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - -
+time 10005 nps 705561 fen 8/8/p3k1p1/Bb5p/1P5P/5P2/1r4P1/3R2K1 b - -
+time 10002 nps 666163 fen 4k3/q4p2/2n1p1p1/p1Np4/3P1QP1/PP3P2/6K1/8 b - -
+time 10001 nps 832831 fen 3bn3/4k3/2p3p1/ppN2P2/P5P1/1P1KB3/8/8 b - -
+time 10005 nps 466120 fen r1b1r1k1/5pbp/pp1p1np1/2qPn3/P1p1P3/2N1BPN1/1P1QB1PP/R1R4K b - -
+time 10001 nps 548152 fen r1q1rnk1/p1p2pp1/bp2p2p/n2pP3/Q1PP1N1B/P1PB1P2/6PP/R4RK1 w - d6
+time 10005 nps 501631 fen r3r1k1/1bpnqppp/1p1p4/p2Pp3/1PP1P3/P5P1/1BQ2PBP/1R1R2K1 b - -
+time 10005 nps 806885 fen 1r6/4Pk2/1p1p1P2/p7/8/1P1K2p1/P7/5R2 b - -
+time 10005 nps 456764 fen 1rbqk2r/2pp1ppp/p1n2n2/1pb1p3/P3P3/1B3N2/1PPP1PPP/RNBQ1RK1 w k -
+time 10004 nps 622163 fen r4bk1/6pp/1B2n3/4P3/pp6/1P2N1P1/P5KP/3R4 w - -
+time 10005 nps 391173 fen r1bqkb1r/pp1n1ppp/2n5/2ppP3/3P1P2/5N2/PP4PP/RNBQKB1R w KQkq -
+time 10005 nps 572837 fen r1qr2k1/2p2pPp/p3n3/1p6/8/4BQ2/PP3PPP/R2R2K1 w - -
+time 10001 nps 745191 fen 4r3/1p4k1/p1p1P1pp/3p4/1P1N4/P6B/7P/4K3 w - -
+time 10003 nps 588527 fen 8/R4pk1/4pbq1/8/2P4p/5Q2/8/5K2 b - -
+time 10000 nps 727055 fen 4k3/R4pp1/P7/4P2p/5P2/3p2P1/r7/4K3 w - -
+time 10005 nps 544247 fen 2r3k1/1p4p1/p3bp2/8/N3Pb1p/2R4P/1PP1Q1P1/2q3BK b - -
+time 10003 nps 427376 fen rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -
+time 10002 nps 1510552 fen 8/6N1/8/1k4K1/3n4/8/5P2/8 b - -
+time 10005 nps 479218 fen rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -
+time 10005 nps 826335 fen 8/PRn5/3k4/r4p2/5PB1/8/5P2/6K1 w - -
+time 10003 nps 808604 fen r5k1/4Rpp1/3p3p/2pP4/p1P3P1/1P6/P4PP1/5K2 w - -
+time 10005 nps 918000 fen 5n2/2k1KB2/7P/8/3n1P2/8/p1N5/8 w - -
+time 10005 nps 431903 fen rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -
+result nps 622920
 + echo
 

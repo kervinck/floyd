@@ -738,6 +738,29 @@ uint64_t hash(Board_t self)
         return key;
 }
 
+// Pawn/king hash
+uint64_t pawnKingHash(Board_t self)
+{
+        static const int filterPawnKing[] = {
+                [empty] = empty,
+                [whitePawn] = whitePawn, [whiteKnight] = empty, [whiteBishop] = empty,
+                [whiteRook] = empty,     [whiteQueen]  = empty, [whiteKing]   = whiteKing,
+                [blackPawn] = blackPawn, [blackKnight] = empty, [blackBishop] = empty,
+                [blackRook] = empty,     [blackQueen]  = empty, [blackKing]   = blackKing,
+        };
+
+        uint64_t key = 0;
+
+        // Pieces
+        for (int square=0; square<boardSize; square++) {
+                int piece = self->squares[square];
+                key ^= zobristPiece[filterPawnKing[piece]][square];
+        }
+
+        // Castling
+        return key ^ hashCastleFlags(self->castleFlags);
+}
+
 /*----------------------------------------------------------------------+
  |      isPromotion                                                     |
  +----------------------------------------------------------------------*/

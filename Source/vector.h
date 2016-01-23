@@ -578,15 +578,15 @@
         P(rookByRank_5, -282),
         P(rookByRank_6, -141), // -rank8
 
-        P(rookOnHalfOpen_0, 165), // fileA
-        P(rookOnHalfOpen_1, 174),
-        P(rookOnHalfOpen_2, 131),
-        P(rookOnHalfOpen_3, 160), // fileD
+        P(rookOnHalfOpen_0, 155), // fileA
+        P(rookOnHalfOpen_1, 128),
+        P(rookOnHalfOpen_2, 82),
+        P(rookOnHalfOpen_3, 74), // fileD
 
-        P(rookOnOpen_0, 155), // fileA
-        P(rookOnOpen_1, 128),
-        P(rookOnOpen_2, 82),
-        P(rookOnOpen_3, 74), // fileD
+        P(rookOnOpen_0, 165), // fileA
+        P(rookOnOpen_1, 174),
+        P(rookOnOpen_2, 131),
+        P(rookOnOpen_3, 160), // fileD
 
         /*
          *  Queens

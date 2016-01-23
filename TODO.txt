@@ -1,4 +1,26 @@
 
+|Todo| Rooks and queens on open files [evaluate]
+
+- potential open files for rooks
+Require that the number of helpers is at least the number of sentries
+
+Potential open file:
+        - Not doubled pawn
+        - The pawn can advance to meet a sentry
+                Why wouldn't it be able to advance?
+                        Only if there is no sentry
+        - In that position, if there are two sentries
+                Then there must also be support of a helper
+        Thats it?
+        - Sentry must not be mobile (but then we can make a passer)
+
+        Score by file (a-file is probably very good)
+        Score by rank of the pawn
+        Score by rank of the sentry?
+        Score by difference in moves/squares?
+
+- Doubling on open files
+
 |Todo| Clearer handling of minmovetime [timecontrol]
 
 Now we increase safety to 20 s when increment is (almost) 0.
@@ -15,8 +37,6 @@ There must be a cleaner way
 |Todo| Blocking of passers
 
 |Todo| Rooks and queens before and behind passers
-
-|Todo| Rooks and queens on open files [evaluate]
 
 |Todo| Strong squares
 

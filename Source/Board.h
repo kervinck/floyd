@@ -168,6 +168,7 @@ void boardToFen(Board_t self, char *fen);
  *  Compute a 64-bit hash for the current position using Polyglot-Zobrist hashing
  */
 uint64_t hash(Board_t self);
+uint64_t pawnKingHash(Board_t self);
 
 /*
  *  Generate all pseudo-legal moves for the position and return the move count

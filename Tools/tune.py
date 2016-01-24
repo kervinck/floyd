@@ -16,7 +16,7 @@ import sys
 #-----------------------------------------------------------------------
 
 # Number of workers to launch (-n)
-cpu = 16
+cpu = multiprocessing.cpu_count()
 
 # Search depth for evaluations. 0 means qSearch only (-d)
 depth = 0

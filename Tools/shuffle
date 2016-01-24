@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+
+import random
+import subprocess
+import sys
+
+if len(sys.argv) > 1 and sys.argv[1][0] == '-':
+        count = int(sys.argv[1][1:])
+else:
+        count = None
+
+sorter = subprocess.Popen(['sort'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+
+for line in sys.stdin:
+        sorter.stdin.write('%09d %s' % (random.randint(0, 999999999), line))
+
+sorter.stdin.close()
+
+try:
+        for line in sorter.stdout:
+                if count == 0:
+                        sorter.kill()
+                        break
+                print line[10:],
+                if count is not None:
+                        count -= 1
+except IOError:
+        sorter.kill()

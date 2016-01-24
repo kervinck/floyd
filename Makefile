@@ -122,11 +122,11 @@ tune: .module
 
 # One standard iteration only for the parameters listed in `params'
 ptune: .module
-	bzcat Data/ccrl-shuffled-3M.epd.bz2 | shuffle | head `head -1 params` | python Tools/tune.py Tuning/vector.json `grep -v "^[#-]" params`
+	bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/shuffle `head -1 params` | python Tools/tune.py Tuning/vector.json `grep -v "^[#-]" params`
 
 # Coarse tuning (1M positions)
 ctune: .module
-	bzcat Data/ccrl-shuffled-3M.epd.bz2 | shuffle | head -1000000 | python Tools/tune.py Tuning/vector.json
+	bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/shuffle -1000000 | python Tools/tune.py Tuning/vector.json
 
 # Extended tuning (10M positions)
 xtune: .module Data/ccrl-shuffled-10M.epd.bz2

@@ -86,8 +86,9 @@ enum piece {
 };
 
 enum pieceColor { white = 0, black = 1 };
-
 #define pieceColor(piece) ((piece) >= blackKing) // piece must not be 'empty'
+
+#define squareColor(square) ((file(square) ^ rank(square) ^ fileH ^ rank1) & 1)
 
 /*
  *  Game state

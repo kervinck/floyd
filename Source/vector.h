@@ -39,41 +39,65 @@
         P(rookValue, 4360),
         P(bishopValue, 2467),
         P(knightValue, 2323),
-        P(pawnValue1, 1018), P(pawnValue2, 1680), P(pawnValue3, 2350), P(pawnValue4, 3029),
-        P(pawnValue5, 3700), P(pawnValue6, 4345), P(pawnValue7, 4956), P(pawnValue8, 5503),
+        P(pawnValue1, 1018),
+        P(pawnValue2, 1680),
+        P(pawnValue3, 2350),
+        P(pawnValue4, 3029),
+        P(pawnValue5, 3700),
+        P(pawnValue6, 4345),
+        P(pawnValue7, 4956),
+        P(pawnValue8, 5503),
 
         P(queenAndQueen, -711),
         P(queenAndRook, -628),
         P(queenAndBishop, 66),
         P(queenAndKnight, -15),
-        P(queenAndPawn_1, -101), P(queenAndPawn_2, -72),
+        P(queenAndPawn_1, -101),
+        P(queenAndPawn_2, -72),
+
         P(rookAndRook, -287),
         P(rookAndBishop, -113),
         P(rookAndKnight, -129),
-        P(rookAndPawn_1, -57), P(rookAndPawn_2, -52),
+        P(rookAndPawn_1, -57),
+        P(rookAndPawn_2, -52),
+
         P(bishopAndBishop, 112),
         P(bishopAndKnight, -4),
-        P(bishopAndPawn_1, -54), P(bishopAndPawn_2, -19),
+        P(bishopAndPawn_1, -53),
+        P(bishopAndPawn_2, -2),
+
         P(knightAndKnight, -42),
-        P(knightAndPawn_1, -26), P(knightAndPawn_2, -1),
+        P(knightAndPawn_1, -25),
+        P(knightAndPawn_2, -9),
 
         P(queenVsRook, -313),
         P(queenVsBishop, 50),
         P(queenVsKnight, -7),
-        P(queenVsPawn_1, 128), P(queenVsPawn_2, -113),
+        P(queenVsPawn_1, 128),
+        P(queenVsPawn_2, -113),
+
         P(rookVsBishop, -41),
         P(rookVsKnight, -6),
-        P(rookVsPawn_1, -7), P(rookVsPawn_2, -42),
+        P(rookVsPawn_1, -7),
+        P(rookVsPawn_2, -42),
+
         P(bishopVsKnight, 23),
-        P(bishopVsPawn_1, -11), P(bishopVsPawn_2, -13),
-        P(knightVsPawn_1, -4), P(knightVsPawn_2, -21),
+        P(bishopVsPawn_1, -7),
+        P(bishopVsPawn_2, -13),
+
+        P(knightVsPawn_1, -3),
+        P(knightVsPawn_2, -21),
+
+        /*
+         *  Board control
+         */
 
         P(controlCenter, 28),
         P(controlExtendedCenter, 35),
         P(controlOutside, 22),
 
         /*
-         *  king safety
+         *  King safety
          */
 
         // scaling
@@ -175,8 +199,14 @@
         P(pawnByRank_3, -30),
         P(pawnByRank_4, 75), // -rank7
 
-        P(doubledPawnA, -198), P(doubledPawnB, -132), P(doubledPawnC, -181), P(doubledPawnD, -131),
-        P(doubledPawnE, -126), P(doubledPawnF, -67), P(doubledPawnG, -53), P(doubledPawnH, -224),
+        P(doubledPawnA, -198),
+        P(doubledPawnB, -132),
+        P(doubledPawnC, -181),
+        P(doubledPawnD, -131),
+        P(doubledPawnE, -126),
+        P(doubledPawnF, -67),
+        P(doubledPawnG, -53),
+        P(doubledPawnH, -224),
 
         P(backwardPawnClosedByRank_0, 11),
         P(backwardPawnClosedByRank_1, 16),
@@ -217,35 +247,59 @@
         P(rammedWeakPawnG, -24),
         P(rammedWeakPawnH, -57),
 
-        P(isolatedPawnClosedA, 156), P(isolatedPawnClosedB, 50),
-        P(isolatedPawnClosedC, 14), P(isolatedPawnClosedD, 30),
-        P(isolatedPawnClosedE, -59), P(isolatedPawnClosedF, -97),
-        P(isolatedPawnClosedG, -115), P(isolatedPawnClosedH, -22),
+        P(isolatedPawnClosedA, 156),
+        P(isolatedPawnClosedB, 50),
+        P(isolatedPawnClosedC, 14),
+        P(isolatedPawnClosedD, 30),
+        P(isolatedPawnClosedE, -59),
+        P(isolatedPawnClosedF, -97),
+        P(isolatedPawnClosedG, -115),
+        P(isolatedPawnClosedH, -22),
 
-        P(isolatedPawnOpenA, 141), P(isolatedPawnOpenB, 64),
-        P(isolatedPawnOpenC, -29), P(isolatedPawnOpenD, -83),
-        P(isolatedPawnOpenE, -92), P(isolatedPawnOpenF, -53),
-        P(isolatedPawnOpenG, -14), P(isolatedPawnOpenH, 58),
+        P(isolatedPawnOpenA, 141),
+        P(isolatedPawnOpenB, 64),
+        P(isolatedPawnOpenC, -29),
+        P(isolatedPawnOpenD, -83),
+        P(isolatedPawnOpenE, -92),
+        P(isolatedPawnOpenF, -53),
+        P(isolatedPawnOpenG, -14),
+        P(isolatedPawnOpenH, 58),
 
-        P(sidePawnClosedA, 88), P(sidePawnClosedB, 49),
-        P(sidePawnClosedC, 75), P(sidePawnClosedD, -12),
-        P(sidePawnClosedE, -31), P(sidePawnClosedF, -67),
-        P(sidePawnClosedG, -123), P(sidePawnClosedH, -49),
+        P(sidePawnClosedA, 88),
+        P(sidePawnClosedB, 49),
+        P(sidePawnClosedC, 75),
+        P(sidePawnClosedD, -12),
+        P(sidePawnClosedE, -31),
+        P(sidePawnClosedF, -67),
+        P(sidePawnClosedG, -123),
+        P(sidePawnClosedH, -49),
 
-        P(sidePawnOpenA, 79), P(sidePawnOpenB, 65),
-        P(sidePawnOpenC, 21), P(sidePawnOpenD, -40),
-        P(sidePawnOpenE, -33), P(sidePawnOpenF, -15),
-        P(sidePawnOpenG, 12), P(sidePawnOpenH, 21),
+        P(sidePawnOpenA, 79),
+        P(sidePawnOpenB, 65),
+        P(sidePawnOpenC, 21),
+        P(sidePawnOpenD, -40),
+        P(sidePawnOpenE, -33),
+        P(sidePawnOpenF, -15),
+        P(sidePawnOpenG, 12),
+        P(sidePawnOpenH, 21),
 
-        P(middlePawnClosedA, 0), P(middlePawnClosedB, 18),
-        P(middlePawnClosedC, 105), P(middlePawnClosedD, -8),
-        P(middlePawnClosedE, -4), P(middlePawnClosedF, -24),
-        P(middlePawnClosedG, -97), P(middlePawnClosedH, 0),
+        P(middlePawnClosedA, 0),
+        P(middlePawnClosedB, 18),
+        P(middlePawnClosedC, 105),
+        P(middlePawnClosedD, -8),
+        P(middlePawnClosedE, -4),
+        P(middlePawnClosedF, -24),
+        P(middlePawnClosedG, -97),
+        P(middlePawnClosedH, 0),
 
-        P(middlePawnOpenA, 0), P(middlePawnOpenB, -31),
-        P(middlePawnOpenC, 16), P(middlePawnOpenD, -10),
-        P(middlePawnOpenE, 8), P(middlePawnOpenF, -32),
-        P(middlePawnOpenG, -50), P(middlePawnOpenH, 0),
+        P(middlePawnOpenA, 0),
+        P(middlePawnOpenB, -31),
+        P(middlePawnOpenC, 16),
+        P(middlePawnOpenD, -10),
+        P(middlePawnOpenE, 8),
+        P(middlePawnOpenF, -32),
+        P(middlePawnOpenG, -50),
+        P(middlePawnOpenH, 0),
 
         P(duoPawnA, 13),
         P(duoPawnB, -10),
@@ -321,14 +375,32 @@
         P(mobilePawn_5, 91),
 
         // Quadratic polynomials for passers
-        P(passerA_0, -72), P(passerB_0, 46), P(passerC_0, 141), P(passerD_0, 123),
-        P(passerE_0, 263), P(passerF_0, 176), P(passerG_0, 103), P(passerH_0, 59),
+        P(passerA_0, -72),
+        P(passerB_0, 46),
+        P(passerC_0, 141),
+        P(passerD_0, 123),
+        P(passerE_0, 263),
+        P(passerF_0, 176),
+        P(passerG_0, 103),
+        P(passerH_0, 59),
 
-        P(passerA_1, 70), P(passerB_1, -9), P(passerC_1, -63), P(passerD_1, -40),
-        P(passerE_1, -96), P(passerF_1, -21), P(passerG_1, 62), P(passerH_1, 95),
+        P(passerA_1, 70),
+        P(passerB_1, -9),
+        P(passerC_1, -63),
+        P(passerD_1, -40),
+        P(passerE_1, -96),
+        P(passerF_1, -21),
+        P(passerG_1, 62),
+        P(passerH_1, 95),
 
-        P(passerA_2, 142), P(passerB_2, 204), P(passerC_2, 237), P(passerD_2, 199),
-        P(passerE_2, 245), P(passerF_2, 196), P(passerG_2, 122), P(passerH_2, 80),
+        P(passerA_2, 142),
+        P(passerB_2, 204),
+        P(passerC_2, 237),
+        P(passerD_2, 199),
+        P(passerE_2, 245),
+        P(passerF_2, 196),
+        P(passerG_2, 122),
+        P(passerH_2, 80),
 
         P(passerScalingOffset, 3980),
         P(passerAndQueen, 942),
@@ -356,12 +428,6 @@
         P(candidateF, 22),
         P(candidateG, 0),
         P(candidateH, 44),
-#if 0
-        P(drawBlockedA, 0), P(drawBlockedB, 0), P(drawBlockedC, 0), P(drawBlockedD, 0),
-        P(drawBlockedE, 0), P(drawBlockedF, 0), P(drawBlockedG, 0), P(drawBlockedH, 0),
-
-        P(drawPasser_0, 0), P(drawPasser_1, 0), P(drawPasser_2, 0),
-#endif
 
         /*
          *  Knights
@@ -393,14 +459,21 @@
         P(knightByRank_5, 88),
         P(knightByRank_6, 144), // -rank8
 
+        P(knightAndSpan_0, -95), // span0 (pawnless)
+        P(knightAndSpan_1, -86),
+        P(knightAndSpan_2, -16),
+        P(knightAndSpan_3, 19), // -span4 (7-8 files)
+
+        P(knightVsSpan_0, -144), // span0 (pawnless)
+        P(knightVsSpan_1, -76),
+        P(knightVsSpan_2, 6),
+        P(knightVsSpan_3, 32), // -span4 (7-8 files)
+
         /*
          *  Bishops
          */
 
 #if 0
-        P(bishopOnLong_0, 5),
-        P(bishopOnLong_1, 31),
-
         P(bishopByFile_0, -40), // fileA
         P(bishopByFile_1, -50),
         P(bishopByFile_2, -41),
@@ -417,7 +490,7 @@
         P(bishopByRank_5, 30),
         P(bishopByRank_6, 9), // -rank8
 #else
-       P(bishopBySquare_0, -176),
+        P(bishopBySquare_0, -176),
         P(bishopBySquare_1, 5),
         P(bishopBySquare_2, -72),
         P(bishopBySquare_3, 94),
@@ -562,6 +635,24 @@
         P(bishopBySquare_63x, -23),
 #endif
 
+        P(bishopAndSpan_0, -164), // span0 (pawnless)
+        P(bishopAndSpan_1, -137),
+        P(bishopAndSpan_2, -98),
+        P(bishopAndSpan_3, -67), // -span4 (7-8 files)
+
+        P(bishopVsSpan_0, -335), // span0 (pawnless)
+        P(bishopVsSpan_1, -253),
+        P(bishopVsSpan_2, -156),
+        P(bishopVsSpan_3, -94), // -span4 (7-8 files)
+
+        P(bishopAndLikePawn_1, -36),
+        P(bishopAndLikePawn_2, -4),
+        P(bishopAndLikeRammedPawn, -48),
+
+        P(bishopVsLikePawn_1, -23),
+        P(bishopVsLikePawn_2, -5),
+        P(bishopVsLikeRammedPawn, 11),
+
         /*
          *  Rooks
          */
@@ -632,20 +723,6 @@
         P(kingByRank_5, -205),
         P(kingByRank_6, 18), // -rank8
 
-#if 0
-        P(attackForceQueen, 0),  P(attackForceQueenX, 0),
-        P(attackForceRook, 0),   P(attackForceRookX, 0),
-        P(attackForceBishop, 0), P(attackForceBishopX, 0),
-        P(attackForceKnight, 0), P(attackForceKnightX, 0),
-        P(attackForcePawn, 0),   P(attackForcePawnX, 0),
-
-        P(defenceForceQueen, 0),  P(defenceForceQueenX, 0),
-        P(defenceForceRook, 0),   P(defenceForceRookX, 0),
-        P(defenceForceBishop, 0), P(defenceForceBishopX, 0),
-        P(defenceForceKnight, 0), P(defenceForceKnightX, 0),
-        P(defenceForcePawn, 0),   P(defenceForcePawnX, 0),
-#endif
-
         // Drawness. Positive is more drawish. Negative is more sharp
         P(drawOffset, -92),
         P(drawQueen, -213),
@@ -668,9 +745,11 @@
         P(drawUnlikeBishopsAndQueens, 655),
         P(drawUnlikeBishopsAndRooks, 413),
         P(drawUnlikeBishopsAndKnights, 882),
-        // TODO: pawn and pawn block square colors
 
-
+        P(drawRammed_0, 374), // fileA/H
+        P(drawRammed_1, 294),
+        P(drawRammed_2, 319),
+        P(drawRammed_3, 138), // fileD/E
 // }
 
 /*----------------------------------------------------------------------+

@@ -74,19 +74,22 @@ static const struct evaluation initEvaluation;
 
 /* struct material {
         uint64_t materialKey;
-        int wilo, draw;
+        int wiloScore, drawScore;
         double passerScaling[2];
         double safetyScaling[2];
 }; */
 
 struct pawnKingStructure {
         //uint64_t pawnKingHash;
-        short pawnScore[2]; // TODO: wiloScore, drawScore
+        short pawnScore[2];
+        short drawScore;
         short passerScore[2];
         short shelter[2];
+        short bishopWilo[2][2]; // [bishopColor][squareColor]
+        // TODO: something to boost drawness when bishops don't interact with enemy pawns
         unsigned char pawnOnFile[2]; // open, half-open
-        unsigned char center[2];
-        unsigned char span[2];
+        unsigned char span[2]; // 0..4
+        //unsigned char center[2]; // 0..4
 };
 
 #define pawnOnFile(side, file) bitTest(pawns->pawnOnFile[side], file)
@@ -179,8 +182,8 @@ static void evaluatePawnFile(const int v[vectorLen],
                             int file, int side, const bool onKingSide[2],
                             struct pawnKingStructure *pawns,
                             int maxPawnFromFirst[2][10][2]);
-static int evaluateKnight(const int v[vectorLen], int fileIndex, int rankIndex, bool oppKings);
-static int evaluateBishop(const int v[vectorLen], int fileIndex, int rankIndex, bool oppKings);
+static int evaluateKnight(const int v[vectorLen], int fileIndex, int rankIndex, bool oppKings, int side, const struct pawnKingStructure *pawns);
+static int evaluateBishop(const int v[vectorLen], int fileIndex, int rankIndex, bool oppKings, int square, int side, const struct pawnKingStructure *pawns);
 static int evaluateRook(int square, int side, const int v[vectorLen], const struct pawnKingStructure *pawns);
 static int evaluateQueen (const int v[vectorLen], int fileIndex, int rankIndex, bool oppKings);
 static int evaluateKing  (const int v[vectorLen], int fileIndex, int rankIndex);
@@ -231,8 +234,7 @@ int evaluate(Board_t self)
         unsigned long long materialKey = 0; // TODO: calculate incrementally in moves.c
         for (int square=0; square<boardSize; square++) {
                 int piece = self->squares[square];
-                int file = file(square), rank = rank(square);
-                int squareColor = (file ^ rank ^ fileH ^ rank1) & 1;
+                int squareColor = squareColor(square);
                 materialKey += materialKeys[piece][squareColor];
         }
 
@@ -369,10 +371,10 @@ int evaluate(Board_t self)
                         e.rooks[side] += evaluateRook(square, side, v, &pawns);
                         break;
                 case whiteBishop: case blackBishop:
-                        e.bishops[side] += evaluateBishop(v, fileIndex, rankIndex, oppKings);
+                        e.bishops[side] += evaluateBishop(v, fileIndex, rankIndex, oppKings, square, side, &pawns);
                         break;
                 case whiteKnight: case blackKnight:
-                        e.knights[side] += evaluateKnight(v, fileIndex, rankIndex, oppKings);
+                        e.knights[side] += evaluateKnight(v, fileIndex, rankIndex, oppKings, side, &pawns);
                         break;
                 }
         }
@@ -490,7 +492,8 @@ int evaluate(Board_t self)
                 + nrRooks   * v[drawRook]
                 + nrBishops * v[drawBishop]
                 + nrKnights * v[drawKnight]
-                + nrPawns   * v[drawPawn];
+                + nrPawns   * v[drawPawn]
+                + pawns.drawScore;
 
         if (nrQueens > 0 && nrRooks + nrBishops + nrKnights == 0)
                 drawScore += v[drawQueenEnding];
@@ -664,8 +667,7 @@ static void extractPawnStructure(Board_t self, const int v[vectorLen], struct pa
                 onKingSide[side] = isOnKingSide(self->sides[side].king);
 
         /*
-         *  Maximum distance of pawn to rank1, for each file and both sides.
-         *  And then the same from rank8 point of view.
+         *  Maximum distance of pawn to first rank, for each file and both sides.
          *  Used to detect open files, doubled pawns, passers, etc.
          */
         int maxPawnFromFirst[2][10][2] = {{{0}}}; // [perspective][1+file][pawnColor]
@@ -677,26 +679,61 @@ static void extractPawnStructure(Board_t self, const int v[vectorLen], struct pa
         int maxPawnFromFileA[2] = {0};
         int maxPawnFromFileH[2] = {0};
 
+        int bySquareColor[2][2] = {{0}}; // [pawnColor][squareColor]
+        int rammedBySquareColor[2][2] = {{0}};
+
         // Pawn location scan
         for (int square=0; square<boardSize; square++) {
                 int piece = self->squares[square];
                 if (piece == whitePawn || piece == blackPawn) {
                         int file = file(square), rank = rank(square);
-                        int color = pieceColor(piece);
+                        int pawnColor = pieceColor(piece);
                         #define setMax(a, b) if ((a) < (b)) (a) = (b)
 
-                        setMax(maxPawnFromFirst[white][1+file][color], rank ^ rank1);
-                        setMax(maxPawnFromFirst[black][1+file][color], rank ^ rank8);
+                        setMax(maxPawnFromFirst[white][1+file][pawnColor], rank ^ rank1);
+                        setMax(maxPawnFromFirst[black][1+file][pawnColor], rank ^ rank8);
 
-                        setMax(maxPawnFromFileA[color], file ^ fileA);
-                        setMax(maxPawnFromFileH[color], file ^ fileH);
+                        setMax(maxPawnFromFileA[pawnColor], file ^ fileA);
+                        setMax(maxPawnFromFileH[pawnColor], file ^ fileH);
+
+                        int squareColor = squareColor(square);
+                        bySquareColor[pawnColor][squareColor] += 1;
+
+                        static const int pawnStep[] = { a3 - a2, a6 - a7 };
+                        int inFront = self->squares[square+pawnStep[pawnColor]];
+                        if (inFront == whitePawn || inFront == blackPawn) {
+                                rammedBySquareColor[pawnColor][squareColor] += 1;
+
+                                int fileType = min(file, flip(file));
+                                pawns->drawScore += v[drawRammed_0 + fileType];
+                        }
                 }
         }
 
-        // Center [0..14] and span [0..8]
+        // Bishop and pawn square color scoring
         for (int side=white; side<=black; side++) {
-                pawns->center[side] = maxPawnFromFileA[side] - maxPawnFromFileH[side] + 7;
-                pawns->span[side] = max(0, maxPawnFromFileA[side] + maxPawnFromFileH[side] - 6);
+                int xside = other(side);
+                for (int squareColor=white; squareColor<=black; squareColor++)
+                        pawns->bishopWilo[side][squareColor] =
+                                v[bishopAndLikePawn_1]     * bySquareColor[side][squareColor]
+                              + v[bishopAndLikePawn_2]     * bySquareColor[side][squareColor] * bySquareColor[side][squareColor]
+                              + v[bishopAndLikeRammedPawn] * rammedBySquareColor[side][squareColor]
+                              + v[bishopVsLikePawn_1]      * bySquareColor[xside][squareColor]
+                              + v[bishopVsLikePawn_2]      * bySquareColor[xside][squareColor] * bySquareColor[xside][squareColor]
+                              + v[bishopVsLikeRammedPawn]  * rammedBySquareColor[xside][squareColor];
+        }
+
+        // Center [0..14]/3 -> [0..4] and span [0, 2..9]/2 -> [0..4]
+        // +---+---+---+---+---+---+---+---+
+        // | 0 0 0 1 1 1 2 2 2 3 3 3 4 4 4 | = center = (minPawnFile + maxPawnFile) / 3 : [0..4]
+        // +---+---+---+---+---+---+---+---+
+        //   a   b   c   d   e   f   g   h
+        for (int side=white; side<=black; side++) {
+                //pawns->center[side] = (maxPawnFromFileA[side] + (7 - maxPawnFromFileH[side])) / 3;
+                //assert(0 <= pawns->center[side] && pawns->center[side] <= 4);
+
+                pawns->span[side] = max(0, maxPawnFromFileA[side] + maxPawnFromFileH[side] - 5) / 2;
+                assert(0 <= pawns->span[side] && pawns->span[side] <= 4);
         }
 
         // Pawn features
@@ -714,7 +751,7 @@ static void extractPawnStructure(Board_t self, const int v[vectorLen], struct pa
                 int shelter = shelterPenalty(v, side, file(target), maxPawnFromFirst);
                 int kShelter = kFlag ? shelterPenalty(v, side, fileG, maxPawnFromFirst) : shelter;
                 int qShelter = qFlag ? shelterPenalty(v, side, fileC, maxPawnFromFirst) : shelter;
-                int best = min(shelter, min(kShelter, qShelter)); 
+                int best = min(shelter, min(kShelter, qShelter));
                 shelter -= (v[shelterCastled] * (shelter - best)) >> 8; // (1-w)*S + w*B == A - w*(S-B)
                 if (rank(king) != firstRank[side])
                         shelter += v[shelterWalkingKing];
@@ -903,7 +940,7 @@ static void evaluatePawnFile(const int v[vectorLen],
  |      evaluateKnight                                                  |
  +----------------------------------------------------------------------*/
 
-static int evaluateKnight(const int v[vectorLen], int fileIndex, int rankIndex, bool oppKings)
+static int evaluateKnight(const int v[vectorLen], int fileIndex, int rankIndex, bool oppKings, int side, const struct pawnKingStructure *pawns)
 {
         int knightScore = 0;
 
@@ -914,6 +951,14 @@ static int evaluateKnight(const int v[vectorLen], int fileIndex, int rankIndex, 
         if (rankIndex > 0) knightScore -= v[knightByRank_0 + rankIndex - 1];
         if (rankIndex < 7) knightScore += v[knightByRank_0 + rankIndex];
 
+        int span = pawns->span[side];
+        if (span > 0) knightScore -= v[knightAndSpan_0 + span - 1];
+        if (span < 4) knightScore += v[knightAndSpan_0 + span];
+
+        int xspan = pawns->span[other(side)];
+        if (xspan > 0) knightScore -= v[knightVsSpan_0 + xspan - 1];
+        if (xspan < 4) knightScore += v[knightVsSpan_0 + xspan];
+
         // TODO: strong squares / outposts
 
         return knightScore;
@@ -923,10 +968,25 @@ static int evaluateKnight(const int v[vectorLen], int fileIndex, int rankIndex, 
  |      evaluateBishop                                                  |
  +----------------------------------------------------------------------*/
 
-static int evaluateBishop(const int v[vectorLen], int fileIndex, int rankIndex, bool oppKings)
+static int evaluateBishop(const int v[vectorLen], int fileIndex, int rankIndex, bool oppKings, int square, int side, const struct pawnKingStructure *pawns)
 {
+        int bishopScore = 0;
+
         int offset = oppKings ? bishopBySquare_0x : bishopBySquare_0;
-        return v[offset + square(fileIndex, rankIndex)];
+        bishopScore += v[offset + square(fileIndex, rankIndex)];
+
+        int span = pawns->span[side];
+        if (span > 0) bishopScore -= v[bishopAndSpan_0 + span - 1];
+        if (span < 4) bishopScore += v[bishopAndSpan_0 + span];
+
+        int xspan = pawns->span[other(side)];
+        if (xspan > 0) bishopScore -= v[bishopVsSpan_0 + xspan - 1];
+        if (xspan < 4) bishopScore += v[bishopVsSpan_0 + xspan];
+
+        int squareColor = squareColor(square);
+        bishopScore += pawns->bishopWilo[side][squareColor];
+
+        return bishopScore;
 }
 
 /*----------------------------------------------------------------------+
@@ -958,16 +1018,12 @@ static int evaluateRook(int square, int side, const int v[vectorLen], const stru
         return rookScore;
 }
 
-// TODO: rook on potential open file
 // TODO: rook on open/half-open to king zone
 // TODO: relation to opponent king zone (normalized to reduce pressure on hash table)
-// TODO: doubling (same file)
 // TODO: connecting (side by side), connecting on 7th
 // TODO: controlling squares on an open file (not just by rook)
-// TODO: weak pawn on open file
 // TODO: supporting/blocking passers
 // TODO: attacking backward pawns
-// TODO: strong squares
 
 /*----------------------------------------------------------------------+
  |      evaluateQueen                                                   |
@@ -987,8 +1043,6 @@ static int evaluateQueen(const int v[vectorLen], int fileIndex, int rankIndex, b
         return queenScore;
 }
 // TODO: attacking backward pawns
-// TODO: relation to both kings
-// TODO: strong squares
 
 /*----------------------------------------------------------------------+
  |      evaluateKing                                                    |

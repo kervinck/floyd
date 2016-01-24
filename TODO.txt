@@ -1,5 +1,17 @@
 
-|Todo| Rooks and queens on open files [evaluate]
+|Todo| Use ABC as future queens-side king shelter instead of BCD
+
+|Todo| Blocking of passers [evaluate]
+
+|Todo| Rooks and queens in front or behind passers [evaluate]
+
+|Todo| Strong squares / outposts [evaluate]
+
+Isn't this simply "piece supported by own pawn"?
+ - Consider location. E.g. 3rd rank is probably not important
+ - Bonus per rank: 6p model
+
+|Todo| Potential open files [evaluate]
 
 - potential open files for rooks
 Require that the number of helpers is at least the number of sentries
@@ -19,34 +31,12 @@ Potential open file:
         Score by rank of the sentry?
         Score by difference in moves/squares?
 
-- Doubling on open files
+|Todo| Rooks on files with weak pawns [evaluate]
 
-|Todo| Clearer handling of minmovetime [timecontrol]
-
-Now we increase safety to 20 s when increment is (almost) 0.
-This is double indirect:
-1. Associating "inc=0" with "minmovetime"
-2. Putting the solution in "safety", instead of elsewhere
-There must be a cleaner way
-
-|Todo| Sneaker (hidden passed pawn)
+|Todo| Sneaker (hidden passed pawn) [evaluate]
 
         Passed pawn, if not blocked
         Helper can sacrifice itself to make a passer
-
-|Todo| Blocking of passers
-
-|Todo| Rooks and queens before and behind passers
-
-|Todo| Strong squares
-
-|Todo| Pawn levers [evaluate]
-
-|Todo| Drawness of blocked pawns [evaluate]
-
-|Todo| Undrawness of material advantage
-
-Instead of just "phase"
 
 |Todo| Candidate passer [evaluate]
 
@@ -54,29 +44,19 @@ Two types:
 1. Floyd type: check that the helpers are on the right spot
 2. Fruit type: just see if the helpers outnumber the sentries
 
+|Todo| Pawn levers [evaluate]
+
+|Todo| Undrawness of material advantage [evaluate]
+
+Instead of just "phase"
+
 |Todo| Remove "fileIndex" concept [qa]
 
-|Todo| Pawn mobility [evaluate]
+|Todo| Board control: what can I drop on a square [evaluate]
 
-Can it move safely & how far
+|Todo| Piece vs pawn center
 
-- Blocked by pawn
-- Blocked by pawn attack
-
-- Blocked by own piece
-- Blocked by opponent piece
-- Blocked by opponent piece attack
-- Blocked by opponent while not defended by pawn
-
-Board control: what can I drop on a square
-Mobility: what can I actually move to a square
-
-|Todo| Piece vs pawn span
-
-bishopToSpan
-knightToSpan
-drawPawnSpan
-
+Center X and center Y
 knightToPawnCenter
 kingToPawnCenter
 
@@ -85,28 +65,23 @@ kingToPawnCenter
 Pawn center (rank, file)
 Opponent king
 Passers
-Weak pawn
+Weak pawn (kings)
 
 |Todo| Attacking a non-mobile pawn
 
 |Todo| Piece mobility [evaluate]
 
-|Todo| Attack x piece matrix
+Mobility = what can I actually move to a square, safely
 
-|Todo| Threats
+|Todo| Attack x piece matrix [evaluate]
 
-Threat:
- weaker attacks stronger piece or undefended piece
+|Todo| Threats [evaluate]
+
+Threat: weaker attacks stronger piece or undefended piece
 
 1st threat
 2nd threat
 3rd threat
-
-|Todo| Outposts
-
-Isn't this simply "piece supported by own pawn"?
- - Consider location. E.g. 3rd rank is probably not important
- - Bonus per rank: 6p model
 
 |Todo| Check Rebel evaluation features [evaluate]
 
@@ -125,8 +100,6 @@ take many things.
 
 https://chessprogramming.wikispaces.com/Evaluation
 
-|Todo| Expand board control. Include mobility [evaluate]
-
 |Todo| Bring back the symmetry to reduce parameters
 |Todo| Simplify bishop tables again
 
@@ -134,7 +107,10 @@ https://chessprogramming.wikispaces.com/Evaluation
 
 |Todo| Add left/right testing [qa,evaluate]
 
-|Todo| Use ABC as future queens-side king shelter instead of BCD
+|Todo| Introduction of pawn/king table [speed]
+
+Step 1: cache only the last result
+Step 2: full blown table
 
 ------------------------------------------------------------------------
 
@@ -151,7 +127,6 @@ R vs N+PP
 More complex:
 RP vs NN
 Q vs RR
-
 
 |Todo| Basic history heuristic [search]
 
@@ -310,4 +285,14 @@ and gain some fake elo at ultra fast tc.
 |Todo| Principle component analysis [tune]
 
 For decorrelation of parameters
+
+|Todo| Clearer handling of minmovetime [timecontrol]
+
+Now we increase safety to 20 s when increment is (almost) 0.
+This is double indirect:
+1. Associating "inc=0" with "minmovetime"
+2. Putting the solution in "safety", instead of elsewhere
+There must be a cleaner way
+
+|Todo| Rook doubling on open files [evaluate]
 

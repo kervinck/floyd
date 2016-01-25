@@ -129,6 +129,7 @@ struct Engine {
 extern int globalVector[];
 extern const int vectorLen;
 extern const char * const vectorLabels[];
+extern uint64_t globalVectorBaseHash;
 
 /*----------------------------------------------------------------------+
  |      Functions                                                       |
@@ -160,6 +161,10 @@ double ttCalcLoad(Engine_t self);
  *  Time control
  */
 void setTimeTargets(Engine_t self, double time, double inc, int movestogo, double movetime);
+
+// Init and cleanup
+void initEngine(Engine_t self);
+void cleanupEngine(Engine_t self);
 
 /*----------------------------------------------------------------------+
  |                                                                      |

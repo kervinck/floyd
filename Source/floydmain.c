@@ -40,8 +40,6 @@
 
 #include "uci.h"
 
-static struct Engine engine;
-
 int main(int argc, const char *argv[])
 {
         if (argc <= 1)
@@ -51,17 +49,14 @@ int main(int argc, const char *argv[])
                        "\n"
                        "Type \"help\" for more information, or \"quit\" to leave.\n\n");
 
+        struct Engine engine;
+        initEngine(&engine);
+
         setupBoard(&engine.board, startpos); // be nice and allow `go' without `position'
 
         uciMain(&engine, argv + 1);
 
-        // TODO: move this to a destructor
-        freeList(engine.board.hashHistory);
-        freeList(engine.board.undoStack);
-        freeList(engine.searchMoves);
-        freeList(engine.pv);
-        freeList(engine.killers);
-        free(engine.tt.slots);
+        cleanupEngine(&engine);
 
         return 0;
 }

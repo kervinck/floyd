@@ -114,6 +114,7 @@ floydmodule_setCoefficient(PyObject *self, PyObject *args)
 
         long oldValue = globalVector[coef];
         globalVector[coef] = newValue;
+        globalVectorBaseHash = ~xorshift64star(~globalVectorBaseHash); // invalidate the pawnKingTable
 
         PyObject *result = PyTuple_New(2);
         if (!result)
@@ -160,7 +161,7 @@ floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
                 return null;
 
         struct Engine engine;
-        memset(&engine, 0, sizeof engine);
+        initEngine(&engine);
 
         ttSetSize(&engine, (depth > 0) ? 4*1024*1024 : 0); // TODO: remove when we have a proper engine object
 
@@ -193,6 +194,7 @@ floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
         engine.pondering = false;
         engine.infoFunction = infoFunction;
         engine.infoData = infoData;
+
         rootSearch(&engine);
 
         PyObject *result = PyTuple_New(2);
@@ -220,13 +222,7 @@ floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
                 return null;
         }
 
-        // TODO: move this to a destructor
-        freeList(engine.board.hashHistory);
-        freeList(engine.board.undoStack);
-        freeList(engine.searchMoves);
-        freeList(engine.pv);
-        freeList(engine.killers);
-        free(engine.tt.slots);
+        cleanupEngine(&engine);
 
         return result;
 }

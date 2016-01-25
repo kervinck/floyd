@@ -59,6 +59,9 @@ struct Board {
         uint64_t hash;
         uint64List hashHistory;
 
+        uint64_t pawnKingHash;
+        uint64List pkHashHistory;
+
         int eloDiff;
 
         /*

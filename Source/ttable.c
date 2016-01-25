@@ -230,15 +230,7 @@ double ttCalcLoad(Engine_t self)
  */
 void ttClearFast(Engine_t self)
 {
-        uint64_t x = ~self->tt.baseHash;
-
-        // xorshift64star
-        x ^= x >> 12;
-        x ^= x << 25;
-        x ^= x >> 27;
-        x *= 2685821657736338717ULL;
-
-        self->tt.baseHash = ~x;
+        self->tt.baseHash = ~xorshift64star(~self->tt.baseHash);
 }
 
 /*----------------------------------------------------------------------+

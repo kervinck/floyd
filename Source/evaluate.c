@@ -79,8 +79,8 @@ static const struct evaluation initEvaluation;
         double safetyScaling[2];
 }; */
 
-struct pawnKingStructure {
-        //uint64_t pawnKingHash;
+struct pkSlot {
+        uint64_t pawnKingHash;
         short pawnScore[2];
         short drawScore;
         short passerScore[2];
@@ -93,15 +93,6 @@ struct pawnKingStructure {
 };
 
 #define pawnOnFile(side, file) bitTest(pawns->pawnOnFile[side], file)
-
-#if 0
-enum pawnFlags {
-        pawnFlagPasser        = 1 << 0,
-        pawnFlagPotentialOpen = 1 << 1,
-};
-#endif
-
-static const struct pawnKingStructure initPawnStructure;
 
 #define nrPawns(side)      (int)(((materialKey) >> (((side) << 2) + 0)) & 15)
 #define nrKnights(side)    (int)(((materialKey) >> (((side) << 2) + 8)) & 15)
@@ -148,6 +139,7 @@ int globalVector[] = {
         #include "vector.h"
         #undef P
 };
+uint64_t globalVectorBaseHash; // TODO: move to Python engine object
 
 static const int firstRank[] = { rank1, rank8 }; // white, black
 
@@ -168,6 +160,9 @@ static const int kingZoneCenter[] = {
         Z(h1), Z(h2), Z(h3), Z(h4), Z(h5), Z(h6), Z(h7), Z(h8),
 };
 
+#define pawnKingLen (1L << 17) // must be power of 2
+static struct pkSlot pawnKingTable[pawnKingLen];
+
 /*----------------------------------------------------------------------+
  |      Functions                                                       |
  +----------------------------------------------------------------------*/
@@ -177,14 +172,16 @@ static double logit(double p);
 
 static int squareOf(Board_t self, int piece);
 
-static void extractPawnStructure(Board_t self, const int v[vectorLen], struct pawnKingStructure *pawns);
+static void extractPawnStructure(Board_t self, const int v[vectorLen], struct pkSlot *pawns);
 static void evaluatePawnFile(const int v[vectorLen],
                             int file, int side, const bool onKingSide[2],
-                            struct pawnKingStructure *pawns,
+                            struct pkSlot *pawns,
                             int maxPawnFromFirst[2][10][2]);
-static int evaluateKnight(const int v[vectorLen], int fileIndex, int rankIndex, bool oppKings, int side, const struct pawnKingStructure *pawns);
-static int evaluateBishop(const int v[vectorLen], int fileIndex, int rankIndex, bool oppKings, int square, int side, const struct pawnKingStructure *pawns);
-static int evaluateRook(int square, int side, const int v[vectorLen], const struct pawnKingStructure *pawns);
+static int evaluateKnight(const int v[vectorLen], int fileIndex, int rankIndex, bool oppKings,
+                          int side, const struct pkSlot *pawns);
+static int evaluateBishop(const int v[vectorLen], int fileIndex, int rankIndex, bool oppKings,
+                          int square, int side, const struct pkSlot *pawns);
+static int evaluateRook(int square, int side, const int v[vectorLen], const struct pkSlot *pawns);
 static int evaluateQueen (const int v[vectorLen], int fileIndex, int rankIndex, bool oppKings);
 static int evaluateKing  (const int v[vectorLen], int fileIndex, int rankIndex);
 
@@ -328,12 +325,14 @@ int evaluate(Board_t self)
          |      Pawn structure                                          |
          +--------------------------------------------------------------*/
 
-        struct pawnKingStructure pawns = initPawnStructure;
-        extractPawnStructure(self, v, &pawns);
+        long pkIndex = (self->pawnKingHash ^ globalVectorBaseHash) & (pawnKingLen - 1);
+        struct pkSlot *pawns = &pawnKingTable[pkIndex];
+        if (pawns->pawnKingHash != self->pawnKingHash)
+                extractPawnStructure(self, v, pawns);
 
         for (int side=white; side<=black; side++) {
-                e.pawns[side] = pawns.pawnScore[side];
-                e.passers[side] = round(pawns.passerScore[side] * e.passerScaling[side]);
+                e.pawns[side] = pawns->pawnScore[side];
+                e.passers[side] = round(pawns->passerScore[side] * e.passerScaling[side]);
         }
 
         /*--------------------------------------------------------------+
@@ -368,13 +367,13 @@ int evaluate(Board_t self)
                         e.queens[side] += evaluateQueen(v, fileIndex, rankIndex, oppKings);
                         break;
                 case whiteRook: case blackRook:
-                        e.rooks[side] += evaluateRook(square, side, v, &pawns);
+                        e.rooks[side] += evaluateRook(square, side, v, pawns);
                         break;
                 case whiteBishop: case blackBishop:
-                        e.bishops[side] += evaluateBishop(v, fileIndex, rankIndex, oppKings, square, side, &pawns);
+                        e.bishops[side] += evaluateBishop(v, fileIndex, rankIndex, oppKings, square, side, pawns);
                         break;
                 case whiteKnight: case blackKnight:
-                        e.knights[side] += evaluateKnight(v, fileIndex, rankIndex, oppKings, side, &pawns);
+                        e.knights[side] += evaluateKnight(v, fileIndex, rankIndex, oppKings, side, pawns);
                         break;
                 }
         }
@@ -471,11 +470,11 @@ int evaluate(Board_t self)
                 // TODO: maybe it is better to scale shelter and attack independently:
                 // - Small attacks should scale the same as shelter
                 // - Heavy attacks are always dangerous
-                int shelter = pawns.shelter[side];
+                int shelter = pawns->shelter[side];
                 e.safety[side] = -trunc(e.safetyScaling[side] * (shelter + attack));
 
                 // Castling capability intrinsic value
-                // TODO: move to pawnKingStructure
+                // TODO: move to pkSlot
                 int kFlag = self->castleFlags & (castleFlagWhiteKside << side);
                 int qFlag = self->castleFlags & (castleFlagWhiteQside << side);
                 if (kFlag | qFlag)
@@ -493,7 +492,7 @@ int evaluate(Board_t self)
                 + nrBishops * v[drawBishop]
                 + nrKnights * v[drawKnight]
                 + nrPawns   * v[drawPawn]
-                + pawns.drawScore;
+                + pawns->drawScore;
 
         if (nrQueens > 0 && nrRooks + nrBishops + nrKnights == 0)
                 drawScore += v[drawQueenEnding];
@@ -659,8 +658,10 @@ int evaluate(Board_t self)
  |      extractPawnStructure                                            |
  +----------------------------------------------------------------------*/
 
-static void extractPawnStructure(Board_t self, const int v[vectorLen], struct pawnKingStructure *pawns)
+static void extractPawnStructure(Board_t self, const int v[vectorLen], struct pkSlot *pawns)
 {
+        *pawns = (struct pkSlot) { .pawnKingHash = self->pawnKingHash };
+
         // Kings
         bool onKingSide[2]; // true if respective king on E-H
         for (int side=white; side<=black; side++)
@@ -766,7 +767,7 @@ static void extractPawnStructure(Board_t self, const int v[vectorLen], struct pa
 // Helper for extractPawnStructure
 static void evaluatePawnFile(const int v[vectorLen],
                             int file, int side, const bool onKingSide[2],
-                            struct pawnKingStructure *pawns,
+                            struct pkSlot *pawns,
                             int maxPawnFromFirst[2][10][2])
 {
         int xside = other(side);
@@ -940,7 +941,8 @@ static void evaluatePawnFile(const int v[vectorLen],
  |      evaluateKnight                                                  |
  +----------------------------------------------------------------------*/
 
-static int evaluateKnight(const int v[vectorLen], int fileIndex, int rankIndex, bool oppKings, int side, const struct pawnKingStructure *pawns)
+static int evaluateKnight(const int v[vectorLen], int fileIndex, int rankIndex, bool oppKings,
+                          int side, const struct pkSlot *pawns)
 {
         int knightScore = 0;
 
@@ -968,7 +970,8 @@ static int evaluateKnight(const int v[vectorLen], int fileIndex, int rankIndex, 
  |      evaluateBishop                                                  |
  +----------------------------------------------------------------------*/
 
-static int evaluateBishop(const int v[vectorLen], int fileIndex, int rankIndex, bool oppKings, int square, int side, const struct pawnKingStructure *pawns)
+static int evaluateBishop(const int v[vectorLen], int fileIndex, int rankIndex, bool oppKings,
+                          int square, int side, const struct pkSlot *pawns)
 {
         int bishopScore = 0;
 
@@ -993,7 +996,7 @@ static int evaluateBishop(const int v[vectorLen], int fileIndex, int rankIndex, 
  |      evaluateRook                                                    |
  +----------------------------------------------------------------------*/
 
-static int evaluateRook(int square, int side, const int v[vectorLen], const struct pawnKingStructure *pawns)
+static int evaluateRook(int square, int side, const int v[vectorLen], const struct pkSlot *pawns)
 {
         int rookScore = 0;
 

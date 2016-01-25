@@ -151,6 +151,7 @@ double xTime(void);
 char *stringCopy(char *s, const char *t);
 int compareInt(const void *ap, const void *bp);
 int readLine(void *fp, charList *lineBuffer);
+uint64_t xorshift64star(uint64_t x);
 
 /*----------------------------------------------------------------------+
  |      Main support                                                    |

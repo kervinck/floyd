@@ -1,4 +1,12 @@
 
+|Todo| Processing multiple commands with arguments cli hangs [bug]
+
+Example:
+        ./floyd 'bench movetime 100' quit
+
+This works fine:
+        ./floyd bench quit
+
 |Todo| Use ABC as future queens-side king shelter instead of BCD
 
 |Todo| Blocking of passers [evaluate]

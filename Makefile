@@ -17,7 +17,7 @@
 
 floydVersion:=$(shell python Tools/getVersion.py versions.json Source/*)
 
-uciSources:=cplus.c evaluate.c floydmain.c format.c kpk.c moves.c\
+uciSources:=cplus.c engine.c evaluate.c floydmain.c format.c kpk.c moves.c\
             parse.c search.c test.c ttable.c uci.c zobrist.c
 uciSources:=$(addprefix Source/, $(uciSources))
 

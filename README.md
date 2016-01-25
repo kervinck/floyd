@@ -115,10 +115,11 @@ Hierarchy for source modules is as follows:
   +--- Engine.h
   |     +--- search.c                   PVS, scout, quiescence search, SEE
   |     +--- ttable.c                   Transposition table
-  |     `--- evaluate.c                 Position evaluation
-  |           +--- vector.h             Evaluation features and weights
-  |           `--- kpk.h                In-memory bitbase for King+Pawn vs King
-  |                 `--- kpk.c
+  |     +--- evaluate.c                 Position evaluation
+  |     |     +--- vector.h             Evaluation features and weights
+  |     |     `--- kpk.h                In-memory bitbase for King+Pawn vs King
+  |     |           `--- kpk.c
+  |     `--- engine.c                   Engine object chores
   +--- Board.h
   |     +--- format.c                   Conversion to FEN and UCI move notation
   |     +--- parse.c                    Conversion from FEN and UCI move notation

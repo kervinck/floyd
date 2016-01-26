@@ -751,7 +751,7 @@ static void extractPawnStructure(Board_t self, const int v[vectorLen], struct pk
                 int qFlag = self->castleFlags & (castleFlagWhiteQside << side);
                 int shelter = shelterPenalty(v, side, file(target), maxPawnFromFirst);
                 int kShelter = kFlag ? shelterPenalty(v, side, fileG, maxPawnFromFirst) : shelter;
-                int qShelter = qFlag ? shelterPenalty(v, side, fileC, maxPawnFromFirst) : shelter;
+                int qShelter = qFlag ? shelterPenalty(v, side, fileB, maxPawnFromFirst) : shelter;
                 int best = min(shelter, min(kShelter, qShelter));
                 shelter -= (v[shelterCastled] * (shelter - best)) >> 8; // (1-w)*S + w*B == A - w*(S-B)
                 if (rank(king) != firstRank[side])

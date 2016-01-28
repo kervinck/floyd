@@ -1,14 +1,4 @@
 
-|Todo| Processing multiple commands with arguments cli hangs [bug]
-
-Example:
-        ./floyd 'bench movetime 100' quit
-
-This works fine:
-        ./floyd bench quit
-
-|Todo| Use ABC as future queens-side king shelter instead of BCD
-
 |Todo| Blocking of passers [evaluate]
 
 |Todo| Rooks and queens in front or behind passers [evaluate]
@@ -303,4 +293,12 @@ This is double indirect:
 There must be a cleaner way
 
 |Todo| Rook doubling on open files [evaluate]
+
+|Todo| Processing multiple commands with arguments cli hangs [bug]
+
+Example:
+        ./floyd 'bench movetime 100' quit
+
+This works fine:
+        ./floyd bench quit
 

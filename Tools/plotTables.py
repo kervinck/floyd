@@ -7,7 +7,8 @@ import numpy as np
 import sys
 
 with open(sys.argv[1], 'r') as fp:
-        vector = {item[0]:item[1] for item in json.load(fp)}
+        jsonVector, history = json.load(fp)
+        vector = {item[0]:item[1] for item in jsonVector}
 
 def pawn(fileIndex, rankIndex, xKing):
         if rankIndex in [0, 7]:
@@ -45,9 +46,9 @@ def rook(fileIndex, rankIndex, xKing):
 
 def queen(fileIndex, rankIndex, xKing):
         value = 0
-        x = 'x' if xKing else ''
-        if fileIndex > 0: value -= vector['queenByFile_%d%s' % (fileIndex - 1, x)]
-        if fileIndex < 7: value += vector['queenByFile_%d%s' % (fileIndex, x)]
+        fileIndex = min(fileIndex, 7 - fileIndex)
+        if fileIndex > 0: value -= vector['queenByFile_%d' % (fileIndex - 1)]
+        if fileIndex < 3: value += vector['queenByFile_%d' % (fileIndex)]
         if rankIndex > 0: value -= vector['queenByRank_%d' % (rankIndex - 1)]
         if rankIndex < 7: value += vector['queenByRank_%d' % (rankIndex)]
         return value
@@ -147,8 +148,7 @@ if __name__ == '__main__':
         plotMap(axes[1][0], bishop, True,  'Bishops (%d = %.2fp)' % (bishopValue, bishopValue / pawnValue))
         plotMap(axes[1][1], bishop, False, 'Bishops')
         plotMap(axes[1][2], rook,   None,  'Rooks (%d = %.2fp)' % (rookValue, rookValue / pawnValue))
-        plotMap(axes[2][0], queen,  True,  'Queens (%d = %.2fp)' % (queenValue, queenValue / pawnValue))
-        plotMap(axes[2][1], queen,  False, 'Queens')
+        plotMap(axes[2][0], queen,  None,  'Queens (%d = %.2fp)' % (queenValue, queenValue / pawnValue))
         plotMap(axes[2][2], king,   None,  'King')
         plotMap(axes[2][3], passer, False, 'Passers', scale=None)
 

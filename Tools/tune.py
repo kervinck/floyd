@@ -249,10 +249,10 @@ def calcWindow(value):
 #       writeVector
 #-----------------------------------------------------------------------
 
-def writeVector(vector, deltas, filename):
+def writeVector(vector, deltas, coverages, history, filename):
         with open(filename, 'w') as fp:
-                asList = sorted(zip(names, vector, deltas),  key=lambda x: x[2])
-                json.dump(asList, fp, indent=1, separators=(',', ':'))
+                asList = sorted(zip(names, vector, deltas, coverages),  key=lambda x: x[2])
+                json.dump((asList, history), fp, indent=1, separators=(',', ':'))
                 fp.write('\n')
 
 #-----------------------------------------------------------------------
@@ -341,6 +341,8 @@ if __name__ == '__main__':
 
         vector, names = getVector()
         deltas = [None] * len(vector) # priority for new items
+        coverages = [None] * len(vector)
+        history = []
 
         # -- Step 1: Parse command line arguments
 
@@ -396,18 +398,20 @@ if __name__ == '__main__':
         try:
                 with open(filename, 'r') as fp:
                         values = dict(zip(names, vector))
-                        for i, (name, value, delta) in enumerate(json.load(fp)):
+                        jsonVector, history = json.load(fp)
+                        for name, value, delta, coverage in jsonVector:
                                 try:
                                         coef = names.index(name)
                                         values[name] = value
                                         deltas[coef] = delta
+                                        coverages[coef] = coverage
                                 except ValueError:
                                         print 'warning invalid id', name
                         vector = [values[name] for name in names]
         except IOError as err:
                 print err
                 print 'continuing'
-                writeVector(vector, deltas, filename)
+                writeVector(vector, deltas, coverages, history, filename)
 
         coefList = range(len(vector))
         if len(sys.argv) > argi:
@@ -451,6 +455,8 @@ if __name__ == '__main__':
                                 alpha = 0.75
                                 deltas[coef] = alpha * deltaResidual + (1.0 - alpha) * deltas[coef]
 
+                        coverages[coef] = float(active) / float(len(tests))
+
                         if newValue != oldValue:
                                 print 'update id %s residual %.9f delta %.3e active %d oldValue %d newValue %d' % (
                                         names[coef], newResidual, deltaResidual, active, oldValue, newValue)
@@ -458,7 +464,8 @@ if __name__ == '__main__':
                                 exitValue = 0
                                 bestResidual = newResidual
                                 exhausted = False
-                        writeVector(vector, deltas, filename)
+                        history.append((names[coef], len(tests), active, newValue, newResidual)) # always update history
+                        writeVector(vector, deltas, coverages, history, filename)
                         print
 
                 # Keep the most volatile half for the next round

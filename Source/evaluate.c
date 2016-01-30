@@ -46,6 +46,8 @@
 
 #define isOnKingSide(square) ((file(square) ^ fileA) >> 2)
 
+#define kingDistance(a, b) max(abs(file(a) - file(b)), abs(rank(a) - rank(b)))
+
 enum vector {
         #define P(id, value) id
         #include "vector.h"
@@ -167,11 +169,6 @@ static struct pkSlot pawnKingTable[pawnKingLen];
  |      Functions                                                       |
  +----------------------------------------------------------------------*/
 
-static double sigmoid(double x);
-static double logit(double p);
-
-static int squareOf(Board_t self, int piece);
-
 static void extractPawnStructure(Board_t self, const int v[vectorLen], struct pkSlot *pawns);
 static void evaluatePawnFile(Board_t self, const int v[vectorLen], struct pkSlot *pawns, int file, int side,
                              int maxPawnFromFirst[2][10][2]);
@@ -183,6 +180,10 @@ static int evaluateKing  (Board_t self, const int v[vectorLen], int square, int 
 
 static int shelterPenalty(const int v[vectorLen], int side, int file, int maxPawnFromFirst[2][10][2]);
 
+static double sigmoid(double x);
+static double logit(double p);
+static int squareOf(Board_t self, int piece);
+
 /*----------------------------------------------------------------------+
  |      evaluate                                                        |
  +----------------------------------------------------------------------*/
@@ -190,7 +191,6 @@ static int shelterPenalty(const int v[vectorLen], int side, int file, int maxPaw
 // TODO:
 // rooks behind passers (w+b)
 // rooks before passers (w+b)
-// distance from enemy king file
 // occupancy of front square
 // occupancy of second square
 // occupancy of any  square
@@ -935,6 +935,10 @@ static int evaluateKnight(Board_t self, const int v[vectorLen], const struct pkS
         if (xspan > 0) knightScore -= v[knightVsSpan_0 + xspan - 1];
         if (xspan < 4) knightScore += v[knightVsSpan_0 + xspan];
 
+        // Distance to kings
+        knightScore += v[knightToOwnKing] * kingDistance(square, self->sides[side].king)
+                     + v[knightToKing]    * kingDistance(square, self->sides[other(side)].king);
+
         // TODO: strong squares / outposts
 
         return knightScore;
@@ -966,6 +970,10 @@ static int evaluateBishop(Board_t self, const int v[vectorLen], const struct pkS
         int squareColor = squareColor(square);
         bishopScore += pawns->bishopWilo[side][squareColor];
 
+        // Distance to kings
+        bishopScore += v[bishopToOwnKing] * kingDistance(square, self->sides[side].king)
+                     + v[bishopToKing]    * kingDistance(square, self->sides[other(side)].king);
+
         return bishopScore;
 }
 
@@ -986,6 +994,10 @@ static int evaluateRook(Board_t self, const int v[vectorLen], const struct pkSlo
         if (fileType < 3) rookScore += v[rookByFile_0 + fileType];
         if (rankIndex > 0) rookScore -= v[rookByRank_0 + rankIndex - 1];
         if (rankIndex < 7) rookScore += v[rookByRank_0 + rankIndex];
+
+        // Distance to kings
+        rookScore += v[rookToOwnKing] * kingDistance(square, self->sides[side].king)
+                   + v[rookToKing]    * kingDistance(square, self->sides[other(side)].king);
 
         // Rook on open or half-open file
         if (!pawnOnFile(side, file)) {
@@ -1013,16 +1025,19 @@ static int evaluateQueen(Board_t self, const int v[vectorLen], const struct pkSl
 {
         int queenScore = 0;
 
-        int fileIndex = file(square) ^ fileA ^ ((file(self->sides[side].king) ^ fileA) >> 2 ? 0 : 7);
+        int file = file(square);
+        int fileType = min(file, flip(file));
         int rankIndex = rank(square) ^ firstRank[side]; // Relative to own first rank
-        bool oppKings = (file(self->sides[white].king) ^ file(self->sides[black].king)) >> 2;
 
         // File and rank dependent scoring
-        int offset = oppKings ? queenByFile_0x : queenByFile_0;
-        if (fileIndex > 0) queenScore -= v[offset + fileIndex - 1];
-        if (fileIndex < 7) queenScore += v[offset + fileIndex];
+        if (fileType > 0) queenScore -= v[queenByFile_0 + fileType - 1];
+        if (fileType < 3) queenScore += v[queenByFile_0 + fileType];
         if (rankIndex > 0) queenScore -= v[queenByRank_0 + rankIndex - 1];
         if (rankIndex < 7) queenScore += v[queenByRank_0 + rankIndex];
+
+        // Distance to kings
+        queenScore += v[queenToOwnKing] * kingDistance(square, self->sides[side].king)
+                    + v[queenToKing]    * kingDistance(square, self->sides[other(side)].king);
 
         return queenScore;
 }

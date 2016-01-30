@@ -683,21 +683,9 @@
          *  Queens
          */
 
-        P(queenByFile_0, -112), // fileA
-        P(queenByFile_1, -168),
-        P(queenByFile_2, -170),
-        P(queenByFile_3, -147),
-        P(queenByFile_4, -114),
-        P(queenByFile_5, -82),
-        P(queenByFile_6, -31), // -fileH
-
-        P(queenByFile_0x, -8), // fileA
-        P(queenByFile_1x, -8),
-        P(queenByFile_2x, 19),
-        P(queenByFile_3x, 74),
-        P(queenByFile_4x, 134),
-        P(queenByFile_5x, 169),
-        P(queenByFile_6x, 130), // -fileH
+        P(queenByFile_0, -41), // fileA
+        P(queenByFile_1, -54),
+        P(queenByFile_2, -39), // -fileD
 
         P(queenByRank_0, -134), // rank1
         P(queenByRank_1, -216),
@@ -706,6 +694,15 @@
         P(queenByRank_4, -270),
         P(queenByRank_5, -182),
         P(queenByRank_6, -107), // -rank8
+
+        P(queenToKing, -9),
+        P(queenToOwnKing, -7),
+        P(rookToKing, -4),
+        P(rookToOwnKing, 1),
+        P(bishopToKing, -1),
+        P(bishopToOwnKing, -1),
+        P(knightToKing, -3),
+        P(knightToOwnKing, 0),
 
         /*
          *  Kings

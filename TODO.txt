@@ -1,4 +1,21 @@
 
+|Todo| King distance to passers [evaluate]
+
+|Todo| Rename pawnKingHash [qa]
+
+Because we want to add bishop colors as well, and
+reduce the king component to their files.
+
+Candidates:
+        subHash <-- looks best
+        miniHash
+        structHash
+        xHash
+        pHash
+        pawnHash
+        slowHash
+        coarseHash
+
 |Todo| Blocking of passers [evaluate]
 
 |Todo| Rooks and queens in front or behind passers [evaluate]
@@ -47,8 +64,6 @@ Two types:
 |Todo| Undrawness of material advantage [evaluate]
 
 Instead of just "phase"
-
-|Todo| Remove "fileIndex" concept [qa]
 
 |Todo| Board control: what can I drop on a square [evaluate]
 
@@ -301,4 +316,58 @@ Example:
 
 This works fine:
         ./floyd bench quit
+
+|Todo| False mate score [bug]
+
+Floyd (2244) vs. honestFrnd (1341) --- Thu Jan 28, 23:07 ??? 2016
+Rated blitz match, initial time: 5 minutes, increment: 0 seconds.
+
+Move  Floyd                   honestFrnd
+----  ---------------------   ---------------------
+  1.  e4      (0:00.000)      e5      (0:00.000)
+  2.  Nf3     (0:00.100)      d6      (0:00.966)
+  3.  d4      (0:00.100)      Nd7     (0:02.163)
+  4.  Bc4     (0:00.100)      f6      (0:00.887)
+  5.  Nc3     (0:00.100)      c6      (0:00.960)
+  6.  a4      (0:11.282)      Ne7     (0:00.652)
+  7.  O-O     (0:09.515)      Qc7     (0:00.683)
+  8.  dxe5    (0:07.084)      dxe5    (0:01.423)
+  9.  h4      (0:15.474)      b6      (0:08.678)
+ 10.  Be3     (0:11.819)      Ng6     (0:03.429)
+ 11.  Qe2     (0:10.984)      Be7     (0:03.578)
+ 12.  Rad1    (0:05.970)      Nc5     (0:08.167)
+ 13.  h5      (0:05.513)      Nf8     (0:02.080)
+ 14.  h6      (0:05.587)      g6      (0:02.819)
+ 15.  b4      (0:06.126)      Nce6    (0:03.189)
+ 16.  Bb3     (0:05.095)      Bxb4    (0:02.835)
+ 17.  Nb5     (0:05.740)      cxb5    (0:03.939)
+ 18.  Qxb5+   (0:11.572)      Bd7     (0:29.267)
+ 19.  Qxb4    (0:04.703)      Nc5     (0:16.457)
+ 20.  Bxc5    (0:32.666)      Qxc5    (0:03.680)
+ 21.  Qe1     (0:26.072)      Ne6     (0:04.932)
+ 22.  Rd5     (0:02.704)      Qc7     (0:11.412)
+ 23.  Qb4     (0:08.736)      a5      (0:16.546)
+ 24.  Qd6     (0:02.686)      Qxd6    (0:03.811)
+ 25.  Rxd6    (0:06.903)      Ke7     (0:16.178)
+ 26.  Rfd1    (0:03.852)      Nc5     (0:11.258)
+ 27.  Rxb6    (0:12.258)      Bg4     (0:02.805)
+ 28.  Rb5     (0:02.248)      Nxe4    (0:03.003)
+ 29.  Rb7+    (0:03.457)      Ke8     (0:06.774)
+ 30.  Bd5     (0:02.883)      Ng5     (0:10.945)
+
+Floyd(C)(2244)[327] whispers: depth=8 score=3.17 time=3.32 node=257743 speed=77633 pv=Nxg5 fxg5 Re1 Bd7 Rb6 Rc8 Rxe5+ Kd8 Bb3 Kc7
+ 31.  Nxg5    (0:03.325)      Bxd1    (0:05.666)
+
+Floyd(C)(2244)[327] whispers: depth=9 score=99.93 time=0.77 node=115634 speed=150174 pv=Bc6+ Kd8 Nf7+ Kc8 Nd6+ Kd8 Rd7#
+ 32.  Bc6+    (0:00.782)      Kf8     (0:07.388)
+
+Floyd(C)(2244)[327] whispers: depth=3 score=99.97 time=0.00 node=354 speed=0 pv=Nxh7+ Rxh7 Rg7
+ 33.  Nxh7+   (0:00.100)      Rxh7    (0:09.833)
+
+Floyd(C)(2244)[327] whispers: depth=12 score=8.23 time=20.49 node=1876960 speed=91603 pv=Rxh7 Kg8 Rg7+ Kh8 Bxa8 Bxc2 Bc6 e4 Ra7 e3 fxe3 f5 Rxa5 Bxa4 Bxa4
+ 34.  Rxh7    (0:07.747)      Rc8     (0:18.823)
+ 35.  Rh8+    (0:01.431)      Ke7     (0:05.406)
+ 36.  Rxc8    (0:09.119)
+      {Black resigns} 1-0
+
 

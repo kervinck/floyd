@@ -711,9 +711,9 @@
          *  Kings
          */
 
-        P(kingByFile_0, 42), // fileD
-        P(kingByFile_1, 57),
-        P(kingByFile_2, 51), // -fileH
+        P(kingByFile_0, -51), // fileA
+        P(kingByFile_1, -57),
+        P(kingByFile_2, -42), // -fileD
 
         P(kingByRank_0, -253), // rank1
         P(kingByRank_1, -419),

@@ -54,9 +54,9 @@ def queen(fileIndex, rankIndex, xKing):
 
 def king(fileIndex, rankIndex, xKing):
         value = 0
-        if fileIndex < 4: fileIndex ^= 7
-        if fileIndex > 4: value -= vector['kingByFile_%d' % (fileIndex - 4 - 1)]
-        if fileIndex < 7: value += vector['kingByFile_%d' % (fileIndex - 4)]
+        fileIndex = min(fileIndex, 7 - fileIndex)
+        if fileIndex > 0: value -= vector['kingByFile_%d' % (fileIndex - 1)]
+        if fileIndex < 3: value += vector['kingByFile_%d' % (fileIndex)]
         if rankIndex > 0: value -= vector['kingByRank_%d' % (rankIndex - 1)]
         if rankIndex < 7: value += vector['kingByRank_%d' % (rankIndex)]
         return value

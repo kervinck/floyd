@@ -53,26 +53,6 @@ enum vector {
         #undef P
 };
 
-struct evaluation {
-        // Accumulators
-        int material[2];
-        int safety[2];
-        int passers[2];  // passers, not scaled
-        int control[2];  // control of each square
-        int mobility[2]; // use extended attack maps
-        int kings[2];    // PST, distance to weak pawns, distance to passers (w+b)
-        int queens[2];
-        int rooks[2];    // PST, doubled, strong squares
-        int bishops[2];  // PST, trapped, strong squares, can engage enemy pawns, not blocked by own pawns, pawn span is good
-        int knights[2];  // PST, strong squares, pawn span is bad
-        int pawns[2];    // PST, doubled, grouped, mobile
-        int others[2];
-
-        double passerScaling[2];
-        double safetyScaling[2];
-};
-static const struct evaluation initEvaluation;
-
 /* struct material {
         uint64_t materialKey;
         int wiloScore, drawScore;
@@ -202,9 +182,11 @@ static int squareOf(Board_t self, int piece);
 
 int evaluate(Board_t self)
 {
-        struct evaluation e = initEvaluation;
-
         const int *v = globalVector;
+
+        int wiloScore[2]; // Accumulators
+        double passerScaling[2];
+        double safetyScaling[2];
 
         /*--------------------------------------------------------------+
          |      Feature extraction                                      |
@@ -235,7 +217,7 @@ int evaluate(Board_t self)
         for (int side=white; side<=black; side++) {
                 int xside = other(side);
 
-                e.material[side] =
+                wiloScore[side] =
                         nrQueens(side) * (
                                 + v[queenValue]
                                 + v[queenAndQueen]  * (nrQueens(side) - 1)
@@ -284,9 +266,9 @@ int evaluate(Board_t self)
                                 + v[knightVsPawn_2]  * nrPawns(xside) * nrPawns(xside) / 8);
 
                 if (nrPawns(side) > 0)
-                        e.material[side] += v[pawnValue1 + nrPawns(side) - 1];
+                        wiloScore[side] += v[pawnValue1 + nrPawns(side) - 1];
 
-                e.passerScaling[side] = sigmoid(1e-3 * (v[passerScalingOffset]
+                passerScaling[side] = sigmoid(1e-3 * (v[passerScalingOffset]
                         + nrQueens(side)   * v[passerAndQueen]
                         + nrRooks(side)    * v[passerAndRook]
                         + nrBishops(side)  * v[passerAndBishop]
@@ -298,7 +280,7 @@ int evaluate(Board_t self)
                         + nrKnights(xside) * v[passerVsKnight]
                         + nrPawns(xside)   * v[passerVsPawn]));
 
-                e.safetyScaling[side] = sigmoid(1e-3 * (v[safetyScalingOffset]
+                safetyScaling[side] = sigmoid(1e-3 * (v[safetyScalingOffset]
                         + nrQueens(side)   * v[safetyAndQueen]
                         + nrRooks(side)    * v[safetyAndRook]
                         + nrBishops(side)  * v[safetyAndBishop]
@@ -321,8 +303,8 @@ int evaluate(Board_t self)
                 extractPawnStructure(self, v, pawns);
 
         for (int side=white; side<=black; side++) {
-                e.pawns[side] = pawns->wiloScore[side];
-                e.passers[side] = round(pawns->passerScore[side] * e.passerScaling[side]);
+                wiloScore[side] += pawns->wiloScore[side];
+                wiloScore[side] += round(pawns->passerScore[side] * passerScaling[side]);
         }
 
         /*--------------------------------------------------------------+
@@ -330,7 +312,7 @@ int evaluate(Board_t self)
          +--------------------------------------------------------------*/
 
         for (int side=white; side<=black; side++)
-                e.kings[side] += evaluateKing(v, self->sides[side].king, side);
+                wiloScore[side] += evaluateKing(v, self->sides[side].king, side);
 
         // Scan board for pieces
         for (int square=0; square<boardSize; square++) {
@@ -342,16 +324,16 @@ int evaluate(Board_t self)
 
                 switch (piece) {
                 case whiteQueen: case blackQueen:
-                        e.queens[side] += evaluateQueen(self, v, square, side);
+                        wiloScore[side] += evaluateQueen(self, v, square, side);
                         break;
                 case whiteRook: case blackRook:
-                        e.rooks[side] += evaluateRook(self, v, pawns, square, side);
+                        wiloScore[side] += evaluateRook(self, v, pawns, square, side);
                         break;
                 case whiteBishop: case blackBishop:
-                        e.bishops[side] += evaluateBishop(self, v, pawns, square, side);
+                        wiloScore[side] += evaluateBishop(self, v, pawns, square, side);
                         break;
                 case whiteKnight: case blackKnight:
-                        e.knights[side] += evaluateKnight(self, v, pawns, square, side);
+                        wiloScore[side] += evaluateKnight(self, v, pawns, square, side);
                         break;
                 }
         }
@@ -383,10 +365,10 @@ int evaluate(Board_t self)
                         controlValue = v[controlOutside];
 
                 if (wAttack > bAttack)
-                        e.control[white] += controlValue;
+                        wiloScore[white] += controlValue;
 
                 if (wAttack < bAttack)
-                        e.control[black] += controlValue;
+                        wiloScore[black] += controlValue;
         }
 
         /*--------------------------------------------------------------+
@@ -451,7 +433,7 @@ int evaluate(Board_t self)
                 int shelter = pawns->shelter[side];
                 if (rank(king) != firstRank[side])
                         shelter += v[shelterWalkingKing];
-                e.safety[side] = -trunc(e.safetyScaling[side] * (shelter + attack));
+                wiloScore[xside] += trunc(safetyScaling[side] * (shelter + attack));
         }
 
         /*--------------------------------------------------------------+
@@ -518,24 +500,10 @@ int evaluate(Board_t self)
         int side = sideToMove(self);
         int xside = other(side);
 
-        #define partial(side) (\
-                  e.material[side] \
-                + e.safety[side] \
-                + e.passers[side] \
-                + e.control[side] \
-                + e.mobility[side] \
-                + e.kings[side] \
-                + e.queens[side] \
-                + e.rooks[side] \
-                + e.bishops[side] \
-                + e.knights[side] \
-                + e.pawns[side] \
-                + e.others[side])
+        wiloScore[side] += v[tempo]; // side to move bonus
+        wiloScore[white] += self->eloDiff * v[eloDiff] / 10; // contempt
 
-        e.others[side] += v[tempo]; // side to move bonus
-        e.others[white] += self->eloDiff * v[eloDiff] / 10; // contempt
-
-        int wiloScore = partial(side) - partial(xside);
+        int wiloSum = wiloScore[side] - wiloScore[xside];
 
         /*--------------------------------------------------------------+
          |      Special endgames                                        |
@@ -553,12 +521,12 @@ int evaluate(Board_t self)
 
         if (nrEffectivePieces == 3) {
                 if (nrQueens(side) + nrRooks(side) > 0) {
-                        wiloScore += v[winBonus]; // KQK, KRK
+                        wiloSum += v[winBonus]; // KQK, KRK
                         drawScore -= v[winBonus];
                 }
 
                 if (nrQueens(xside) + nrRooks(xside) > 0) {
-                        wiloScore -= v[winBonus]; // KKQ, KKR
+                        wiloSum -= v[winBonus]; // KKQ, KKR
                         drawScore -= v[winBonus];
                 }
 
@@ -584,7 +552,7 @@ int evaluate(Board_t self)
                         if (egtScore == 0)
                                 return 0;
                         else {
-                                wiloScore += egtScore * v[winBonus];
+                                wiloSum += egtScore * v[winBonus];
                                 drawScore -= v[winBonus];
                         }
                 }
@@ -605,7 +573,7 @@ int evaluate(Board_t self)
          +--------------------------------------------------------------*/
 
         // Combine wiloScore and drawScore into an expected game result
-        double Wp = sigmoid(wiloScore * 1e-3);
+        double Wp = sigmoid(wiloSum * 1e-3);
         double D = sigmoid(drawScore * 1e-3);
         double P = 0.5 * D + Wp - D * Wp;
 
@@ -615,9 +583,6 @@ int evaluate(Board_t self)
         if (score == 0) score++; // Reserve 0 exclusively for draws
         score = min(score,  maxEval);
         score = max(score, -maxEval);
-
-        //printf("%s wilo %d Wp %.3f draw %d D %.1f P %.3f score %d\n",
-                //__func__, wiloScore, Wp, drawScore, D, P, score);
 
         /*--------------------------------------------------------------+
          |      Return                                                  |

@@ -293,14 +293,6 @@ There must be a cleaner way
 
 |Todo| Rook doubling on open files [evaluate]
 
-|Todo| Processing multiple commands with arguments cli hangs [bug]
-
-Example:
-        ./floyd 'bench movetime 100' quit
-
-This works fine:
-        ./floyd bench quit
-
 |Todo| False mate score [bug]
 
 Floyd (2244) vs. honestFrnd (1341) --- Thu Jan 28, 23:07 ??? 2016

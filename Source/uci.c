@@ -171,6 +171,7 @@ void uciMain(Engine_t self, const char *argv[])
                         for (const char *s=*argv++; *s; s++)
                                 pushList(lineBuffer, *s);
                         pushList(lineBuffer, '\n');
+                        pushList(lineBuffer, 0);
                 } else if (readLine(stdin, &lineBuffer) == 0)
                         break;
 

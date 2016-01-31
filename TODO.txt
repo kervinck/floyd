@@ -346,4 +346,9 @@ Floyd(C)(2244)[327] whispers: depth=12 score=8.23 time=20.49 node=1876960 speed=
  36.  Rxc8    (0:09.119)
       {Black resigns} 1-0
 
+|Todo| Another minor parsing hickup [bug]
 
+debug on
+position fen 2rq1rk1/1b2ppbp/1p3np1/pN1p4/2PPn3/BQ2PN1P/P3BPP1/2R2RK1 w - - 5 15 moves f3e5 e4d2 b3c2 d2f1 g1f1
+info sting input position fen 2rq1rk1/1b2ppbp/1p3np1/pN1p4/2PPn3/BQ2PN1P/P3BPP1/2R2RK1 w - - 5 15 moves f3e5 e4d2 b3c2 d2f1 g1f1
+info string Illegal move

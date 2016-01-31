@@ -496,7 +496,7 @@ int evaluate(Board_t self)
 
         for (int side=white; side<=black; side++)
                 if ((materialKey & ~materialKeySide[side]) == materialKey) { // against bare king
-                        wiloScore[side] += v[winBonus];
+                        wiloScore[other(side)] += v[winBonus];
                         drawScore -= v[winBonus];
                 }
 

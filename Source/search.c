@@ -573,7 +573,6 @@ static bool moveToFront(int moveList[], int nrMoves, int move)
                 int longMove = moveList[i];
                 if ((longMove & moveMask) == move) {
                         memmove(&moveList[1], &moveList[0], i * sizeof(moveList[0]));
-                        //moveList[0] = move;
                         moveList[0] = longMove;
                         return true;
                 }

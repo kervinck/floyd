@@ -172,8 +172,8 @@ static void evaluatePawnFile(Board_t self, const int v[vectorLen], struct pkSlot
 static int evaluateKnight(Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side);
 static int evaluateBishop(Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side);
 static int evaluateRook  (Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side);
-static int evaluateQueen (Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side);
-static int evaluateKing  (Board_t self, const int v[vectorLen], int square, int side);
+static int evaluateQueen (Board_t self, const int v[vectorLen],                             int square, int side);
+static int evaluateKing  (              const int v[vectorLen],                             int square, int side);
 
 static int shelterPenalty(const int v[vectorLen], int side, int file, int maxPawnFromFirst[2][10][2]);
 
@@ -326,6 +326,9 @@ int evaluate(Board_t self)
          |      Piece placement                                         |
          +--------------------------------------------------------------*/
 
+        for (int side=white; side<=black; side++)
+                e.kings[side] += evaluateKing(v, self->sides[side].king, side);
+
         // Scan board for pieces
         for (int square=0; square<boardSize; square++) {
                 int piece = self->squares[square];
@@ -335,11 +338,8 @@ int evaluate(Board_t self)
                 int side = pieceColor(piece);
 
                 switch (piece) {
-                case whiteKing: case blackKing:
-                        e.kings[side] += evaluateKing(self, v, square, side);
-                        break;
                 case whiteQueen: case blackQueen:
-                        e.queens[side] += evaluateQueen(self, v, pawns, square, side);
+                        e.queens[side] += evaluateQueen(self, v, square, side);
                         break;
                 case whiteRook: case blackRook:
                         e.rooks[side] += evaluateRook(self, v, pawns, square, side);
@@ -449,14 +449,6 @@ int evaluate(Board_t self)
                 if (rank(king) != firstRank[side])
                         shelter += v[shelterWalkingKing];
                 e.safety[side] = -trunc(e.safetyScaling[side] * (shelter + attack));
-
-                // Castling capability intrinsic value
-                // TODO: move to pkSlot
-                int kFlag = self->castleFlags & (castleFlagWhiteKside << side);
-                int qFlag = self->castleFlags & (castleFlagWhiteQside << side);
-                if (kFlag | qFlag)
-                        e.kings[side] += !qFlag ? v[castleK] :
-                                         !kFlag ? v[castleQ] : v[castleKQ];
         }
 
         /*--------------------------------------------------------------+
@@ -727,6 +719,11 @@ static void extractPawnStructure(Board_t self, const int v[vectorLen], struct pk
                 int best = min(shelter, min(kShelter, qShelter));
                 shelter -= (v[shelterCastled] * (shelter - best)) >> 8; // (1-w)*S + w*B == S - w*(S-B)
                 pawns->shelter[side] = shelter;
+
+                // Castling capability intrinsic value
+                if (kFlag | qFlag)
+                        pawns->wiloScore[side] += !qFlag ? v[castleK] :
+                                                  !kFlag ? v[castleQ] : v[castleKQ];
         }
 }
 
@@ -965,7 +962,7 @@ static int evaluateBishop(Board_t self, const int v[vectorLen], const struct pkS
         if (xspan < 4) bishopScore += v[bishopVsSpan_0 + xspan];
 
         int squareColor = squareColor(square);
-        bishopScore += pawns->bishopWilo[side][squareColor];
+        bishopScore += pawns->bishopWilo[side][squareColor]; // TODO: fold this into pkSlot
 
         // Distance to kings
         bishopScore += v[bishopToOwnKing] * kingDistance(square, self->sides[side].king)
@@ -1018,7 +1015,7 @@ static int evaluateRook(Board_t self, const int v[vectorLen], const struct pkSlo
  |      evaluateQueen                                                   |
  +----------------------------------------------------------------------*/
 
-static int evaluateQueen(Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side)
+static int evaluateQueen(Board_t self, const int v[vectorLen], int square, int side)
 {
         int queenScore = 0;
 
@@ -1060,7 +1057,7 @@ static int shelterPenalty(const int v[vectorLen], int side, int file, int maxPaw
         return sum;
 }
 
-static int evaluateKing(Board_t self, const int v[vectorLen], int square, int side)
+static int evaluateKing(const int v[vectorLen], int square, int side)
 {
         int kingScore = 0;
 

@@ -731,7 +731,6 @@ static uint64_t hashEnPassant(int square)
         return square ? zobristEnPassant[file(square)^fileA] : 0;
 }
 
-
 // Calculate Zobrist hash using Polyglot's definition
 uint64_t hash(Board_t self)
 {
@@ -757,8 +756,6 @@ uint64_t hash(Board_t self)
 // Pawn/king hash
 uint64_t pawnKingHash(Board_t self)
 {
-        uint64_t key = 0;
-
         if (subHash[whitePawn][a1] == 0ULL) { // Implicit initialization
                 for (int square=0; square<boardSize; square++) {
                         subHash[whitePawn][square] = zobristPiece[whitePawn][square];
@@ -771,6 +768,8 @@ uint64_t pawnKingHash(Board_t self)
                         //subHash[blackBishop][square] = zobristPiece[blackBishop][squareColor(square) ? f8 : c8];
                 }
         }
+
+        uint64_t key = 0;
 
         // Pieces
         for (int square=0; square<boardSize; square++) {

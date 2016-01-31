@@ -76,7 +76,6 @@ kingToPawnCenter
 |Todo| Proximities
 
 Pawn center (rank, file)
-Opponent king
 Passers
 Weak pawn (kings)
 
@@ -119,11 +118,6 @@ https://chessprogramming.wikispaces.com/Evaluation
 |Todo| Add white/black testing [qa,evaluate]
 
 |Todo| Add left/right testing [qa,evaluate]
-
-|Todo| Introduction of pawn/king table [speed]
-
-Step 1: cache only the last result
-Step 2: full blown table
 
 ------------------------------------------------------------------------
 
@@ -208,17 +202,7 @@ http://nvie.com/posts/a-successful-git-branching-model/
 
 |Todo| Granularity of win32 clock too low? [win32]
 
-|Todo| Multicore support for tuning [speed]
-
 |Todo| Terminology: coefficient or parameter [qa]
-
-|Todo| Measure repeatibility of tuner [verification,tune]
-
-Tune with 10 different subsets of ccrl @ 1M
-Observe variation of vector and residual
-
-Tune with 10 different subsets of ccrl @ 100k
-Observe variation of vector and residual
 
 |Todo| Consider gradient descent [tune]
 

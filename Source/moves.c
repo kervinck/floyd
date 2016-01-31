@@ -156,13 +156,7 @@ static const unsigned char knightDirections[] = {
         N(h1), N(h2), N(h3), N(h4), N(h5), N(h6), N(h7), N(h8),
 };
 
-static const int filterPawnKing[] = {
-        [empty] = empty,
-        [whitePawn] = whitePawn, [whiteKnight] = empty, [whiteBishop] = empty,
-        [whiteRook] = empty,     [whiteQueen]  = empty, [whiteKing]   = whiteKing,
-        [blackPawn] = blackPawn, [blackKnight] = empty, [blackBishop] = empty,
-        [blackRook] = empty,     [blackQueen]  = empty, [blackKing]   = blackKing,
-};
+static uint64_t subHash[13][64]; // Hash constants (pawn/king/bishop/castling)
 
 /*----------------------------------------------------------------------+
  |      Functions                                                       |
@@ -452,12 +446,10 @@ extern void makeMove(Board_t self, int move)
                             ^ zobristPiece[_piece][to]                  \
                             ^ zobristPiece[_victim][to];                \
                                                                         \
-                /* And the pawn/king hash */                            \
-                int _pkPiece  = filterPawnKing[_piece];                 \
-                int _pkVictim = filterPawnKing[_victim];                \
-                self->pawnKingHash ^= zobristPiece[_pkPiece][from]      \
-                                    ^ zobristPiece[_pkPiece][to]        \
-                                    ^ zobristPiece[_pkVictim][to];      \
+                /* And the pawn/king/etc hash */                        \
+                self->pawnKingHash ^= subHash[_piece][from]             \
+                                    ^ subHash[_piece][to]               \
+                                    ^ subHash[_victim][to];             \
         )
 
         // Always clear en passant info
@@ -739,6 +731,7 @@ static uint64_t hashEnPassant(int square)
         return square ? zobristEnPassant[file(square)^fileA] : 0;
 }
 
+
 // Calculate Zobrist hash using Polyglot's definition
 uint64_t hash(Board_t self)
 {
@@ -766,10 +759,23 @@ uint64_t pawnKingHash(Board_t self)
 {
         uint64_t key = 0;
 
+        if (subHash[whitePawn][a1] == 0ULL) { // Implicit initialization
+                for (int square=0; square<boardSize; square++) {
+                        subHash[whitePawn][square] = zobristPiece[whitePawn][square];
+                        subHash[blackPawn][square] = zobristPiece[blackPawn][square];
+                        int kingFile = file(square);
+                        kingFile = (kingFile == fileA) ? fileB : (kingFile == fileH) ? fileG : kingFile;
+                        subHash[whiteKing][square] = zobristPiece[whiteKing][square(kingFile,rank1)];
+                        subHash[blackKing][square] = zobristPiece[blackKing][square(kingFile,rank8)];
+                        //subHash[whiteBishop][square] = zobristPiece[whiteBishop][squareColor(square) ? c1 : f1];
+                        //subHash[blackBishop][square] = zobristPiece[blackBishop][squareColor(square) ? f8 : c8];
+                }
+        }
+
         // Pieces
         for (int square=0; square<boardSize; square++) {
                 int piece = self->squares[square];
-                key ^= zobristPiece[filterPawnKing[piece]][square];
+                key ^= subHash[piece][square];
         }
 
         // Castling

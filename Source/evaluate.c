@@ -43,9 +43,6 @@
 #endif
 
 #define flip(fileOrRank) ((fileOrRank) ^ 7)
-
-#define isOnKingSide(square) ((file(square) ^ fileA) >> 2)
-
 #define kingDistance(a, b) max(abs(file(a) - file(b)), abs(rank(a) - rank(b)))
 
 enum vector {
@@ -449,6 +446,8 @@ int evaluate(Board_t self)
                 // - Small attacks should scale the same as shelter
                 // - Heavy attacks are always dangerous
                 int shelter = pawns->shelter[side];
+                if (rank(king) != firstRank[side])
+                        shelter += v[shelterWalkingKing];
                 e.safety[side] = -trunc(e.safetyScaling[side] * (shelter + attack));
 
                 // Castling capability intrinsic value
@@ -726,9 +725,7 @@ static void extractPawnStructure(Board_t self, const int v[vectorLen], struct pk
                 int kShelter = kFlag ? shelterPenalty(v, side, fileG, maxPawnFromFirst) : shelter;
                 int qShelter = qFlag ? shelterPenalty(v, side, fileB, maxPawnFromFirst) : shelter;
                 int best = min(shelter, min(kShelter, qShelter));
-                shelter -= (v[shelterCastled] * (shelter - best)) >> 8; // (1-w)*S + w*B == A - w*(S-B)
-                if (rank(king) != firstRank[side])
-                        shelter += v[shelterWalkingKing];
+                shelter -= (v[shelterCastled] * (shelter - best)) >> 8; // (1-w)*S + w*B == S - w*(S-B)
                 pawns->shelter[side] = shelter;
         }
 }

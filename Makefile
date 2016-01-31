@@ -100,7 +100,7 @@ sts: .module
 	@for STS in Data/STS/*.epd; do\
 	 printf "%-40s: " `basename $${STS}`;\
 	 python Tools/epdtest.py 0.15 < "$${STS}" | awk '/total 100$$/{print $$5}';\
-	done
+	done | awk '{print;n++;s+=$$NF}END{printf "Total score: %d (%.1f%%)\n", s, s/n}'
 
 # Run node count regression test
 nodes: .module
@@ -171,7 +171,7 @@ todo: # xtodo
 
 # Make fingerprint for regression testing
 fingerprint: clean
-	@env floydVersion=$(floydVersion) sh -x Tools/fingerprint.sh 2>&1 | tee fingerprint
+	@env floydVersion=$(floydVersion) sh Tools/fingerprint.sh 2>&1 | tee fingerprint
 	[ `uname -s` != 'Darwin' ] || opendiff Docs/fingerprint fingerprint
 
 # Shootout against last version, 1000 games 10+0.15

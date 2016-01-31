@@ -91,7 +91,7 @@ struct pkSlot {
  |      Data                                                            |
  +----------------------------------------------------------------------*/
 
-static const unsigned long long materialKeys[][2] = {
+static const uint64_t materialKeys[][2] = {
         [empty]       = { 0, 0 },
         [whitePawn]   = { 0x514e000000000001ull, 0x514e000000000001ull },
         [blackPawn]   = { 0x696d000000000010ull, 0x696d000000000010ull },
@@ -106,6 +106,7 @@ static const unsigned long long materialKeys[][2] = {
         [whiteKing]   = { 0, 0 },
         [blackKing]   = { 0, 0 },
 };
+static const uint64_t materialKeySide[] = { 0x0f0f0f0f0full, 0xf0f0f0f0f0ull }; // white, black
 
 const char * const vectorLabels[] = {
         #define P(id, value) #id
@@ -200,7 +201,7 @@ int evaluate(Board_t self)
          +--------------------------------------------------------------*/
 
         // Scan board for material key
-        unsigned long long materialKey = 0; // TODO: calculate incrementally in moves.c
+        uint64_t materialKey = 0; // TODO: calculate incrementally in moves.c
         for (int square=0; square<boardSize; square++) {
                 int piece = self->squares[square];
                 int squareColor = squareColor(square);
@@ -493,6 +494,12 @@ int evaluate(Board_t self)
                 if (dM) drawScore += v[drawMinorImbalance];
         }
 
+        for (int side=white; side<=black; side++)
+                if ((materialKey & ~materialKeySide[side]) == materialKey) { // against bare king
+                        wiloScore[side] += v[winBonus];
+                        drawScore -= v[winBonus];
+                }
+
         /*--------------------------------------------------------------+
          |      Subtotal                                                |
          +--------------------------------------------------------------*/
@@ -557,7 +564,6 @@ int evaluate(Board_t self)
                         }
                 }
         }
-
 #if 0
         if (nrEffectivePieces == 4) {
                 if (nrKnights(xside) == 2)
@@ -576,6 +582,8 @@ int evaluate(Board_t self)
         double Wp = sigmoid(wiloSum * 1e-3);
         double D = sigmoid(drawScore * 1e-3);
         double P = 0.5 * D + Wp - D * Wp;
+
+        //printf("wiloSum %+d drawScore %+d P %f\n", wiloSum, drawScore, P);
 
         static const double Ci = 4.0 / M_LN10;
         int score = round(Ci * logit(P) * 1e+3);

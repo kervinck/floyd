@@ -669,15 +669,20 @@
         P(rookByRank_5, -287),
         P(rookByRank_6, -138), // -rank8
 
-        P(rookOnHalfOpen_0, 164), // fileA
-        P(rookOnHalfOpen_1, 101),
-        P(rookOnHalfOpen_2, 66),
-        P(rookOnHalfOpen_3, 59), // fileD
+        P(rookOnHalfOpen_0, 171), // fileA
+        P(rookOnHalfOpen_1, 97),
+        P(rookOnHalfOpen_2, 55),
+        P(rookOnHalfOpen_3, 50), // fileD
 
         P(rookOnOpen_0, 167), // fileA
         P(rookOnOpen_1, 135),
         P(rookOnOpen_2, 109),
         P(rookOnOpen_3, 140), // fileD
+
+        P(rookToWeakPawn_0, 141),
+        P(rookToWeakPawn_1, 127),
+        P(rookToWeakPawn_2, 122),
+        P(rookToWeakPawn_3, 112),
 
         /*
          *  Queens

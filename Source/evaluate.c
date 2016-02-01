@@ -159,7 +159,7 @@ static void evaluatePawnFile(Board_t self, const int v[vectorLen], struct pkSlot
 static int evaluatePasser(Board_t self, const int v[vectorLen], int fileFlag, int side, uint64_t materialKey);
 static int evaluateKnight(Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side);
 static int evaluateBishop(Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side);
-static int evaluateRook  (Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side);
+static int evaluateRook  (Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side, double safetyScaling[2]);
 static int evaluateQueen (Board_t self, const int v[vectorLen],                             int square, int side);
 static int evaluateKing  (              const int v[vectorLen],                             int square, int side);
 
@@ -333,7 +333,7 @@ int evaluate(Board_t self)
                         break;
                 case whiteRook: case blackRook:
                         side = pieceColor(piece);
-                        wiloScore[side] += evaluateRook(self, v, pawns, square, side);
+                        wiloScore[side] += evaluateRook(self, v, pawns, square, side, safetyScaling);
                         break;
                 case whiteBishop: case blackBishop:
                         side = pieceColor(piece);
@@ -999,7 +999,7 @@ static int evaluateBishop(Board_t self, const int v[vectorLen], const struct pkS
  |      evaluateRook                                                    |
  +----------------------------------------------------------------------*/
 
-static int evaluateRook(Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side)
+static int evaluateRook(Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side, double safetyScaling[2])
 {
         int rookScore = 0;
 
@@ -1026,12 +1026,15 @@ static int evaluateRook(Board_t self, const int v[vectorLen], const struct pkSlo
                                 rookScore += v[rookOnHalfOpen_0 + fileType];
                 } else
                         rookScore += v[rookOnOpen_0 + fileType];
+
+                int xside = other(side);
+                int deltaFile = abs(file(square) - file(self->sides[xside].king));
+                rookScore += trunc(safetyScaling[xside] * v[rookToKing_0 + deltaFile]);
         }
 
         return rookScore;
 }
 
-// TODO: rook on open/half-open to king zone
 // TODO: relation to opponent king zone (normalized to reduce pressure on hash table)
 // TODO: connecting (side by side), connecting on 7th
 // TODO: controlling squares on an open file (not just by rook)

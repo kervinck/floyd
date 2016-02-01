@@ -694,6 +694,15 @@
         P(rookToWeakPawn_2, 122),
         P(rookToWeakPawn_3, 112),
 
+        P(rookToKing_0, 180), // d=0
+        P(rookToKing_1, 101), // d=1
+        P(rookToKing_2, 73), // d=2
+        P(rookToKing_3, 29),
+        P(rookToKing_4, 4),
+        P(rookToKing_5, -62),
+        P(rookToKing_6, -98),
+        P(rookToKing_7, -71),
+
         /*
          *  Queens
          */

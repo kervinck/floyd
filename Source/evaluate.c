@@ -77,39 +77,21 @@ struct pkSlot {
 
 #define pawnOnFile(side, file) bitTest(pawns->pawnOnFile[side], file)
 
-#define nrPawns(side)      (int)(((materialKey) >> (((side) << 2) + 0)) & 15)
-#define nrKnights(side)    (int)(((materialKey) >> (((side) << 2) + 8)) & 15)
-#define nrBishops(side)    (int)(((materialKey) >> (((side) << 2) + 16)) & 15)
-#define nrRooks(side)      (int)(((materialKey) >> (((side) << 2) + 24)) & 15)
-#define nrQueens(side)     (int)(((materialKey) >> (((side) << 2) + 32)) & 15)
-#define nrBishopsD(side)   (int)(((materialKey) >> (((side) << 2) + 40)) & 15)
+#define nrPawns(side)      (int)((self->materialKey >> (((side) << 2) + 0)) & 15)
+#define nrKnights(side)    (int)((self->materialKey >> (((side) << 2) + 8)) & 15)
+#define nrBishops(side)    (int)((self->materialKey >> (((side) << 2) + 16)) & 15)
+#define nrRooks(side)      (int)((self->materialKey >> (((side) << 2) + 24)) & 15)
+#define nrQueens(side)     (int)((self->materialKey >> (((side) << 2) + 32)) & 15)
+#define nrBishopsD(side)   (int)((self->materialKey >> (((side) << 2) + 40)) & 15)
 #define nrBishopsL(side)   (nrBishops(side) - nrBishopsD(side))
 #define materialHash(side) (((materialKey) >> 48) & 0xffff)
+
 #define nrMinors(side)     (nrKnights(side) + nrBishops(side))
 #define nrMajors(side)     (nrRooks(side)   + nrQueens(side))
 
 /*----------------------------------------------------------------------+
  |      Data                                                            |
  +----------------------------------------------------------------------*/
-
-static const uint64_t materialKeys[][2] = {
-        [empty]       = { 0, 0 },
-        [whitePawn]   = { 0x514e000000000001ull, 0x514e000000000001ull },
-        [blackPawn]   = { 0x696d000000000010ull, 0x696d000000000010ull },
-        [whiteKnight] = { 0x6ab5000000000100ull, 0x6ab5000000000100ull },
-        [blackKnight] = { 0xd903000000001000ull, 0xd903000000001000ull },
-        [whiteBishop] = { 0x2081000000010000ull, 0x2081000000010000ull + 0xb589010000000000ull },
-        [blackBishop] = { 0x3d15000000100000ull, 0x3d15000000100000ull + 0x67f5100000000000ull },
-        [whiteRook]   = { 0xae45000001000000ull, 0xae45000001000000ull },
-        [blackRook]   = { 0x7de9000010000000ull, 0x7de9000010000000ull },
-        [whiteQueen]  = { 0x9ac3000100000000ull, 0x9ac3000100000000ull },
-        [blackQueen]  = { 0xa96f001000000000ull, 0xa96f001000000000ull },
-        [whiteKing]   = { 0, 0 },
-        [blackKing]   = { 0, 0 },
-};
-
-static const uint64_t materialMaskPiecesAndPawns[] = { 0x0f0f0f0f0full, 0xf0f0f0f0f0ull }; // white, black
-static const uint64_t materialMaskPiecesNoPawns[]  = { 0x0f0f0f0f00ull, 0xf0f0f0f000ull }; // white, black
 
 const char * const vectorLabels[] = {
         #define P(id, value) #id
@@ -156,7 +138,7 @@ static struct pkSlot pawnKingTable[pawnKingLen];
 static void extractPawnStructure(Board_t self, const int v[vectorLen], struct pkSlot *pawns);
 static void evaluatePawnFile(Board_t self, const int v[vectorLen], struct pkSlot *pawns, int file, int side,
                              int maxPawnFromFirst[2][10][2]);
-static int evaluatePasser(Board_t self, const int v[vectorLen], int fileFlag, int side, uint64_t materialKey);
+static int evaluatePasser(Board_t self, const int v[vectorLen], int fileFlag, int side);
 static int evaluateKnight(Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side);
 static int evaluateBishop(Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side);
 static int evaluateRook  (Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side, double safetyScaling[2]);
@@ -203,14 +185,6 @@ int evaluate(Board_t self)
         /*--------------------------------------------------------------+
          |      Material balance                                        |
          +--------------------------------------------------------------*/
-
-        // Scan board for material key
-        uint64_t materialKey = 0; // TODO: calculate incrementally in moves.c
-        for (int square=0; square<boardSize; square++) {
-                int piece = self->squares[square];
-                int squareColor = squareColor(square);
-                materialKey += materialKeys[piece][squareColor];
-        }
 
         // Useful piece counters
         int nrQueens  = nrQueens(white)  + nrQueens(black);
@@ -312,7 +286,7 @@ int evaluate(Board_t self)
 
                 wiloScore[side] += round(pawns->passerScore[side] * passerScaling[side]);
                 for (int files=pawns->passerOnFile[side]; files; files&=files-1)
-                        wiloScore[side] += evaluatePasser(self, v, files & -files, side, materialKey);
+                        wiloScore[side] += evaluatePasser(self, v, files & -files, side);
         }
 
         /*--------------------------------------------------------------+
@@ -502,7 +476,7 @@ int evaluate(Board_t self)
         }
 
         for (int side=white; side<=black; side++)
-                if ((materialKey & materialMaskPiecesAndPawns[side]) == 0) { // bare king
+                if ((self->materialKey & materialMaskPiecesAndPawns[side]) == 0) { // bare king
                         wiloScore[other(side)] += v[winBonus];
                         drawScore -= v[winBonus];
                 }
@@ -878,7 +852,7 @@ static void evaluatePawnFile(Board_t self, const int v[vectorLen], struct pkSlot
  |      evaluatePasser                                                  |
  +----------------------------------------------------------------------*/
 
-static int evaluatePasser(Board_t self, const int v[vectorLen], int fileFlag, int side, uint64_t materialKey)
+static int evaluatePasser(Board_t self, const int v[vectorLen], int fileFlag, int side)
 {
         int file = bitIndex8(fileFlag);
         assert(1 << file == fileFlag);
@@ -913,7 +887,7 @@ static int evaluatePasser(Board_t self, const int v[vectorLen], int fileFlag, in
         } else {
                 passerScore += v[freePasser]; // No blocker
 
-                if ((materialKey & materialMaskPiecesNoPawns[xside]) == 0) {
+                if ((self->materialKey & materialMaskPiecesNoPawns[xside]) == 0) {
                         // NOW's heuristic (http://talkchess.com/forum/viewtopic.php?p=125794)
                         int rankFlip = (side == white) ?  0 : square(0, 7);
                         int king  = rankFlip ^ self->sides[side].king;

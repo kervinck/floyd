@@ -156,6 +156,24 @@ static const unsigned char knightDirections[] = {
         N(h1), N(h2), N(h3), N(h4), N(h5), N(h6), N(h7), N(h8),
 };
 
+const uint64_t materialKeys[][2] = {
+        [empty]       = { 0, 0 },
+        [whitePawn]   = { 0x514e000000000001ull, 0x514e000000000001ull },
+        [blackPawn]   = { 0x696d000000000010ull, 0x696d000000000010ull },
+        [whiteKnight] = { 0x6ab5000000000100ull, 0x6ab5000000000100ull },
+        [blackKnight] = { 0xd903000000001000ull, 0xd903000000001000ull },
+        [whiteBishop] = { 0x2081000000010000ull, 0x2081000000010000ull + 0xb589010000000000ull },
+        [blackBishop] = { 0x3d15000000100000ull, 0x3d15000000100000ull + 0x67f5100000000000ull },
+        [whiteRook]   = { 0xae45000001000000ull, 0xae45000001000000ull },
+        [blackRook]   = { 0x7de9000010000000ull, 0x7de9000010000000ull },
+        [whiteQueen]  = { 0x9ac3000100000000ull, 0x9ac3000100000000ull },
+        [blackQueen]  = { 0xa96f001000000000ull, 0xa96f001000000000ull },
+        [whiteKing]   = { 0, 0 },
+        [blackKing]   = { 0, 0 },
+};
+const uint64_t materialMaskPiecesAndPawns[] = { 0x0f0f0f0f0full, 0xf0f0f0f0f0ull }; // white, black
+const uint64_t materialMaskPiecesNoPawns[]  = { 0x0f0f0f0f00ull, 0xf0f0f0f000ull }; // white, black
+
 static uint64_t subHash[13][64]; // Hash constants (pawn/king/bishop/castling)
 
 /*----------------------------------------------------------------------+
@@ -400,6 +418,7 @@ extern void undoMove(Board_t self)
         self->plyNumber--;
         self->hash = popList(self->hashHistory);
         self->pawnKingHash = popList(self->pkHashHistory);
+        self->materialKey = popList(self->materialHistory);
 
         assert(self->undoStack.len > 0);
         signed char *bytes = (signed char*)self;
@@ -419,6 +438,7 @@ extern void makeMove(Board_t self, int move)
 
         pushList(self->hashHistory, self->hash);
         pushList(self->pkHashHistory, self->pawnKingHash);
+        pushList(self->materialHistory, self->materialKey);
 
         preparePushList(self->undoStack, maxMoveUndo);
         signed char *sp = &self->undoStack.v[self->undoStack.len];
@@ -450,6 +470,9 @@ extern void makeMove(Board_t self, int move)
                 self->pawnKingHash ^= subHash[_piece][from]             \
                                     ^ subHash[_piece][to]               \
                                     ^ subHash[_victim][to];             \
+                                                                        \
+                /* Update the material key */                           \
+                self->materialKey -= materialKeys[_victim][squareColor(to)];\
         )
 
         // Always clear en passant info
@@ -482,6 +505,8 @@ extern void makeMove(Board_t self, int move)
                                 self->hash ^= zobristPiece[whitePawn][from]
                                             ^ zobristPiece[promoPiece][from];
                                 self->pawnKingHash ^= zobristPiece[whitePawn][from];
+                                self->materialKey += materialKeys[promoPiece][squareColor(to)]
+                                                   - materialKeys[whitePawn][0];
                         }
                         break;
 
@@ -493,6 +518,7 @@ extern void makeMove(Board_t self, int move)
                         self->squares[square] = empty;
                         self->hash ^= zobristPiece[victim][square];
                         self->pawnKingHash ^= zobristPiece[victim][square];
+                        self->materialKey -= materialKeys[victim][0];
                         break;
                 }
                 case rank2:
@@ -507,6 +533,8 @@ extern void makeMove(Board_t self, int move)
                                 self->hash ^= zobristPiece[blackPawn][from]
                                             ^ zobristPiece[promoPiece][from];
                                 self->pawnKingHash ^= zobristPiece[blackPawn][from];
+                                self->materialKey += materialKeys[promoPiece][squareColor(to)]
+                                                   - materialKeys[blackPawn][0];
                         }
                         break;
 
@@ -574,6 +602,7 @@ void makeNullMove(Board_t self)
 {
         pushList(self->hashHistory, self->hash);
         pushList(self->pkHashHistory, self->pawnKingHash);
+        pushList(self->materialHistory, self->materialKey);
         self->hash ^= zobristTurn[0];
 
         preparePushList(self->undoStack, maxMoveUndo);

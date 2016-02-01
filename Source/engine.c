@@ -43,6 +43,7 @@ void cleanupEngine(Engine_t self)
 {
         freeList(self->board.hashHistory);
         freeList(self->board.pkHashHistory);
+        freeList(self->board.materialHistory);
         freeList(self->board.undoStack);
         freeList(self->searchMoves);
         freeList(self->pv);

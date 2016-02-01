@@ -53,7 +53,6 @@ struct Board {
         signed char castleFlags;
         signed char enPassantPawn;
         signed char halfmoveClock;
-
         int plyNumber; // holds both side to move and full move number
 
         uint64_t hash;
@@ -61,6 +60,9 @@ struct Board {
 
         uint64_t pawnKingHash;
         uint64List pkHashHistory;
+
+        uint64_t materialKey;
+        uint64List materialHistory;
 
         int eloDiff;
 
@@ -141,9 +143,12 @@ enum moveFlags {
 
 extern const char startpos[];
 
-// Expose these for use in evaluation (king safety)
-extern const unsigned char kingDirections[];
+// Expose these for use in evaluation
+extern const unsigned char kingDirections[boardSize];
 extern const signed char kingStep[];
+extern const uint64_t materialKeys[][2];
+extern const uint64_t materialMaskPiecesAndPawns[2];
+extern const uint64_t materialMaskPiecesNoPawns[2];
 
 /*----------------------------------------------------------------------+
  |      Functions                                                       |

@@ -72,6 +72,7 @@ extern int setupBoard(Board_t self, const char *fen)
         int file = fileA, rank = rank8;
         int nrWhiteKings = 0, nrBlackKings = 0;
         memset(self->squares, empty, boardSize);
+        self->materialKey = 0;
         while (rank != rank1 || file != fileH + fileStep) {
                 int piece = empty;
                 int count = 1;
@@ -97,6 +98,8 @@ extern int setupBoard(Board_t self, const char *fen)
                 default:
                         return 0; // FEN error
                 }
+                int squareColor = squareColor(square(file,rank));
+                self->materialKey += materialKeys[piece][squareColor];
                 do {
                         self->squares[square(file,rank)] = piece;
                         file += fileStep;

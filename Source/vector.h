@@ -414,6 +414,16 @@
         P(passerVsKnight, -995),
         P(passerVsPawn, 134),
 
+        P(freePasser, 30), // no blocker
+
+        P(blocker_0, -100), // stop square
+        P(blocker_1, -105),
+        P(blocker_2, -62),
+        P(blocker_3, -35),
+        P(blocker_4, -38), // -furtest square
+
+        P(unstoppablePasser, 567),
+
         P(candidateByRank_0, 10),
         P(candidateByRank_1, 33),
         P(candidateByRank_2, 77),

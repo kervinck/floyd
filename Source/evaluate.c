@@ -69,7 +69,8 @@ struct pkSlot {
         short bishopWilo[2][2]; // [bishopColor][squareColor]
         // TODO: something to boost drawness when bishops don't interact with enemy pawns
         unsigned char pawnOnFile[2]; // open, half-open
-        unsigned char weakPawn[2];
+        unsigned char passerOnFile[2];
+        unsigned char weakPawnOnFile[2];
         unsigned char span[2]; // 0..4
         //unsigned char center[2]; // 0..4
 };
@@ -106,14 +107,15 @@ static const uint64_t materialKeys[][2] = {
         [whiteKing]   = { 0, 0 },
         [blackKing]   = { 0, 0 },
 };
-static const uint64_t materialKeySide[] = { 0x0f0f0f0f0full, 0xf0f0f0f0f0ull }; // white, black
+
+static const uint64_t materialMaskPiecesAndPawns[] = { 0x0f0f0f0f0full, 0xf0f0f0f0f0ull }; // white, black
+static const uint64_t materialMaskPiecesNoPawns[]  = { 0x0f0f0f0f00ull, 0xf0f0f0f000ull }; // white, black
 
 const char * const vectorLabels[] = {
         #define P(id, value) #id
         #include "vector.h"
         #undef P
 };
-
 const int vectorLen = arrayLen(vectorLabels);
 
 // TODO: should become default and const
@@ -125,6 +127,7 @@ int globalVector[] = {
 uint64_t globalVectorBaseHash; // TODO: move to Python engine object
 
 static const int firstRank[] = { rank1, rank8 }; // white, black
+static const int pawnStep[] = { a3 - a2, a6 - a7 };
 
 /*
  *  Center of the 3x3 square attack zone around the king
@@ -153,6 +156,7 @@ static struct pkSlot pawnKingTable[pawnKingLen];
 static void extractPawnStructure(Board_t self, const int v[vectorLen], struct pkSlot *pawns);
 static void evaluatePawnFile(Board_t self, const int v[vectorLen], struct pkSlot *pawns, int file, int side,
                              int maxPawnFromFirst[2][10][2]);
+static int evaluatePasser(Board_t self, const int v[vectorLen], int fileFlag, int side, uint64_t materialKey);
 static int evaluateKnight(Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side);
 static int evaluateBishop(Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side);
 static int evaluateRook  (Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side);
@@ -305,7 +309,10 @@ int evaluate(Board_t self)
 
         for (int side=white; side<=black; side++) {
                 wiloScore[side] += pawns->wiloScore[side];
+
                 wiloScore[side] += round(pawns->passerScore[side] * passerScaling[side]);
+                for (int files=pawns->passerOnFile[side]; files; files&=files-1)
+                        wiloScore[side] += evaluatePasser(self, v, files & -files, side, materialKey);
         }
 
         /*--------------------------------------------------------------+
@@ -495,7 +502,7 @@ int evaluate(Board_t self)
         }
 
         for (int side=white; side<=black; side++)
-                if ((materialKey & ~materialKeySide[side]) == materialKey) { // against bare king
+                if ((materialKey & materialMaskPiecesAndPawns[side]) == 0) { // bare king
                         wiloScore[other(side)] += v[winBonus];
                         drawScore -= v[winBonus];
                 }
@@ -640,7 +647,6 @@ static void extractPawnStructure(Board_t self, const int v[vectorLen], struct pk
                         int squareColor = squareColor(square);
                         bySquareColor[pawnColor][squareColor] += 1;
 
-                        static const int pawnStep[] = { a3 - a2, a6 - a7 };
                         int inFront = self->squares[square+pawnStep[pawnColor]];
                         if (inFront == whitePawn || inFront == blackPawn) {
                                 rammedBySquareColor[pawnColor][squareColor] += 1;
@@ -776,7 +782,7 @@ static void evaluatePawnFile(Board_t self, const int v[vectorLen], struct pkSlot
                 if (openFile) {
                         if (frontPawn > 2) pawnScore -= v[backwardPawnOpenByRank_0 + frontPawn - 2];
                         if (frontPawn < 6) pawnScore += v[backwardPawnOpenByRank_0 + frontPawn - 1];
-                        pawns->weakPawn[side] |= bit(file);
+                        pawns->weakPawnOnFile[side] |= bit(file);
                 } else {
                         if (frontPawn > 2) pawnScore -= v[backwardPawnClosedByRank_0 + frontPawn - 2];
                         if (frontPawn < 6) pawnScore += v[backwardPawnClosedByRank_0 + frontPawn - 1];
@@ -800,6 +806,7 @@ static void evaluatePawnFile(Board_t self, const int v[vectorLen], struct pkSlot
                             + v[passerA_1 + fileIndex] * (frontPawn - 1)
                             + v[passerA_2 + fileIndex] * (frontPawn - 1) * (frontPawn - 2) / 4;
                 pawns->passerScore[side] += nominal;
+                pawns->passerOnFile[side] |= bit(file);
         }
         // TODO: scoring by square (no polynomials)
         // TODO: passer is doubled penalty
@@ -865,6 +872,60 @@ static void evaluatePawnFile(Board_t self, const int v[vectorLen], struct pkSlot
 #endif
 
         pawns->wiloScore[side] += pawnScore;
+}
+
+/*----------------------------------------------------------------------+
+ |      evaluatePasser                                                  |
+ +----------------------------------------------------------------------*/
+
+static int evaluatePasser(Board_t self, const int v[vectorLen], int fileFlag, int side, uint64_t materialKey)
+{
+        int file = bitIndex8(fileFlag);
+        assert(1 << file == fileFlag);
+
+        // Scan backwards from promotion square
+        int xside = other(side);
+        int freeSquares = 6; // Free until proven otherwise
+        int square = square(file, firstRank[xside]);
+        for (;;) {
+                int piece = self->squares[square];
+                if (piece == whitePawn || piece == blackPawn)
+                        break;
+                if (piece == empty)
+                        freeSquares++;
+                else
+                        freeSquares = 0;
+                square -= pawnStep[side];
+                assert(0 <= square && square < boardSize);
+                if (square & ~(boardSize - 1))
+                        return 0; // Safety net for pawn hash collisions
+        }
+
+        assert(0 <= square && square < boardSize);
+        assert(file(square) == file);
+        assert(pieceColor(self->squares[square]) == side);
+
+        int passerScore = 0;
+
+        if (freeSquares < 6) { // There is a blocker
+                if (freeSquares > 0) passerScore -= v[blocker_0 + freeSquares - 1];
+                if (freeSquares < 5) passerScore += v[blocker_0 + freeSquares];
+        } else {
+                passerScore += v[freePasser]; // No blocker
+
+                if ((materialKey & materialMaskPiecesNoPawns[xside]) == 0) {
+                        // NOW's heuristic (http://talkchess.com/forum/viewtopic.php?p=125794)
+                        int rankFlip = (side == white) ?  0 : square(0, 7);
+                        int king  = rankFlip ^ self->sides[side].king;
+                        int xking = rankFlip ^ self->sides[xside].king;
+                        int pawn  = rankFlip ^ square;
+                        if (kpkProbe(white, king, pawn, xking) > 0
+                         && kpkProbe(black, king, pawn, xking) < 0)
+                                passerScore += v[unstoppablePasser];
+                }
+        }
+
+        return passerScore;
 }
 
 /*----------------------------------------------------------------------+
@@ -959,7 +1020,7 @@ static int evaluateRook(Board_t self, const int v[vectorLen], const struct pkSlo
         // Rook on open or half-open file
         if (!pawnOnFile(side, file)) {
                 if (pawnOnFile(other(side), file)) {
-                        if (bitTest(pawns->weakPawn[other(side)], file))
+                        if (bitTest(pawns->weakPawnOnFile[other(side)], file))
                                 rookScore += v[rookToWeakPawn_0 + fileType];
                         else
                                 rookScore += v[rookOnHalfOpen_0 + fileType];

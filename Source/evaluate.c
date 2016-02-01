@@ -318,22 +318,22 @@ int evaluate(Board_t self)
         // Scan board for pieces
         for (int square=0; square<boardSize; square++) {
                 int piece = self->squares[square];
-                if (piece == empty)
-                        continue;
-
-                int side = pieceColor(piece);
-
+                int side;
                 switch (piece) {
                 case whiteQueen: case blackQueen:
+                        side = pieceColor(piece);
                         wiloScore[side] += evaluateQueen(self, v, square, side);
                         break;
                 case whiteRook: case blackRook:
+                        side = pieceColor(piece);
                         wiloScore[side] += evaluateRook(self, v, pawns, square, side);
                         break;
                 case whiteBishop: case blackBishop:
+                        side = pieceColor(piece);
                         wiloScore[side] += evaluateBishop(self, v, pawns, square, side);
                         break;
                 case whiteKnight: case blackKnight:
+                        side = pieceColor(piece);
                         wiloScore[side] += evaluateKnight(self, v, pawns, square, side);
                         break;
                 }

@@ -402,27 +402,42 @@
         P(passerG_2, 106),
         P(passerH_2, 68),
 
-        P(passerScalingOffset, 3976),
-        P(passerAndQueen, 1101),
-        P(passerAndRook, 580),
-        P(passerAndBishop, 551),
-        P(passerAndKnight, 242),
-        P(passerAndPawn, -613),
-        P(passerVsQueen, -430),
-        P(passerVsRook, -559),
-        P(passerVsBishop, -1479),
-        P(passerVsKnight, -995),
-        P(passerVsPawn, 134),
+        P(passerScalingOffset, 4030),
+        P(passerAndQueen, 1275),
+        P(passerAndRook, 612),
+        P(passerAndBishop, 632),
+        P(passerAndKnight, 231),
+        P(passerAndPawn, -642),
+        P(passerVsQueen, -641),
+        P(passerVsRook, -497),
+        P(passerVsBishop, -1290),
+        P(passerVsKnight, -994),
+        P(passerVsPawn, 261),
 
-        P(freePasser, 30), // no blocker
+        P(protectedPasser, -17), // TODO: check this after tuning
+        P(connectedPasser, -70), // TODO: check this after tuning
 
-        P(blocker_0, -100), // stop square
-        P(blocker_1, -105),
-        P(blocker_2, -62),
-        P(blocker_3, -35),
-        P(blocker_4, -38), // -furtest square
+        P(safePasser, 153), // no blocker and totally safe passage
 
-        P(unstoppablePasser, 567),
+        P(blocker_0, -103), // stop square
+        P(blocker_1, -95),
+        P(blocker_2, -52),
+        P(blocker_3, -29),
+        P(blocker_4, -27), // -furtest square
+
+        P(blockedByOwn, 40), // TODO: check this after tuning
+        P(blockedByOther, -59), // TODO: check this after tuning
+
+        P(controller_0, -42), // stop square
+        P(controller_1, -23),
+        P(controller_2, 22),
+        P(controller_3, 2),
+        P(controller_4, -7), // -furtest square
+
+        P(unstoppablePasser, 359),
+
+        P(kingToPasser, 20),
+        P(kingToOwnPasser, -25),
 
         P(candidateByRank_0, 10),
         P(candidateByRank_1, 33),

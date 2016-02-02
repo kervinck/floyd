@@ -77,6 +77,8 @@ struct pkSlot {
 
 #define pawnOnFile(side, file) bitTest(pawns->pawnOnFile[side], file)
 
+// TODO: move to Board.h? Hide behind function once removed from critical path?
+// int pieceCount(Board_t self, int piece);
 #define nrPawns(side)      (int)((self->materialKey >> (((side) << 2) + 0)) & 15)
 #define nrKnights(side)    (int)((self->materialKey >> (((side) << 2) + 8)) & 15)
 #define nrBishops(side)    (int)((self->materialKey >> (((side) << 2) + 16)) & 15)
@@ -115,6 +117,7 @@ static const int pawnStep[] = { a3 - a2, a6 - a7 };
  *  Center of the 3x3 square attack zone around the king
  *  (so shifted for borders and corners: e1->e2, h1->g2, f2->f2, etc.)
  */
+// TODO: move to moves.c? (because also needed for subHash?)
 #define Z(sq) [sq] = square(file(sq)==fileA ? fileB : file(sq)==fileH ? fileG : file(sq),\
                             rank(sq)==rank1 ? rank2 : rank(sq)==rank8 ? rank7 : rank(sq))
 static const int kingZoneCenter[] = {
@@ -154,18 +157,6 @@ static int squareOf(Board_t self, int piece);
 /*----------------------------------------------------------------------+
  |      evaluate                                                        |
  +----------------------------------------------------------------------*/
-
-// TODO:
-// rooks behind passers (w+b)
-// rooks before passers (w+b)
-// occupancy of front square
-// occupancy of second square
-// occupancy of any  square
-// control of front square
-// control of second square
-// control of any square
-// supported passer
-// connected passers
 
 int evaluate(Board_t self)
 {
@@ -776,11 +767,13 @@ static void evaluatePawnFile(Board_t self, const int v[vectorLen], struct pkSlot
 
         // Passer
         if (openFile && lastSentry <= frontPawn) {
+                pawns->passerOnFile[side] |= bit(file);
                 int nominal = v[passerA_0 + fileIndex]
                             + v[passerA_1 + fileIndex] * (frontPawn - 1)
                             + v[passerA_2 + fileIndex] * (frontPawn - 1) * (frontPawn - 2) / 4;
+                if (isDefended) nominal += v[protectedPasser];
+                if (isDuo)      nominal += v[connectedPasser];
                 pawns->passerScore[side] += nominal;
-                pawns->passerOnFile[side] |= bit(file);
         }
         // TODO: scoring by square (no polynomials)
         // TODO: passer is doubled penalty
@@ -852,43 +845,59 @@ static void evaluatePawnFile(Board_t self, const int v[vectorLen], struct pkSlot
  |      evaluatePasser                                                  |
  +----------------------------------------------------------------------*/
 
+// TODO: rooks behind/before passers (w+b)
 static int evaluatePasser(Board_t self, const int v[vectorLen], int fileFlag, int side)
 {
+        // Find the passer and scan the path to promotion while doing so
         int file = bitIndex8(fileFlag);
-        assert(1 << file == fileFlag);
-
-        // Scan backwards from promotion square
         int xside = other(side);
-        int freeSquares = 6; // Free until proven otherwise
-        int square = square(file, firstRank[xside]);
+        int square = square(file, firstRank[xside]); // Scan backwards
+        int myPawn = (side == white) ? whitePawn : blackPawn;
+        int freeSquares = 6; // Path is free until proven otherwise
+        int safeSquares = 6; // Same logic for controlled squares
         for (;;) {
                 int piece = self->squares[square];
-                if (piece == whitePawn || piece == blackPawn)
+                if (piece == myPawn)
                         break;
-                if (piece == empty)
+                if (piece == empty) {
                         freeSquares++;
-                else
+                        int defenders = self->sides[side].attacks[square];
+                        int attackers = self->sides[xside].attacks[square];
+                        safeSquares = (attackers <= defenders) ? safeSquares + 1 : 0;
+                        // TODO: consider see() instead
+                } else
                         freeSquares = 0;
                 square -= pawnStep[side];
-                assert(0 <= square && square < boardSize);
                 if (square & ~(boardSize - 1))
                         return 0; // Safety net for pawn hash collisions
         }
 
-        assert(0 <= square && square < boardSize);
-        assert(file(square) == file);
-        assert(pieceColor(self->squares[square]) == side);
-
         int passerScore = 0;
 
-        if (freeSquares < 6) { // There is a blocker
+        // Consider unsafe squares only upto the first blocker (if any)
+        if (safeSquares < freeSquares) {
+                assert(safeSquares < 6);
+                if (safeSquares > 0) passerScore -= v[controller_0 + safeSquares - 1];
+                if (safeSquares < 5) passerScore += v[controller_0 + safeSquares];
+        }
+
+        if (freeSquares < 6) {
+                // Distance to blocker
                 if (freeSquares > 0) passerScore -= v[blocker_0 + freeSquares - 1];
                 if (freeSquares < 5) passerScore += v[blocker_0 + freeSquares];
-        } else {
-                passerScore += v[freePasser]; // No blocker
 
+                // Piece type of blocker
+                int blocker = self->squares[square + (freeSquares + 1) * pawnStep[side]];
+                assert(blocker != empty);
+                passerScore += v[pieceColor(blocker) == side ? blockedByOwn : blockedByOther];
+        } else {
+                // No blocker
+                if (freeSquares == safeSquares)
+                        passerScore += v[safePasser]; // Completely safe path
+
+                // NOW's heuristic for unstoppable pawns
+                // Ref: http://talkchess.com/forum/viewtopic.php?p=125794
                 if ((self->materialKey & materialMaskPiecesNoPawns[xside]) == 0) {
-                        // NOW's heuristic (http://talkchess.com/forum/viewtopic.php?p=125794)
                         int rankFlip = (side == white) ?  0 : square(0, 7);
                         int king  = rankFlip ^ self->sides[side].king;
                         int xking = rankFlip ^ self->sides[xside].king;
@@ -898,6 +907,10 @@ static int evaluatePasser(Board_t self, const int v[vectorLen], int fileFlag, in
                                 passerScore += v[unstoppablePasser];
                 }
         }
+
+        // King distances
+        passerScore += (kingDistance(self->sides[side].king, square) - 1)  * v[kingToOwnPasser]
+                     + (kingDistance(self->sides[xside].king, square) - 1) * v[kingToPasser];
 
         return passerScore;
 }
@@ -929,6 +942,7 @@ static int evaluateKnight(Board_t self, const int v[vectorLen], const struct pkS
         if (xspan < 4) knightScore += v[knightVsSpan_0 + xspan];
 
         // Distance to kings
+        // TODO: offset -1!
         knightScore += v[knightToOwnKing] * kingDistance(square, self->sides[side].king)
                      + v[knightToKing]    * kingDistance(square, self->sides[other(side)].king);
 

@@ -1,30 +1,28 @@
 
-|Todo| King distance to passers [evaluate]
-
-|Todo| Rename pawnKingHash [qa]
-
-Because we want to add bishop colors as well, and
-reduce the king component to their files.
-
-Candidates:
-        subHash <-- looks best
-        miniHash
-        structHash
-        xHash
-        pHash
-        pawnHash
-        slowHash
-        coarseHash
-
-|Todo| Blocking of passers [evaluate]
-
 |Todo| Rooks and queens in front or behind passers [evaluate]
+
+|Todo| Rooks on files with weak pawns [evaluate]
 
 |Todo| Strong squares / outposts [evaluate]
 
 Isn't this simply "piece supported by own pawn"?
  - Consider location. E.g. 3rd rank is probably not important
  - Bonus per rank: 6p model
+
+|Todo| Sneaker (hidden passed pawn) [evaluate]
+
+        Passed pawn, if not blocked
+        Helper can sacrifice itself to make a passer
+
+|Todo| Candidate passer [evaluate]
+
+Two types:
+1. Floyd type: check that the helpers are on the right spot
+2. Fruit type: just see if the helpers outnumber the sentries
+
+|Todo| Pawn levers [evaluate]
+
+|Todo| Board control: what can I drop on a square [evaluate]
 
 |Todo| Potential open files [evaluate]
 
@@ -46,27 +44,6 @@ Potential open file:
         Score by rank of the sentry?
         Score by difference in moves/squares?
 
-|Todo| Rooks on files with weak pawns [evaluate]
-
-|Todo| Sneaker (hidden passed pawn) [evaluate]
-
-        Passed pawn, if not blocked
-        Helper can sacrifice itself to make a passer
-
-|Todo| Candidate passer [evaluate]
-
-Two types:
-1. Floyd type: check that the helpers are on the right spot
-2. Fruit type: just see if the helpers outnumber the sentries
-
-|Todo| Pawn levers [evaluate]
-
-|Todo| Undrawness of material advantage [evaluate]
-
-Instead of just "phase"
-
-|Todo| Board control: what can I drop on a square [evaluate]
-
 |Todo| Piece vs pawn center
 
 Center X and center Y
@@ -79,11 +56,11 @@ Pawn center (rank, file)
 Passers
 Weak pawn (kings)
 
-|Todo| Attacking a non-mobile pawn
-
 |Todo| Piece mobility [evaluate]
 
 Mobility = what can I actually move to a square, safely
+
+|Todo| Attacking a non-mobile pawn
 
 |Todo| Attack x piece matrix [evaluate]
 
@@ -94,6 +71,10 @@ Threat: weaker attacks stronger piece or undefended piece
 1st threat
 2nd threat
 3rd threat
+
+|Todo| Undrawness of material advantage [evaluate]
+
+Instead of just "phase"
 
 |Todo| Check Rebel evaluation features [evaluate]
 
@@ -352,3 +333,19 @@ debug on
 position fen 2rq1rk1/1b2ppbp/1p3np1/pN1p4/2PPn3/BQ2PN1P/P3BPP1/2R2RK1 w - - 5 15 moves f3e5 e4d2 b3c2 d2f1 g1f1
 info sting input position fen 2rq1rk1/1b2ppbp/1p3np1/pN1p4/2PPn3/BQ2PN1P/P3BPP1/2R2RK1 w - - 5 15 moves f3e5 e4d2 b3c2 d2f1 g1f1
 info string Illegal move
+
+|Todo| Rename pawnKingHash [qa]
+
+Because we want to add bishop colors as well, and
+reduce the king component to their files.
+
+Candidates:
+        subHash <-- looks best
+        miniHash
+        structHash
+        xHash
+        pHash
+        pawnHash
+        slowHash
+        coarseHash
+

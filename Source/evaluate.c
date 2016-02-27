@@ -46,6 +46,7 @@
 #define kingDistance(a, b) max(abs(file(a) - file(b)), abs(rank(a) - rank(b)))
 #define fileIndex(board, file_, side) ((file_) ^ fileA ^ ((file((board)->sides[side].king) ^ fileA) >> 2 ? 0 : 7))
 #define oppKings(board) ((file((board)->sides[white].king) ^ file((board)->sides[black].king)) >> 2)
+#define isPawn(piece) ((piece) == whitePawn || (piece) == blackPawn)
 
 enum vector {
         #define P(id, value) id
@@ -76,6 +77,7 @@ struct pkSlot {
 };
 
 #define pawnOnFile(side, file) bitTest(pawns->pawnOnFile[side], file)
+#define passerOnFile(side, file) bitTest(pawns->passerOnFile[side], file)
 
 // TODO: move to Board.h? Hide behind function once removed from critical path?
 // int pieceCount(Board_t self, int piece);
@@ -141,10 +143,11 @@ static struct pkSlot pawnKingTable[pawnKingLen];
 static void extractPawnStructure(Board_t self, const int v[vectorLen], struct pkSlot *pawns);
 static void evaluatePawnFile(Board_t self, const int v[vectorLen], struct pkSlot *pawns, int file, int side,
                              int maxPawnFromFirst[2][10][2]);
-static int evaluatePasser(Board_t self, const int v[vectorLen], int fileFlag, int side);
+static int evaluatePasser(Board_t self, const int v[vectorLen], int fileFlag, int side, int passerSquare[2][8]);
 static int evaluateKnight(Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side);
 static int evaluateBishop(Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side);
-static int evaluateRook  (Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side, double safetyScaling[2]);
+static int evaluateRook  (Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side,
+                          double safetyScaling[2], int passerSquare[2][8]);
 static int evaluateQueen (Board_t self, const int v[vectorLen],                             int square, int side);
 static int evaluateKing  (              const int v[vectorLen],                             int square, int side);
 
@@ -165,6 +168,7 @@ int evaluate(Board_t self)
         int wiloScore[2]; // Accumulators
         double passerScaling[2];
         double safetyScaling[2];
+        int passerSquare[2][8];
 
         /*--------------------------------------------------------------+
          |      Feature extraction                                      |
@@ -277,7 +281,7 @@ int evaluate(Board_t self)
 
                 wiloScore[side] += round(pawns->passerScore[side] * passerScaling[side]);
                 for (int files=pawns->passerOnFile[side]; files; files&=files-1)
-                        wiloScore[side] += evaluatePasser(self, v, files & -files, side);
+                        wiloScore[side] += evaluatePasser(self, v, files & -files, side, passerSquare);
         }
 
         /*--------------------------------------------------------------+
@@ -298,7 +302,8 @@ int evaluate(Board_t self)
                         break;
                 case whiteRook: case blackRook:
                         side = pieceColor(piece);
-                        wiloScore[side] += evaluateRook(self, v, pawns, square, side, safetyScaling);
+                        wiloScore[side] += evaluateRook(self, v, pawns, square, side,
+                                                        safetyScaling, passerSquare);
                         break;
                 case whiteBishop: case blackBishop:
                         side = pieceColor(piece);
@@ -598,7 +603,7 @@ static void extractPawnStructure(Board_t self, const int v[vectorLen], struct pk
         // Pawn location scan
         for (int square=0; square<boardSize; square++) {
                 int piece = self->squares[square];
-                if (piece == whitePawn || piece == blackPawn) {
+                if (isPawn(piece)) {
                         int file = file(square), rank = rank(square);
                         int pawnColor = pieceColor(piece);
                         #define setMax(a, b) if ((a) < (b)) (a) = (b)
@@ -613,7 +618,7 @@ static void extractPawnStructure(Board_t self, const int v[vectorLen], struct pk
                         bySquareColor[pawnColor][squareColor] += 1;
 
                         int inFront = self->squares[square+pawnStep[pawnColor]];
-                        if (inFront == whitePawn || inFront == blackPawn) {
+                        if (isPawn(inFront)) {
                                 rammedBySquareColor[pawnColor][squareColor] += 1;
 
                                 int fileType = min(file, flip(file));
@@ -846,7 +851,14 @@ static void evaluatePawnFile(Board_t self, const int v[vectorLen], struct pkSlot
  +----------------------------------------------------------------------*/
 
 // TODO: rooks behind/before passers (w+b)
-static int evaluatePasser(Board_t self, const int v[vectorLen], int fileFlag, int side)
+/*
+Several ways to detect
+- While searching for the passer, as side-effect
+- After finding the passer
+- Considering the attacks on the pawn
+- While evaluating the rook and finding it on a passer file <-- This one
+*/
+static int evaluatePasser(Board_t self, const int v[vectorLen], int fileFlag, int side, int passerSquare[2][8])
 {
         // Find the passer and scan the path to promotion while doing so
         int file = bitIndex8(fileFlag);
@@ -871,6 +883,7 @@ static int evaluatePasser(Board_t self, const int v[vectorLen], int fileFlag, in
                 if (square & ~(boardSize - 1))
                         return 0; // Safety net for pawn hash collisions
         }
+        passerSquare[side][file] = square;
 
         int passerScore = 0;
 
@@ -895,8 +908,7 @@ static int evaluatePasser(Board_t self, const int v[vectorLen], int fileFlag, in
                 if (freeSquares == safeSquares)
                         passerScore += v[safePasser]; // Completely safe path
 
-                // NOW's heuristic for unstoppable pawns
-                // Ref: http://talkchess.com/forum/viewtopic.php?p=125794
+                // NOW's heuristic (http://talkchess.com/forum/viewtopic.php?p=125794)
                 if ((self->materialKey & materialMaskPiecesNoPawns[xside]) == 0) {
                         int rankFlip = (side == white) ?  0 : square(0, 7);
                         int king  = rankFlip ^ self->sides[side].king;
@@ -987,7 +999,9 @@ static int evaluateBishop(Board_t self, const int v[vectorLen], const struct pkS
  |      evaluateRook                                                    |
  +----------------------------------------------------------------------*/
 
-static int evaluateRook(Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side, double safetyScaling[2])
+// Precondition is that evaluatePasser() is already done and recorded the passer squares
+static int evaluateRook(Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side,
+                        double safetyScaling[2], int passerSquare[2][8])
 {
         int rookScore = 0;
 
@@ -1020,14 +1034,22 @@ static int evaluateRook(Board_t self, const int v[vectorLen], const struct pkSlo
                 rookScore += trunc(safetyScaling[xside] * v[rookToKing_0 + deltaFile]);
         }
 
+        // Relation to passers on each side
+        for (int passerColor=white; passerColor<=black; passerColor++)
+                if (passerOnFile(passerColor, file)) {
+                        int passer = passerSquare[passerColor][file];
+                        assert(isPawn(self->squares[passer]));
+                        assert(pieceColor(self->squares[passer]) == passerColor);
+                        int inFront = (square > passer) == (pawnStep[passerColor] > 0);
+                        int ownPasser = side == passerColor;
+                        rookScore += v[(inFront ? rookInFrontPasser_0 : rookBehindPasser_0) + ownPasser];
+                }
+
         return rookScore;
 }
 
-// TODO: relation to opponent king zone (normalized to reduce pressure on hash table)
-// TODO: connecting (side by side), connecting on 7th
+// TODO: connecting (side by side)
 // TODO: controlling squares on an open file (not just by rook)
-// TODO: supporting/blocking passers
-// TODO: attacking backward pawns
 
 /*----------------------------------------------------------------------+
  |      evaluateQueen                                                   |

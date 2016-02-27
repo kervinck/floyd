@@ -718,6 +718,12 @@
         P(rookToKing_6, -114),
         P(rookToKing_7, -141),
 
+        P(rookInFrontPasser_0, 0), // opponent's
+        P(rookInFrontPasser_1, 0), // own passer
+
+        P(rookBehindPasser_0, 0), // opponent's
+        P(rookBehindPasser_1, 0), // own passer
+
         /*
          *  Queens
          */

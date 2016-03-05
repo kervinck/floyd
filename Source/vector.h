@@ -148,6 +148,12 @@
         P(attackByQueen, 183),
         P(attackByKing, -258),
 
+        P(attackPieces_0, 0),
+        P(attackPieces_1, 0),
+        P(attackPieces_2, 0),
+        P(attackPieces_3, 0),
+        P(attackPieces_4, 0),
+
         // TODO: pawn storm
 
         // king mobility
@@ -494,6 +500,9 @@
         P(knightVsSpan_2, -78),
         P(knightVsSpan_3, 4), // -span4 (7-8 files)
 
+        P(knightToKing, -15),
+        P(knightToOwnKing, -10),
+
         /*
          *  Bishops
          */
@@ -678,6 +687,9 @@
         P(bishopVsLikePawn_2, -6),
         P(bishopVsLikeRammedPawn, 6),
 
+        P(bishopToKing, 0),
+        P(bishopToOwnKing, -8),
+
         /*
          *  Rooks
          */
@@ -718,9 +730,11 @@
         P(rookToKing_6, -104),
         P(rookToKing_7, -132),
 
+        P(rookToKing, -14),
+        P(rookToOwnKing, 2),
+
         P(rookInFrontPasser_0, -50), // opponent's
         P(rookInFrontPasser_1, 123), // own passer
-
         P(rookBehindPasser_0, 372), // opponent's
         P(rookBehindPasser_1, 56), // own passer
 
@@ -742,12 +756,11 @@
 
         P(queenToKing, -23),
         P(queenToOwnKing, -10),
-        P(rookToKing, -14),
-        P(rookToOwnKing, 2),
-        P(bishopToKing, 0),
-        P(bishopToOwnKing, -8),
-        P(knightToKing, -15),
-        P(knightToOwnKing, -10),
+
+        P(queenInFrontPasser_0, 0), // opponent's
+        P(queenInFrontPasser_1, 0), // own passer
+        P(queenBehindPasser_0, 0), // opponent's
+        P(queenBehindPasser_1, 0), // own passer
 
         /*
          *  Kings

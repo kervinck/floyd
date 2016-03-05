@@ -43,7 +43,7 @@
 #endif
 
 #define flip(fileOrRank) ((fileOrRank) ^ 7)
-#define kingDistance(a, b) max(abs(file(a) - file(b)), abs(rank(a) - rank(b)))
+#define kingDistance(a, b) (max(abs(file(a) - file(b)), abs(rank(a) - rank(b))) - 1)
 #define fileIndex(board, file_, side) ((file_) ^ fileA ^ ((file((board)->sides[side].king) ^ fileA) >> 2 ? 0 : 7))
 #define oppKings(board) ((file((board)->sides[white].king) ^ file((board)->sides[black].king)) >> 2)
 #define isPawn(piece) ((piece) == whitePawn || (piece) == blackPawn)
@@ -141,14 +141,13 @@ static struct pkSlot pawnKingTable[pawnKingLen];
  +----------------------------------------------------------------------*/
 
 static void extractPawnStructure(Board_t self, const int v[vectorLen], struct pkSlot *pawns);
-static void evaluatePawnFile(Board_t self, const int v[vectorLen], struct pkSlot *pawns, int file, int side,
-                             int maxPawnFromFirst[2][10][2]);
+// TODO: cleanup these function prototypes
+static void evaluatePawnFile(Board_t self, const int v[vectorLen], struct pkSlot *pawns, int file, int side, int maxPawnFromFirst[2][10][2]);
 static int evaluatePasser(Board_t self, const int v[vectorLen], int fileFlag, int side, int passerSquare[2][8]);
 static int evaluateKnight(Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side);
 static int evaluateBishop(Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side);
-static int evaluateRook  (Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side,
-                          double safetyScaling[2], int passerSquare[2][8]);
-static int evaluateQueen (Board_t self, const int v[vectorLen],                             int square, int side);
+static int evaluateRook  (Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side, double safetyScaling[2], int passerSquare[2][8]);
+static int evaluateQueen (Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side, int passerSquare[2][8]);
 static int evaluateKing  (              const int v[vectorLen],                             int square, int side);
 
 static int shelterPenalty(const int v[vectorLen], int side, int file, int maxPawnFromFirst[2][10][2]);
@@ -298,12 +297,11 @@ int evaluate(Board_t self)
                 switch (piece) {
                 case whiteQueen: case blackQueen:
                         side = pieceColor(piece);
-                        wiloScore[side] += evaluateQueen(self, v, square, side);
+                        wiloScore[side] += evaluateQueen(self, v, pawns, square, side, passerSquare);
                         break;
                 case whiteRook: case blackRook:
                         side = pieceColor(piece);
-                        wiloScore[side] += evaluateRook(self, v, pawns, square, side,
-                                                        safetyScaling, passerSquare);
+                        wiloScore[side] += evaluateRook(self, v, pawns, square, side, safetyScaling, passerSquare);
                         break;
                 case whiteBishop: case blackBishop:
                         side = pieceColor(piece);
@@ -363,7 +361,7 @@ int evaluate(Board_t self)
                 int nrAttackedSquares = (attacks[-9] > 0) + (attacks[-8] > 0) + (attacks[-7] > 0)
                                       + (attacks[-1] > 0) + (attacks[ 0] > 0) + (attacks[ 1] > 0)
                                       + (attacks[ 7] > 0) + (attacks[ 8] > 0) + (attacks[ 9] > 0);
-                nrAttackedSquares = min(nrAttackedSquares, 6); // clip 7..9 at 6
+                nrAttackedSquares = min(nrAttackedSquares, 6); // clip at 6
 
                 // A measure of distinct pieces attacking the king zone
                 int attackers = attacks[-9] | attacks[-8] | attacks[-7]
@@ -374,7 +372,8 @@ int evaluate(Board_t self)
                 int nrAttackRooks  = (attackers >> 2) & 3;
                 int nrAttackMinors = (attackers >> 4) & 3;
                 int nrAttackPawns  = attackers >> 6;
-                // TODO: non-linearity on number of attackers
+                int nrAttackers = nrAttackKings + nrAttackQueens + nrAttackRooks + nrAttackMinors + nrAttackPawns;
+                nrAttackers = min(nrAttackers, 5); // clip at 5
 
                 // Safe squares for the king (0 or 1 is not good)
                 // TODO: should this be a part of safety scaling at all?
@@ -402,6 +401,8 @@ int evaluate(Board_t self)
                 if (nrAttackMinors < 3) attack += v[attackByMinor_0 + nrAttackMinors];
                 if (nrAttackPawns  > 0) attack -= v[attackByPawn_0  + nrAttackPawns-1];
                 if (nrAttackPawns  < 3) attack += v[attackByPawn_0  + nrAttackPawns];
+                if (nrAttackers    > 0) attack -= v[attackPieces_0  + nrAttackers-1];
+                if (nrAttackers    < 5) attack += v[attackPieces_0  + nrAttackers];
                 if (kingMobility < 2) attack += v[mobilityKing_0  + kingMobility];
 
                 // King safety is the (negative) scaled shelter and attack score
@@ -850,14 +851,6 @@ static void evaluatePawnFile(Board_t self, const int v[vectorLen], struct pkSlot
  |      evaluatePasser                                                  |
  +----------------------------------------------------------------------*/
 
-// TODO: rooks behind/before passers (w+b)
-/*
-Several ways to detect
-- While searching for the passer, as side-effect
-- After finding the passer
-- Considering the attacks on the pawn
-- While evaluating the rook and finding it on a passer file <-- This one
-*/
 static int evaluatePasser(Board_t self, const int v[vectorLen], int fileFlag, int side, int passerSquare[2][8])
 {
         // Find the passer and scan the path to promotion while doing so
@@ -920,9 +913,10 @@ static int evaluatePasser(Board_t self, const int v[vectorLen], int fileFlag, in
                 }
         }
 
-        // King distances
-        passerScore += (kingDistance(self->sides[side].king, square) - 1)  * v[kingToOwnPasser]
-                     + (kingDistance(self->sides[xside].king, square) - 1) * v[kingToPasser];
+        // King distances to square in front of passer
+        int stopSquare = square + pawnStep[side];
+        passerScore += v[kingToOwnPasser] * kingDistance(self->sides[side].king,  stopSquare)
+                     + v[kingToPasser]    * kingDistance(self->sides[xside].king, stopSquare);
 
         return passerScore;
 }
@@ -954,7 +948,6 @@ static int evaluateKnight(Board_t self, const int v[vectorLen], const struct pkS
         if (xspan < 4) knightScore += v[knightVsSpan_0 + xspan];
 
         // Distance to kings
-        // TODO: offset -1!
         knightScore += v[knightToOwnKing] * kingDistance(square, self->sides[side].king)
                      + v[knightToKing]    * kingDistance(square, self->sides[other(side)].king);
 
@@ -999,9 +992,7 @@ static int evaluateBishop(Board_t self, const int v[vectorLen], const struct pkS
  |      evaluateRook                                                    |
  +----------------------------------------------------------------------*/
 
-// Precondition is that evaluatePasser() is already done and recorded the passer squares
-static int evaluateRook(Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side,
-                        double safetyScaling[2], int passerSquare[2][8])
+static int evaluateRook(Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side, double safetyScaling[2], int passerSquare[2][8])
 {
         int rookScore = 0;
 
@@ -1038,8 +1029,6 @@ static int evaluateRook(Board_t self, const int v[vectorLen], const struct pkSlo
         for (int passerColor=white; passerColor<=black; passerColor++)
                 if (passerOnFile(passerColor, file)) {
                         int passer = passerSquare[passerColor][file];
-                        assert(isPawn(self->squares[passer]));
-                        assert(pieceColor(self->squares[passer]) == passerColor);
                         int inFront = (square > passer) == (pawnStep[passerColor] > 0);
                         int ownPasser = side == passerColor;
                         rookScore += v[(inFront ? rookInFrontPasser_0 : rookBehindPasser_0) + ownPasser];
@@ -1048,14 +1037,11 @@ static int evaluateRook(Board_t self, const int v[vectorLen], const struct pkSlo
         return rookScore;
 }
 
-// TODO: connecting (side by side)
-// TODO: controlling squares on an open file (not just by rook)
-
 /*----------------------------------------------------------------------+
  |      evaluateQueen                                                   |
  +----------------------------------------------------------------------*/
 
-static int evaluateQueen(Board_t self, const int v[vectorLen], int square, int side)
+static int evaluateQueen(Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side, int passerSquare[2][8])
 {
         int queenScore = 0;
 
@@ -1073,9 +1059,17 @@ static int evaluateQueen(Board_t self, const int v[vectorLen], int square, int s
         queenScore += v[queenToOwnKing] * kingDistance(square, self->sides[side].king)
                     + v[queenToKing]    * kingDistance(square, self->sides[other(side)].king);
 
+        // Relation to passers on each side
+        for (int passerColor=white; passerColor<=black; passerColor++)
+                if (passerOnFile(passerColor, file)) {
+                        int passer = passerSquare[passerColor][file];
+                        int inFront = (square > passer) == (pawnStep[passerColor] > 0);
+                        int ownPasser = side == passerColor;
+                        queenScore += v[(inFront ? queenInFrontPasser_0 : queenBehindPasser_0) + ownPasser];
+                }
+
         return queenScore;
 }
-// TODO: attacking backward pawns
 
 /*----------------------------------------------------------------------+
  |      evaluateKing                                                    |

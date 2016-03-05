@@ -1,13 +1,11 @@
 
-|Todo| Rooks and queens in front or behind passers [evaluate]
-
-|Todo| Rooks on files with weak pawns [evaluate]
-
 |Todo| Strong squares / outposts [evaluate]
 
 Isn't this simply "piece supported by own pawn"?
  - Consider location. E.g. 3rd rank is probably not important
  - Bonus per rank: 6p model
+
+|Todo| Control of squares on open file [evaluate]
 
 |Todo| Sneaker (hidden passed pawn) [evaluate]
 
@@ -61,6 +59,7 @@ Weak pawn (kings)
 Mobility = what can I actually move to a square, safely
 
 |Todo| Attacking a non-mobile pawn
+|Todo| Attacks on backward/weak pawns
 
 |Todo| Attack x piece matrix [evaluate]
 
@@ -82,16 +81,27 @@ Ref: http://www.top-5000.nl/authors/rebel/chess840.htm
 
 |Todo| Check Stockfish evaluation features [evaluate]
 
-|Todo| Check "Fruit/Rybka" evaluation features [evaluate]
+|Todo| Knight mobility (vanilla)
+|Todo| Trapped bishop (we already have it partly in the PST)
+|Todo| Blocked bishop (bishop behind immobile pawn)
+|Todo| Opposite bishop depends on pawn count difference
+|Todo| Rook Mobility
+|Todo| Rook on 7th when king on back rank
+|Todo| Penalty for lacking horizontal mobility (crafty)
+|Todo| Blocked rook (as in Rookie)
+|Todo| Queen on 7th when king on back rank
+|Todo| Queen Mobility
+|Todo| Make the passer/king distance dependent on passer rank (Rybka)
 
-Go through eval_comp forwards and backwards again and
-take many things.
+|Todo| Overextended pawns which need to be defended by a piece
 
-|Todo| LittleChessEvaluationCompendium.pdf [evaluate]
+|Todo| Pins
 
-|Todo| Chess programming wiki [evaluate]
+|Todo| KRPKR
 
-https://chessprogramming.wikispaces.com/Evaluation
+"The only rule that applies in this ending: if the black king is in front of the white pawn the game is a draw"
+
+|Todo| Pawn storm
 
 |Todo| Bring back the symmetry to reduce parameters
 |Todo| Simplify bishop tables again

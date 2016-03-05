@@ -164,7 +164,7 @@ void uciMain(Engine_t self)
         // Prepare threading
         xThread_t searchThread = null;
 
-        // Process commands, first from arguments and then from stdin
+        // Process commands
         while (readLine(stdin, &lineBuffer) != 0) {
                 char *line = lineBuffer.v;
                 if (debug) printf("info string input %s", line);

@@ -40,21 +40,20 @@
 
 #include "uci.h"
 
-int main(int argc, const char *argv[])
+int main(void)
 {
-        if (argc <= 1)
-                printf("\nFloyd Chess Engine - Version "quote2(floydVersion)"\n"
-                       "Copyright (C) 2015-2016, Marcel van Kervinck\n"
-                       "All rights reserved\n"
-                       "\n"
-                       "Type \"help\" for more information, or \"quit\" to leave.\n\n");
+        printf("\nFloyd Chess Engine - Version "quote2(floydVersion)"\n"
+               "Copyright (C) 2015-2016, Marcel van Kervinck\n"
+               "All rights reserved\n"
+               "\n"
+               "Type \"help\" for more information, or \"quit\" to leave.\n\n");
 
         struct Engine engine;
         initEngine(&engine);
 
         setupBoard(&engine.board, startpos); // be nice and allow `go' without `position'
 
-        uciMain(&engine, argv + 1);
+        uciMain(&engine);
 
         cleanupEngine(&engine);
 

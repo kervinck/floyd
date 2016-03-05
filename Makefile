@@ -68,7 +68,7 @@ pgo: floyd-pgo1 floyd-pgo2
 
 floyd-pgo1: $(wildcard Source/*) Makefile versions.json
 	$(GCC) $(CFLAGS) -DNDEBUG -o $@ $(uciSources) $(LDFLAGS) -fprofile-generate
-	./$@ bench quit | grep result
+	echo bench | ./$@ | grep result
 
 floyd-pgo2: $(wildcard Source/*) Makefile versions.json floyd-pgo1
 	$(GCC) $(CFLAGS) -DNDEBUG -o $@ $(uciSources) $(LDFLAGS) -fprofile-use
@@ -110,7 +110,7 @@ nodes: .module
 
 # Run nodes per second benchmark 3 times
 bench: floyd-pgo2
-	for N in 1 2 3; do ./floyd-pgo2 bench quit | grep result; done
+	for N in 1 2 3; do echo bench | ./floyd-pgo2 | grep result; done
 
 # Calculate residual of evaluation function
 residual: .module

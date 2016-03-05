@@ -154,7 +154,7 @@ static int _scanToken(char **line, const char *format, void *value)
  |      uciMain                                                         |
  +----------------------------------------------------------------------*/
 
-void uciMain(Engine_t self, const char *argv[])
+void uciMain(Engine_t self)
 {
         charList lineBuffer = emptyList;
         bool debug = false;
@@ -165,16 +165,7 @@ void uciMain(Engine_t self, const char *argv[])
         xThread_t searchThread = null;
 
         // Process commands, first from arguments and then from stdin
-        for (;;) {
-                if (*argv != null) {
-                        lineBuffer.len = 0;
-                        for (const char *s=*argv++; *s; s++)
-                                pushList(lineBuffer, *s);
-                        pushList(lineBuffer, '\n');
-                        pushList(lineBuffer, 0);
-                } else if (readLine(stdin, &lineBuffer) == 0)
-                        break;
-
+        while (readLine(stdin, &lineBuffer) != 0) {
                 char *line = lineBuffer.v;
                 if (debug) printf("info string input %s", line);
 

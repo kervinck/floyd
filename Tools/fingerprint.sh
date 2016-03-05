@@ -48,7 +48,7 @@ echo
 
 echo "*** Smoke tests:"
 make easy | grep result
-./floyd bench quit
+echo bench | ./floyd
 echo bench | wine ./floyd.w32.exe
 echo
 

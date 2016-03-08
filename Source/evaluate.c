@@ -1029,7 +1029,7 @@ static int evaluateRook(Board_t self, const int v[vectorLen], const struct pkSlo
         for (int passerColor=white; passerColor<=black; passerColor++)
                 if (passerOnFile(passerColor, file)) {
                         int passer = passerSquare[passerColor][file];
-                        int inFront = (square > passer) == (pawnStep[passerColor] > 0);
+                        int inFront = equalSign(square - passer, pawnStep[passerColor]);
                         int ownPasser = side == passerColor;
                         rookScore += v[(inFront ? rookInFrontPasser_0 : rookBehindPasser_0) + ownPasser];
                 }
@@ -1063,7 +1063,7 @@ static int evaluateQueen(Board_t self, const int v[vectorLen], const struct pkSl
         for (int passerColor=white; passerColor<=black; passerColor++)
                 if (passerOnFile(passerColor, file)) {
                         int passer = passerSquare[passerColor][file];
-                        int inFront = (square > passer) == (pawnStep[passerColor] > 0);
+                        int inFront = equalSign(square - passer, pawnStep[passerColor]);
                         int ownPasser = side == passerColor;
                         queenScore += v[(inFront ? queenInFrontPasser_0 : queenBehindPasser_0) + ownPasser];
                 }

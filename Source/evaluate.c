@@ -43,7 +43,7 @@
 #endif
 
 #define flip(fileOrRank) ((fileOrRank) ^ 7)
-#define kingDistance(a, b) (max(abs(file(a) - file(b)), abs(rank(a) - rank(b))) - 1)
+#define kingDistance(a, b) max(abs(file(a) - file(b)), abs(rank(a) - rank(b)))
 #define fileIndex(board, file_, side) ((file_) ^ fileA ^ ((file((board)->sides[side].king) ^ fileA) >> 2 ? 0 : 7))
 #define oppKings(board) ((file((board)->sides[white].king) ^ file((board)->sides[black].king)) >> 2)
 #define isPawn(piece) ((piece) == whitePawn || (piece) == blackPawn)
@@ -914,9 +914,9 @@ static int evaluatePasser(Board_t self, const int v[vectorLen], int fileFlag, in
         }
 
         // King distances to square in front of passer
-        int stopSquare = square + pawnStep[side];
-        passerScore += v[kingToOwnPasser] * kingDistance(self->sides[side].king,  stopSquare)
-                     + v[kingToPasser]    * kingDistance(self->sides[xside].king, stopSquare);
+        int stopSquare = square ;//+ pawnStep[side];
+        passerScore += v[kingToOwnPasser] * (kingDistance(self->sides[side].king,  stopSquare) - 1)
+                     + v[kingToPasser]    * (kingDistance(self->sides[xside].king, stopSquare) - 1);
 
         return passerScore;
 }
@@ -948,8 +948,8 @@ static int evaluateKnight(Board_t self, const int v[vectorLen], const struct pkS
         if (xspan < 4) knightScore += v[knightVsSpan_0 + xspan];
 
         // Distance to kings
-        knightScore += v[knightToOwnKing] * kingDistance(square, self->sides[side].king)
-                     + v[knightToKing]    * kingDistance(square, self->sides[other(side)].king);
+        knightScore += v[knightToOwnKing] * (kingDistance(square, self->sides[side].king) - 1)
+                     + v[knightToKing]    * (kingDistance(square, self->sides[other(side)].king) - 1);
 
         // TODO: strong squares / outposts
 
@@ -982,8 +982,8 @@ static int evaluateBishop(Board_t self, const int v[vectorLen], const struct pkS
         bishopScore += pawns->bishopWilo[side][squareColor]; // TODO: fold this into pkSlot
 
         // Distance to kings
-        bishopScore += v[bishopToOwnKing] * kingDistance(square, self->sides[side].king)
-                     + v[bishopToKing]    * kingDistance(square, self->sides[other(side)].king);
+        bishopScore += v[bishopToOwnKing] * (kingDistance(square, self->sides[side].king) - 1)
+                     + v[bishopToKing]    * (kingDistance(square, self->sides[other(side)].king) - 1);
 
         return bishopScore;
 }
@@ -1007,8 +1007,8 @@ static int evaluateRook(Board_t self, const int v[vectorLen], const struct pkSlo
         if (rankIndex < 7) rookScore += v[rookByRank_0 + rankIndex];
 
         // Distance to kings
-        rookScore += v[rookToOwnKing] * kingDistance(square, self->sides[side].king)
-                   + v[rookToKing]    * kingDistance(square, self->sides[other(side)].king);
+        rookScore += v[rookToOwnKing] * (kingDistance(square, self->sides[side].king) - 1)
+                   + v[rookToKing]    * (kingDistance(square, self->sides[other(side)].king) - 1);
 
         // Rook on open or half-open file
         if (!pawnOnFile(side, file)) {
@@ -1029,7 +1029,7 @@ static int evaluateRook(Board_t self, const int v[vectorLen], const struct pkSlo
         for (int passerColor=white; passerColor<=black; passerColor++)
                 if (passerOnFile(passerColor, file)) {
                         int passer = passerSquare[passerColor][file];
-                        int inFront = equalSign(square - passer, pawnStep[passerColor]);
+                        int inFront = (square > passer) == (pawnStep[passerColor] > 0);
                         int ownPasser = side == passerColor;
                         rookScore += v[(inFront ? rookInFrontPasser_0 : rookBehindPasser_0) + ownPasser];
                 }
@@ -1056,14 +1056,14 @@ static int evaluateQueen(Board_t self, const int v[vectorLen], const struct pkSl
         if (rankIndex < 7) queenScore += v[queenByRank_0 + rankIndex];
 
         // Distance to kings
-        queenScore += v[queenToOwnKing] * kingDistance(square, self->sides[side].king)
-                    + v[queenToKing]    * kingDistance(square, self->sides[other(side)].king);
+        queenScore += v[queenToOwnKing] * (kingDistance(square, self->sides[side].king) - 1)
+                    + v[queenToKing]    * (kingDistance(square, self->sides[other(side)].king) - 1);
 
         // Relation to passers on each side
         for (int passerColor=white; passerColor<=black; passerColor++)
                 if (passerOnFile(passerColor, file)) {
                         int passer = passerSquare[passerColor][file];
-                        int inFront = equalSign(square - passer, pawnStep[passerColor]);
+                        int inFront = (square > passer) == (pawnStep[passerColor] > 0);
                         int ownPasser = side == passerColor;
                         queenScore += v[(inFront ? queenInFrontPasser_0 : queenBehindPasser_0) + ownPasser];
                 }

@@ -90,7 +90,7 @@ static const char *positions[] = {
  |      uciBenchmark                                                    |
  +----------------------------------------------------------------------*/
 
-void uciBenchmark(Engine_t self, double time)
+void uciBenchmark(Engine_t self, double time, int bestOf)
 {
         char oldPosition[maxFenSize]; // TODO: clone engine and then share tt instead
         boardToFen(board(self), oldPosition);
@@ -98,10 +98,10 @@ void uciBenchmark(Engine_t self, double time)
         kpkGenerate(); // Initialize before measuring speed
         printf("egt class KPK check %s\n", kpkSelfCheck() ? "OK" : "FAILED");
 
-        long long totalNodes = 0;
-        double totalSeconds = 0.0;
+        #define N arrayLen(positions)
+        double best[N] = {0.0}, sum = 0.0;
 
-        for (int i=0; i<arrayLen(positions); i++) {
+        for (int j=0, i=0; j<bestOf*N; j++, i=j%N) {
                 setupBoard(board(self), positions[i]);
                 self->target.time = 0.0;
                 self->target.maxTime = time;
@@ -110,14 +110,14 @@ void uciBenchmark(Engine_t self, double time)
                 self->target.scores = (intPair) {{ -maxInt, maxInt }};
                 self->infoFunction = noInfoFunction;
                 rootSearch(self);
-                totalNodes += self->nodeCount;
                 double s = self->seconds;
-                totalSeconds += s;
                 double nps = (s > 0.0) ? self->nodeCount / s : 0.0;
                 printf("time %.f nps %.f fen %s\n", s * 1e3, nps, positions[i]);
+                sum += max(0, nps - best[i]);
+                best[i] = max(best[i], nps);
         }
 
-        printf("result nps %.0f\n", (double) totalNodes / totalSeconds);
+        printf("result nps %.0f\n", sum / N);
 
         setupBoard(board(self), oldPosition);
 }

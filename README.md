@@ -94,10 +94,10 @@ Extra commands:
         Show this list of commands.
   eval
         Show evaluation.
-  bench [ movetime <millis> ]
-        Speed test using 40 standard positions. Default `movetime' is 1000.
+  bench [ movetime <millis> ] [ bestof <repeat> ]
+        Speed test using 40 standard positions. Default: movetime 333 bestof 3
   moves [ depth <ply> ]
-        Move generation test. Default `depth' is 1.
+        Move generation test. Default: depth 1
 
 Unknown commands and options are silently ignored, except in debug mode.
 ```

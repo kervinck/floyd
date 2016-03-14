@@ -101,10 +101,10 @@ X"  help"
 X"        Show this list of commands."
 X"  eval"
 X"        Show evaluation."
-X"  bench [ movetime <millis> ]"
-X"        Speed test using 40 standard positions. Default `movetime' is 1000."
+X"  bench [ movetime <millis> ] [ bestof <repeat> ]"
+X"        Speed test using 40 standard positions. Default: movetime 333 bestof 3"
 X"  moves [ depth <ply> ]"
-X"        Move generation test. Default `depth' is 1."
+X"        Move generation test. Default: depth 1"
 X
 X"Unknown commands and options are silently ignored, except in debug mode."
 X;
@@ -301,9 +301,10 @@ void uciMain(Engine_t self)
                 }
                 else if (scan("bench")) {
                         updateOptions(self, &oldOptions, &newOptions);
-                        long movetime = 1000;
-                        scanValue("movetime %ld", &movetime);
-                        uciBenchmark(self, movetime * ms);
+                        int movetime = 333, bestof = 3;
+                        scanValue("movetime %d", &movetime);
+                        scanValue("bestof %d", &bestof);
+                        uciBenchmark(self, movetime * ms, bestof);
                 }
                 else if (scan("moves")) {
                         int depth = 1;

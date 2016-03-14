@@ -80,5 +80,5 @@ head -100 Data/qmate.epd | time python Tools/epdtest.py 10 | grep result
 echo
 
 echo "*** Speed:"
-echo bench movetime 10000 | ./floyd-pgo2
+echo 'bench movetime 3000 bestof 3' | ./floyd-pgo2
 echo

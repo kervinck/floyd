@@ -104,7 +104,7 @@ static const signed char knightJump[] = { // Offsets for knight jumps
 #define x88u(square) ((square) + ((square) & ~7))
 
 // Sign-extended 0x88 for vectors:
-#define x88s(vector) (x88u(vector) + (((vector) << 1) & 8))
+#define x88s(vector) (x88u(vector) + (((vector) * 2) & 8))
 
 // Move stays inside board?
 #define onBoard(square, vector) (((x88u(square) + x88s(vector)) & 0x88) == 0)

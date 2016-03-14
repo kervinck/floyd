@@ -134,8 +134,8 @@ enum moveFlags {
 };
 #define specialMove(from, to)   (specialMoveFlag | move(from, to))
 
-#define from(move)              (((move) >> boardBits) & ~(~0<<boardBits))
-#define to(move)                ( (move)               & ~(~0<<boardBits))
+#define from(move)              (((move) >> boardBits) & ones(boardBits))
+#define to(move)                ( (move)               & ones(boardBits))
 
 /*----------------------------------------------------------------------+
  |      Data                                                            |

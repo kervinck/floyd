@@ -5,8 +5,6 @@ Isn't this simply "piece supported by own pawn"?
  - Consider location. E.g. 3rd rank is probably not important
  - Bonus per rank: 6p model
 
-|Todo| Control of squares on open file [evaluate]
-
 |Todo| Sneaker (hidden passed pawn) [evaluate]
 
         Passed pawn, if not blocked
@@ -17,6 +15,8 @@ Isn't this simply "piece supported by own pawn"?
 Two types:
 1. Floyd type: check that the helpers are on the right spot
 2. Fruit type: just see if the helpers outnumber the sentries
+
+|Todo| Passer scoring based on table instead of quad [evaluate]
 
 |Todo| Pawn levers [evaluate]
 
@@ -92,6 +92,7 @@ Ref: http://www.top-5000.nl/authors/rebel/chess840.htm
 |Todo| Queen on 7th when king on back rank
 |Todo| Queen Mobility
 |Todo| Make the passer/king distance dependent on passer rank (Rybka)
+|Todo| Control of squares on open file [evaluate]
 
 |Todo| Overextended pawns which need to be defended by a piece
 
@@ -99,7 +100,8 @@ Ref: http://www.top-5000.nl/authors/rebel/chess840.htm
 
 |Todo| KRPKR
 
-"The only rule that applies in this ending: if the black king is in front of the white pawn the game is a draw"
+"The only rule that applies in this ending: if the black king is
+in front of the white pawn the game is a draw"
 
 |Todo| Pawn storm
 
@@ -109,8 +111,6 @@ Ref: http://www.top-5000.nl/authors/rebel/chess840.htm
 |Todo| Add white/black testing [qa,evaluate]
 
 |Todo| Add left/right testing [qa,evaluate]
-
-------------------------------------------------------------------------
 
 |Todo| Train specific exchange compensations
 
@@ -125,6 +125,15 @@ R vs N+PP
 More complex:
 RP vs NN
 Q vs RR
+
+|Todo| Another minor parsing hickup [bug]
+
+debug on
+position fen 2rq1rk1/1b2ppbp/1p3np1/pN1p4/2PPn3/BQ2PN1P/P3BPP1/2R2RK1 w - - 5 15 moves f3e5 e4d2 b3c2 d2f1 g1f1
+info sting input position fen 2rq1rk1/1b2ppbp/1p3np1/pN1p4/2PPn3/BQ2PN1P/P3BPP1/2R2RK1 w - - 5 15 moves f3e5 e4d2 b3c2 d2f1 g1f1
+info string Illegal move
+
+------------------------------------------------------------------------
 
 |Todo| Basic history heuristic [search]
 
@@ -249,13 +258,6 @@ Platform: UNKNOWN
 2RR2bK/b1N4p/1pkNp1r1/p3p2r/6P1/n1p5/n5P1/6B1 w - - acn 330710; acs 1; bm g3; ce 32758; dm 5; pv g3 h6 Ncb5+ Kd5 Nxc3+ Nxc3 Nc4+ Ke4 Nd2#;
 6RQ/6pP/p5K1/1r2p2N/p3k3/R7/B7/B7 w - - acn 106602; acs 0; bm Qxg7 Rc3; ce 32758; dm 5; pv Rc3 Rb6+ Kg5 Rg6+ Kxg6 a3 Rd8 a5 Bb1#;
 
-|Todo| Best of <n> benchmark [qa]
-
-First verify that variance of the extreme is indeed better than
-the variance of the mean.
-
-See timing.log and timing3.log
-
 |Todo| Move logit() from evaluate to rootSearch [speed]
 
 |Todo| Null move for zugzwang
@@ -337,13 +339,6 @@ Floyd(C)(2244)[327] whispers: depth=12 score=8.23 time=20.49 node=1876960 speed=
  36.  Rxc8    (0:09.119)
       {Black resigns} 1-0
 
-|Todo| Another minor parsing hickup [bug]
-
-debug on
-position fen 2rq1rk1/1b2ppbp/1p3np1/pN1p4/2PPn3/BQ2PN1P/P3BPP1/2R2RK1 w - - 5 15 moves f3e5 e4d2 b3c2 d2f1 g1f1
-info sting input position fen 2rq1rk1/1b2ppbp/1p3np1/pN1p4/2PPn3/BQ2PN1P/P3BPP1/2R2RK1 w - - 5 15 moves f3e5 e4d2 b3c2 d2f1 g1f1
-info string Illegal move
-
 |Todo| Rename pawnKingHash [qa]
 
 Because we want to add bishop colors as well, and
@@ -358,4 +353,13 @@ Candidates:
         pawnHash
         slowHash
         coarseHash
+
+|Todo| Alekhine's Gun [evaluate]
+
+"I should mention, too that you do need to handle stacked attackers
+such as "Alekhine's Gun". This is commonly done by considering own
+rooks as transparent when calculating rank/file attacks, as well
+as as Queens being "transparent" when considering Bishop attacks."
+
+http://talkchess.com/forum/viewtopic.php?p=665703#665703
 

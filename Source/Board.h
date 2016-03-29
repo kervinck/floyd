@@ -121,7 +121,7 @@ enum castleFlag {
  *  13-14       promotion: Q=0, R=1, B=2, N=3
  */
 
-#define boardBits  6
+#define boardBits 6
 
 #define move(from, to)          (((from) << boardBits) | (to))
 enum moveFlags {
@@ -134,8 +134,8 @@ enum moveFlags {
 };
 #define specialMove(from, to)   (specialMoveFlag | move(from, to))
 
-#define from(move)              (((move) >> boardBits) & ones(boardBits))
-#define to(move)                ( (move)               & ones(boardBits))
+#define from(move)              (int) (((move) >> boardBits) & ones(boardBits))
+#define to(move)                (int) ( (move)               & ones(boardBits))
 
 /*----------------------------------------------------------------------+
  |      Data                                                            |

@@ -28,10 +28,10 @@ CFLAGS:=-std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-poin
 
 # Use a real gcc for pgo
 ifeq "$(osType)" "Darwin"
- GCC:=gcc-mp-4.8
+ GCC:=gcc-mp-4.8 # From MacPorts
 endif
 ifeq "$(osType)" "Linux"
- GCC:=gcc-4.8
+ GCC:=gcc-4.8 # Ubuntu default
 endif
 
 ifeq "$(osType)" "Linux"
@@ -63,16 +63,15 @@ all: .module floyd
 floyd: $(wildcard Source/*) Makefile versions.json
 	$(CC) $(CFLAGS) -o $@ $(uciSources) $(LDFLAGS)
 
-# Compile with profile-guided optimization (gcc-4.8)
+# Compile with profile-guided optimization
 pgo: floyd-pgo1 floyd-pgo2
 
 floyd-pgo1: $(wildcard Source/*) Makefile versions.json
 	$(GCC) $(CFLAGS) -DNDEBUG -o $@ $(uciSources) $(LDFLAGS) -fprofile-generate
-	echo bench | ./$@ | grep result
+	echo 'bench movetime 500 bestof 1' | ./$@ | grep result
 
 floyd-pgo2: $(wildcard Source/*) Makefile versions.json floyd-pgo1
 	$(GCC) $(CFLAGS) -DNDEBUG -o $@ $(uciSources) $(LDFLAGS) -fprofile-use
-	rm -f *.gcda
 
 # Cross-compile as Win32 UCI engine
 win: $(win32_exe)
@@ -108,9 +107,9 @@ nodes: .module
 	/ nodes / { n[$$5] += $$10; n[-1] += !$$5 }\
 	END       { for (d=0; n[d]; d++) print d, n[d], n[d] / n[d-1] }'
 
-# Run nodes per second benchmark 3 times
-bench: floyd-pgo2
+bench: floyd-pgo2 floyd
 	for N in 1 2 3; do echo bench | ./floyd-pgo2 | grep result; done
+	echo bench | ./floyd | grep result # for comparison
 
 # Calculate residual of evaluation function
 residual: .module

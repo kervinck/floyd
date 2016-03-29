@@ -43,7 +43,7 @@
 #endif
 
 #define flip(fileOrRank) ((fileOrRank) ^ 7)
-#define kingDistance(a, b) max(abs(file(a) - file(b)), abs(rank(a) - rank(b)))
+#define kingDistance(a, b) (max(abs(file(a) - file(b)), abs(rank(a) - rank(b))) - 1)
 #define fileIndex(board, file_, side) ((file_) ^ fileA ^ ((file((board)->sides[side].king) ^ fileA) >> 2 ? 0 : 7))
 #define oppKings(board) ((file((board)->sides[white].king) ^ file((board)->sides[black].king)) >> 2)
 #define isPawn(piece) ((piece) == whitePawn || (piece) == blackPawn)
@@ -372,8 +372,6 @@ int evaluate(Board_t self)
                 int nrAttackRooks  = (attackers >> 2) & 3;
                 int nrAttackMinors = (attackers >> 4) & 3;
                 int nrAttackPawns  = attackers >> 6;
-                int nrAttackers = nrAttackKings + nrAttackQueens + nrAttackRooks + nrAttackMinors + nrAttackPawns;
-                nrAttackers = min(nrAttackers, 5); // clip at 5
 
                 // Safe squares for the king (0 or 1 is not good)
                 // TODO: should this be a part of safety scaling at all?
@@ -401,8 +399,6 @@ int evaluate(Board_t self)
                 if (nrAttackMinors < 3) attack += v[attackByMinor_0 + nrAttackMinors];
                 if (nrAttackPawns  > 0) attack -= v[attackByPawn_0  + nrAttackPawns-1];
                 if (nrAttackPawns  < 3) attack += v[attackByPawn_0  + nrAttackPawns];
-                if (nrAttackers    > 0) attack -= v[attackPieces_0  + nrAttackers-1];
-                if (nrAttackers    < 5) attack += v[attackPieces_0  + nrAttackers];
                 if (kingMobility < 2) attack += v[mobilityKing_0  + kingMobility];
 
                 // King safety is the (negative) scaled shelter and attack score
@@ -914,9 +910,9 @@ static int evaluatePasser(Board_t self, const int v[vectorLen], int fileFlag, in
         }
 
         // King distances to square in front of passer
-        int stopSquare = square ;//+ pawnStep[side];
-        passerScore += v[kingToOwnPasser] * (kingDistance(self->sides[side].king,  stopSquare) - 1)
-                     + v[kingToPasser]    * (kingDistance(self->sides[xside].king, stopSquare) - 1);
+        int stopSquare = square + pawnStep[side];
+        passerScore += v[kingToOwnPasser] * kingDistance(self->sides[side].king,  stopSquare)
+                     + v[kingToPasser]    * kingDistance(self->sides[xside].king, stopSquare);
 
         return passerScore;
 }
@@ -948,8 +944,8 @@ static int evaluateKnight(Board_t self, const int v[vectorLen], const struct pkS
         if (xspan < 4) knightScore += v[knightVsSpan_0 + xspan];
 
         // Distance to kings
-        knightScore += v[knightToOwnKing] * (kingDistance(square, self->sides[side].king) - 1)
-                     + v[knightToKing]    * (kingDistance(square, self->sides[other(side)].king) - 1);
+        knightScore += v[knightToOwnKing] * kingDistance(square, self->sides[side].king)
+                     + v[knightToKing]    * kingDistance(square, self->sides[other(side)].king);
 
         // TODO: strong squares / outposts
 
@@ -982,8 +978,8 @@ static int evaluateBishop(Board_t self, const int v[vectorLen], const struct pkS
         bishopScore += pawns->bishopWilo[side][squareColor]; // TODO: fold this into pkSlot
 
         // Distance to kings
-        bishopScore += v[bishopToOwnKing] * (kingDistance(square, self->sides[side].king) - 1)
-                     + v[bishopToKing]    * (kingDistance(square, self->sides[other(side)].king) - 1);
+        bishopScore += v[bishopToOwnKing] * kingDistance(square, self->sides[side].king)
+                     + v[bishopToKing]    * kingDistance(square, self->sides[other(side)].king);
 
         return bishopScore;
 }
@@ -1007,8 +1003,8 @@ static int evaluateRook(Board_t self, const int v[vectorLen], const struct pkSlo
         if (rankIndex < 7) rookScore += v[rookByRank_0 + rankIndex];
 
         // Distance to kings
-        rookScore += v[rookToOwnKing] * (kingDistance(square, self->sides[side].king) - 1)
-                   + v[rookToKing]    * (kingDistance(square, self->sides[other(side)].king) - 1);
+        rookScore += v[rookToOwnKing] * kingDistance(square, self->sides[side].king)
+                   + v[rookToKing]    * kingDistance(square, self->sides[other(side)].king);
 
         // Rook on open or half-open file
         if (!pawnOnFile(side, file)) {
@@ -1056,8 +1052,8 @@ static int evaluateQueen(Board_t self, const int v[vectorLen], const struct pkSl
         if (rankIndex < 7) queenScore += v[queenByRank_0 + rankIndex];
 
         // Distance to kings
-        queenScore += v[queenToOwnKing] * (kingDistance(square, self->sides[side].king) - 1)
-                    + v[queenToKing]    * (kingDistance(square, self->sides[other(side)].king) - 1);
+        queenScore += v[queenToOwnKing] * kingDistance(square, self->sides[side].king)
+                    + v[queenToKing]    * kingDistance(square, self->sides[other(side)].king);
 
         // Relation to passers on each side
         for (int passerColor=white; passerColor<=black; passerColor++)

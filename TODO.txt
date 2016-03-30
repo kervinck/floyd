@@ -1,4 +1,42 @@
 
+|Todo| Consolidate this version as v0.8
+
+Main changes:
+- Gained approximately 150 elo at fast time controls
+- More attractive playing style
+- Improved timecontrol for very fast fames with zero increment
+Under the hood:
+- Recapture extension and single reply extension
+- Saner evaluation for passers and king attacks
+- Replace unnecessarily complex SAN parser with UCI-only move parsing
+- Added pawn/king table to keep speed roughly unchanged
+
+Rank Name              Elo    +    - games score oppo. draws 
+   1 Fruit 2.1         325    3    3 103066   85%     1    9% 
+   2 Floyd x39c6dcc5    24    5    5 24007   43%    93   12%  <-- v0.8
+   3 Floyd x74b8c9e2    22    5    5 24000   43%    93   12% 
+   4 Floyd xc24c30ee    21    5    5 24000   43%    93   12% 
+   5 Floyd x1b467414    21    5    5 24000   43%    93   12% 
+   6 Floyd xc5eb784e    19    5    5 24000   43%    93   12% 
+   7 Floyd xd20545ae    18    5    5 24000   43%    93   12% 
+   8 Floyd x4783c832    18    5    5 24000   43%    93   11% 
+   9 Floyd xc16dbb39    14    6    6 14124   42%    93   12% 
+  10 Floyd 0.7        -139    2    2 115065   32%    14   14% <-- v0.7
+  11 Floyd 0.6        -343    6    6 12000   24%  -139   18% 
+                 Fr Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl
+Fruit 2.1          100100100100100100100100100100
+Floyd x39c6dcc5   0    67 79 79 91 96 97 99100100
+Floyd x74b8c9e2   0 32    64 65 81 91 93 98100100
+Floyd xc24c30ee   0 20 35    50 70 83 86 97100100
+Floyd x1b467414   0 20 34 49    70 83 86 97100100
+Floyd xc5eb784e   0  8 18 29 29    67 71 92100100
+Floyd xd20545ae   0  3  8 16 16 32    55 85100100
+Floyd x4783c832   0  2  6 13 13 28 44    82100100
+Floyd xc16dbb39   0  0  1  2  2  7 14 17   100100
+Floyd 0.7         0  0  0  0  0  0  0  0  0   100
+Floyd 0.6         0  0  0  0  0  0  0  0  0  0   
+marcelk@fx8350-1:~/floyd$ 
+
 |Todo| Strong squares / outposts [evaluate]
 
 Isn't this simply "piece supported by own pawn"?

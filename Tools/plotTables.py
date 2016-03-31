@@ -7,56 +7,57 @@ import numpy as np
 import sys
 
 with open(sys.argv[1], 'r') as fp:
-        vector = {item[0]:item[1] for item in json.load(fp)}
+        jsonVector, history = json.load(fp)
+        vector = {item[0]:item[1] for item in jsonVector}
 
 def pawn(fileIndex, rankIndex, xKing):
         if rankIndex in [0, 7]:
                 return None
         value = 0
-        if fileIndex > 0: value -= vector['pawnByFile_%d' % (fileIndex - 1)]
-        if fileIndex < 7: value += vector['pawnByFile_%d' % (fileIndex)]
+        x = 'x' if xKing else ''
+        if fileIndex > 0: value -= vector['pawnByFile_%d%s' % (fileIndex - 1, x)]
+        if fileIndex < 7: value += vector['pawnByFile_%d%s' % (fileIndex, x)]
         if rankIndex > 1: value -= vector['pawnByRank_%d' % (rankIndex - 1 - 1)]
         if rankIndex < 6: value += vector['pawnByRank_%d' % (rankIndex - 1)]
         return value
 
 def knight(fileIndex, rankIndex, xKing):
         value = 0
-        if fileIndex > 0: value -= vector['knightByFile_%d' % (fileIndex - 1)]
-        if fileIndex < 7: value += vector['knightByFile_%d' % (fileIndex)]
+        x = 'x' if xKing else ''
+        if fileIndex > 0: value -= vector['knightByFile_%d%s' % (fileIndex - 1, x)]
+        if fileIndex < 7: value += vector['knightByFile_%d%s' % (fileIndex, x)]
         if rankIndex > 0: value -= vector['knightByRank_%d' % (rankIndex - 1)]
         if rankIndex < 7: value += vector['knightByRank_%d' % (rankIndex)]
         return value
 
 def bishop(fileIndex, rankIndex, xKing):
-        value = 0
-        if fileIndex - rankIndex == 0: value += vector['bishopOnLong_0']
-        if fileIndex + rankIndex == 7: value += vector['bishopOnLong_1']
-        if fileIndex < 7: value += vector['bishopByFile_%d' % (fileIndex)]
-        if rankIndex > 0: value -= vector['bishopByRank_%d' % (rankIndex - 1)]
-        if rankIndex < 7: value += vector['bishopByRank_%d' % (rankIndex)]
-        return value
+        x = 'x' if xKing else ''
+        squareIndex = fileIndex * 8 + rankIndex
+        return vector['bishopBySquare_%d%s' % (squareIndex, x) ]
 
 def rook(fileIndex, rankIndex, xKing):
         value = 0
+        fileIndex = min(fileIndex, 7 - fileIndex)
         if fileIndex > 0: value -= vector['rookByFile_%d' % (fileIndex - 1)]
-        if fileIndex < 7: value += vector['rookByFile_%d' % (fileIndex)]
+        if fileIndex < 3: value += vector['rookByFile_%d' % (fileIndex)]
         if rankIndex > 0: value -= vector['rookByRank_%d' % (rankIndex - 1)]
         if rankIndex < 7: value += vector['rookByRank_%d' % (rankIndex)]
         return value
 
 def queen(fileIndex, rankIndex, xKing):
         value = 0
+        fileIndex = min(fileIndex, 7 - fileIndex)
         if fileIndex > 0: value -= vector['queenByFile_%d' % (fileIndex - 1)]
-        if fileIndex < 7: value += vector['queenByFile_%d' % (fileIndex)]
+        if fileIndex < 3: value += vector['queenByFile_%d' % (fileIndex)]
         if rankIndex > 0: value -= vector['queenByRank_%d' % (rankIndex - 1)]
         if rankIndex < 7: value += vector['queenByRank_%d' % (rankIndex)]
         return value
 
 def king(fileIndex, rankIndex, xKing):
         value = 0
-        if fileIndex < 4: fileIndex ^= 7
-        if fileIndex > 4: value -= vector['kingByFile_%d' % (fileIndex - 4 - 1)]
-        if fileIndex < 7: value += vector['kingByFile_%d' % (fileIndex - 4)]
+        fileIndex = min(fileIndex, 7 - fileIndex)
+        if fileIndex > 0: value -= vector['kingByFile_%d' % (fileIndex - 1)]
+        if fileIndex < 3: value += vector['kingByFile_%d' % (fileIndex)]
         if rankIndex > 0: value -= vector['kingByRank_%d' % (rankIndex - 1)]
         if rankIndex < 7: value += vector['kingByRank_%d' % (rankIndex)]
         return value
@@ -106,8 +107,8 @@ def plotMap(ax, evaluate, xKing, title, scale=300):
                 ax.pcolor(X, Y, matrix, cmap=pyplot.cm.RdYlGn, vmin=-scale, vmax=scale)
         ax.axis([0, 8, 0, 8])
 
-        ax.plot(2 if xKing else 6, 7.75, 'o', color='black')
         if xKing is not None:
+                ax.plot(2 if xKing else 6, 7.75, 'o', color='black')
                 ax.plot(6, 0.25, 'o', color='white')
         ax.plot([4, 4], [0,8], color='grey', linestyle=':')
 
@@ -146,10 +147,8 @@ if __name__ == '__main__':
         plotMap(axes[0][3], knight, False, 'Knights')
         plotMap(axes[1][0], bishop, True,  'Bishops (%d = %.2fp)' % (bishopValue, bishopValue / pawnValue))
         plotMap(axes[1][1], bishop, False, 'Bishops')
-        plotMap(axes[1][2], rook,   True,  'Rooks (%d = %.2fp)' % (rookValue, rookValue / pawnValue))
-        plotMap(axes[1][3], rook,   False, 'Rooks')
-        plotMap(axes[2][0], queen,  True,  'Queens (%d = %.2fp)' % (queenValue, queenValue / pawnValue))
-        plotMap(axes[2][1], queen,  False, 'Queens')
+        plotMap(axes[1][2], rook,   None,  'Rooks (%d = %.2fp)' % (rookValue, rookValue / pawnValue))
+        plotMap(axes[2][0], queen,  None,  'Queens (%d = %.2fp)' % (queenValue, queenValue / pawnValue))
         plotMap(axes[2][2], king,   None,  'King')
         plotMap(axes[2][3], passer, False, 'Passers', scale=None)
 

@@ -6,7 +6,7 @@
  +----------------------------------------------------------------------*/
 
 /*
- *  Copyright (C) 2015, Marcel van Kervinck
+ *  Copyright (C) 2015-2016, Marcel van Kervinck
  *  All rights reserved
  *
  *  Please read the enclosed file `LICENSE' or retrieve this document
@@ -82,7 +82,7 @@ static const char castleFlagsClear[boardSize] = {
         [h1] = castleFlagWhiteKside,
 };
 
-static const signed char kingStep[] = { // Offsets for king moves
+const signed char kingStep[] = { // Offsets for king moves
         [1<<bitN] = stepN, [1<<bitNE] = stepNE,
         [1<<bitE] = stepE, [1<<bitSE] = stepSE,
         [1<<bitS] = stepS, [1<<bitSW] = stepSW,
@@ -104,7 +104,7 @@ static const signed char knightJump[] = { // Offsets for knight jumps
 #define x88u(square) ((square) + ((square) & ~7))
 
 // Sign-extended 0x88 for vectors:
-#define x88s(vector) (x88u(vector) + (((vector) << 1) & 8))
+#define x88s(vector) (x88u(vector) + (((vector) * 2) & 8))
 
 // Move stays inside board?
 #define onBoard(square, vector) (((x88u(square) + x88s(vector)) & 0x88) == 0)
@@ -133,7 +133,7 @@ static const signed char knightJump[] = { // Offsets for knight jumps
              +dir(sq,jumpSSW,bitSSW)   +   dir(sq,jumpSSE,bitSSE))
 
 // 8 bits per square representing which directions a king can step to
-static const unsigned char kingDirections[] = {
+const unsigned char kingDirections[] = {
         K(a1), K(a2), K(a3), K(a4), K(a5), K(a6), K(a7), K(a8),
         K(b1), K(b2), K(b3), K(b4), K(b5), K(b6), K(b7), K(b8),
         K(c1), K(c2), K(c3), K(c4), K(c5), K(c6), K(c7), K(c8),
@@ -155,6 +155,26 @@ static const unsigned char knightDirections[] = {
         N(g1), N(g2), N(g3), N(g4), N(g5), N(g6), N(g7), N(g8),
         N(h1), N(h2), N(h3), N(h4), N(h5), N(h6), N(h7), N(h8),
 };
+
+const uint64_t materialKeys[][2] = {
+        [empty]       = { 0, 0 },
+        [whitePawn]   = { 0x514e000000000001ull, 0x514e000000000001ull },
+        [blackPawn]   = { 0x696d000000000010ull, 0x696d000000000010ull },
+        [whiteKnight] = { 0x6ab5000000000100ull, 0x6ab5000000000100ull },
+        [blackKnight] = { 0xd903000000001000ull, 0xd903000000001000ull },
+        [whiteBishop] = { 0x2081000000010000ull, 0x2081000000010000ull + 0xb589010000000000ull },
+        [blackBishop] = { 0x3d15000000100000ull, 0x3d15000000100000ull + 0x67f5100000000000ull },
+        [whiteRook]   = { 0xae45000001000000ull, 0xae45000001000000ull },
+        [blackRook]   = { 0x7de9000010000000ull, 0x7de9000010000000ull },
+        [whiteQueen]  = { 0x9ac3000100000000ull, 0x9ac3000100000000ull },
+        [blackQueen]  = { 0xa96f001000000000ull, 0xa96f001000000000ull },
+        [whiteKing]   = { 0, 0 },
+        [blackKing]   = { 0, 0 },
+};
+const uint64_t materialMaskPiecesAndPawns[] = { 0x0f0f0f0f0full, 0xf0f0f0f0f0ull }; // white, black
+const uint64_t materialMaskPiecesNoPawns[]  = { 0x0f0f0f0f00ull, 0xf0f0f0f000ull }; // white, black
+
+static uint64_t subHash[13][64]; // Hash constants (pawn/king/bishop/castling)
 
 /*----------------------------------------------------------------------+
  |      Functions                                                       |
@@ -204,8 +224,7 @@ static void generateSlides(Board_t self, int from, int dirs)
         dirs &= kingDirections[from];
         int dir = 0;
         do {
-                dir -= dirs; // pick next
-                dir &= dirs;
+                dir = (dir - dirs) & dirs; // pick next
                 int vector = kingStep[dir];
                 int to = from;
                 do {
@@ -225,6 +244,7 @@ static void generateSlides(Board_t self, int from, int dirs)
  */
 extern int generateMoves(Board_t self, int moveList[maxMoves])
 {
+        int side = sideToMove(self);
         updateSideInfo(self);
 
         self->movePtr = moveList;
@@ -241,43 +261,36 @@ extern int generateMoves(Board_t self, int moveList[maxMoves])
                 switch (piece) {
                         int dir, dirs;
 
-                case whiteKing:
-                case blackKing:
+                case whiteKing: case blackKing:
                         dirs = kingDirections[from];
                         dir = 0;
                         do {
-                                dir -= dirs; // pick next
-                                dir &= dirs;
+                                dir = (dir - dirs) & dirs; // pick next
                                 to = from + kingStep[dir];
                                 if (self->squares[to] == empty
                                  || pieceColor(self->squares[to]) != sideToMove(self))
-                                        if (self->xside->attacks[to] == 0)
+                                        if (self->sides[other(side)].attacks[to] == 0)
                                                 pushMove(self, from, to);
                         } while (dirs -= dir); // remove and go to next
                         break;
 
-                case whiteQueen:
-                case blackQueen:
+                case whiteQueen: case blackQueen:
                         generateSlides(self, from, dirsQueen);
                         break;
 
-                case whiteRook:
-                case blackRook:
+                case whiteRook: case blackRook:
                         generateSlides(self, from, dirsRook);
                         break;
 
-                case whiteBishop:
-                case blackBishop:
+                case whiteBishop: case blackBishop:
                         generateSlides(self, from, dirsBishop);
                         break;
 
-                case whiteKnight:
-                case blackKnight:
+                case whiteKnight: case blackKnight:
                         dirs = knightDirections[from];
                         dir = 0;
                         do {
-                                dir -= dirs; // pick next
-                                dir &= dirs;
+                                dir = (dir - dirs) & dirs; // pick next
                                 to = from + knightJump[dir];
                                 if (self->squares[to] == empty
                                  || pieceColor(self->squares[to]) != sideToMove(self))
@@ -353,21 +366,21 @@ extern int generateMoves(Board_t self, int moveList[maxMoves])
                 };
 
                 int side = sideToMove(self);
-                int sq = self->side->king;
+                int sq = self->sides[side].king;
 
                 if ((self->castleFlags & flags[side][0])
                  && self->squares[sq+stepE] == empty
                  && self->squares[sq+2*stepE] == empty
-                 && self->xside->attacks[sq+stepE] == 0
-                 && self->xside->attacks[sq+2*stepE] == 0)
+                 && self->sides[other(side)].attacks[sq+stepE] == 0
+                 && self->sides[other(side)].attacks[sq+2*stepE] == 0)
                         pushSpecialMove(self, sq, sq + 2*stepE);
 
                 if ((self->castleFlags & flags[side][1])
                  && self->squares[sq+stepW] == empty
                  && self->squares[sq+2*stepW] == empty
                  && self->squares[sq+3*stepW] == empty
-                 && self->xside->attacks[sq+stepW] == 0
-                 && self->xside->attacks[sq+2*stepW] == 0)
+                 && self->sides[other(side)].attacks[sq+stepW] == 0
+                 && self->sides[other(side)].attacks[sq+2*stepW] == 0)
                         pushSpecialMove(self, sq, sq + 2*stepW);
         }
 
@@ -404,6 +417,8 @@ extern void undoMove(Board_t self)
         self->halfmoveClock--;
         self->plyNumber--;
         self->hash = popList(self->hashHistory);
+        self->pawnKingHash = popList(self->pkHashHistory);
+        self->materialKey = popList(self->materialHistory);
 
         assert(self->undoStack.len > 0);
         signed char *bytes = (signed char*)self;
@@ -419,8 +434,13 @@ extern void undoMove(Board_t self)
 
 extern void makeMove(Board_t self, int move)
 {
-        preparePushList(self->undoStack, maxMoveUndo);
+        int to = to(move), from = from(move);
 
+        pushList(self->hashHistory, self->hash);
+        pushList(self->pkHashHistory, self->pawnKingHash);
+        pushList(self->materialHistory, self->materialKey);
+
+        preparePushList(self->undoStack, maxMoveUndo);
         signed char *sp = &self->undoStack.v[self->undoStack.len];
         *sp++ = sentinel;
 
@@ -435,7 +455,7 @@ extern void makeMove(Board_t self, int move)
                                                                         \
                 /* Update the undo stack */                             \
                 push(from, _piece);                                     \
-                push(to, _victim);                                      \
+                push(to, _victim); /* last for recaptureSquare */       \
                                                                         \
                 /* Make the simple move */                              \
                 self->squares[to] = _piece;                             \
@@ -445,20 +465,24 @@ extern void makeMove(Board_t self, int move)
                 self->hash ^= zobristPiece[_piece][from]                \
                             ^ zobristPiece[_piece][to]                  \
                             ^ zobristPiece[_victim][to];                \
+                                                                        \
+                /* And the pawn/king/etc hash */                        \
+                self->pawnKingHash ^= subHash[_piece][from]             \
+                                    ^ subHash[_piece][to]               \
+                                    ^ subHash[_victim][to];             \
+                                                                        \
+                /* Update the material key */                           \
+                self->materialKey -= materialKeys[_victim][squareColor(to)];\
         )
 
-        pushList(self->hashHistory, self->hash);
-
-        // Always clear en passant info first
+        // Always clear en passant info
         if (self->enPassantPawn) {
                 push(offsetof_enPassantPawn, self->enPassantPawn);
                 self->hash ^= hashEnPassant(self->enPassantPawn);
                 self->enPassantPawn = 0;
         }
 
-        int to = to(move), from = from(move);
-
-        // Handle specials first
+        // Handle special moves first
         if (move & specialMoveFlag) {
                 switch (rank(from)) {
                 case rank8:
@@ -480,6 +504,9 @@ extern void makeMove(Board_t self, int move)
                                 self->squares[from] = promoPiece;
                                 self->hash ^= zobristPiece[whitePawn][from]
                                             ^ zobristPiece[promoPiece][from];
+                                self->pawnKingHash ^= zobristPiece[whitePawn][from];
+                                self->materialKey += materialKeys[promoPiece][squareColor(to)]
+                                                   - materialKeys[whitePawn][0];
                         }
                         break;
 
@@ -490,6 +517,8 @@ extern void makeMove(Board_t self, int move)
                         push(square, victim);
                         self->squares[square] = empty;
                         self->hash ^= zobristPiece[victim][square];
+                        self->pawnKingHash ^= zobristPiece[victim][square];
+                        self->materialKey -= materialKeys[victim][0];
                         break;
                 }
                 case rank2:
@@ -503,6 +532,9 @@ extern void makeMove(Board_t self, int move)
                                 self->squares[from] = promoPiece;
                                 self->hash ^= zobristPiece[blackPawn][from]
                                             ^ zobristPiece[promoPiece][from];
+                                self->pawnKingHash ^= zobristPiece[blackPawn][from];
+                                self->materialKey += materialKeys[promoPiece][squareColor(to)]
+                                                   - materialKeys[blackPawn][0];
                         }
                         break;
 
@@ -530,15 +562,17 @@ extern void makeMove(Board_t self, int move)
         } else
                 self->halfmoveClock++; // Can overflow the byte, but don't worry
 
-        makeSimpleMove(from, to);
-
         int flagsToClear = (castleFlagsClear[from] | castleFlagsClear[to]) & self->castleFlags;
         if (flagsToClear) {
                 push(offsetof_castleFlags, self->castleFlags);
                 self->castleFlags ^= flagsToClear;
-                self->hash ^= hashCastleFlags(flagsToClear);
+                uint64_t deltaHash = hashCastleFlags(flagsToClear);
+                self->hash ^= deltaHash;
+                self->pawnKingHash ^= deltaHash;
         }
 
+        // The real move always as last
+        makeSimpleMove(from, to);
         self->undoStack.len = sp - self->undoStack.v;
 
         // Finalize en passant (this is only safe after the update of self->undoStack.len)
@@ -547,17 +581,33 @@ extern void makeMove(Board_t self, int move)
 }
 
 /*----------------------------------------------------------------------+
+ |      recaptureSquare                                                 |
+ +----------------------------------------------------------------------*/
+
+extern int recaptureSquare(Board_t self)
+{
+        // Note: a mild abuse of info pushed last on the undo stack
+        int ix = self->undoStack.len;
+        if (ix < 2) return -1;
+        int victim = self->undoStack.v[ix-2];
+        int square = self->undoStack.v[ix-1];
+        return (victim == empty) ? -1 : square;
+}
+
+/*----------------------------------------------------------------------+
  |      Null move                                                       |
  +----------------------------------------------------------------------*/
 
 void makeNullMove(Board_t self)
 {
-        preparePushList(self->undoStack, maxMoveUndo);
+        pushList(self->hashHistory, self->hash);
+        pushList(self->pkHashHistory, self->pawnKingHash);
+        pushList(self->materialHistory, self->materialKey);
+        self->hash ^= zobristTurn[0];
 
+        preparePushList(self->undoStack, maxMoveUndo);
         signed char *sp = &self->undoStack.v[self->undoStack.len];
         *sp++ = sentinel;
-
-        pushList(self->hashHistory, self->hash);
 
         push(offsetof_halfmoveClock, self->halfmoveClock);
         self->halfmoveClock = 1;
@@ -567,11 +617,9 @@ void makeNullMove(Board_t self)
                 self->hash ^= hashEnPassant(self->enPassantPawn);
                 self->enPassantPawn = 0;
         }
+        self->undoStack.len = sp - self->undoStack.v;
 
         self->plyNumber++;
-        self->hash ^= zobristTurn[0];
-
-        self->undoStack.len = sp - self->undoStack.v;
 }
 
 /*----------------------------------------------------------------------+
@@ -584,8 +632,7 @@ static void updateSliderAttacks(Board_t self, int from, int dirs, struct side *s
         dirs &= kingDirections[from];
         int dir = 0;
         do {
-                dir -= dirs; // pick next
-                dir &= dirs;
+                dir = (dir - dirs) & dirs; // pick next
                 int to = from;
                 do {
                         to += kingStep[dir];
@@ -600,25 +647,19 @@ extern void updateSideInfo(Board_t self)
         if (self->sideInfoPlyNumber == self->plyNumber)
                 return;
 
-        memset(&self->sides[white], 0, sizeof self->sides[white]);
-        memset(&self->sides[black], 0, sizeof self->sides[black]);
-
-        self->side  = (sideToMove(self) == white) ? &self->sides[white] : &self->sides[black];
-        self->xside = (sideToMove(self) == white) ? &self->sides[black] : &self->sides[white];
+        memset(&self->sides, 0, sizeof self->sides);
 
         for (int from=0; from<boardSize; from++) {
                 int piece = self->squares[from];
                 if (piece == empty) continue;
 
+                int dir, dirs;
                 switch (piece) {
-                        int dir, dirs;
-
                 case whiteKing:
                         dirs = kingDirections[from];
                         dir = 0;
                         do {
-                                dir -= dirs; // pick next
-                                dir &= dirs;
+                                dir = (dir - dirs) & dirs; // pick next
                                 int to = from + kingStep[dir];
                                 self->sides[white].attacks[to] += attackKing;
                         } while (dirs -= dir); // remove and go to next
@@ -629,8 +670,7 @@ extern void updateSideInfo(Board_t self)
                         dirs = kingDirections[from];
                         dir = 0;
                         do {
-                                dir -= dirs; // pick next
-                                dir &= dirs;
+                                dir = (dir - dirs) & dirs; // pick next
                                 int to = from + kingStep[dir];
                                 self->sides[black].attacks[to] += attackKing;
                         } while (dirs -= dir); // remove and go to next
@@ -665,8 +705,7 @@ extern void updateSideInfo(Board_t self)
                         dirs = knightDirections[from];
                         dir = 0;
                         do {
-                                dir -= dirs; // pick next
-                                dir &= dirs;
+                                dir = (dir - dirs) & dirs; // pick next
                                 int to = from + knightJump[dir];
                                 self->sides[white].attacks[to] += attackMinor;
                         } while (dirs -= dir); // remove and go to next
@@ -676,8 +715,7 @@ extern void updateSideInfo(Board_t self)
                         dirs = knightDirections[from];
                         dir = 0;
                         do {
-                                dir -= dirs; // pick next
-                                dir &= dirs;
+                                dir = (dir - dirs) & dirs; // pick next
                                 int to = from + knightJump[dir];
                                 self->sides[black].attacks[to] += attackMinor;
                         } while (dirs -= dir); // remove and go to next
@@ -692,9 +730,9 @@ extern void updateSideInfo(Board_t self)
 
                 case blackPawn:
                         if (file(from) != fileH)
-                                self->sides[black].attacks[from+stepSE] = attackPawn;
+                                self->sides[black].attacks[from+stepSE] += attackPawn;
                         if (file(from) != fileA)
-                                self->sides[black].attacks[from+stepSW] = attackPawn;
+                                self->sides[black].attacks[from+stepSW] += attackPawn;
                         break;
                 }
         }
@@ -744,6 +782,34 @@ uint64_t hash(Board_t self)
         return key;
 }
 
+// Pawn/king hash
+uint64_t pawnKingHash(Board_t self)
+{
+        if (subHash[whitePawn][a1] == 0ULL) { // Implicit initialization
+                for (int square=0; square<boardSize; square++) {
+                        subHash[whitePawn][square] = zobristPiece[whitePawn][square];
+                        subHash[blackPawn][square] = zobristPiece[blackPawn][square];
+                        int kingFile = file(square);
+                        kingFile = (kingFile == fileA) ? fileB : (kingFile == fileH) ? fileG : kingFile;
+                        subHash[whiteKing][square] = zobristPiece[whiteKing][square(kingFile,rank1)];
+                        subHash[blackKing][square] = zobristPiece[blackKing][square(kingFile,rank8)];
+                        //subHash[whiteBishop][square] = zobristPiece[whiteBishop][squareColor(square) ? c1 : f1];
+                        //subHash[blackBishop][square] = zobristPiece[blackBishop][squareColor(square) ? f8 : c8];
+                }
+        }
+
+        uint64_t key = 0;
+
+        // Pieces
+        for (int square=0; square<boardSize; square++) {
+                int piece = self->squares[square];
+                key ^= subHash[piece][square];
+        }
+
+        // Castling
+        return key ^ hashCastleFlags(self->castleFlags);
+}
+
 /*----------------------------------------------------------------------+
  |      isPromotion                                                     |
  +----------------------------------------------------------------------*/
@@ -773,7 +839,8 @@ bool isLegalMove(Board_t self, int move)
 int inCheck(Board_t self)
 {
         updateSideInfo(self);
-        return self->xside->attacks[self->side->king] != 0;
+        int side = sideToMove(self);
+        return self->sides[other(side)].attacks[self->sides[side].king] != 0;
 }
 
 /*----------------------------------------------------------------------+

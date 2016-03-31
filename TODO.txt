@@ -1,13 +1,79 @@
 
-|Todo| Pawn mobility
+|Todo| Strong squares / outposts [evaluate]
 
-|Todo| Introduction of material table.
+Isn't this simply "piece supported by own pawn"?
+ - Consider location. E.g. 3rd rank is probably not important
+ - Bonus per rank: 6p model
 
-|Todo| King safety [evaluate]
+|Todo| Sneaker (hidden passed pawn) [evaluate]
 
-|Todo| Rooks and queens on open files [evaluate]
+        Passed pawn, if not blocked
+        Helper can sacrifice itself to make a passer
 
-|Todo| Left-right location parameters [evaluate]
+|Todo| Candidate passer [evaluate]
+
+Two types:
+1. Floyd type: check that the helpers are on the right spot
+2. Fruit type: just see if the helpers outnumber the sentries
+
+|Todo| Passer scoring based on table instead of quad [evaluate]
+
+|Todo| Pawn levers [evaluate]
+
+|Todo| Board control: what can I drop on a square [evaluate]
+
+|Todo| Potential open files [evaluate]
+
+- potential open files for rooks
+Require that the number of helpers is at least the number of sentries
+
+Potential open file:
+        - Not doubled pawn
+        - The pawn can advance to meet a sentry
+                Why wouldn't it be able to advance?
+                        Only if there is no sentry
+        - In that position, if there are two sentries
+                Then there must also be support of a helper
+        Thats it?
+        - Sentry must not be mobile (but then we can make a passer)
+
+        Score by file (a-file is probably very good)
+        Score by rank of the pawn
+        Score by rank of the sentry?
+        Score by difference in moves/squares?
+
+|Todo| Piece vs pawn center
+
+Center X and center Y
+knightToPawnCenter
+kingToPawnCenter
+
+|Todo| Proximities
+
+Pawn center (rank, file)
+Passers
+Weak pawn (kings)
+
+|Todo| Piece mobility [evaluate]
+
+Mobility = what can I actually move to a square, safely
+
+|Todo| Attacking a non-mobile pawn
+|Todo| Attacks on backward/weak pawns
+
+|Todo| Attack x piece matrix [evaluate]
+
+|Todo| Threats [evaluate]
+
+Threat: weaker attacks stronger piece or undefended piece
+
+1st threat
+2nd threat
+3rd threat
+
+|Todo| Undrawness of material advantage [evaluate]
+
+Instead of just "phase"
 
 |Todo| Check Rebel evaluation features [evaluate]
 
@@ -15,24 +81,65 @@ Ref: http://www.top-5000.nl/authors/rebel/chess840.htm
 
 |Todo| Check Stockfish evaluation features [evaluate]
 
-|Todo| Check "Fruit/Rybka" evaluation features [evaluate]
+|Todo| Knight mobility (vanilla)
+|Todo| Trapped bishop (we already have it partly in the PST)
+|Todo| Blocked bishop (bishop behind immobile pawn)
+|Todo| Opposite bishop depends on pawn count difference
+|Todo| Rook Mobility
+|Todo| Rook on 7th when king on back rank
+|Todo| Penalty for lacking horizontal mobility (crafty)
+|Todo| Blocked rook (as in Rookie)
+|Todo| Queen on 7th when king on back rank
+|Todo| Queen Mobility
+|Todo| Make the passer/king distance dependent on passer rank (Rybka)
+|Todo| Control of squares on open file [evaluate]
 
-Go through eval_comp forwards and backwards again and
-take many things.
+|Todo| Overextended pawns which need to be defended by a piece
 
-|Todo| LittleChessEvaluationCompendium.pdf [evaluate]
+|Todo| Pins
 
-|Todo| Chess programming wiki [evaluate]
+|Todo| KRPKR
 
-https://chessprogramming.wikispaces.com/Evaluation
+"The only rule that applies in this ending: if the black king is
+in front of the white pawn the game is a draw"
 
-|Todo| Experiment: tune each bishop square [evaluate]
+|Todo| Pawn storm
 
-|Todo| Expand board control. Include mobility [evaluate]
+|Todo| Bring back the symmetry to reduce parameters
+|Todo| Simplify bishop tables again
 
 |Todo| Add white/black testing [qa,evaluate]
 
 |Todo| Add left/right testing [qa,evaluate]
+
+|Todo| Train specific exchange compensations
+
+R vs B
+R vs B+P
+R vs B+PP
+R vs N
+R vs N+P
+R vs N+PP
++with or without bishop pair
+
+More complex:
+RP vs NN
+Q vs RR
+
+|Todo| Another minor parsing hickup [bug]
+
+debug on
+position fen 2rq1rk1/1b2ppbp/1p3np1/pN1p4/2PPn3/BQ2PN1P/P3BPP1/2R2RK1 w - - 5 15 moves f3e5 e4d2 b3c2 d2f1 g1f1
+info sting input position fen 2rq1rk1/1b2ppbp/1p3np1/pN1p4/2PPn3/BQ2PN1P/P3BPP1/2R2RK1 w - - 5 15 moves f3e5 e4d2 b3c2 d2f1 g1f1
+info string Illegal move
+
+------------------------------------------------------------------------
+
+|Todo| Basic history heuristic [search]
+
+|Todo| Introduction of material table [speed]
+
+Floyd is slow, but we should aim to keep it above 1Mnps
 
 |Todo| Introduce move flags for 32 bit
 
@@ -40,7 +147,7 @@ https://chessprogramming.wikispaces.com/Evaluation
 
 |Todo| Extend move flags
 
-- Extend flags beyond 
+- Extend flags beyond
 
 Concept choice: keep flags with move or in seperate table?
 
@@ -87,7 +194,15 @@ http://nvie.com/posts/a-successful-git-branching-model/
         Make release notes
         Merge into master
 
-|Todo| Basic history heuristic [search]
+Make branch:
+        git checkout dev
+        git checkout -b v0.8
+
+Merge release into master:
+        git checkout master
+        git merge --no-ff v0.8
+        git branch -d v0.8
+        git push origin dev
 
 |Todo| Basic counter move? [search]
 
@@ -97,33 +212,12 @@ http://nvie.com/posts/a-successful-git-branching-model/
 
 |Todo| Granularity of win32 clock too low? [win32]
 
-|Todo| Multicore support for tuning [speed]
-
 |Todo| Terminology: coefficient or parameter [qa]
 
-|Todo| Measure repeatibility of tuner [verification,tune]
-
-Tune with 10 different subsets of ccrl @ 1M
-Observe variation of vector and residual 
-
-Tune with 10 different subsets of ccrl @ 100k
-Observe variation of vector and residual 
-
-|Todo| Get residuals of some existing evaluations for comparison [evaluate]
-
- - Crafty 24.1
- - Fruit 2.1
- - Giraffe
- - Gnucheese
- - Hiarcs 14
- - Junior 2011
- - Komodo x?
- - Rookie 3.9
- - Rybka 2.3.2a
- - Shredder 12
- - Stockfish 6
-
 |Todo| Consider gradient descent [tune]
+
+Or better:
+https://en.wikipedia.org/wiki/Conjugate_gradient_method
 
 |Todo| Test tuner on Rosenbrock function [tune]
 
@@ -147,19 +241,6 @@ As a callback interface with the search info data
 |Todo| Move ordering based on delta eval [search]
 
 Then also cache evaluation in ttable
-
-|Todo| Execute command line arguments as uci command [main,usability]
-
-floyd [ <uciCommand> <uciOption> ... ]
-
-eg.
-floyd 'debug on'
-floyd 'go depth 8'
-floyd help
-floyd bench
-
-Main obstacle is that the token scanner assumes there is always a
-whitespace or newline after each word.
 
 |Todo| Consider persistent alarm thread [speed]
 
@@ -187,14 +268,108 @@ Platform: UNKNOWN
 2RR2bK/b1N4p/1pkNp1r1/p3p2r/6P1/n1p5/n5P1/6B1 w - - acn 330710; acs 1; bm g3; ce 32758; dm 5; pv g3 h6 Ncb5+ Kd5 Nxc3+ Nxc3 Nc4+ Ke4 Nd2#;
 6RQ/6pP/p5K1/1r2p2N/p3k3/R7/B7/B7 w - - acn 106602; acs 0; bm Qxg7 Rc3; ce 32758; dm 5; pv Rc3 Rb6+ Kg5 Rg6+ Kxg6 a3 Rd8 a5 Bb1#;
 
-|Todo| Best of <n> benchmark [qa]
-
-First verify that variance of the extreme is indeed better than
-the variance of the mean.
-
-See timing.log and timing3.log
-
 |Todo| Move logit() from evaluate to rootSearch [speed]
 
 |Todo| Null move for zugzwang
+
+|Todo| Calculate the impact of each parameter [tune]
+
+Lazy method: set each to 0 and compute the delta of the residual
+
+|Todo| Auto jitter monitoring [timecontrol]
+
+Keep track of maximum jitter in a session, and use that instead of the
+2.5 seconds safety margin. Then see if we can reduce 2.5 to 0.5 with this
+and gain some fake elo at ultra fast tc.
+
+|Todo| Principle component analysis [tune]
+
+For decorrelation of parameters
+
+|Todo| Clearer handling of minmovetime [timecontrol]
+
+Now we increase safety to 20 s when increment is (almost) 0.
+This is double indirect:
+1. Associating "inc=0" with "minmovetime"
+2. Putting the solution in "safety", instead of elsewhere
+There must be a cleaner way
+
+|Todo| Rook doubling on open files [evaluate]
+
+|Todo| False mate score [bug]
+
+Floyd (2244) vs. honestFrnd (1341) --- Thu Jan 28, 23:07 ??? 2016
+Rated blitz match, initial time: 5 minutes, increment: 0 seconds.
+
+Move  Floyd                   honestFrnd
+----  ---------------------   ---------------------
+  1.  e4      (0:00.000)      e5      (0:00.000)
+  2.  Nf3     (0:00.100)      d6      (0:00.966)
+  3.  d4      (0:00.100)      Nd7     (0:02.163)
+  4.  Bc4     (0:00.100)      f6      (0:00.887)
+  5.  Nc3     (0:00.100)      c6      (0:00.960)
+  6.  a4      (0:11.282)      Ne7     (0:00.652)
+  7.  O-O     (0:09.515)      Qc7     (0:00.683)
+  8.  dxe5    (0:07.084)      dxe5    (0:01.423)
+  9.  h4      (0:15.474)      b6      (0:08.678)
+ 10.  Be3     (0:11.819)      Ng6     (0:03.429)
+ 11.  Qe2     (0:10.984)      Be7     (0:03.578)
+ 12.  Rad1    (0:05.970)      Nc5     (0:08.167)
+ 13.  h5      (0:05.513)      Nf8     (0:02.080)
+ 14.  h6      (0:05.587)      g6      (0:02.819)
+ 15.  b4      (0:06.126)      Nce6    (0:03.189)
+ 16.  Bb3     (0:05.095)      Bxb4    (0:02.835)
+ 17.  Nb5     (0:05.740)      cxb5    (0:03.939)
+ 18.  Qxb5+   (0:11.572)      Bd7     (0:29.267)
+ 19.  Qxb4    (0:04.703)      Nc5     (0:16.457)
+ 20.  Bxc5    (0:32.666)      Qxc5    (0:03.680)
+ 21.  Qe1     (0:26.072)      Ne6     (0:04.932)
+ 22.  Rd5     (0:02.704)      Qc7     (0:11.412)
+ 23.  Qb4     (0:08.736)      a5      (0:16.546)
+ 24.  Qd6     (0:02.686)      Qxd6    (0:03.811)
+ 25.  Rxd6    (0:06.903)      Ke7     (0:16.178)
+ 26.  Rfd1    (0:03.852)      Nc5     (0:11.258)
+ 27.  Rxb6    (0:12.258)      Bg4     (0:02.805)
+ 28.  Rb5     (0:02.248)      Nxe4    (0:03.003)
+ 29.  Rb7+    (0:03.457)      Ke8     (0:06.774)
+ 30.  Bd5     (0:02.883)      Ng5     (0:10.945)
+
+Floyd(C)(2244)[327] whispers: depth=8 score=3.17 time=3.32 node=257743 speed=77633 pv=Nxg5 fxg5 Re1 Bd7 Rb6 Rc8 Rxe5+ Kd8 Bb3 Kc7
+ 31.  Nxg5    (0:03.325)      Bxd1    (0:05.666)
+
+Floyd(C)(2244)[327] whispers: depth=9 score=99.93 time=0.77 node=115634 speed=150174 pv=Bc6+ Kd8 Nf7+ Kc8 Nd6+ Kd8 Rd7#
+ 32.  Bc6+    (0:00.782)      Kf8     (0:07.388)
+
+Floyd(C)(2244)[327] whispers: depth=3 score=99.97 time=0.00 node=354 speed=0 pv=Nxh7+ Rxh7 Rg7
+ 33.  Nxh7+   (0:00.100)      Rxh7    (0:09.833)
+
+Floyd(C)(2244)[327] whispers: depth=12 score=8.23 time=20.49 node=1876960 speed=91603 pv=Rxh7 Kg8 Rg7+ Kh8 Bxa8 Bxc2 Bc6 e4 Ra7 e3 fxe3 f5 Rxa5 Bxa4 Bxa4
+ 34.  Rxh7    (0:07.747)      Rc8     (0:18.823)
+ 35.  Rh8+    (0:01.431)      Ke7     (0:05.406)
+ 36.  Rxc8    (0:09.119)
+      {Black resigns} 1-0
+
+|Todo| Rename pawnKingHash [qa]
+
+Because we want to add bishop colors as well, and
+reduce the king component to their files.
+
+Candidates:
+        subHash <-- looks best
+        miniHash
+        structHash
+        xHash
+        pHash
+        pawnHash
+        slowHash
+        coarseHash
+
+|Todo| Alekhine's Gun [evaluate]
+
+"I should mention, too that you do need to handle stacked attackers
+such as "Alekhine's Gun". This is commonly done by considering own
+rooks as transparent when calculating rank/file attacks, as well
+as as Queens being "transparent" when considering Bishop attacks."
+
+http://talkchess.com/forum/viewtopic.php?p=665703#665703
 

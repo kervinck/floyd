@@ -6,7 +6,7 @@
  +----------------------------------------------------------------------*/
 
 /*
- *  Copyright (C) 2015, Marcel van Kervinck
+ *  Copyright (C) 2015-2016, Marcel van Kervinck
  *  All rights reserved
  *
  *  Please read the enclosed file `LICENSE' or retrieve this document
@@ -46,7 +46,11 @@
 #define maxLongLong ((long long)(~0ULL >> 1))
 #define minLongLong (-maxLongLong - 1LL)
 
-#define ones(n) (~(~0ULL << (n)))
+#define ones(n) ~(~0ULL << (n))
+#define bit(i) (1ULL << (i))
+#define bitTest(w,i) (((w) >> (i)) & 1)
+#define bitIndex8(w) (((w) & 0xf0 ? 4 : 0) + ((w) & 0xcc ? 2 : 0) + ((w) & 0xaa ? 1 : 0))
+#define equalSign(a, b) (((a) ^ (b)) >= 0)
 
 #define unused(a) ((void)(a))
 
@@ -149,6 +153,7 @@ double xTime(void);
 char *stringCopy(char *s, const char *t);
 int compareInt(const void *ap, const void *bp);
 int readLine(void *fp, charList *lineBuffer);
+uint64_t xorshift64star(uint64_t x);
 
 /*----------------------------------------------------------------------+
  |      Main support                                                    |

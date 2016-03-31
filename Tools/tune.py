@@ -16,7 +16,7 @@ import sys
 #-----------------------------------------------------------------------
 
 # Number of workers to launch (-n)
-cpu = 4
+cpu = multiprocessing.cpu_count()
 
 # Search depth for evaluations. 0 means qSearch only (-d)
 depth = 0
@@ -249,10 +249,10 @@ def calcWindow(value):
 #       writeVector
 #-----------------------------------------------------------------------
 
-def writeVector(vector, deltas, filename):
+def writeVector(vector, deltas, coverages, history, filename):
         with open(filename, 'w') as fp:
-                asList = sorted(zip(names, vector, deltas),  key=lambda x: x[2])
-                json.dump(asList, fp, indent=1, separators=(',', ':'))
+                asList = sorted(zip(names, vector, deltas, coverages),  key=lambda x: x[2])
+                json.dump((asList, history), fp, indent=1, separators=(',', ':'))
                 fp.write('\n')
 
 #-----------------------------------------------------------------------
@@ -340,7 +340,9 @@ if __name__ == '__main__':
         # -- Step 0: Get vector definition from module
 
         vector, names = getVector()
-        deltas = [-1.0] * len(vector) # priority for new items
+        deltas = [None] * len(vector) # priority for new items
+        coverages = [None] * len(vector)
+        history = []
 
         # -- Step 1: Parse command line arguments
 
@@ -354,6 +356,7 @@ if __name__ == '__main__':
                 print '    -d <depth>     - search depth per position (default 0)'
                 print '    -s <steps>     - probe steps before window shrink (default 2)'
                 print '    -m <count>     - active positions before short-cut evaluation (default +Inf)'
+                #print '    -z             - calculate contribution per parameter'
                 print '    -q             - print the current residual and quit'
                 sys.exit(0)
 
@@ -395,17 +398,20 @@ if __name__ == '__main__':
         try:
                 with open(filename, 'r') as fp:
                         values = dict(zip(names, vector))
-                        for i, (name, value, delta) in enumerate(json.load(fp)):
+                        jsonVector, history = json.load(fp)
+                        for name, value, delta, coverage in jsonVector:
                                 try:
                                         coef = names.index(name)
                                         values[name] = value
                                         deltas[coef] = delta
+                                        coverages[coef] = coverage
                                 except ValueError:
                                         print 'warning invalid id', name
                         vector = [values[name] for name in names]
         except IOError as err:
                 print err
-                print 'continue'
+                print 'continuing'
+                writeVector(vector, deltas, coverages, history, filename)
 
         coefList = range(len(vector))
         if len(sys.argv) > argi:
@@ -436,16 +442,20 @@ if __name__ == '__main__':
         coefList = sorted(coefList, key=lambda x:deltas[x])
         while len(coefList) > 0 and not exhausted:
                 nrRounds += 1
-                print 'round %d count %d' % (nrRounds, len(coefList))
-                print
-
                 exhausted = True
-                for coef in coefList:
+                for index, coef in enumerate(coefList):
+                        print 'round %d count %d of %d' % (nrRounds, index + 1, len(coefList))
                         oldValue = vector[coef]
                         newValue, newResidual, active = tuneSingle(coef, tests, oldValue, bestResidual)
 
                         deltaResidual = newResidual - bestResidual
-                        deltas[coef] = deltaResidual
+                        if deltas[coef] is None:
+                                deltas[coef] = deltaResidual
+                        else:
+                                alpha = 0.75
+                                deltas[coef] = alpha * deltaResidual + (1.0 - alpha) * deltas[coef]
+
+                        coverages[coef] = float(active) / float(len(tests))
 
                         if newValue != oldValue:
                                 print 'update id %s residual %.9f delta %.3e active %d oldValue %d newValue %d' % (
@@ -454,7 +464,8 @@ if __name__ == '__main__':
                                 exitValue = 0
                                 bestResidual = newResidual
                                 exhausted = False
-                        writeVector(vector, deltas, filename)
+                        history.append((names[coef], len(tests), active, newValue, newResidual)) # always update history
+                        writeVector(vector, deltas, coverages, history, filename)
                         print
 
                 # Keep the most volatile half for the next round

@@ -42,7 +42,7 @@ $ make
 $ ./floyd 
 
 Floyd Chess Engine - Version 0.x
-Copyright (C) 2015, Marcel van Kervinck
+Copyright (C) 2015-2016, Marcel van Kervinck
 All rights reserved
 
 Type "help" for more information, or "quit" to leave.
@@ -94,10 +94,10 @@ Extra commands:
         Show this list of commands.
   eval
         Show evaluation.
-  bench [ movetime <millis> ]
-        Speed test using 40 standard positions. Default `movetime' is 1000.
+  bench [ movetime <millis> ] [ bestof <repeat> ]
+        Speed test using 40 standard positions. Default: movetime 333 bestof 3
   moves [ depth <ply> ]
-        Move generation test. Default `depth' is 1.
+        Move generation test. Default: depth 1
 
 Unknown commands and options are silently ignored, except in debug mode.
 ```
@@ -115,10 +115,11 @@ Hierarchy for source modules is as follows:
   +--- Engine.h
   |     +--- search.c                   PVS, scout, quiescence search, SEE
   |     +--- ttable.c                   Transposition table
-  |     `--- evaluate.c                 Position evaluation
-  |           +--- vector.h             Evaluation features and weights
-  |           `--- kpk.h                In-memory bitbase for King+Pawn vs King
-  |                 `--- kpk.c
+  |     +--- evaluate.c                 Position evaluation
+  |     |     +--- vector.h             Evaluation features and weights
+  |     |     `--- kpk.h                In-memory bitbase for King+Pawn vs King
+  |     |           `--- kpk.c
+  |     `--- engine.c                   Engine object chores
   +--- Board.h
   |     +--- format.c                   Conversion to FEN and UCI move notation
   |     +--- parse.c                    Conversion from FEN and UCI move notation

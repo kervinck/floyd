@@ -6,7 +6,7 @@
  +----------------------------------------------------------------------*/
 
 /*
- *  Copyright (C) 2015, Marcel van Kervinck
+ *  Copyright (C) 2015-2016, Marcel van Kervinck
  *  All rights reserved
  *
  *  Please read the enclosed file `LICENSE' or retrieve this document
@@ -53,18 +53,22 @@ struct Board {
         signed char castleFlags;
         signed char enPassantPawn;
         signed char halfmoveClock;
-
         int plyNumber; // holds both side to move and full move number
 
         uint64_t hash;
         uint64List hashHistory;
+
+        uint64_t pawnKingHash;
+        uint64List pkHashHistory;
+
+        uint64_t materialKey;
+        uint64List materialHistory;
 
         int eloDiff;
 
         /*
          *  Side data
          */
-        struct side *side, *xside;
         struct side sides[2];
         int sideInfoPlyNumber; // for auto-update
 
@@ -87,8 +91,9 @@ enum piece {
 };
 
 enum pieceColor { white = 0, black = 1 };
-
 #define pieceColor(piece) ((piece) >= blackKing) // piece must not be 'empty'
+
+#define squareColor(square) ((file(square) ^ rank(square) ^ fileH ^ rank1) & 1)
 
 /*
  *  Game state
@@ -96,12 +101,13 @@ enum pieceColor { white = 0, black = 1 };
 
 enum castleFlag {
         castleFlagWhiteKside = 1 << 0,
-        castleFlagWhiteQside = 1 << 1,
-        castleFlagBlackKside = 1 << 2,
+        castleFlagBlackKside = 1 << 1,
+        castleFlagWhiteQside = 1 << 2,
         castleFlagBlackQside = 1 << 3
 };
 
 #define sideToMove(board) ((board)->plyNumber & 1)
+#define other(side) ((side) ^ 1)
 
 /*
  *  Moves
@@ -115,7 +121,7 @@ enum castleFlag {
  *  13-14       promotion: Q=0, R=1, B=2, N=3
  */
 
-#define boardBits  6
+#define boardBits 6
 
 #define move(from, to)          (((from) << boardBits) | (to))
 enum moveFlags {
@@ -128,14 +134,21 @@ enum moveFlags {
 };
 #define specialMove(from, to)   (specialMoveFlag | move(from, to))
 
-#define from(move)              (((move) >> boardBits) & ~(~0<<boardBits))
-#define to(move)                ( (move)               & ~(~0<<boardBits))
+#define from(move)              (int) (((move) >> boardBits) & ones(boardBits))
+#define to(move)                (int) ( (move)               & ones(boardBits))
 
 /*----------------------------------------------------------------------+
  |      Data                                                            |
  +----------------------------------------------------------------------*/
 
 extern const char startpos[];
+
+// Expose these for use in evaluation
+extern const unsigned char kingDirections[boardSize];
+extern const signed char kingStep[];
+extern const uint64_t materialKeys[][2];
+extern const uint64_t materialMaskPiecesAndPawns[2];
+extern const uint64_t materialMaskPiecesNoPawns[2];
 
 /*----------------------------------------------------------------------+
  |      Functions                                                       |
@@ -164,6 +177,7 @@ void boardToFen(Board_t self, char *fen);
  *  Compute a 64-bit hash for the current position using Polyglot-Zobrist hashing
  */
 uint64_t hash(Board_t self);
+uint64_t pawnKingHash(Board_t self);
 
 /*
  *  Generate all pseudo-legal moves for the position and return the move count
@@ -181,7 +195,9 @@ void makeMove(Board_t self, int move);
 static inline bool wasLegalMove(Board_t self)
 {
         updateSideInfo(self);
-        return self->side->attacks[self->xside->king] == 0;
+        int side = sideToMove(self);
+        int xking = self->sides[other(side)].king;
+        return self->sides[side].attacks[xking] == 0;
 }
 
 /*
@@ -203,12 +219,10 @@ char *moveToUci(Board_t self, char moveString[maxMoveSize], int move);
 /*
  *  Parse move input, disambiguate abbreviated notations
  *  A movelist must be prepared by the caller for disambiguation.
- *  Return the length of the move on success, or <= 0 on failure:
- *   0 : Invalid move syntax
- *  -1 : Not a legal move in this position
- *  -2 : Ambiguous move
+ *  Return the length of the move on success, or 0 on failure
+ *  (invalid move syntax or not a legal move)
  */
-extern int parseMove(Board_t self, const char *line, int xmoves[maxMoves], int xlen, int *move);
+extern int parseUciMove(Board_t self, const char *line, int xmoves[maxMoves], int xlen, int *move);
 
 // Clear the ep flag if there are not legal moves
 extern void normalizeEnPassantStatus(Board_t self);
@@ -224,6 +238,9 @@ extern bool isPromotion(Board_t self, int from, int to);
 
 // Search tree to fixed depth for correctness testing
 extern long long moveTest(Board_t self, int depth);
+
+// Target square in case the last move was a capture, or -1 otherwise
+extern int recaptureSquare(Board_t self);
 
 /*----------------------------------------------------------------------+
  |                                                                      |

@@ -6,7 +6,7 @@
  +----------------------------------------------------------------------*/
 
 /*
- *  Copyright (C) 2015, Marcel van Kervinck
+ *  Copyright (C) 2015-2016, Marcel van Kervinck
  *  All rights reserved
  *
  *  Please read the enclosed file `LICENSE' or retrieve this document
@@ -160,6 +160,18 @@ int readLine(void *fpPointer, charList *lineBuffer)
 
         pushList(*lineBuffer, '\0');
         return lineBuffer->len-1;
+}
+
+/*----------------------------------------------------------------------+
+ |      xorshift64star                                                  |
+ +----------------------------------------------------------------------*/
+
+uint64_t xorshift64star(uint64_t x)
+{
+        x ^= x >> 12;
+        x ^= x << 25;
+        x ^= x >> 27;
+        return x * 2685821657736338717ULL;
 }
 
 /*----------------------------------------------------------------------+

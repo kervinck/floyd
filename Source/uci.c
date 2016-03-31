@@ -6,7 +6,7 @@
  +----------------------------------------------------------------------*/
 
 /*
- *  Copyright (C) 2015, Marcel van Kervinck
+ *  Copyright (C) 2015-2016, Marcel van Kervinck
  *  All rights reserved
  *
  *  Please read the enclosed file `LICENSE' or retrieve this document
@@ -65,7 +65,7 @@ X"        Enable/disable debug mode and show its status."
 X"  setoption name <optionName> [ value <optionValue> ]"
 X"        Set option. The new value becomes active with the next `isready'."
 X"  isready"
-X"        Activate any changed options and reply 'isready' when done."
+X"        Activate any changed options and reply `readyok' when done."
 X"  ucinewgame"
 X"        A new game has started. (ignored)"
 X"  position [ startpos | fen <fenField> ... ] [ moves <move> ... ]"
@@ -101,10 +101,10 @@ X"  help"
 X"        Show this list of commands."
 X"  eval"
 X"        Show evaluation."
-X"  bench [ movetime <millis> ]"
-X"        Speed test using 40 standard positions. Default `movetime' is 1000."
+X"  bench [ movetime <millis> ] [ bestof <repeat> ]"
+X"        Speed test using 40 standard positions. Default: movetime 333 bestof 3"
 X"  moves [ depth <ply> ]"
-X"        Move generation test. Default `depth' is 1."
+X"        Move generation test. Default: depth 1"
 X
 X"Unknown commands and options are silently ignored, except in debug mode."
 X;
@@ -124,22 +124,22 @@ static void updateOptions(Engine_t self,
  |      _scanToken                                                      |
  +----------------------------------------------------------------------*/
 
-// Token and (optional) value scanner
+// Token and optional value scanner
 static int _scanToken(char **line, const char *format, void *value)
 {
-        char next = 0;
+        char nextChar = 0;
         int n = 0;
         if (value)
-                sscanf(*line, format, value, &next, &n);
+                sscanf(*line, format, value, &nextChar, &n);
         else
-                sscanf(*line, format, &next, &n);
-        if (!isspace(next)) // space or newline
+                sscanf(*line, format, &nextChar, &n);
+        if (!isspace(nextChar)) // expect space or newline to follow
                 n = 0;
         *line += n;
         return n;
 }
-#define scan(tokens) _scanToken(&line, " " tokens "%c %n", null)
 #define scanValue(tokens, value) _scanToken(&line, " " tokens "%c %n", value)
+#define scan(tokens) scanValue(tokens, null)
 
 // For skipping unknown commands or options
 #define skipOneToken(type) Statement(\
@@ -164,19 +164,19 @@ void uciMain(Engine_t self)
         // Prepare threading
         xThread_t searchThread = null;
 
-        // Process commands from stdin
-        while (fflush(stdout), readLine(stdin, &lineBuffer) > 0) {
+        // Process commands
+        while (readLine(stdin, &lineBuffer) != 0) {
                 char *line = lineBuffer.v;
                 if (debug) printf("info string input %s", line);
 
                 if (scan("uci"))
                         printf("id name Floyd "quote2(floydVersion)"\n"
-                                "id author Marcel van Kervinck\n"
-                                "option name Hash type spin default %ld min 0 max %ld\n"
-                                "option name Clear Hash type button\n"
-                                "option name Ponder type check default true\n"
-                                "uciok\n",
-                               newOptions.Hash, maxHash);
+                               "id author Marcel van Kervinck\n"
+                               "option name Hash type spin default %ld min 0 max %ld\n"
+                               "option name Clear Hash type button\n"
+                               "option name Ponder type check default true\n"
+                               "uciok\n",
+                                newOptions.Hash, maxHash);
 
                 else if (scan("debug")) {
                         if (scan("on")) debug = true;
@@ -186,7 +186,7 @@ void uciMain(Engine_t self)
                 else if (scan("setoption")) {
                         if (scanValue("name Hash value %ld", &newOptions.Hash)) pass;
                         else if (scan("name Ponder value true")) pass;
-                        else if (scan("name Ponder value false")) pass;
+                        else if (scan("name Ponder value false")) pass; // just ignore it
                         else if (scan("name Clear Hash")) newOptions.ClearHash = !oldOptions.ClearHash;
                 }
                 else if (scan("isready")) {
@@ -211,10 +211,9 @@ void uciMain(Engine_t self)
                                 for (int n=1; n>0; line+=n) {
                                         int moves[maxMoves], move;
                                         int nrMoves = generateMoves(board(self), moves);
-                                        n = parseMove(board(self), line, moves, nrMoves, &move);
+                                        n = parseUciMove(board(self), line, moves, nrMoves, &move);
                                         if (n > 0) makeMove(board(self), move);
-                                        if (debug && n == -1) printf("info string Illegal move\n");
-                                        if (debug && n == -2) printf("info string Ambiguous move\n");
+                                        else if (debug) printf("info string Illegal move\n");
                                 }
                         }
 
@@ -239,7 +238,6 @@ void uciMain(Engine_t self)
                         self->infoFunction = uciSearchInfo;
                         self->infoData = self;
                         self->pondering = false;
-                        self->moveReady = false;
 
                         self->target.depth = maxDepth;
                         self->target.nodeCount = maxLongLong;
@@ -264,10 +262,9 @@ void uciMain(Engine_t self)
                                         for (int n=1; n>0; line+=n) {
                                                 int moves[maxMoves], move;
                                                 int nrMoves = generateMoves(board(self), moves);
-                                                n = parseMove(board(self), line, moves, nrMoves, &move);
+                                                n = parseUciMove(board(self), line, moves, nrMoves, &move);
                                                 if (n > 0) pushList(self->searchMoves, move);
-                                                if (debug && n == -1) printf("info string Illegal move\n");
-                                                if (debug && n == -2) printf("info string Ambiguous move\n");
+                                                else if (debug) printf("info string Illegal move\n");
                                         }
                                 else skipOneToken("Option");
 
@@ -304,9 +301,10 @@ void uciMain(Engine_t self)
                 }
                 else if (scan("bench")) {
                         updateOptions(self, &oldOptions, &newOptions);
-                        long movetime = 1000;
-                        scanValue("movetime %ld", &movetime);
-                        uciBenchmark(self, movetime * ms);
+                        int movetime = 333, bestof = 3;
+                        scanValue("movetime %d", &movetime);
+                        scanValue("bestof %d", &bestof);
+                        uciBenchmark(self, movetime * ms, bestof);
                 }
                 else if (scan("moves")) {
                         int depth = 1;
@@ -317,6 +315,7 @@ void uciMain(Engine_t self)
                         skipOneToken("Command");
 
                 skipOtherTokens(); // For info when debugging
+                fflush(stdout);
         }
 
         searchThread = stopSearch(self, searchThread);

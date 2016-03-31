@@ -6,7 +6,7 @@
  +----------------------------------------------------------------------*/
 
 /*
- *  Copyright (C) 2015, Marcel van Kervinck
+ *  Copyright (C) 2015-2016, Marcel van Kervinck
  *  All rights reserved
  *
  *  Please read the enclosed file `LICENSE' or retrieve this document
@@ -133,7 +133,7 @@ int ttWrite(Engine_t self, struct ttSlot slot, int depth, int score, int alpha, 
                          */
                         if (board(self)->halfmoveClock == 0 && score <= maxDtz)
                                 return score;
-                        slot.score += board(self)->plyNumber - self->rootPlyNumber;
+                        slot.score += ply(self);
                         slot.isWinLossScore = 1;
                         assert(slot.score < maxMate); // maxMate not in chess
                 }
@@ -144,7 +144,7 @@ int ttWrite(Engine_t self, struct ttSlot slot, int depth, int score, int alpha, 
                 if (score < minEval - 1) {
                         if (board(self)->halfmoveClock == 0 && score >= minDtz)
                                 return score;
-                        slot.score -= board(self)->plyNumber - self->rootPlyNumber;
+                        slot.score -= ply(self);
                         slot.isWinLossScore = 1;
                         assert(slot.score >= minMate);
                 }
@@ -230,15 +230,7 @@ double ttCalcLoad(Engine_t self)
  */
 void ttClearFast(Engine_t self)
 {
-        uint64_t x = ~self->tt.baseHash;
-
-        // xorshift64star
-        x ^= x >> 12;
-        x ^= x << 25;
-        x ^= x >> 27;
-        x *= 2685821657736338717ULL;
-
-        self->tt.baseHash = ~x;
+        self->tt.baseHash = ~xorshift64star(~self->tt.baseHash);
 }
 
 /*----------------------------------------------------------------------+

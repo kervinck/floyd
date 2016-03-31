@@ -12,7 +12,8 @@ import sys
 import json
 
 with open(sys.argv[1], 'r') as fp:
-        vector = {item[0]:item[1] for item in json.load(fp)}
+        jsonVector, history = json.load(fp)
+        vector = {item[0]:item[1] for item in jsonVector}
 
 nrMatches = 0
 

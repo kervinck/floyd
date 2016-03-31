@@ -5,6 +5,7 @@ floydModule = Extension(
         'floyd',
         sources = [
                 'Source/cplus.c',
+                'Source/engine.c',
                 'Source/evaluate.c',
                 'Source/floydmodule.c',
                 'Source/format.c',

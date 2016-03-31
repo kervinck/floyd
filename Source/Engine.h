@@ -6,7 +6,7 @@
  +----------------------------------------------------------------------*/
 
 /*
- *  Copyright (C) 2015, Marcel van Kervinck
+ *  Copyright (C) 2015-2016, Marcel van Kervinck
  *  All rights reserved
  *
  *  Please read the enclosed file `LICENSE' or retrieve this document
@@ -110,7 +110,6 @@ struct Engine {
         void *infoData;
 
         volatile bool pondering;
-        volatile bool moveReady;
         xAlarm_t alarmHandle;
         void *abortTarget;
 };
@@ -130,6 +129,7 @@ struct Engine {
 extern int globalVector[];
 extern const int vectorLen;
 extern const char * const vectorLabels[];
+extern uint64_t globalVectorBaseHash;
 
 /*----------------------------------------------------------------------+
  |      Functions                                                       |
@@ -161,6 +161,10 @@ double ttCalcLoad(Engine_t self);
  *  Time control
  */
 void setTimeTargets(Engine_t self, double time, double inc, int movestogo, double movetime);
+
+// Init and cleanup
+void initEngine(Engine_t self);
+void cleanupEngine(Engine_t self);
 
 /*----------------------------------------------------------------------+
  |                                                                      |

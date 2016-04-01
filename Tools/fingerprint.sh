@@ -64,7 +64,7 @@ echo "*** Game playing:"
 cutechess-cli -concurrency 4 -rounds 50 -repeat -each tc=10+0.15\
 	-openings file=Data/book-6000-openings.pgn order=random\
 	-engine cmd=./floyd-pgo2 proto=uci\
-	-engine cmd=floyd0.7 proto=uci # user must have this version installed
+	-engine cmd=floyd0.8 proto=uci # user must have this version installed
 echo
 
 echo "*** Tactics:"

@@ -307,7 +307,7 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
         int bestScore = minInt;
         for (int move=makeFirstMove(self,&node), j=0; move; move=makeNextMove(self,&node), j++) {
                 int newDepth = max(0, depth - 1 + extension);
-                int reduction = (depth >= 4) && (j >= 1) && (move < 0) && isCutNode(nodeType);
+                int reduction = (depth >= 4) && (j >= 1) && (move < 0);
                 int reducedDepth = max(0, newDepth - reduction);
                 int score = -scout(self, reducedDepth, -(alpha+1), nodeType+1);
                 if (score > alpha && reducedDepth < newDepth)

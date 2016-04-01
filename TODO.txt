@@ -194,6 +194,16 @@ http://nvie.com/posts/a-successful-git-branching-model/
         Make release notes
         Merge into master
 
+Make branch:
+        git checkout dev
+        git checkout -b v0.8
+
+Merge release into master:
+        git checkout master
+        git merge --no-ff v0.8
+        git branch -d v0.8
+        git push origin dev
+
 |Todo| Basic counter move? [search]
 
 |Todo| Checks in qsearch, at least in PV and after null move

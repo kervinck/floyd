@@ -37,7 +37,7 @@ echo
 echo "*** Build:"
 make clean
 make floyd
-make module
+make .module
 make floyd-pgo2
 make floyd.w32.exe
 echo

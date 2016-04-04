@@ -179,7 +179,7 @@ shootout: floyd-pgo2
 	 -openings file=Data/book-6000-openings.pgn order=random\
 	 -resign movecount=1 score=500\
 	 -engine cmd=./floyd-pgo2 proto=uci\
-	 -engine cmd=floyd0.7 proto=uci\
+	 -engine cmd=floyd0.8 proto=uci\
 	 -pgnout shootout.pgn
 
 # Show simplified git log

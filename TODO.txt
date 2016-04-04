@@ -1,4 +1,45 @@
 
+|Todo| Basic history heuristic [search]
+
+|Todo| Introduction of material table [speed]
+
+Floyd is slow, but we should aim to keep it above 1Mnps
+
+|Todo| Introduce move flags for 32 bit
+
+- Simplify UCI move formatting
+
+|Todo| Extend move flags
+
+- Extend flags beyond
+
+Concept choice: keep flags with move or in seperate table?
+
+          search                     board
++------------+------------+------------+-------------+
+| SEE/killer |   history  | properties |     move    |
++------------+------------+------------+-------------+
+      16            16           16           16
+
+        moveList[i] += self->history[moveList[i] & moveMask]
+
+1. Sort a long key.
+        - Makes everyone migrate to Move_t
+        + Can use standard qsort
+2. Sort only the scores, with back reference to the move (index)
+3. Sort through a history table, requires modified qsort
+4. Hide all in a move picker object
+5. Place scores at index+256
+        - Doesn't work with qsort
+
+Desirable properties
+- generateMoves still generates ints (32bit)
+- can use stdlib qsort
+
+------------------------------------------------------------------------
+
+|Todo| Rook or Queen and/vs pawn span [evaluate]
+
 |Todo| Strong squares / outposts [evaluate]
 
 Isn't this simply "piece supported by own pawn"?
@@ -134,43 +175,6 @@ info sting input position fen 2rq1rk1/1b2ppbp/1p3np1/pN1p4/2PPn3/BQ2PN1P/P3BPP1/
 info string Illegal move
 
 ------------------------------------------------------------------------
-
-|Todo| Basic history heuristic [search]
-
-|Todo| Introduction of material table [speed]
-
-Floyd is slow, but we should aim to keep it above 1Mnps
-
-|Todo| Introduce move flags for 32 bit
-
-- Simplify UCI move formatting
-
-|Todo| Extend move flags
-
-- Extend flags beyond
-
-Concept choice: keep flags with move or in seperate table?
-
-          search                     board
-+------------+------------+------------+-------------+
-| SEE/killer |   history  | properties |     move    |
-+------------+------------+------------+-------------+
-      16            16           16           16
-
-        moveList[i] += self->history[moveList[i] & moveMask]
-
-1. Sort a long key.
-        - Makes everyone migrate to Move_t
-        + Can use standard qsort
-2. Sort only the scores, with back reference to the move (index)
-3. Sort through a history table, requires modified qsort
-4. Hide all in a move picker object
-5. Place scores at index+256
-        - Doesn't work with qsort
-
-Desirable properties
-- generateMoves still generates ints (32bit)
-- can use stdlib qsort
 
 |Todo| Win64 version from Makefile [win64]
 

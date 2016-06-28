@@ -191,7 +191,7 @@ void uciMain(Engine_t self)
                 }
                 else if (scan("isready")) {
                         updateOptions(self, &oldOptions, &newOptions);
-                        printf("readyok\n");
+                        printf("\nreadyok\n");
                 }
                 else if (scan("ucinewgame"))
                         pass;

@@ -44,8 +44,10 @@ struct Node {
         int moveList[maxMoves];
 };
 
-#define moveMask ((int) ones(16))
+#define moveMask ((int) ones(15))
 #define moveScore(longMove) ((longMove) >> 16) // Extract score from move list entry
+#define historyBits 11 // 15 for a move and 6 for SEE leaves 11 for history
+#define historyIndex(move) ((int) ((move) & ones(12)))
 
 /*----------------------------------------------------------------------+
  |      Functions                                                       |
@@ -57,7 +59,7 @@ static int qSearch(Engine_t self, int alpha);
 
 static int updateBestAndPonderMove(Engine_t self);
 static int staticMoveScore(Board_t self, int move);
-static int filterAndSort(Board_t self, int moveList[], int nrMoves, int moveFilter);
+static int filterAndSort(Engine_t self, int moveList[], int nrMoves, int moveFilter);
 static int filterLegalMoves(Board_t self, int moveList[], int nrMoves);
 static bool moveToFront(int moveList[], int nrMoves, int move);
 static bool repetition(Engine_t self);
@@ -65,6 +67,7 @@ static bool allowNullMove(Board_t self);
 
 static void killersToFront(Engine_t self, int ply, int moveList[], int nrMoves);
 static void updateKillers(Engine_t self, int ply, int move);
+static void updateHistory(short historyCounts[], int index, int depth);
 
 static int makeFirstMove(Engine_t self, struct Node *node);
 static int makeNextMove(Engine_t self, struct Node *node);
@@ -93,6 +96,7 @@ void rootSearch(Engine_t self)
                 self->killers.len = 0;
                 self->bestMove = self->ponderMove = 0;
                 self->tt.now = (self->tt.now + 1) & ones(ttDateBits);
+                memset(self->historyCounts, 0, sizeof self->historyCounts);
         }
 
         if (self->target.maxTime > 0.0 && !self->pondering)
@@ -192,7 +196,7 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                 nrMoves = self->searchMoves.len;
                 memcpy(moveList, self->searchMoves.v, nrMoves * sizeof(int));
         }
-        nrMoves = filterAndSort(board(self), moveList, nrMoves, moveFilter);
+        nrMoves = filterAndSort(self, moveList, nrMoves, moveFilter);
         nrMoves = filterLegalMoves(board(self), moveList, nrMoves); // Easier for PVS
         moveToFront(moveList, nrMoves, slot.move);
 
@@ -316,7 +320,10 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
                 bestScore = max(bestScore, score);
                 if (score > alpha) { // Fail high
                         node.slot.move = move & moveMask;
-                        if (j > 0) updateKillers(self, ply(self), move);
+                        if (j > 0) {
+                                updateKillers(self, ply(self), move);
+                                updateHistory(self->historyCounts, historyIndex(move), depth);
+                        }
                         break;
                 }
         }
@@ -348,7 +355,7 @@ static int qSearch(Engine_t self, int alpha)
         // Generate good captures, or all escapes when in check
         int moveList[maxMoves];
         int nrMoves = generateMoves(board(self), moveList);
-        nrMoves = filterAndSort(board(self), moveList, nrMoves, check ? minInt : 0);
+        nrMoves = filterAndSort(self, moveList, nrMoves, check ? minInt : 0);
         moveToFront(moveList, nrMoves, slot.move);
 
         // Try if any generated move can improve the result
@@ -413,7 +420,7 @@ static int makeNextMove(Engine_t self, struct Node *node)
         if (node->phase == 0) {
                 int ttMove = node->moveList[0];
                 node->nrMoves = generateMoves(board(self), node->moveList);
-                node->nrMoves = filterAndSort(board(self), node->moveList, node->nrMoves, minInt);
+                node->nrMoves = filterAndSort(self, node->moveList, node->nrMoves, minInt);
                 killersToFront(self, ply(self), node->moveList, node->nrMoves);
                 node->i = moveToFront(node->moveList, node->nrMoves, ttMove); // skip if already emitted
                 node->phase = 1;
@@ -495,13 +502,15 @@ static int compareMoves(const void *ap, const void *bp)
         return (a < b) - (a > b);
 }
 
-static int filterAndSort(Board_t self, int moveList[], int nrMoves, int moveFilter)
+static int filterAndSort(Engine_t self, int moveList[], int nrMoves, int moveFilter)
 {
         int j = 0;
         for (int i=0; i<nrMoves; i++) {
-                int moveScore = staticMoveScore(self, moveList[i]);
+                int moveScore = staticMoveScore(board(self), moveList[i]);
                 if (moveScore >= moveFilter)
-                        moveList[j++] = (moveScore << 16) + (moveList[i] & moveMask);
+                        moveList[j++] = (moveScore << 26)
+                                      + (self->historyCounts[historyIndex(moveList[i])] << 15)
+                                      + (moveList[i] & moveMask);
         }
         qsort(moveList, j, sizeof(moveList[0]), compareMoves);
         return j;
@@ -557,6 +566,14 @@ static void updateKillers(Engine_t self, int ply, int move)
                 killers->v[i] = killers->v[i-1];
                 killers->v[i-1] = move & moveMask;
         }
+}
+
+static void updateHistory(short historyCounts[], int index, int depth)
+{
+        historyCounts[index] += min(64, depth * depth); // Rookie v1
+        if (historyCounts[index] >= (1 << historyBits))
+                for (int i=0; i <= historyIndex(~0); i++)
+                        historyCounts[i] >>= 1;
 }
 
 /*----------------------------------------------------------------------+

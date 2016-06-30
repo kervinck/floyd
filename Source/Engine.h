@@ -85,6 +85,7 @@ struct Engine {
         } tt;
 
         List(killersTuple) killers;
+        short historyCounts[4096];
 
         // last search result
         struct {

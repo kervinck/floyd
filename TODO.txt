@@ -1,10 +1,4 @@
 
-|Todo| Basic history heuristic [search]
-
-|Todo| Introduction of material table [speed]
-
-Floyd is slow, but we should aim to keep it above 1Mnps
-
 |Todo| Introduce move flags for 32 bit
 
 - Simplify UCI move formatting
@@ -15,13 +9,43 @@ Floyd is slow, but we should aim to keep it above 1Mnps
 
 Concept choice: keep flags with move or in seperate table?
 
+staticMoveScore (SEE) range
+min: -18
+max: +17
+--> 6 bits
+
           search                     board
 +------------+------------+------------+-------------+
 | SEE/killer |   history  | properties |     move    |
 +------------+------------+------------+-------------+
-      16            16           16           16
+      16            16          16           16
 
-        moveList[i] += self->history[moveList[i] & moveMask]
+                                        fedcba9876543210
+                                        ----------xxxxxx to square
+                                        ----xxxxxx------ from square
+                                        ---x------------ specialMove
+                                        -xx------------- promotion piece
+                                        -xx------------- piece type: K Q RB P
+
+                             upCapture (always good)
+                             trade
+                             downCapture
+                             gives check
+                             safe move
+                             strong move
+                             weak move
+                             piece type (KQRNBP)
+                           fedcba9876543210
+                           -----------x----
+                           -----------x----
+                           ------------x---
+                           -------------xxx
+ fedcba9876543210
+ -x-------------- hash table move
+ --xxxx---------- SEE
+ --xxxx---------- SEE
+ ----------------
+ ------------xxxx
 
 1. Sort a long key.
         - Makes everyone migrate to Move_t
@@ -35,6 +59,10 @@ Concept choice: keep flags with move or in seperate table?
 Desirable properties
 - generateMoves still generates ints (32bit)
 - can use stdlib qsort
+
+|Todo| Introduction of material table [speed]
+
+Floyd is slow, but we should aim to keep it above 1Mnps
 
 ------------------------------------------------------------------------
 
@@ -376,4 +404,9 @@ rooks as transparent when calculating rank/file attacks, as well
 as as Queens being "transparent" when considering Bishop attacks."
 
 http://talkchess.com/forum/viewtopic.php?p=665703#665703
+
+|Todo| Proper solution for patch 0.8.1
+
+- Atomic printing of info lines by uciSearchInfo()
+- Remove the extra \n before readyok
 

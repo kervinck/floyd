@@ -293,7 +293,7 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
          && minEval <= alpha && alpha < maxEval
          && !check && allowNullMove(board(self))) {
                 makeNullMove(board(self));
-                int reduction = 2;
+                int reduction = min((depth + 1) / 2, 3);
                 int score = -scout(self, max(0, depth - reduction - 1), -(alpha+1), nodeType+1);
                 undoMove(board(self));
                 if (score > alpha)

@@ -289,9 +289,9 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
 
         // Null move pruning
         int check = inCheck(board(self));
-        if (depth >= 2 && isCutNode(nodeType)
-         && minEval <= alpha && alpha < maxEval
-         && !check && allowNullMove(board(self))) {
+        if (depth >= 2 && minEval <= alpha && alpha < maxEval
+         && !check && allowNullMove(board(self))
+         && evaluate(board(self)) > alpha) {
                 makeNullMove(board(self));
                 int reduction = min((depth + 1) / 2, 3);
                 int score = -scout(self, max(0, depth - reduction - 1), -(alpha+1), nodeType+1);

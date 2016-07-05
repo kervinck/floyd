@@ -103,7 +103,7 @@ sts: .module
 
 # Run node count regression test
 nodes: .module
-	python Tools/nodetest.py 7 < Data/thousand.epd | awk '\
+	python Tools/nodetest.py 8 < Data/thousand.epd | awk '\
 	/ nodes / { n[$$5] += $$10; n[-1] += !$$5 }\
 	END       { for (d=0; n[d]; d++) print d, n[d], n[d] / n[d-1] }'
 

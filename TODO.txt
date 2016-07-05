@@ -1,4 +1,64 @@
 
+Floud 0.9 dev status:
+ 0 Floyd 0.8         0 elo reference
+ 1 Floyd x42835a08  11 elo uniform reductions (+11)
+ 2 Floyd x800ecb47  52 elo history counters (+41)
+ 3 Floyd x0e0dc088  58 elo integrate older tuning (+6)
+
+Target +200
+
+------------------------------------------------------------------------
+        Search
+------------------------------------------------------------------------
+
+|Todo| Null move verification
+
+if (depth >= 12)
+        verificationDepth = max(0, depth/2 - 6)
+        if (verificationDepth > 2) {
+
+        }
+
+|Todo| Staged null move
+
+One with large reduction, second with lower R
+
+        R1 = 4, R2 = 2
+Score of Floyd x833a9c04 vs Floyd 0.8: 459 - 260 - 281  [0.600] 1000
+ELO difference: 70
+Finished match
+
+floyd1 x0e0dc088 vanilla nullmove (R=2)
+floyd2 x833a9c04 staged nullmove (R=4, R=2)
+
+Score of floyd1 vs floyd2: 343 - 361 - 296  [0.491] 1000
+ELO difference: -6
+Finished match
+
+Winning fraction: 0.491
+Elo difference: -6.25452
+p-value: 0.248759
+
+|Todo| Exponential history counters [search]
+
+|Todo| Futility qSearch
+
+|Todo| Futility search
+
+|Todo| More agressuve null move tuning
+
+|Todo| More agressive LMR tuning
+
+|Todo| Move ordering based on delta eval [search]
+
+Then also cache evaluation in ttable
+
+|Todo| Basic counter move [search]
+
+|Todo| Checks in qsearch, at least in PV and after null move
+
+#define minDepth -7
+
 |Todo| Introduce move flags for 32 bit
 
 - Simplify UCI move formatting
@@ -64,6 +124,8 @@ Desirable properties
 
 Floyd is slow, but we should aim to keep it above 1Mnps
 
+------------------------------------------------------------------------
+        Evaluate
 ------------------------------------------------------------------------
 
 |Todo| Rook or Queen and/vs pawn span [evaluate]
@@ -195,14 +257,31 @@ More complex:
 RP vs NN
 Q vs RR
 
+|Todo| Alekhine's Gun [evaluate]
+
+"I should mention, too that you do need to handle stacked attackers
+such as "Alekhine's Gun". This is commonly done by considering own
+rooks as transparent when calculating rank/file attacks, as well
+as as Queens being "transparent" when considering Bishop attacks."
+
+http://talkchess.com/forum/viewtopic.php?p=665703#665703
+
+|Todo| Rook doubling on open files [evaluate]
+
+------------------------------------------------------------------------
+        Other
+------------------------------------------------------------------------
+
+|Todo| Sync KPK with pfkpk git archive
+
+Geometry bug
+
 |Todo| Another minor parsing hickup [bug]
 
 debug on
 position fen 2rq1rk1/1b2ppbp/1p3np1/pN1p4/2PPn3/BQ2PN1P/P3BPP1/2R2RK1 w - - 5 15 moves f3e5 e4d2 b3c2 d2f1 g1f1
 info sting input position fen 2rq1rk1/1b2ppbp/1p3np1/pN1p4/2PPn3/BQ2PN1P/P3BPP1/2R2RK1 w - - 5 15 moves f3e5 e4d2 b3c2 d2f1 g1f1
 info string Illegal move
-
-------------------------------------------------------------------------
 
 |Todo| Win64 version from Makefile [win64]
 
@@ -236,12 +315,6 @@ Merge release into master:
         git branch -d v0.8
         git push origin dev
 
-|Todo| Basic counter move? [search]
-
-|Todo| Checks in qsearch, at least in PV and after null move
-
-#define minDepth -7
-
 |Todo| Granularity of win32 clock too low? [win32]
 
 |Todo| Terminology: coefficient or parameter [qa]
@@ -269,10 +342,6 @@ https://en.wikipedia.org/wiki/Rosenbrock_function
 |Todo| Accept a lambda as value to `info' in search() [python]
 
 As a callback interface with the search info data
-
-|Todo| Move ordering based on delta eval [search]
-
-Then also cache evaluation in ttable
 
 |Todo| Consider persistent alarm thread [speed]
 
@@ -325,8 +394,6 @@ This is double indirect:
 1. Associating "inc=0" with "minmovetime"
 2. Putting the solution in "safety", instead of elsewhere
 There must be a cleaner way
-
-|Todo| Rook doubling on open files [evaluate]
 
 |Todo| False mate score [bug]
 
@@ -392,18 +459,10 @@ Candidates:
         structHash
         xHash
         pHash
+        pkbHash
         pawnHash
         slowHash
         coarseHash
-
-|Todo| Alekhine's Gun [evaluate]
-
-"I should mention, too that you do need to handle stacked attackers
-such as "Alekhine's Gun". This is commonly done by considering own
-rooks as transparent when calculating rank/file attacks, as well
-as as Queens being "transparent" when considering Bishop attacks."
-
-http://talkchess.com/forum/viewtopic.php?p=665703#665703
 
 |Todo| Proper solution for patch 0.8.1
 

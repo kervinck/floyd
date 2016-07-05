@@ -1,9 +1,12 @@
 
 Floud 0.9 dev status:
  0 Floyd 0.8         0 elo reference
- 1 Floyd x42835a08  11 elo uniform reductions (+11)
- 2 Floyd x800ecb47  52 elo history counters (+41)
- 3 Floyd x0e0dc088  58 elo integrate older tuning (+6)
+ 1 Floyd x42835a08  11 elo uniform reductions
+ 2 Floyd x800ecb47  53 elo history counters
+ 3 Floyd x0e0dc088  60 elo integrate older tuning
+ 4 Floyd x32aa5271  70 elo depth-dependent null reduction
+ 5 Floyd xb171e499  72 elo evaluation-guarded null move, i.s.o. node type
+ 6 Floyd x7c96b2ca     elo unconditional null move, i.s.o. evaluation
 
 Target +200
 

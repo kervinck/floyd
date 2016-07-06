@@ -359,6 +359,11 @@ static int qSearch(Engine_t self, int alpha)
 
         // Try if any generated move can improve the result
         for (int i=0; i<nrMoves && bestScore<=alpha; i++) {
+
+                int maxGain = moveList[i] >> 26; // TODO: this is implementation-defined
+                if (!check && bestScore + maxGain * 1500 + 1500 < alpha)
+                        break; // Delta pruning (we should actually fail-hard with alpha)
+
                 makeMove(board(self), moveList[i]);
                 if (wasLegalMove(board(self))) {
                         self->nodeCount++;

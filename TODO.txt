@@ -14,15 +14,13 @@ Target +200
         Search
 ------------------------------------------------------------------------
 
-|Todo| Null move verification
+|Todo| Exponential history counters [search]
 
-if (depth >= 12)
-        verificationDepth = max(0, depth/2 - 6)
-        if (verificationDepth > 2) {
+|Todo| Retry evaluation filtering for null move [search]
 
-        }
+Cache evaluations to prevent the NPS drop
 
-|Todo| Staged null move
+|Todo| Staged null move [search]
 
 One with large reduction, second with lower R
 
@@ -41,8 +39,6 @@ Finished match
 Winning fraction: 0.491
 Elo difference: -6.25452
 p-value: 0.248759
-
-|Todo| Exponential history counters [search]
 
 |Todo| Futility qSearch
 
@@ -126,6 +122,16 @@ Desirable properties
 |Todo| Introduction of material table [speed]
 
 Floyd is slow, but we should aim to keep it above 1Mnps
+
+|Todo| Null move verification
+
+if (depth >= 12)
+        verificationDepth = max(0, depth/2 - 6)
+        if (verificationDepth > 2) {
+
+        }
+
+Test with zugzwang positions
 
 ------------------------------------------------------------------------
         Evaluate

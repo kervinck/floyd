@@ -359,11 +359,18 @@ static int qSearch(Engine_t self, int alpha)
 
         // Try if any generated move can improve the result
         for (int i=0; i<nrMoves && bestScore<=alpha; i++) {
+                // Delta pruning
+                if (!check) {
+                        assert(moveList[i] >= 0);
+                        int maxDelta = (moveList[i] >> 26) * 1500 + 1500;
+                        if (maxDelta <= alpha - bestScore) {
+                                break;                 // Option 1: return eval()
+                                bestScore = alpha;     // Option 2: fail hard
+                                bestScore += maxDelta; // Option 3: fail semi-hard
+                        }
+                }
 
-                int maxGain = moveList[i] >> 26; // TODO: this is implementation-defined
-                if (!check && bestScore + maxGain * 1500 + 1500 < alpha)
-                        break; // Delta pruning (we should actually fail-hard with alpha)
-
+                // Search deeper
                 makeMove(board(self), moveList[i]);
                 if (wasLegalMove(board(self))) {
                         self->nodeCount++;

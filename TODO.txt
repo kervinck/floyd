@@ -1,18 +1,34 @@
 
 Floud 0.9 dev status:
- 0 Floyd 0.8         0 elo reference
- 1 Floyd x42835a08  11 elo uniform reductions
- 2 Floyd x800ecb47  53 elo history counters
- 3 Floyd x0e0dc088  60 elo integrate older tuning
- 4 Floyd x32aa5271  70 elo depth-dependent null reduction
- 5 Floyd xb171e499  72 elo evaluation-guarded null move, i.s.o. node type
- 6 Floyd x7c96b2ca     elo unconditional null move, i.s.o. evaluation
+   Version         Elo Change
+ 0 Floyd 0.8         0 reference
+ 1 Floyd x42835a08  11 uniform reductions
+ 2 Floyd x800ecb47  55 history counters
+ 3 Floyd x0e0dc088  62 integrate older tuning
+ 4 Floyd x32aa5271  72 depth-dependent null reduction
+ 5 Floyd xb171e499  74 evaluation-guarded null move, i.s.o. node type
+ 6 Floyd x7c96b2ca  82 unconditional null move, i.s.o. evaluation
+ 8 Floyd xc6c5dae2  86 simple delta pruning
+
+Rank Name              Elo    +    - games score oppo. draws 
+   1 Fruit 2.1         325    3    3 76543   83%    24   10% 
+   2 Floyd xc6c5dae2    83    5    5 14220   41%   163   19% 
+   3 Floyd x7c96b2ca    81    4    4 24000   41%   163   20% 
+   4 Floyd xb171e499    74    7    7  9486   40%   163   19% 
+   5 Floyd x32aa5271    72    7    7  9375   40%   163   19% 
+   6 Floyd x0e0dc088    62    4    4 24000   39%   163   19% 
+   7 Floyd x800ecb47    55    4    4 24000   38%   163   19% 
+   8 Floyd 0.8           0    2    2 76538   41%    75   23% 
+   9 Floyd 0.7        -151    4    4 36000   38%   -10   13% 
+  10 Floyd 0.6        -355    6    6 12000   24%  -151   18% 
 
 Target +200
 
 ------------------------------------------------------------------------
         Search
 ------------------------------------------------------------------------
+
+|Todo| Collect statistics for delta pruning [search]
 
 |Todo| Exponential history counters [search]
 

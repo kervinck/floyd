@@ -1,8 +1,8 @@
 *** Version:
-x7c96b2ca
+xe10a938d
 
 *** Fingerprint date:
-Tue Jul  5 19:50:18 CEST 2016
+Fri Jul  8 22:13:33 CEST 2016
 
 *** System information:
 Darwin beobook3 15.5.0 Darwin Kernel Version 15.5.0: Tue Apr 19 18:36:36 PDT 2016; root:xnu-3248.50.21~8/RELEASE_X86_64 x86_64
@@ -11,14 +11,11 @@ Darwin beobook3 15.5.0 Darwin Kernel Version 15.5.0: Tue Apr 19 18:36:36 PDT 201
 /Users/marcelk/Projects/floyd
 
 *** Last git commit:
-commit 45a31e844957c61d4f4eaf47e43b2010ce83b113
+commit d3e94ae785dcdf75d1a5941fac125faed0a566b9
 Author: Marcel van Kervinck <marcelk@bitpit.net>
-Date:   Tue Jul 5 17:10:12 2016 +0200
+Date:   Fri Jul 8 22:02:23 2016 +0200
 
-    Unrestricted null move [search,x7c96b2ca]
-    
-    Remove Fruit condition and not even restricting double or triple null move...
-    ~20 elo more?
+    Bit of cleanup [qa]
 
 *** Git status:
 On branch dev
@@ -44,7 +41,9 @@ Untracked files:
 	floyd-x833a9c04
 	floyd-xa88aa500
 	floyd-xb171e499
+	floyd-xc6c5dae2
 	games-4ply.pgn
+	games.pgn
 	params
 	rrun
 	shootout.pgn
@@ -54,50 +53,50 @@ Untracked files:
 nothing added to commit but untracked files present (use "git add" to track)
 
 *** Todo list:
-     120
+     123
 
 *** Line count:
 CountLoc v1.6.2, (c) 2015 mar
 -------------------------------------------------------------------------------
 Type                      Files       Blank     Comment Punctuation        Code
 -------------------------------------------------------------------------------
-C source                     14         821         962         447        3015
+C source                     14         823         965         450        3028
 C/C++ header                  8         263         320          24         909
 -------------------------------------------------------------------------------
-Total                        22        1084        1282         471        3924
+Total                        22        1086        1285         474        3937
 
 *** Build:
-env floydVersion=x7c96b2ca python setup.py clean --all
+env floydVersion=xe10a938d python setup.py clean --all
 running clean
 'build/lib.macosx-10.11-intel-2.7' does not exist -- can't clean it
 'build/bdist.macosx-10.11-intel' does not exist -- can't clean it
 'build/scripts-2.7' does not exist -- can't clean it
 rm -f floyd floyd.w32.exe floyd-pgo[12] *.gcda .module
 rm -rf build
-cc -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=x7c96b2ca -o floyd Source/cplus.c Source/engine.c Source/evaluate.c Source/floydmain.c Source/format.c Source/kpk.c Source/moves.c Source/parse.c Source/search.c Source/test.c Source/ttable.c Source/uci.c Source/zobrist.c 
-env CC="cc" CFLAGS="-std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=x7c96b2ca" floydVersion="x7c96b2ca" python setup.py build
+cc -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xe10a938d -o floyd Source/cplus.c Source/engine.c Source/evaluate.c Source/floydmain.c Source/format.c Source/kpk.c Source/moves.c Source/parse.c Source/search.c Source/test.c Source/ttable.c Source/uci.c Source/zobrist.c 
+env CC="cc" CFLAGS="-std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xe10a938d" floydVersion="xe10a938d" python setup.py build
 running build
 running build_ext
 building 'floyd' extension
 creating build
 creating build/temp.macosx-10.11-intel-2.7
 creating build/temp.macosx-10.11-intel-2.7/Source
-cc -DNDEBUG -g -fwrapv -Os -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=x7c96b2ca -arch i386 -arch x86_64 -pipe -UNDEBUG -I/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/cplus.c -o build/temp.macosx-10.11-intel-2.7/Source/cplus.o
-cc -DNDEBUG -g -fwrapv -Os -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=x7c96b2ca -arch i386 -arch x86_64 -pipe -UNDEBUG -I/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/engine.c -o build/temp.macosx-10.11-intel-2.7/Source/engine.o
-cc -DNDEBUG -g -fwrapv -Os -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=x7c96b2ca -arch i386 -arch x86_64 -pipe -UNDEBUG -I/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/evaluate.c -o build/temp.macosx-10.11-intel-2.7/Source/evaluate.o
-cc -DNDEBUG -g -fwrapv -Os -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=x7c96b2ca -arch i386 -arch x86_64 -pipe -UNDEBUG -I/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/floydmodule.c -o build/temp.macosx-10.11-intel-2.7/Source/floydmodule.o
-cc -DNDEBUG -g -fwrapv -Os -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=x7c96b2ca -arch i386 -arch x86_64 -pipe -UNDEBUG -I/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/format.c -o build/temp.macosx-10.11-intel-2.7/Source/format.o
-cc -DNDEBUG -g -fwrapv -Os -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=x7c96b2ca -arch i386 -arch x86_64 -pipe -UNDEBUG -I/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/moves.c -o build/temp.macosx-10.11-intel-2.7/Source/moves.o
-cc -DNDEBUG -g -fwrapv -Os -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=x7c96b2ca -arch i386 -arch x86_64 -pipe -UNDEBUG -I/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/kpk.c -o build/temp.macosx-10.11-intel-2.7/Source/kpk.o
-cc -DNDEBUG -g -fwrapv -Os -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=x7c96b2ca -arch i386 -arch x86_64 -pipe -UNDEBUG -I/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/parse.c -o build/temp.macosx-10.11-intel-2.7/Source/parse.o
-cc -DNDEBUG -g -fwrapv -Os -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=x7c96b2ca -arch i386 -arch x86_64 -pipe -UNDEBUG -I/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/search.c -o build/temp.macosx-10.11-intel-2.7/Source/search.o
-cc -DNDEBUG -g -fwrapv -Os -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=x7c96b2ca -arch i386 -arch x86_64 -pipe -UNDEBUG -I/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/test.c -o build/temp.macosx-10.11-intel-2.7/Source/test.o
-cc -DNDEBUG -g -fwrapv -Os -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=x7c96b2ca -arch i386 -arch x86_64 -pipe -UNDEBUG -I/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/ttable.c -o build/temp.macosx-10.11-intel-2.7/Source/ttable.o
-cc -DNDEBUG -g -fwrapv -Os -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=x7c96b2ca -arch i386 -arch x86_64 -pipe -UNDEBUG -I/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/uci.c -o build/temp.macosx-10.11-intel-2.7/Source/uci.o
-cc -DNDEBUG -g -fwrapv -Os -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=x7c96b2ca -arch i386 -arch x86_64 -pipe -UNDEBUG -I/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/zobrist.c -o build/temp.macosx-10.11-intel-2.7/Source/zobrist.o
+cc -DNDEBUG -g -fwrapv -Os -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xe10a938d -arch i386 -arch x86_64 -pipe -UNDEBUG -I/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/cplus.c -o build/temp.macosx-10.11-intel-2.7/Source/cplus.o
+cc -DNDEBUG -g -fwrapv -Os -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xe10a938d -arch i386 -arch x86_64 -pipe -UNDEBUG -I/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/engine.c -o build/temp.macosx-10.11-intel-2.7/Source/engine.o
+cc -DNDEBUG -g -fwrapv -Os -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xe10a938d -arch i386 -arch x86_64 -pipe -UNDEBUG -I/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/evaluate.c -o build/temp.macosx-10.11-intel-2.7/Source/evaluate.o
+cc -DNDEBUG -g -fwrapv -Os -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xe10a938d -arch i386 -arch x86_64 -pipe -UNDEBUG -I/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/floydmodule.c -o build/temp.macosx-10.11-intel-2.7/Source/floydmodule.o
+cc -DNDEBUG -g -fwrapv -Os -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xe10a938d -arch i386 -arch x86_64 -pipe -UNDEBUG -I/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/format.c -o build/temp.macosx-10.11-intel-2.7/Source/format.o
+cc -DNDEBUG -g -fwrapv -Os -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xe10a938d -arch i386 -arch x86_64 -pipe -UNDEBUG -I/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/moves.c -o build/temp.macosx-10.11-intel-2.7/Source/moves.o
+cc -DNDEBUG -g -fwrapv -Os -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xe10a938d -arch i386 -arch x86_64 -pipe -UNDEBUG -I/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/kpk.c -o build/temp.macosx-10.11-intel-2.7/Source/kpk.o
+cc -DNDEBUG -g -fwrapv -Os -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xe10a938d -arch i386 -arch x86_64 -pipe -UNDEBUG -I/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/parse.c -o build/temp.macosx-10.11-intel-2.7/Source/parse.o
+cc -DNDEBUG -g -fwrapv -Os -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xe10a938d -arch i386 -arch x86_64 -pipe -UNDEBUG -I/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/search.c -o build/temp.macosx-10.11-intel-2.7/Source/search.o
+cc -DNDEBUG -g -fwrapv -Os -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xe10a938d -arch i386 -arch x86_64 -pipe -UNDEBUG -I/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/test.c -o build/temp.macosx-10.11-intel-2.7/Source/test.o
+cc -DNDEBUG -g -fwrapv -Os -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xe10a938d -arch i386 -arch x86_64 -pipe -UNDEBUG -I/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/ttable.c -o build/temp.macosx-10.11-intel-2.7/Source/ttable.o
+cc -DNDEBUG -g -fwrapv -Os -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xe10a938d -arch i386 -arch x86_64 -pipe -UNDEBUG -I/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/uci.c -o build/temp.macosx-10.11-intel-2.7/Source/uci.o
+cc -DNDEBUG -g -fwrapv -Os -Wall -Wstrict-prototypes -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xe10a938d -arch i386 -arch x86_64 -pipe -UNDEBUG -I/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7 -c Source/zobrist.c -o build/temp.macosx-10.11-intel-2.7/Source/zobrist.o
 creating build/lib.macosx-10.11-intel-2.7
-cc -bundle -undefined dynamic_lookup -arch i386 -arch x86_64 -Wl,-F. -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=x7c96b2ca build/temp.macosx-10.11-intel-2.7/Source/cplus.o build/temp.macosx-10.11-intel-2.7/Source/engine.o build/temp.macosx-10.11-intel-2.7/Source/evaluate.o build/temp.macosx-10.11-intel-2.7/Source/floydmodule.o build/temp.macosx-10.11-intel-2.7/Source/format.o build/temp.macosx-10.11-intel-2.7/Source/moves.o build/temp.macosx-10.11-intel-2.7/Source/kpk.o build/temp.macosx-10.11-intel-2.7/Source/parse.o build/temp.macosx-10.11-intel-2.7/Source/search.o build/temp.macosx-10.11-intel-2.7/Source/test.o build/temp.macosx-10.11-intel-2.7/Source/ttable.o build/temp.macosx-10.11-intel-2.7/Source/uci.o build/temp.macosx-10.11-intel-2.7/Source/zobrist.o -o build/lib.macosx-10.11-intel-2.7/floyd.so
-env floydVersion="x7c96b2ca" python setup.py install --home=build && touch .module
+cc -bundle -undefined dynamic_lookup -arch i386 -arch x86_64 -Wl,-F. -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xe10a938d build/temp.macosx-10.11-intel-2.7/Source/cplus.o build/temp.macosx-10.11-intel-2.7/Source/engine.o build/temp.macosx-10.11-intel-2.7/Source/evaluate.o build/temp.macosx-10.11-intel-2.7/Source/floydmodule.o build/temp.macosx-10.11-intel-2.7/Source/format.o build/temp.macosx-10.11-intel-2.7/Source/moves.o build/temp.macosx-10.11-intel-2.7/Source/kpk.o build/temp.macosx-10.11-intel-2.7/Source/parse.o build/temp.macosx-10.11-intel-2.7/Source/search.o build/temp.macosx-10.11-intel-2.7/Source/test.o build/temp.macosx-10.11-intel-2.7/Source/ttable.o build/temp.macosx-10.11-intel-2.7/Source/uci.o build/temp.macosx-10.11-intel-2.7/Source/zobrist.o -o build/lib.macosx-10.11-intel-2.7/floyd.so
+env floydVersion="xe10a938d" python setup.py install --home=build && touch .module
 running install
 running build
 running build_ext
@@ -106,16 +105,16 @@ creating build/lib
 creating build/lib/python
 copying build/lib.macosx-10.11-intel-2.7/floyd.so -> build/lib/python
 running install_egg_info
-Writing build/lib/python/floyd-x7c96b2ca-py2.7.egg-info
-gcc-mp-4.8  -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=x7c96b2ca -DNDEBUG -o floyd-pgo1 Source/cplus.c Source/engine.c Source/evaluate.c Source/floydmain.c Source/format.c Source/kpk.c Source/moves.c Source/parse.c Source/search.c Source/test.c Source/ttable.c Source/uci.c Source/zobrist.c  -fprofile-generate
+Writing build/lib/python/floyd-xe10a938d-py2.7.egg-info
+gcc-mp-4.8  -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xe10a938d -DNDEBUG -o floyd-pgo1 Source/cplus.c Source/engine.c Source/evaluate.c Source/floydmain.c Source/format.c Source/kpk.c Source/moves.c Source/parse.c Source/search.c Source/test.c Source/ttable.c Source/uci.c Source/zobrist.c  -fprofile-generate
 echo 'bench movetime 500 bestof 1' | ./floyd-pgo1 | grep result
-result nps 489615
-gcc-mp-4.8  -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=x7c96b2ca -DNDEBUG -o floyd-pgo2 Source/cplus.c Source/engine.c Source/evaluate.c Source/floydmain.c Source/format.c Source/kpk.c Source/moves.c Source/parse.c Source/search.c Source/test.c Source/ttable.c Source/uci.c Source/zobrist.c  -fprofile-use
-/usr/local/gcc-4.8.0-qt-4.8.4-for-mingw32/win32-gcc/bin/i586-mingw32-gcc -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=x7c96b2ca -Wno-format  -o floyd.w32.exe Source/cplus.c Source/engine.c Source/evaluate.c Source/floydmain.c Source/format.c Source/kpk.c Source/moves.c Source/parse.c Source/search.c Source/test.c Source/ttable.c Source/uci.c Source/zobrist.c
+result nps 482719
+gcc-mp-4.8  -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xe10a938d -DNDEBUG -o floyd-pgo2 Source/cplus.c Source/engine.c Source/evaluate.c Source/floydmain.c Source/format.c Source/kpk.c Source/moves.c Source/parse.c Source/search.c Source/test.c Source/ttable.c Source/uci.c Source/zobrist.c  -fprofile-use
+/usr/local/gcc-4.8.0-qt-4.8.4-for-mingw32/win32-gcc/bin/i586-mingw32-gcc -std=c11 -pedantic -Wall -Wextra -O3 -fstrict-aliasing -fomit-frame-pointer -DfloydVersion=xe10a938d -Wno-format  -o floyd.w32.exe Source/cplus.c Source/engine.c Source/evaluate.c Source/floydmain.c Source/format.c Source/kpk.c Source/moves.c Source/parse.c Source/search.c Source/test.c Source/ttable.c Source/uci.c Source/zobrist.c
 
 *** Help text:
 
-Floyd Chess Engine - Version x7c96b2ca
+Floyd Chess Engine - Version xe10a938d
 Copyright (C) 2015-2016, Marcel van Kervinck
 All rights reserved
 
@@ -197,436 +196,436 @@ test result OK passed 18 total 19
 test result OK passed 19 total 20
 test result OK passed 20 total 21
 
-Floyd Chess Engine - Version x7c96b2ca
+Floyd Chess Engine - Version xe10a938d
 Copyright (C) 2015-2016, Marcel van Kervinck
 All rights reserved
 
 Type "help" for more information, or "quit" to leave.
 
 egt class KPK check OK
-time 334 nps 437591 fen r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -
-time 335 nps 555695 fen 4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -
-time 335 nps 472441 fen 3rk2r/1pq1bpp1/p1n1p1n1/3pP3/3P2P1/1PPQNNB1/5P2/R3R1K1 b k -
-time 334 nps 595456 fen 7k/8/1p1Q2pp/1p3b2/3p3P/P3q3/BP4PK/8 b - -
-time 334 nps 477223 fen 2r1rnk1/4qppp/p3b3/1p4P1/4p2P/2N1PN2/PP1Q1P2/1KR4R w - -
-time 335 nps 455721 fen 2rk3r/p2n1pp1/bqn1p2p/1p1pP3/3P1N1P/bP1BBN2/P3QPP1/2R1R1K1 w - -
-time 333 nps 617503 fen 1nr2rk1/p3Qppp/1p2p1n1/8/3P4/2N2N2/PP3PPP/2R2RK1 b - -
-time 337 nps 855290 fen 3nr1k1/1p1r3p/pR1pNpp1/3P4/4P3/3P3P/6P1/1R5K b - -
-time 338 nps 536231 fen 4r1k1/pp3ppp/3n4/2n1r3/2P2NP1/4KB2/PP2P2P/R5R1 w - -
-time 338 nps 843133 fen 8/p5pk/1p6/5R1p/P7/5PPK/5r2/8 b - -
-time 338 nps 794154 fen 8/2Q2p2/5qpk/4p3/8/5P1P/6K1/8 w - -
-time 334 nps 543574 fen 5rk1/1pr2bbp/pNp1n1p1/2P1p3/1PBpP3/1N5P/1P3PP1/3RR1K1 b - -
-time 338 nps 699254 fen 8/1b3pk1/rp5p/6p1/6B1/1R4P1/4P2P/4K3 w - -
-time 335 nps 549779 fen r1bqk2r/pp2ppbp/3p1np1/8/2PQP3/2N5/PP2BPPP/R1B1K2R w KQkq -
-time 338 nps 649129 fen 8/1b4pk/7q/p3pP2/1p2P3/1Pp5/2P1Q3/5BK1 b - -
-time 335 nps 530406 fen r2qkb1r/2p2ppp/p1p5/3pP3/4n1b1/3Q1N2/PPP2PPP/RNB2RK1 w kq -
-time 335 nps 557313 fen 4r1k1/pp2pp1n/3p2p1/6Bp/2rN1P1P/q1P5/2PQ2P1/1K1RR3 b - -
-time 337 nps 533037 fen rnbq1rk1/pp3pbp/2pp1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - -
-time 338 nps 681705 fen 8/8/p3k1p1/Bb5p/1P5P/5P2/1r4P1/3R2K1 b - -
-time 337 nps 688005 fen 4k3/q4p2/2n1p1p1/p1Np4/3P1QP1/PP3P2/6K1/8 b - -
-time 337 nps 798460 fen 3bn3/4k3/2p3p1/ppN2P2/P5P1/1P1KB3/8/8 b - -
-time 334 nps 523291 fen r1b1r1k1/5pbp/pp1p1np1/2qPn3/P1p1P3/2N1BPN1/1P1QB1PP/R1R4K b - -
-time 334 nps 607337 fen r1q1rnk1/p1p2pp1/bp2p2p/n2pP3/Q1PP1N1B/P1PB1P2/6PP/R4RK1 w - d6
-time 336 nps 520042 fen r3r1k1/1bpnqppp/1p1p4/p2Pp3/1PP1P3/P5P1/1BQ2PBP/1R1R2K1 b - -
-time 338 nps 848905 fen 1r6/4Pk2/1p1p1P2/p7/8/1P1K2p1/P7/5R2 b - -
-time 333 nps 511327 fen 1rbqk2r/2pp1ppp/p1n2n2/1pb1p3/P3P3/1B3N2/1PPP1PPP/RNBQ1RK1 w k -
-time 334 nps 630018 fen r4bk1/6pp/1B2n3/4P3/pp6/1P2N1P1/P5KP/3R4 w - -
-time 335 nps 418635 fen r1bqkb1r/pp1n1ppp/2n5/2ppP3/3P1P2/5N2/PP4PP/RNBQKB1R w KQkq -
-time 335 nps 545671 fen r1qr2k1/2p2pPp/p3n3/1p6/8/4BQ2/PP3PPP/R2R2K1 w - -
-time 335 nps 759723 fen 4r3/1p4k1/p1p1P1pp/3p4/1P1N4/P6B/7P/4K3 w - -
-time 335 nps 529509 fen 8/R4pk1/4pbq1/8/2P4p/5Q2/8/5K2 b - -
-time 338 nps 734746 fen 4k3/R4pp1/P7/4P2p/5P2/3p2P1/r7/4K3 w - -
-time 336 nps 524747 fen 2r3k1/1p4p1/p3bp2/8/N3Pb1p/2R4P/1PP1Q1P1/2q3BK b - -
-time 337 nps 487254 fen rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -
-time 334 nps 1263526 fen 8/6N1/8/1k4K1/3n4/8/5P2/8 b - -
-time 338 nps 507131 fen rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -
-time 338 nps 788438 fen 8/PRn5/3k4/r4p2/5PB1/8/5P2/6K1 w - -
-time 338 nps 827699 fen r5k1/4Rpp1/3p3p/2pP4/p1P3P1/1P6/P4PP1/5K2 w - -
-time 336 nps 954041 fen 5n2/2k1KB2/7P/8/3n1P2/8/p1N5/8 w - -
-time 335 nps 480638 fen rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -
-time 334 nps 514459 fen r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -
-time 333 nps 527863 fen 4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -
-time 335 nps 529360 fen 3rk2r/1pq1bpp1/p1n1p1n1/3pP3/3P2P1/1PPQNNB1/5P2/R3R1K1 b k -
-time 334 nps 600169 fen 7k/8/1p1Q2pp/1p3b2/3p3P/P3q3/BP4PK/8 b - -
-time 335 nps 492469 fen 2r1rnk1/4qppp/p3b3/1p4P1/4p2P/2N1PN2/PP1Q1P2/1KR4R w - -
-time 340 nps 461226 fen 2rk3r/p2n1pp1/bqn1p2p/1p1pP3/3P1N1P/bP1BBN2/P3QPP1/2R1R1K1 w - -
-time 338 nps 643560 fen 1nr2rk1/p3Qppp/1p2p1n1/8/3P4/2N2N2/PP3PPP/2R2RK1 b - -
-time 336 nps 875416 fen 3nr1k1/1p1r3p/pR1pNpp1/3P4/4P3/3P3P/6P1/1R5K b - -
-time 338 nps 545656 fen 4r1k1/pp3ppp/3n4/2n1r3/2P2NP1/4KB2/PP2P2P/R5R1 w - -
-time 338 nps 883221 fen 8/p5pk/1p6/5R1p/P7/5PPK/5r2/8 b - -
-time 337 nps 809804 fen 8/2Q2p2/5qpk/4p3/8/5P1P/6K1/8 w - -
-time 335 nps 587060 fen 5rk1/1pr2bbp/pNp1n1p1/2P1p3/1PBpP3/1N5P/1P3PP1/3RR1K1 b - -
-time 335 nps 713214 fen 8/1b3pk1/rp5p/6p1/6B1/1R4P1/4P2P/4K3 w - -
-time 334 nps 547450 fen r1bqk2r/pp2ppbp/3p1np1/8/2PQP3/2N5/PP2BPPP/R1B1K2R w KQkq -
-time 335 nps 701858 fen 8/1b4pk/7q/p3pP2/1p2P3/1Pp5/2P1Q3/5BK1 b - -
-time 337 nps 536450 fen r2qkb1r/2p2ppp/p1p5/3pP3/4n1b1/3Q1N2/PPP2PPP/RNB2RK1 w kq -
-time 335 nps 528742 fen 4r1k1/pp2pp1n/3p2p1/6Bp/2rN1P1P/q1P5/2PQ2P1/1K1RR3 b - -
-time 334 nps 568956 fen rnbq1rk1/pp3pbp/2pp1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - -
-time 334 nps 701287 fen 8/8/p3k1p1/Bb5p/1P5P/5P2/1r4P1/3R2K1 b - -
-time 336 nps 703151 fen 4k3/q4p2/2n1p1p1/p1Np4/3P1QP1/PP3P2/6K1/8 b - -
-time 338 nps 847477 fen 3bn3/4k3/2p3p1/ppN2P2/P5P1/1P1KB3/8/8 b - -
-time 338 nps 554110 fen r1b1r1k1/5pbp/pp1p1np1/2qPn3/P1p1P3/2N1BPN1/1P1QB1PP/R1R4K b - -
-time 338 nps 634974 fen r1q1rnk1/p1p2pp1/bp2p2p/n2pP3/Q1PP1N1B/P1PB1P2/6PP/R4RK1 w - d6
-time 338 nps 613167 fen r3r1k1/1bpnqppp/1p1p4/p2Pp3/1PP1P3/P5P1/1BQ2PBP/1R1R2K1 b - -
-time 335 nps 864932 fen 1r6/4Pk2/1p1p1P2/p7/8/1P1K2p1/P7/5R2 b - -
-time 334 nps 496402 fen 1rbqk2r/2pp1ppp/p1n2n2/1pb1p3/P3P3/1B3N2/1PPP1PPP/RNBQ1RK1 w k -
-time 334 nps 734363 fen r4bk1/6pp/1B2n3/4P3/pp6/1P2N1P1/P5KP/3R4 w - -
-time 334 nps 442970 fen r1bqkb1r/pp1n1ppp/2n5/2ppP3/3P1P2/5N2/PP4PP/RNBQKB1R w KQkq -
-time 334 nps 621852 fen r1qr2k1/2p2pPp/p3n3/1p6/8/4BQ2/PP3PPP/R2R2K1 w - -
-time 334 nps 822700 fen 4r3/1p4k1/p1p1P1pp/3p4/1P1N4/P6B/7P/4K3 w - -
-time 337 nps 548973 fen 8/R4pk1/4pbq1/8/2P4p/5Q2/8/5K2 b - -
-time 338 nps 746341 fen 4k3/R4pp1/P7/4P2p/5P2/3p2P1/r7/4K3 w - -
-time 338 nps 563767 fen 2r3k1/1p4p1/p3bp2/8/N3Pb1p/2R4P/1PP1Q1P1/2q3BK b - -
-time 338 nps 529400 fen rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -
-time 338 nps 1304026 fen 8/6N1/8/1k4K1/3n4/8/5P2/8 b - -
-time 334 nps 550247 fen rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -
-time 334 nps 868371 fen 8/PRn5/3k4/r4p2/5PB1/8/5P2/6K1 w - -
-time 334 nps 929510 fen r5k1/4Rpp1/3p3p/2pP4/p1P3P1/1P6/P4PP1/5K2 w - -
-time 334 nps 1076703 fen 5n2/2k1KB2/7P/8/3n1P2/8/p1N5/8 w - -
-time 336 nps 530957 fen rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -
-time 337 nps 485136 fen r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -
-time 338 nps 544062 fen 4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -
-time 335 nps 519543 fen 3rk2r/1pq1bpp1/p1n1p1n1/3pP3/3P2P1/1PPQNNB1/5P2/R3R1K1 b k -
-time 338 nps 651632 fen 7k/8/1p1Q2pp/1p3b2/3p3P/P3q3/BP4PK/8 b - -
-time 338 nps 495844 fen 2r1rnk1/4qppp/p3b3/1p4P1/4p2P/2N1PN2/PP1Q1P2/1KR4R w - -
-time 336 nps 464068 fen 2rk3r/p2n1pp1/bqn1p2p/1p1pP3/3P1N1P/bP1BBN2/P3QPP1/2R1R1K1 w - -
-time 334 nps 668887 fen 1nr2rk1/p3Qppp/1p2p1n1/8/3P4/2N2N2/PP3PPP/2R2RK1 b - -
-time 334 nps 932523 fen 3nr1k1/1p1r3p/pR1pNpp1/3P4/4P3/3P3P/6P1/1R5K b - -
-time 335 nps 518443 fen 4r1k1/pp3ppp/3n4/2n1r3/2P2NP1/4KB2/PP2P2P/R5R1 w - -
-time 334 nps 920292 fen 8/p5pk/1p6/5R1p/P7/5PPK/5r2/8 b - -
-time 334 nps 870393 fen 8/2Q2p2/5qpk/4p3/8/5P1P/6K1/8 w - -
-time 334 nps 599803 fen 5rk1/1pr2bbp/pNp1n1p1/2P1p3/1PBpP3/1N5P/1P3PP1/3RR1K1 b - -
-time 334 nps 782864 fen 8/1b3pk1/rp5p/6p1/6B1/1R4P1/4P2P/4K3 w - -
-time 334 nps 533096 fen r1bqk2r/pp2ppbp/3p1np1/8/2PQP3/2N5/PP2BPPP/R1B1K2R w KQkq -
-time 334 nps 662121 fen 8/1b4pk/7q/p3pP2/1p2P3/1Pp5/2P1Q3/5BK1 b - -
-time 335 nps 577686 fen r2qkb1r/2p2ppp/p1p5/3pP3/4n1b1/3Q1N2/PPP2PPP/RNB2RK1 w kq -
-time 337 nps 519072 fen 4r1k1/pp2pp1n/3p2p1/6Bp/2rN1P1P/q1P5/2PQ2P1/1K1RR3 b - -
-time 338 nps 542513 fen rnbq1rk1/pp3pbp/2pp1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - -
-time 337 nps 710724 fen 8/8/p3k1p1/Bb5p/1P5P/5P2/1r4P1/3R2K1 b - -
-time 337 nps 727715 fen 4k3/q4p2/2n1p1p1/p1Np4/3P1QP1/PP3P2/6K1/8 b - -
-time 338 nps 876713 fen 3bn3/4k3/2p3p1/ppN2P2/P5P1/1P1KB3/8/8 b - -
-time 335 nps 568274 fen r1b1r1k1/5pbp/pp1p1np1/2qPn3/P1p1P3/2N1BPN1/1P1QB1PP/R1R4K b - -
-time 337 nps 691341 fen r1q1rnk1/p1p2pp1/bp2p2p/n2pP3/Q1PP1N1B/P1PB1P2/6PP/R4RK1 w - d6
-time 338 nps 540184 fen r3r1k1/1bpnqppp/1p1p4/p2Pp3/1PP1P3/P5P1/1BQ2PBP/1R1R2K1 b - -
-time 338 nps 928482 fen 1r6/4Pk2/1p1p1P2/p7/8/1P1K2p1/P7/5R2 b - -
-time 337 nps 514735 fen 1rbqk2r/2pp1ppp/p1n2n2/1pb1p3/P3P3/1B3N2/1PPP1PPP/RNBQ1RK1 w k -
-time 338 nps 711514 fen r4bk1/6pp/1B2n3/4P3/pp6/1P2N1P1/P5KP/3R4 w - -
-time 337 nps 441099 fen r1bqkb1r/pp1n1ppp/2n5/2ppP3/3P1P2/5N2/PP4PP/RNBQKB1R w KQkq -
-time 337 nps 617337 fen r1qr2k1/2p2pPp/p3n3/1p6/8/4BQ2/PP3PPP/R2R2K1 w - -
-time 338 nps 805385 fen 4r3/1p4k1/p1p1P1pp/3p4/1P1N4/P6B/7P/4K3 w - -
-time 338 nps 543621 fen 8/R4pk1/4pbq1/8/2P4p/5Q2/8/5K2 b - -
-time 335 nps 779441 fen 4k3/R4pp1/P7/4P2p/5P2/3p2P1/r7/4K3 w - -
-time 336 nps 526238 fen 2r3k1/1p4p1/p3bp2/8/N3Pb1p/2R4P/1PP1Q1P1/2q3BK b - -
-time 335 nps 539402 fen rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -
-time 335 nps 1298722 fen 8/6N1/8/1k4K1/3n4/8/5P2/8 b - -
-time 335 nps 580681 fen rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -
-time 334 nps 905901 fen 8/PRn5/3k4/r4p2/5PB1/8/5P2/6K1 w - -
-time 334 nps 934550 fen r5k1/4Rpp1/3p3p/2pP4/p1P3P1/1P6/P4PP1/5K2 w - -
-time 335 nps 1030793 fen 5n2/2k1KB2/7P/8/3n1P2/8/p1N5/8 w - -
-time 334 nps 560668 fen rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -
-result nps 688355
+time 335 nps 452508 fen r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -
+time 336 nps 521305 fen 4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -
+time 338 nps 469267 fen 3rk2r/1pq1bpp1/p1n1p1n1/3pP3/3P2P1/1PPQNNB1/5P2/R3R1K1 b k -
+time 337 nps 599879 fen 7k/8/1p1Q2pp/1p3b2/3p3P/P3q3/BP4PK/8 b - -
+time 335 nps 470696 fen 2r1rnk1/4qppp/p3b3/1p4P1/4p2P/2N1PN2/PP1Q1P2/1KR4R w - -
+time 334 nps 453273 fen 2rk3r/p2n1pp1/bqn1p2p/1p1pP3/3P1N1P/bP1BBN2/P3QPP1/2R1R1K1 w - -
+time 334 nps 619591 fen 1nr2rk1/p3Qppp/1p2p1n1/8/3P4/2N2N2/PP3PPP/2R2RK1 b - -
+time 334 nps 829363 fen 3nr1k1/1p1r3p/pR1pNpp1/3P4/4P3/3P3P/6P1/1R5K b - -
+time 334 nps 545004 fen 4r1k1/pp3ppp/3n4/2n1r3/2P2NP1/4KB2/PP2P2P/R5R1 w - -
+time 334 nps 841701 fen 8/p5pk/1p6/5R1p/P7/5PPK/5r2/8 b - -
+time 334 nps 767946 fen 8/2Q2p2/5qpk/4p3/8/5P1P/6K1/8 w - -
+time 334 nps 555422 fen 5rk1/1pr2bbp/pNp1n1p1/2P1p3/1PBpP3/1N5P/1P3PP1/3RR1K1 b - -
+time 334 nps 707059 fen 8/1b3pk1/rp5p/6p1/6B1/1R4P1/4P2P/4K3 w - -
+time 334 nps 534169 fen r1bqk2r/pp2ppbp/3p1np1/8/2PQP3/2N5/PP2BPPP/R1B1K2R w KQkq -
+time 334 nps 649909 fen 8/1b4pk/7q/p3pP2/1p2P3/1Pp5/2P1Q3/5BK1 b - -
+time 334 nps 517224 fen r2qkb1r/2p2ppp/p1p5/3pP3/4n1b1/3Q1N2/PPP2PPP/RNB2RK1 w kq -
+time 334 nps 536832 fen 4r1k1/pp2pp1n/3p2p1/6Bp/2rN1P1P/q1P5/2PQ2P1/1K1RR3 b - -
+time 334 nps 527000 fen rnbq1rk1/pp3pbp/2pp1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - -
+time 334 nps 671584 fen 8/8/p3k1p1/Bb5p/1P5P/5P2/1r4P1/3R2K1 b - -
+time 334 nps 670752 fen 4k3/q4p2/2n1p1p1/p1Np4/3P1QP1/PP3P2/6K1/8 b - -
+time 334 nps 834821 fen 3bn3/4k3/2p3p1/ppN2P2/P5P1/1P1KB3/8/8 b - -
+time 334 nps 530106 fen r1b1r1k1/5pbp/pp1p1np1/2qPn3/P1p1P3/2N1BPN1/1P1QB1PP/R1R4K b - -
+time 333 nps 608694 fen r1q1rnk1/p1p2pp1/bp2p2p/n2pP3/Q1PP1N1B/P1PB1P2/6PP/R4RK1 w - d6
+time 337 nps 501106 fen r3r1k1/1bpnqppp/1p1p4/p2Pp3/1PP1P3/P5P1/1BQ2PBP/1R1R2K1 b - -
+time 334 nps 503411 fen 1r6/4Pk2/1p1p1P2/p7/8/1P1K2p1/P7/5R2 b - -
+time 334 nps 476181 fen 1rbqk2r/2pp1ppp/p1n2n2/1pb1p3/P3P3/1B3N2/1PPP1PPP/RNBQ1RK1 w k -
+time 334 nps 433395 fen r4bk1/6pp/1B2n3/4P3/pp6/1P2N1P1/P5KP/3R4 w - -
+time 335 nps 298860 fen r1bqkb1r/pp1n1ppp/2n5/2ppP3/3P1P2/5N2/PP4PP/RNBQKB1R w KQkq -
+time 334 nps 360416 fen r1qr2k1/2p2pPp/p3n3/1p6/8/4BQ2/PP3PPP/R2R2K1 w - -
+time 338 nps 605839 fen 4r3/1p4k1/p1p1P1pp/3p4/1P1N4/P6B/7P/4K3 w - -
+time 335 nps 468354 fen 8/R4pk1/4pbq1/8/2P4p/5Q2/8/5K2 b - -
+time 333 nps 592788 fen 4k3/R4pp1/P7/4P2p/5P2/3p2P1/r7/4K3 w - -
+time 335 nps 443931 fen 2r3k1/1p4p1/p3bp2/8/N3Pb1p/2R4P/1PP1Q1P1/2q3BK b - -
+time 336 nps 387004 fen rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -
+time 336 nps 1032351 fen 8/6N1/8/1k4K1/3n4/8/5P2/8 b - -
+time 334 nps 436154 fen rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -
+time 334 nps 646341 fen 8/PRn5/3k4/r4p2/5PB1/8/5P2/6K1 w - -
+time 338 nps 715266 fen r5k1/4Rpp1/3p3p/2pP4/p1P3P1/1P6/P4PP1/5K2 w - -
+time 335 nps 911872 fen 5n2/2k1KB2/7P/8/3n1P2/8/p1N5/8 w - -
+time 337 nps 465843 fen rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -
+time 336 nps 488426 fen r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -
+time 334 nps 478628 fen 4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -
+time 334 nps 450084 fen 3rk2r/1pq1bpp1/p1n1p1n1/3pP3/3P2P1/1PPQNNB1/5P2/R3R1K1 b k -
+time 335 nps 517692 fen 7k/8/1p1Q2pp/1p3b2/3p3P/P3q3/BP4PK/8 b - -
+time 338 nps 475037 fen 2r1rnk1/4qppp/p3b3/1p4P1/4p2P/2N1PN2/PP1Q1P2/1KR4R w - -
+time 338 nps 465143 fen 2rk3r/p2n1pp1/bqn1p2p/1p1pP3/3P1N1P/bP1BBN2/P3QPP1/2R1R1K1 w - -
+time 338 nps 660303 fen 1nr2rk1/p3Qppp/1p2p1n1/8/3P4/2N2N2/PP3PPP/2R2RK1 b - -
+time 338 nps 873353 fen 3nr1k1/1p1r3p/pR1pNpp1/3P4/4P3/3P3P/6P1/1R5K b - -
+time 335 nps 542483 fen 4r1k1/pp3ppp/3n4/2n1r3/2P2NP1/4KB2/PP2P2P/R5R1 w - -
+time 335 nps 875667 fen 8/p5pk/1p6/5R1p/P7/5PPK/5r2/8 b - -
+time 334 nps 883767 fen 8/2Q2p2/5qpk/4p3/8/5P1P/6K1/8 w - -
+time 333 nps 582939 fen 5rk1/1pr2bbp/pNp1n1p1/2P1p3/1PBpP3/1N5P/1P3PP1/3RR1K1 b - -
+time 335 nps 700002 fen 8/1b3pk1/rp5p/6p1/6B1/1R4P1/4P2P/4K3 w - -
+time 334 nps 481910 fen r1bqk2r/pp2ppbp/3p1np1/8/2PQP3/2N5/PP2BPPP/R1B1K2R w KQkq -
+time 338 nps 610726 fen 8/1b4pk/7q/p3pP2/1p2P3/1Pp5/2P1Q3/5BK1 b - -
+time 336 nps 484250 fen r2qkb1r/2p2ppp/p1p5/3pP3/4n1b1/3Q1N2/PPP2PPP/RNB2RK1 w kq -
+time 338 nps 489886 fen 4r1k1/pp2pp1n/3p2p1/6Bp/2rN1P1P/q1P5/2PQ2P1/1K1RR3 b - -
+time 333 nps 564121 fen rnbq1rk1/pp3pbp/2pp1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - -
+time 338 nps 682036 fen 8/8/p3k1p1/Bb5p/1P5P/5P2/1r4P1/3R2K1 b - -
+time 338 nps 688527 fen 4k3/q4p2/2n1p1p1/p1Np4/3P1QP1/PP3P2/6K1/8 b - -
+time 335 nps 823162 fen 3bn3/4k3/2p3p1/ppN2P2/P5P1/1P1KB3/8/8 b - -
+time 335 nps 557204 fen r1b1r1k1/5pbp/pp1p1np1/2qPn3/P1p1P3/2N1BPN1/1P1QB1PP/R1R4K b - -
+time 333 nps 602596 fen r1q1rnk1/p1p2pp1/bp2p2p/n2pP3/Q1PP1N1B/P1PB1P2/6PP/R4RK1 w - d6
+time 336 nps 507370 fen r3r1k1/1bpnqppp/1p1p4/p2Pp3/1PP1P3/P5P1/1BQ2PBP/1R1R2K1 b - -
+time 333 nps 802765 fen 1r6/4Pk2/1p1p1P2/p7/8/1P1K2p1/P7/5R2 b - -
+time 334 nps 415019 fen 1rbqk2r/2pp1ppp/p1n2n2/1pb1p3/P3P3/1B3N2/1PPP1PPP/RNBQ1RK1 w k -
+time 334 nps 588672 fen r4bk1/6pp/1B2n3/4P3/pp6/1P2N1P1/P5KP/3R4 w - -
+time 334 nps 380296 fen r1bqkb1r/pp1n1ppp/2n5/2ppP3/3P1P2/5N2/PP4PP/RNBQKB1R w KQkq -
+time 334 nps 518399 fen r1qr2k1/2p2pPp/p3n3/1p6/8/4BQ2/PP3PPP/R2R2K1 w - -
+time 334 nps 667012 fen 4r3/1p4k1/p1p1P1pp/3p4/1P1N4/P6B/7P/4K3 w - -
+time 336 nps 468859 fen 8/R4pk1/4pbq1/8/2P4p/5Q2/8/5K2 b - -
+time 334 nps 636868 fen 4k3/R4pp1/P7/4P2p/5P2/3p2P1/r7/4K3 w - -
+time 335 nps 534770 fen 2r3k1/1p4p1/p3bp2/8/N3Pb1p/2R4P/1PP1Q1P1/2q3BK b - -
+time 334 nps 478170 fen rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -
+time 334 nps 1296393 fen 8/6N1/8/1k4K1/3n4/8/5P2/8 b - -
+time 334 nps 545991 fen rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -
+time 334 nps 752235 fen 8/PRn5/3k4/r4p2/5PB1/8/5P2/6K1 w - -
+time 335 nps 762903 fen r5k1/4Rpp1/3p3p/2pP4/p1P3P1/1P6/P4PP1/5K2 w - -
+time 335 nps 870906 fen 5n2/2k1KB2/7P/8/3n1P2/8/p1N5/8 w - -
+time 338 nps 465825 fen rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -
+time 334 nps 430884 fen r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -
+time 336 nps 482359 fen 4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -
+time 333 nps 449635 fen 3rk2r/1pq1bpp1/p1n1p1n1/3pP3/3P2P1/1PPQNNB1/5P2/R3R1K1 b k -
+time 338 nps 490573 fen 7k/8/1p1Q2pp/1p3b2/3p3P/P3q3/BP4PK/8 b - -
+time 337 nps 509294 fen 2r1rnk1/4qppp/p3b3/1p4P1/4p2P/2N1PN2/PP1Q1P2/1KR4R w - -
+time 334 nps 406750 fen 2rk3r/p2n1pp1/bqn1p2p/1p1pP3/3P1N1P/bP1BBN2/P3QPP1/2R1R1K1 w - -
+time 333 nps 579485 fen 1nr2rk1/p3Qppp/1p2p1n1/8/3P4/2N2N2/PP3PPP/2R2RK1 b - -
+time 335 nps 810802 fen 3nr1k1/1p1r3p/pR1pNpp1/3P4/4P3/3P3P/6P1/1R5K b - -
+time 334 nps 472373 fen 4r1k1/pp3ppp/3n4/2n1r3/2P2NP1/4KB2/PP2P2P/R5R1 w - -
+time 336 nps 737102 fen 8/p5pk/1p6/5R1p/P7/5PPK/5r2/8 b - -
+time 334 nps 814858 fen 8/2Q2p2/5qpk/4p3/8/5P1P/6K1/8 w - -
+time 334 nps 507931 fen 5rk1/1pr2bbp/pNp1n1p1/2P1p3/1PBpP3/1N5P/1P3PP1/3RR1K1 b - -
+time 335 nps 683378 fen 8/1b3pk1/rp5p/6p1/6B1/1R4P1/4P2P/4K3 w - -
+time 337 nps 486439 fen r1bqk2r/pp2ppbp/3p1np1/8/2PQP3/2N5/PP2BPPP/R1B1K2R w KQkq -
+time 336 nps 601624 fen 8/1b4pk/7q/p3pP2/1p2P3/1Pp5/2P1Q3/5BK1 b - -
+time 336 nps 531052 fen r2qkb1r/2p2ppp/p1p5/3pP3/4n1b1/3Q1N2/PPP2PPP/RNB2RK1 w kq -
+time 336 nps 508403 fen 4r1k1/pp2pp1n/3p2p1/6Bp/2rN1P1P/q1P5/2PQ2P1/1K1RR3 b - -
+time 334 nps 445732 fen rnbq1rk1/pp3pbp/2pp1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - -
+time 334 nps 624533 fen 8/8/p3k1p1/Bb5p/1P5P/5P2/1r4P1/3R2K1 b - -
+time 334 nps 663646 fen 4k3/q4p2/2n1p1p1/p1Np4/3P1QP1/PP3P2/6K1/8 b - -
+time 334 nps 790336 fen 3bn3/4k3/2p3p1/ppN2P2/P5P1/1P1KB3/8/8 b - -
+time 335 nps 474403 fen r1b1r1k1/5pbp/pp1p1np1/2qPn3/P1p1P3/2N1BPN1/1P1QB1PP/R1R4K b - -
+time 334 nps 574061 fen r1q1rnk1/p1p2pp1/bp2p2p/n2pP3/Q1PP1N1B/P1PB1P2/6PP/R4RK1 w - d6
+time 338 nps 529746 fen r3r1k1/1bpnqppp/1p1p4/p2Pp3/1PP1P3/P5P1/1BQ2PBP/1R1R2K1 b - -
+time 336 nps 709878 fen 1r6/4Pk2/1p1p1P2/p7/8/1P1K2p1/P7/5R2 b - -
+time 334 nps 420366 fen 1rbqk2r/2pp1ppp/p1n2n2/1pb1p3/P3P3/1B3N2/1PPP1PPP/RNBQ1RK1 w k -
+time 334 nps 628925 fen r4bk1/6pp/1B2n3/4P3/pp6/1P2N1P1/P5KP/3R4 w - -
+time 336 nps 388853 fen r1bqkb1r/pp1n1ppp/2n5/2ppP3/3P1P2/5N2/PP4PP/RNBQKB1R w KQkq -
+time 335 nps 567965 fen r1qr2k1/2p2pPp/p3n3/1p6/8/4BQ2/PP3PPP/R2R2K1 w - -
+time 338 nps 670809 fen 4r3/1p4k1/p1p1P1pp/3p4/1P1N4/P6B/7P/4K3 w - -
+time 338 nps 466126 fen 8/R4pk1/4pbq1/8/2P4p/5Q2/8/5K2 b - -
+time 336 nps 665075 fen 4k3/R4pp1/P7/4P2p/5P2/3p2P1/r7/4K3 w - -
+time 338 nps 514536 fen 2r3k1/1p4p1/p3bp2/8/N3Pb1p/2R4P/1PP1Q1P1/2q3BK b - -
+time 337 nps 449375 fen rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -
+time 334 nps 1114257 fen 8/6N1/8/1k4K1/3n4/8/5P2/8 b - -
+time 334 nps 475951 fen rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -
+time 335 nps 710366 fen 8/PRn5/3k4/r4p2/5PB1/8/5P2/6K1 w - -
+time 334 nps 794961 fen r5k1/4Rpp1/3p3p/2pP4/p1P3P1/1P6/P4PP1/5K2 w - -
+time 334 nps 874449 fen 5n2/2k1KB2/7P/8/3n1P2/8/p1N5/8 w - -
+time 336 nps 471992 fen rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -
+result nps 633858
 
-Floyd Chess Engine - Version x7c96b2ca
+Floyd Chess Engine - Version xe10a938d
 Copyright (C) 2015-2016, Marcel van Kervinck
 All rights reserved
 
 Type "help" for more information, or "quit" to leave.
 
 egt class KPK check OK
-time 334 nps 279545 fen r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -
-time 334 nps 375048 fen 4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -
-time 334 nps 338081 fen 3rk2r/1pq1bpp1/p1n1p1n1/3pP3/3P2P1/1PPQNNB1/5P2/R3R1K1 b k -
-time 334 nps 412901 fen 7k/8/1p1Q2pp/1p3b2/3p3P/P3q3/BP4PK/8 b - -
-time 334 nps 336156 fen 2r1rnk1/4qppp/p3b3/1p4P1/4p2P/2N1PN2/PP1Q1P2/1KR4R w - -
-time 334 nps 316455 fen 2rk3r/p2n1pp1/bqn1p2p/1p1pP3/3P1N1P/bP1BBN2/P3QPP1/2R1R1K1 w - -
-time 334 nps 429048 fen 1nr2rk1/p3Qppp/1p2p1n1/8/3P4/2N2N2/PP3PPP/2R2RK1 b - -
-time 334 nps 569919 fen 3nr1k1/1p1r3p/pR1pNpp1/3P4/4P3/3P3P/6P1/1R5K b - -
-time 334 nps 374566 fen 4r1k1/pp3ppp/3n4/2n1r3/2P2NP1/4KB2/PP2P2P/R5R1 w - -
-time 335 nps 567072 fen 8/p5pk/1p6/5R1p/P7/5PPK/5r2/8 b - -
-time 334 nps 535039 fen 8/2Q2p2/5qpk/4p3/8/5P1P/6K1/8 w - -
-time 334 nps 364279 fen 5rk1/1pr2bbp/pNp1n1p1/2P1p3/1PBpP3/1N5P/1P3PP1/3RR1K1 b - -
-time 334 nps 477377 fen 8/1b3pk1/rp5p/6p1/6B1/1R4P1/4P2P/4K3 w - -
-time 334 nps 365907 fen r1bqk2r/pp2ppbp/3p1np1/8/2PQP3/2N5/PP2BPPP/R1B1K2R w KQkq -
-time 335 nps 442940 fen 8/1b4pk/7q/p3pP2/1p2P3/1Pp5/2P1Q3/5BK1 b - -
-time 334 nps 344440 fen r2qkb1r/2p2ppp/p1p5/3pP3/4n1b1/3Q1N2/PPP2PPP/RNB2RK1 w kq -
-time 334 nps 368925 fen 4r1k1/pp2pp1n/3p2p1/6Bp/2rN1P1P/q1P5/2PQ2P1/1K1RR3 b - -
-time 334 nps 367818 fen rnbq1rk1/pp3pbp/2pp1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - -
-time 334 nps 468335 fen 8/8/p3k1p1/Bb5p/1P5P/5P2/1r4P1/3R2K1 b - -
-time 333 nps 475652 fen 4k3/q4p2/2n1p1p1/p1Np4/3P1QP1/PP3P2/6K1/8 b - -
-time 335 nps 565884 fen 3bn3/4k3/2p3p1/ppN2P2/P5P1/1P1KB3/8/8 b - -
-time 335 nps 349672 fen r1b1r1k1/5pbp/pp1p1np1/2qPn3/P1p1P3/2N1BPN1/1P1QB1PP/R1R4K b - -
-time 334 nps 435108 fen r1q1rnk1/p1p2pp1/bp2p2p/n2pP3/Q1PP1N1B/P1PB1P2/6PP/R4RK1 w - d6
-time 334 nps 354629 fen r3r1k1/1bpnqppp/1p1p4/p2Pp3/1PP1P3/P5P1/1BQ2PBP/1R1R2K1 b - -
-time 334 nps 563820 fen 1r6/4Pk2/1p1p1P2/p7/8/1P1K2p1/P7/5R2 b - -
-time 334 nps 338255 fen 1rbqk2r/2pp1ppp/p1n2n2/1pb1p3/P3P3/1B3N2/1PPP1PPP/RNBQ1RK1 w k -
-time 334 nps 411398 fen r4bk1/6pp/1B2n3/4P3/pp6/1P2N1P1/P5KP/3R4 w - -
-time 333 nps 291958 fen r1bqkb1r/pp1n1ppp/2n5/2ppP3/3P1P2/5N2/PP4PP/RNBQKB1R w KQkq -
-time 334 nps 384841 fen r1qr2k1/2p2pPp/p3n3/1p6/8/4BQ2/PP3PPP/R2R2K1 w - -
-time 335 nps 539203 fen 4r3/1p4k1/p1p1P1pp/3p4/1P1N4/P6B/7P/4K3 w - -
-time 334 nps 356650 fen 8/R4pk1/4pbq1/8/2P4p/5Q2/8/5K2 b - -
-time 335 nps 503899 fen 4k3/R4pp1/P7/4P2p/5P2/3p2P1/r7/4K3 w - -
-time 334 nps 358916 fen 2r3k1/1p4p1/p3bp2/8/N3Pb1p/2R4P/1PP1Q1P1/2q3BK b - -
-time 334 nps 322036 fen rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -
-time 334 nps 881030 fen 8/6N1/8/1k4K1/3n4/8/5P2/8 b - -
-time 334 nps 361820 fen rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -
-time 335 nps 529430 fen 8/PRn5/3k4/r4p2/5PB1/8/5P2/6K1 w - -
-time 334 nps 590138 fen r5k1/4Rpp1/3p3p/2pP4/p1P3P1/1P6/P4PP1/5K2 w - -
-time 334 nps 684871 fen 5n2/2k1KB2/7P/8/3n1P2/8/p1N5/8 w - -
-time 334 nps 336183 fen rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -
-time 334 nps 329868 fen r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -
-time 334 nps 371961 fen 4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -
-time 335 nps 356695 fen 3rk2r/1pq1bpp1/p1n1p1n1/3pP3/3P2P1/1PPQNNB1/5P2/R3R1K1 b k -
-time 335 nps 418033 fen 7k/8/1p1Q2pp/1p3b2/3p3P/P3q3/BP4PK/8 b - -
-time 334 nps 322703 fen 2r1rnk1/4qppp/p3b3/1p4P1/4p2P/2N1PN2/PP1Q1P2/1KR4R w - -
-time 335 nps 313358 fen 2rk3r/p2n1pp1/bqn1p2p/1p1pP3/3P1N1P/bP1BBN2/P3QPP1/2R1R1K1 w - -
-time 334 nps 440111 fen 1nr2rk1/p3Qppp/1p2p1n1/8/3P4/2N2N2/PP3PPP/2R2RK1 b - -
-time 334 nps 608937 fen 3nr1k1/1p1r3p/pR1pNpp1/3P4/4P3/3P3P/6P1/1R5K b - -
-time 334 nps 369090 fen 4r1k1/pp3ppp/3n4/2n1r3/2P2NP1/4KB2/PP2P2P/R5R1 w - -
-time 334 nps 605084 fen 8/p5pk/1p6/5R1p/P7/5PPK/5r2/8 b - -
-time 334 nps 578916 fen 8/2Q2p2/5qpk/4p3/8/5P1P/6K1/8 w - -
-time 334 nps 398581 fen 5rk1/1pr2bbp/pNp1n1p1/2P1p3/1PBpP3/1N5P/1P3PP1/3RR1K1 b - -
-time 334 nps 530455 fen 8/1b3pk1/rp5p/6p1/6B1/1R4P1/4P2P/4K3 w - -
-time 334 nps 383141 fen r1bqk2r/pp2ppbp/3p1np1/8/2PQP3/2N5/PP2BPPP/R1B1K2R w KQkq -
-time 334 nps 465365 fen 8/1b4pk/7q/p3pP2/1p2P3/1Pp5/2P1Q3/5BK1 b - -
-time 335 nps 383469 fen r2qkb1r/2p2ppp/p1p5/3pP3/4n1b1/3Q1N2/PPP2PPP/RNB2RK1 w kq -
-time 334 nps 371629 fen 4r1k1/pp2pp1n/3p2p1/6Bp/2rN1P1P/q1P5/2PQ2P1/1K1RR3 b - -
-time 334 nps 364892 fen rnbq1rk1/pp3pbp/2pp1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - -
-time 334 nps 469398 fen 8/8/p3k1p1/Bb5p/1P5P/5P2/1r4P1/3R2K1 b - -
-time 335 nps 503824 fen 4k3/q4p2/2n1p1p1/p1Np4/3P1QP1/PP3P2/6K1/8 b - -
-time 333 nps 559931 fen 3bn3/4k3/2p3p1/ppN2P2/P5P1/1P1KB3/8/8 b - -
-time 333 nps 377585 fen r1b1r1k1/5pbp/pp1p1np1/2qPn3/P1p1P3/2N1BPN1/1P1QB1PP/R1R4K b - -
-time 335 nps 410335 fen r1q1rnk1/p1p2pp1/bp2p2p/n2pP3/Q1PP1N1B/P1PB1P2/6PP/R4RK1 w - d6
-time 335 nps 377090 fen r3r1k1/1bpnqppp/1p1p4/p2Pp3/1PP1P3/P5P1/1BQ2PBP/1R1R2K1 b - -
-time 334 nps 626787 fen 1r6/4Pk2/1p1p1P2/p7/8/1P1K2p1/P7/5R2 b - -
-time 334 nps 366093 fen 1rbqk2r/2pp1ppp/p1n2n2/1pb1p3/P3P3/1B3N2/1PPP1PPP/RNBQ1RK1 w k -
-time 335 nps 482361 fen r4bk1/6pp/1B2n3/4P3/pp6/1P2N1P1/P5KP/3R4 w - -
-time 334 nps 312820 fen r1bqkb1r/pp1n1ppp/2n5/2ppP3/3P1P2/5N2/PP4PP/RNBQKB1R w KQkq -
-time 335 nps 420107 fen r1qr2k1/2p2pPp/p3n3/1p6/8/4BQ2/PP3PPP/R2R2K1 w - -
-time 334 nps 567345 fen 4r3/1p4k1/p1p1P1pp/3p4/1P1N4/P6B/7P/4K3 w - -
-time 335 nps 369707 fen 8/R4pk1/4pbq1/8/2P4p/5Q2/8/5K2 b - -
-time 334 nps 528114 fen 4k3/R4pp1/P7/4P2p/5P2/3p2P1/r7/4K3 w - -
-time 334 nps 376332 fen 2r3k1/1p4p1/p3bp2/8/N3Pb1p/2R4P/1PP1Q1P1/2q3BK b - -
-time 334 nps 343494 fen rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -
-time 334 nps 918997 fen 8/6N1/8/1k4K1/3n4/8/5P2/8 b - -
-time 334 nps 388581 fen rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -
-time 334 nps 578063 fen 8/PRn5/3k4/r4p2/5PB1/8/5P2/6K1 w - -
-time 334 nps 619877 fen r5k1/4Rpp1/3p3p/2pP4/p1P3P1/1P6/P4PP1/5K2 w - -
-time 333 nps 696168 fen 5n2/2k1KB2/7P/8/3n1P2/8/p1N5/8 w - -
-time 335 nps 372430 fen rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -
-time 335 nps 352236 fen r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -
-time 334 nps 374599 fen 4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -
-time 335 nps 351994 fen 3rk2r/1pq1bpp1/p1n1p1n1/3pP3/3P2P1/1PPQNNB1/5P2/R3R1K1 b k -
-time 334 nps 437075 fen 7k/8/1p1Q2pp/1p3b2/3p3P/P3q3/BP4PK/8 b - -
-time 334 nps 356590 fen 2r1rnk1/4qppp/p3b3/1p4P1/4p2P/2N1PN2/PP1Q1P2/1KR4R w - -
-time 359 nps 327379 fen 2rk3r/p2n1pp1/bqn1p2p/1p1pP3/3P1N1P/bP1BBN2/P3QPP1/2R1R1K1 w - -
-time 335 nps 480454 fen 1nr2rk1/p3Qppp/1p2p1n1/8/3P4/2N2N2/PP3PPP/2R2RK1 b - -
-time 334 nps 626270 fen 3nr1k1/1p1r3p/pR1pNpp1/3P4/4P3/3P3P/6P1/1R5K b - -
-time 335 nps 361039 fen 4r1k1/pp3ppp/3n4/2n1r3/2P2NP1/4KB2/PP2P2P/R5R1 w - -
-time 335 nps 598916 fen 8/p5pk/1p6/5R1p/P7/5PPK/5r2/8 b - -
-time 334 nps 586177 fen 8/2Q2p2/5qpk/4p3/8/5P1P/6K1/8 w - -
-time 335 nps 424621 fen 5rk1/1pr2bbp/pNp1n1p1/2P1p3/1PBpP3/1N5P/1P3PP1/3RR1K1 b - -
-time 335 nps 550534 fen 8/1b3pk1/rp5p/6p1/6B1/1R4P1/4P2P/4K3 w - -
-time 334 nps 385778 fen r1bqk2r/pp2ppbp/3p1np1/8/2PQP3/2N5/PP2BPPP/R1B1K2R w KQkq -
-time 335 nps 465021 fen 8/1b4pk/7q/p3pP2/1p2P3/1Pp5/2P1Q3/5BK1 b - -
-time 334 nps 365272 fen r2qkb1r/2p2ppp/p1p5/3pP3/4n1b1/3Q1N2/PPP2PPP/RNB2RK1 w kq -
-time 333 nps 374466 fen 4r1k1/pp2pp1n/3p2p1/6Bp/2rN1P1P/q1P5/2PQ2P1/1K1RR3 b - -
-time 335 nps 363287 fen rnbq1rk1/pp3pbp/2pp1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - -
-time 334 nps 481368 fen 8/8/p3k1p1/Bb5p/1P5P/5P2/1r4P1/3R2K1 b - -
-time 334 nps 506799 fen 4k3/q4p2/2n1p1p1/p1Np4/3P1QP1/PP3P2/6K1/8 b - -
-time 335 nps 592833 fen 3bn3/4k3/2p3p1/ppN2P2/P5P1/1P1KB3/8/8 b - -
-time 334 nps 371662 fen r1b1r1k1/5pbp/pp1p1np1/2qPn3/P1p1P3/2N1BPN1/1P1QB1PP/R1R4K b - -
-time 334 nps 476320 fen r1q1rnk1/p1p2pp1/bp2p2p/n2pP3/Q1PP1N1B/P1PB1P2/6PP/R4RK1 w - d6
-time 335 nps 386060 fen r3r1k1/1bpnqppp/1p1p4/p2Pp3/1PP1P3/P5P1/1BQ2PBP/1R1R2K1 b - -
-time 334 nps 631767 fen 1r6/4Pk2/1p1p1P2/p7/8/1P1K2p1/P7/5R2 b - -
-time 335 nps 353636 fen 1rbqk2r/2pp1ppp/p1n2n2/1pb1p3/P3P3/1B3N2/1PPP1PPP/RNBQ1RK1 w k -
-time 333 nps 498730 fen r4bk1/6pp/1B2n3/4P3/pp6/1P2N1P1/P5KP/3R4 w - -
-time 334 nps 315970 fen r1bqkb1r/pp1n1ppp/2n5/2ppP3/3P1P2/5N2/PP4PP/RNBQKB1R w KQkq -
-time 334 nps 454913 fen r1qr2k1/2p2pPp/p3n3/1p6/8/4BQ2/PP3PPP/R2R2K1 w - -
-time 334 nps 555656 fen 4r3/1p4k1/p1p1P1pp/3p4/1P1N4/P6B/7P/4K3 w - -
-time 334 nps 387210 fen 8/R4pk1/4pbq1/8/2P4p/5Q2/8/5K2 b - -
-time 334 nps 517982 fen 4k3/R4pp1/P7/4P2p/5P2/3p2P1/r7/4K3 w - -
-time 334 nps 410703 fen 2r3k1/1p4p1/p3bp2/8/N3Pb1p/2R4P/1PP1Q1P1/2q3BK b - -
-time 334 nps 383428 fen rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -
-time 335 nps 894543 fen 8/6N1/8/1k4K1/3n4/8/5P2/8 b - -
-time 334 nps 394823 fen rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -
-time 334 nps 615051 fen 8/PRn5/3k4/r4p2/5PB1/8/5P2/6K1 w - -
-time 334 nps 640171 fen r5k1/4Rpp1/3p3p/2pP4/p1P3P1/1P6/P4PP1/5K2 w - -
-time 335 nps 744579 fen 5n2/2k1KB2/7P/8/3n1P2/8/p1N5/8 w - -
-time 334 nps 360964 fen rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -
-result nps 472023
+time 335 nps 273269 fen r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -
+time 335 nps 359182 fen 4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -
+time 335 nps 288033 fen 3rk2r/1pq1bpp1/p1n1p1n1/3pP3/3P2P1/1PPQNNB1/5P2/R3R1K1 b k -
+time 334 nps 341434 fen 7k/8/1p1Q2pp/1p3b2/3p3P/P3q3/BP4PK/8 b - -
+time 334 nps 266242 fen 2r1rnk1/4qppp/p3b3/1p4P1/4p2P/2N1PN2/PP1Q1P2/1KR4R w - -
+time 334 nps 261910 fen 2rk3r/p2n1pp1/bqn1p2p/1p1pP3/3P1N1P/bP1BBN2/P3QPP1/2R1R1K1 w - -
+time 335 nps 364564 fen 1nr2rk1/p3Qppp/1p2p1n1/8/3P4/2N2N2/PP3PPP/2R2RK1 b - -
+time 335 nps 474370 fen 3nr1k1/1p1r3p/pR1pNpp1/3P4/4P3/3P3P/6P1/1R5K b - -
+time 334 nps 319132 fen 4r1k1/pp3ppp/3n4/2n1r3/2P2NP1/4KB2/PP2P2P/R5R1 w - -
+time 335 nps 469958 fen 8/p5pk/1p6/5R1p/P7/5PPK/5r2/8 b - -
+time 334 nps 442763 fen 8/2Q2p2/5qpk/4p3/8/5P1P/6K1/8 w - -
+time 334 nps 299395 fen 5rk1/1pr2bbp/pNp1n1p1/2P1p3/1PBpP3/1N5P/1P3PP1/3RR1K1 b - -
+time 335 nps 406722 fen 8/1b3pk1/rp5p/6p1/6B1/1R4P1/4P2P/4K3 w - -
+time 334 nps 301922 fen r1bqk2r/pp2ppbp/3p1np1/8/2PQP3/2N5/PP2BPPP/R1B1K2R w KQkq -
+time 334 nps 375737 fen 8/1b4pk/7q/p3pP2/1p2P3/1Pp5/2P1Q3/5BK1 b - -
+time 335 nps 292875 fen r2qkb1r/2p2ppp/p1p5/3pP3/4n1b1/3Q1N2/PPP2PPP/RNB2RK1 w kq -
+time 334 nps 310707 fen 4r1k1/pp2pp1n/3p2p1/6Bp/2rN1P1P/q1P5/2PQ2P1/1K1RR3 b - -
+time 334 nps 303709 fen rnbq1rk1/pp3pbp/2pp1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - -
+time 334 nps 402380 fen 8/8/p3k1p1/Bb5p/1P5P/5P2/1r4P1/3R2K1 b - -
+time 334 nps 404743 fen 4k3/q4p2/2n1p1p1/p1Np4/3P1QP1/PP3P2/6K1/8 b - -
+time 334 nps 489045 fen 3bn3/4k3/2p3p1/ppN2P2/P5P1/1P1KB3/8/8 b - -
+time 334 nps 298542 fen r1b1r1k1/5pbp/pp1p1np1/2qPn3/P1p1P3/2N1BPN1/1P1QB1PP/R1R4K b - -
+time 334 nps 366806 fen r1q1rnk1/p1p2pp1/bp2p2p/n2pP3/Q1PP1N1B/P1PB1P2/6PP/R4RK1 w - d6
+time 334 nps 292012 fen r3r1k1/1bpnqppp/1p1p4/p2Pp3/1PP1P3/P5P1/1BQ2PBP/1R1R2K1 b - -
+time 335 nps 483636 fen 1r6/4Pk2/1p1p1P2/p7/8/1P1K2p1/P7/5R2 b - -
+time 334 nps 291925 fen 1rbqk2r/2pp1ppp/p1n2n2/1pb1p3/P3P3/1B3N2/1PPP1PPP/RNBQ1RK1 w k -
+time 335 nps 355988 fen r4bk1/6pp/1B2n3/4P3/pp6/1P2N1P1/P5KP/3R4 w - -
+time 334 nps 251680 fen r1bqkb1r/pp1n1ppp/2n5/2ppP3/3P1P2/5N2/PP4PP/RNBQKB1R w KQkq -
+time 334 nps 328326 fen r1qr2k1/2p2pPp/p3n3/1p6/8/4BQ2/PP3PPP/R2R2K1 w - -
+time 335 nps 453484 fen 4r3/1p4k1/p1p1P1pp/3p4/1P1N4/P6B/7P/4K3 w - -
+time 334 nps 297078 fen 8/R4pk1/4pbq1/8/2P4p/5Q2/8/5K2 b - -
+time 334 nps 427713 fen 4k3/R4pp1/P7/4P2p/5P2/3p2P1/r7/4K3 w - -
+time 334 nps 291201 fen 2r3k1/1p4p1/p3bp2/8/N3Pb1p/2R4P/1PP1Q1P1/2q3BK b - -
+time 334 nps 273701 fen rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -
+time 334 nps 739646 fen 8/6N1/8/1k4K1/3n4/8/5P2/8 b - -
+time 334 nps 308991 fen rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -
+time 335 nps 440012 fen 8/PRn5/3k4/r4p2/5PB1/8/5P2/6K1 w - -
+time 334 nps 493264 fen r5k1/4Rpp1/3p3p/2pP4/p1P3P1/1P6/P4PP1/5K2 w - -
+time 334 nps 565422 fen 5n2/2k1KB2/7P/8/3n1P2/8/p1N5/8 w - -
+time 334 nps 289545 fen rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -
+time 334 nps 292632 fen r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -
+time 335 nps 328388 fen 4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -
+time 334 nps 289763 fen 3rk2r/1pq1bpp1/p1n1p1n1/3pP3/3P2P1/1PPQNNB1/5P2/R3R1K1 b k -
+time 335 nps 371087 fen 7k/8/1p1Q2pp/1p3b2/3p3P/P3q3/BP4PK/8 b - -
+time 334 nps 285862 fen 2r1rnk1/4qppp/p3b3/1p4P1/4p2P/2N1PN2/PP1Q1P2/1KR4R w - -
+time 334 nps 272218 fen 2rk3r/p2n1pp1/bqn1p2p/1p1pP3/3P1N1P/bP1BBN2/P3QPP1/2R1R1K1 w - -
+time 335 nps 381296 fen 1nr2rk1/p3Qppp/1p2p1n1/8/3P4/2N2N2/PP3PPP/2R2RK1 b - -
+time 334 nps 549629 fen 3nr1k1/1p1r3p/pR1pNpp1/3P4/4P3/3P3P/6P1/1R5K b - -
+time 334 nps 317847 fen 4r1k1/pp3ppp/3n4/2n1r3/2P2NP1/4KB2/PP2P2P/R5R1 w - -
+time 333 nps 519724 fen 8/p5pk/1p6/5R1p/P7/5PPK/5r2/8 b - -
+time 334 nps 498820 fen 8/2Q2p2/5qpk/4p3/8/5P1P/6K1/8 w - -
+time 334 nps 329533 fen 5rk1/1pr2bbp/pNp1n1p1/2P1p3/1PBpP3/1N5P/1P3PP1/3RR1K1 b - -
+time 334 nps 441922 fen 8/1b3pk1/rp5p/6p1/6B1/1R4P1/4P2P/4K3 w - -
+time 335 nps 334552 fen r1bqk2r/pp2ppbp/3p1np1/8/2PQP3/2N5/PP2BPPP/R1B1K2R w KQkq -
+time 334 nps 404141 fen 8/1b4pk/7q/p3pP2/1p2P3/1Pp5/2P1Q3/5BK1 b - -
+time 334 nps 321225 fen r2qkb1r/2p2ppp/p1p5/3pP3/4n1b1/3Q1N2/PPP2PPP/RNB2RK1 w kq -
+time 335 nps 314570 fen 4r1k1/pp2pp1n/3p2p1/6Bp/2rN1P1P/q1P5/2PQ2P1/1K1RR3 b - -
+time 334 nps 329841 fen rnbq1rk1/pp3pbp/2pp1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - -
+time 333 nps 419216 fen 8/8/p3k1p1/Bb5p/1P5P/5P2/1r4P1/3R2K1 b - -
+time 334 nps 434880 fen 4k3/q4p2/2n1p1p1/p1Np4/3P1QP1/PP3P2/6K1/8 b - -
+time 334 nps 494075 fen 3bn3/4k3/2p3p1/ppN2P2/P5P1/1P1KB3/8/8 b - -
+time 334 nps 321773 fen r1b1r1k1/5pbp/pp1p1np1/2qPn3/P1p1P3/2N1BPN1/1P1QB1PP/R1R4K b - -
+time 334 nps 350036 fen r1q1rnk1/p1p2pp1/bp2p2p/n2pP3/Q1PP1N1B/P1PB1P2/6PP/R4RK1 w - d6
+time 334 nps 349823 fen r3r1k1/1bpnqppp/1p1p4/p2Pp3/1PP1P3/P5P1/1BQ2PBP/1R1R2K1 b - -
+time 334 nps 572722 fen 1r6/4Pk2/1p1p1P2/p7/8/1P1K2p1/P7/5R2 b - -
+time 334 nps 318467 fen 1rbqk2r/2pp1ppp/p1n2n2/1pb1p3/P3P3/1B3N2/1PPP1PPP/RNBQ1RK1 w k -
+time 334 nps 401186 fen r4bk1/6pp/1B2n3/4P3/pp6/1P2N1P1/P5KP/3R4 w - -
+time 334 nps 262159 fen r1bqkb1r/pp1n1ppp/2n5/2ppP3/3P1P2/5N2/PP4PP/RNBQKB1R w KQkq -
+time 334 nps 373263 fen r1qr2k1/2p2pPp/p3n3/1p6/8/4BQ2/PP3PPP/R2R2K1 w - -
+time 334 nps 486069 fen 4r3/1p4k1/p1p1P1pp/3p4/1P1N4/P6B/7P/4K3 w - -
+time 334 nps 322264 fen 8/R4pk1/4pbq1/8/2P4p/5Q2/8/5K2 b - -
+time 335 nps 464343 fen 4k3/R4pp1/P7/4P2p/5P2/3p2P1/r7/4K3 w - -
+time 334 nps 325653 fen 2r3k1/1p4p1/p3bp2/8/N3Pb1p/2R4P/1PP1Q1P1/2q3BK b - -
+time 334 nps 289626 fen rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -
+time 333 nps 776888 fen 8/6N1/8/1k4K1/3n4/8/5P2/8 b - -
+time 334 nps 327671 fen rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -
+time 335 nps 465704 fen 8/PRn5/3k4/r4p2/5PB1/8/5P2/6K1 w - -
+time 334 nps 525162 fen r5k1/4Rpp1/3p3p/2pP4/p1P3P1/1P6/P4PP1/5K2 w - -
+time 334 nps 622922 fen 5n2/2k1KB2/7P/8/3n1P2/8/p1N5/8 w - -
+time 335 nps 313140 fen rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -
+time 333 nps 261123 fen r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -
+time 366 nps 301973 fen 4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -
+time 335 nps 313633 fen 3rk2r/1pq1bpp1/p1n1p1n1/3pP3/3P2P1/1PPQNNB1/5P2/R3R1K1 b k -
+time 335 nps 382182 fen 7k/8/1p1Q2pp/1p3b2/3p3P/P3q3/BP4PK/8 b - -
+time 334 nps 311269 fen 2r1rnk1/4qppp/p3b3/1p4P1/4p2P/2N1PN2/PP1Q1P2/1KR4R w - -
+time 335 nps 270893 fen 2rk3r/p2n1pp1/bqn1p2p/1p1pP3/3P1N1P/bP1BBN2/P3QPP1/2R1R1K1 w - -
+time 334 nps 412216 fen 1nr2rk1/p3Qppp/1p2p1n1/8/3P4/2N2N2/PP3PPP/2R2RK1 b - -
+time 334 nps 568623 fen 3nr1k1/1p1r3p/pR1pNpp1/3P4/4P3/3P3P/6P1/1R5K b - -
+time 334 nps 330745 fen 4r1k1/pp3ppp/3n4/2n1r3/2P2NP1/4KB2/PP2P2P/R5R1 w - -
+time 335 nps 518988 fen 8/p5pk/1p6/5R1p/P7/5PPK/5r2/8 b - -
+time 334 nps 551874 fen 8/2Q2p2/5qpk/4p3/8/5P1P/6K1/8 w - -
+time 335 nps 358460 fen 5rk1/1pr2bbp/pNp1n1p1/2P1p3/1PBpP3/1N5P/1P3PP1/3RR1K1 b - -
+time 335 nps 467558 fen 8/1b3pk1/rp5p/6p1/6B1/1R4P1/4P2P/4K3 w - -
+time 334 nps 332267 fen r1bqk2r/pp2ppbp/3p1np1/8/2PQP3/2N5/PP2BPPP/R1B1K2R w KQkq -
+time 335 nps 414472 fen 8/1b4pk/7q/p3pP2/1p2P3/1Pp5/2P1Q3/5BK1 b - -
+time 334 nps 330593 fen r2qkb1r/2p2ppp/p1p5/3pP3/4n1b1/3Q1N2/PPP2PPP/RNB2RK1 w kq -
+time 334 nps 322488 fen 4r1k1/pp2pp1n/3p2p1/6Bp/2rN1P1P/q1P5/2PQ2P1/1K1RR3 b - -
+time 335 nps 336842 fen rnbq1rk1/pp3pbp/2pp1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - -
+time 334 nps 416503 fen 8/8/p3k1p1/Bb5p/1P5P/5P2/1r4P1/3R2K1 b - -
+time 335 nps 458331 fen 4k3/q4p2/2n1p1p1/p1Np4/3P1QP1/PP3P2/6K1/8 b - -
+time 334 nps 542377 fen 3bn3/4k3/2p3p1/ppN2P2/P5P1/1P1KB3/8/8 b - -
+time 335 nps 332722 fen r1b1r1k1/5pbp/pp1p1np1/2qPn3/P1p1P3/2N1BPN1/1P1QB1PP/R1R4K b - -
+time 334 nps 393509 fen r1q1rnk1/p1p2pp1/bp2p2p/n2pP3/Q1PP1N1B/P1PB1P2/6PP/R4RK1 w - d6
+time 334 nps 339210 fen r3r1k1/1bpnqppp/1p1p4/p2Pp3/1PP1P3/P5P1/1BQ2PBP/1R1R2K1 b - -
+time 334 nps 587296 fen 1r6/4Pk2/1p1p1P2/p7/8/1P1K2p1/P7/5R2 b - -
+time 335 nps 302451 fen 1rbqk2r/2pp1ppp/p1n2n2/1pb1p3/P3P3/1B3N2/1PPP1PPP/RNBQ1RK1 w k -
+time 334 nps 436440 fen r4bk1/6pp/1B2n3/4P3/pp6/1P2N1P1/P5KP/3R4 w - -
+time 334 nps 278503 fen r1bqkb1r/pp1n1ppp/2n5/2ppP3/3P1P2/5N2/PP4PP/RNBQKB1R w KQkq -
+time 334 nps 424168 fen r1qr2k1/2p2pPp/p3n3/1p6/8/4BQ2/PP3PPP/R2R2K1 w - -
+time 334 nps 479159 fen 4r3/1p4k1/p1p1P1pp/3p4/1P1N4/P6B/7P/4K3 w - -
+time 334 nps 324748 fen 8/R4pk1/4pbq1/8/2P4p/5Q2/8/5K2 b - -
+time 335 nps 448472 fen 4k3/R4pp1/P7/4P2p/5P2/3p2P1/r7/4K3 w - -
+time 334 nps 355853 fen 2r3k1/1p4p1/p3bp2/8/N3Pb1p/2R4P/1PP1Q1P1/2q3BK b - -
+time 334 nps 318811 fen rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -
+time 334 nps 765339 fen 8/6N1/8/1k4K1/3n4/8/5P2/8 b - -
+time 335 nps 312039 fen rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -
+time 334 nps 482446 fen 8/PRn5/3k4/r4p2/5PB1/8/5P2/6K1 w - -
+time 334 nps 554728 fen r5k1/4Rpp1/3p3p/2pP4/p1P3P1/1P6/P4PP1/5K2 w - -
+time 334 nps 634560 fen 5n2/2k1KB2/7P/8/3n1P2/8/p1N5/8 w - -
+time 334 nps 327036 fen rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -
+result nps 411832
 
 *** Node count and branching factor:
 python Tools/nodetest.py 8 < Data/thousand.epd | awk '\
 	/ nodes / { n[$5] += $10; n[-1] += !$5 }\
 	END       { for (d=0; n[d]; d++) print d, n[d], n[d] / n[d-1] }'
-0 6254 6.254
-1 86473 13.8268
-2 436649 5.04954
-3 2057927 4.713
-4 7556681 3.67199
-5 16024251 2.12054
-6 41473293 2.58816
-7 86564001 2.08722
-8 193532887 2.23572
+0 5993 5.993
+1 80100 13.3656
+2 401978 5.01845
+3 1912729 4.75829
+4 6727403 3.51718
+5 14217332 2.11335
+6 37048987 2.6059
+7 77665471 2.09629
+8 170153638 2.19085
 
 *** Evaluation residual:
 bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/tune.py -q Tuning/vector.json
-vector filename 'Tuning/vector.json' residual 0.316159962 positions 3000000 depth 0
+vector filename 'Tuning/vector.json' residual 0.316159781 positions 3000000 depth 0
 
 
 *** Game playing:
 Indexing opening suite...
-Started game 1 of 50 (Floyd x7c96b2ca vs Floyd 0.8)
-Started game 2 of 50 (Floyd 0.8 vs Floyd x7c96b2ca)
-Started game 3 of 50 (Floyd x7c96b2ca vs Floyd 0.8)
-Started game 4 of 50 (Floyd 0.8 vs Floyd x7c96b2ca)
-Finished game 1 (Floyd x7c96b2ca vs Floyd 0.8): 1/2-1/2 {Draw by 3-fold repetition}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 0 - 0 - 1  [0.500] 1
-Started game 5 of 50 (Floyd x7c96b2ca vs Floyd 0.8)
-Finished game 3 (Floyd x7c96b2ca vs Floyd 0.8): 1-0 {White mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 1 - 0 - 1  [0.750] 2
-Started game 6 of 50 (Floyd 0.8 vs Floyd x7c96b2ca)
-Finished game 4 (Floyd 0.8 vs Floyd x7c96b2ca): 1-0 {White mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 1 - 1 - 1  [0.500] 3
-Started game 7 of 50 (Floyd x7c96b2ca vs Floyd 0.8)
-Finished game 2 (Floyd 0.8 vs Floyd x7c96b2ca): 0-1 {Black mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 2 - 1 - 1  [0.625] 4
-Started game 8 of 50 (Floyd 0.8 vs Floyd x7c96b2ca)
-Finished game 5 (Floyd x7c96b2ca vs Floyd 0.8): 1/2-1/2 {Draw by insufficient mating material}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 2 - 1 - 2  [0.600] 5
-Started game 9 of 50 (Floyd x7c96b2ca vs Floyd 0.8)
-Finished game 6 (Floyd 0.8 vs Floyd x7c96b2ca): 1-0 {White mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 2 - 2 - 2  [0.500] 6
-Started game 10 of 50 (Floyd 0.8 vs Floyd x7c96b2ca)
-Finished game 8 (Floyd 0.8 vs Floyd x7c96b2ca): 1-0 {White mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 2 - 3 - 2  [0.429] 7
-Started game 11 of 50 (Floyd x7c96b2ca vs Floyd 0.8)
-Finished game 7 (Floyd x7c96b2ca vs Floyd 0.8): 1-0 {White mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 3 - 3 - 2  [0.500] 8
-Started game 12 of 50 (Floyd 0.8 vs Floyd x7c96b2ca)
-Finished game 9 (Floyd x7c96b2ca vs Floyd 0.8): 1-0 {White mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 4 - 3 - 2  [0.556] 9
-Started game 13 of 50 (Floyd x7c96b2ca vs Floyd 0.8)
-Finished game 10 (Floyd 0.8 vs Floyd x7c96b2ca): 1-0 {White mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 4 - 4 - 2  [0.500] 10
-Started game 14 of 50 (Floyd 0.8 vs Floyd x7c96b2ca)
-Finished game 11 (Floyd x7c96b2ca vs Floyd 0.8): 1/2-1/2 {Draw by 3-fold repetition}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 4 - 4 - 3  [0.500] 11
-Started game 15 of 50 (Floyd x7c96b2ca vs Floyd 0.8)
-Finished game 12 (Floyd 0.8 vs Floyd x7c96b2ca): 1/2-1/2 {Draw by 3-fold repetition}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 4 - 4 - 4  [0.500] 12
-Started game 16 of 50 (Floyd 0.8 vs Floyd x7c96b2ca)
-Finished game 13 (Floyd x7c96b2ca vs Floyd 0.8): 1-0 {White mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 5 - 4 - 4  [0.538] 13
-Started game 17 of 50 (Floyd x7c96b2ca vs Floyd 0.8)
-Finished game 16 (Floyd 0.8 vs Floyd x7c96b2ca): 1/2-1/2 {Draw by 3-fold repetition}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 5 - 4 - 5  [0.536] 14
-Started game 18 of 50 (Floyd 0.8 vs Floyd x7c96b2ca)
-Finished game 15 (Floyd x7c96b2ca vs Floyd 0.8): 1-0 {White mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 6 - 4 - 5  [0.567] 15
-Started game 19 of 50 (Floyd x7c96b2ca vs Floyd 0.8)
-Finished game 14 (Floyd 0.8 vs Floyd x7c96b2ca): 1/2-1/2 {Draw by fifty moves rule}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 6 - 4 - 6  [0.562] 16
-Started game 20 of 50 (Floyd 0.8 vs Floyd x7c96b2ca)
-Finished game 17 (Floyd x7c96b2ca vs Floyd 0.8): 1/2-1/2 {Draw by 3-fold repetition}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 6 - 4 - 7  [0.559] 17
-Started game 21 of 50 (Floyd x7c96b2ca vs Floyd 0.8)
-Finished game 19 (Floyd x7c96b2ca vs Floyd 0.8): 1/2-1/2 {Draw by 3-fold repetition}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 6 - 4 - 8  [0.556] 18
-Started game 22 of 50 (Floyd 0.8 vs Floyd x7c96b2ca)
-Finished game 20 (Floyd 0.8 vs Floyd x7c96b2ca): 0-1 {Black mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 7 - 4 - 8  [0.579] 19
-Started game 23 of 50 (Floyd x7c96b2ca vs Floyd 0.8)
-Finished game 18 (Floyd 0.8 vs Floyd x7c96b2ca): 1-0 {White mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 7 - 5 - 8  [0.550] 20
-Started game 24 of 50 (Floyd 0.8 vs Floyd x7c96b2ca)
-Finished game 21 (Floyd x7c96b2ca vs Floyd 0.8): 0-1 {Black mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 7 - 6 - 8  [0.524] 21
-Started game 25 of 50 (Floyd x7c96b2ca vs Floyd 0.8)
-Finished game 22 (Floyd 0.8 vs Floyd x7c96b2ca): 0-1 {Black mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 8 - 6 - 8  [0.545] 22
-Started game 26 of 50 (Floyd 0.8 vs Floyd x7c96b2ca)
-Finished game 23 (Floyd x7c96b2ca vs Floyd 0.8): 1/2-1/2 {Draw by insufficient mating material}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 8 - 6 - 9  [0.543] 23
-Started game 27 of 50 (Floyd x7c96b2ca vs Floyd 0.8)
-Finished game 24 (Floyd 0.8 vs Floyd x7c96b2ca): 0-1 {Black mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 9 - 6 - 9  [0.562] 24
-Started game 28 of 50 (Floyd 0.8 vs Floyd x7c96b2ca)
-Finished game 25 (Floyd x7c96b2ca vs Floyd 0.8): 1/2-1/2 {Draw by 3-fold repetition}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 9 - 6 - 10  [0.560] 25
-Started game 29 of 50 (Floyd x7c96b2ca vs Floyd 0.8)
-Finished game 26 (Floyd 0.8 vs Floyd x7c96b2ca): 0-1 {Black mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 10 - 6 - 10  [0.577] 26
-Started game 30 of 50 (Floyd 0.8 vs Floyd x7c96b2ca)
-Finished game 27 (Floyd x7c96b2ca vs Floyd 0.8): 0-1 {Black mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 10 - 7 - 10  [0.556] 27
-Started game 31 of 50 (Floyd x7c96b2ca vs Floyd 0.8)
-Finished game 28 (Floyd 0.8 vs Floyd x7c96b2ca): 1/2-1/2 {Draw by 3-fold repetition}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 10 - 7 - 11  [0.554] 28
-Started game 32 of 50 (Floyd 0.8 vs Floyd x7c96b2ca)
-Finished game 29 (Floyd x7c96b2ca vs Floyd 0.8): 1-0 {White mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 11 - 7 - 11  [0.569] 29
-Started game 33 of 50 (Floyd x7c96b2ca vs Floyd 0.8)
-Finished game 30 (Floyd 0.8 vs Floyd x7c96b2ca): 0-1 {Black mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 12 - 7 - 11  [0.583] 30
-Started game 34 of 50 (Floyd 0.8 vs Floyd x7c96b2ca)
-Finished game 31 (Floyd x7c96b2ca vs Floyd 0.8): 0-1 {Black mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 12 - 8 - 11  [0.565] 31
-Started game 35 of 50 (Floyd x7c96b2ca vs Floyd 0.8)
-Finished game 32 (Floyd 0.8 vs Floyd x7c96b2ca): 0-1 {Black mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 13 - 8 - 11  [0.578] 32
-Started game 36 of 50 (Floyd 0.8 vs Floyd x7c96b2ca)
-Finished game 33 (Floyd x7c96b2ca vs Floyd 0.8): 1-0 {White mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 14 - 8 - 11  [0.591] 33
-Started game 37 of 50 (Floyd x7c96b2ca vs Floyd 0.8)
-Finished game 35 (Floyd x7c96b2ca vs Floyd 0.8): 1-0 {White mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 15 - 8 - 11  [0.603] 34
-Started game 38 of 50 (Floyd 0.8 vs Floyd x7c96b2ca)
-Finished game 34 (Floyd 0.8 vs Floyd x7c96b2ca): 1-0 {White mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 15 - 9 - 11  [0.586] 35
-Started game 39 of 50 (Floyd x7c96b2ca vs Floyd 0.8)
-Finished game 37 (Floyd x7c96b2ca vs Floyd 0.8): 1-0 {White mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 16 - 9 - 11  [0.597] 36
-Started game 40 of 50 (Floyd 0.8 vs Floyd x7c96b2ca)
-Finished game 36 (Floyd 0.8 vs Floyd x7c96b2ca): 1-0 {White mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 16 - 10 - 11  [0.581] 37
-Started game 41 of 50 (Floyd x7c96b2ca vs Floyd 0.8)
-Finished game 38 (Floyd 0.8 vs Floyd x7c96b2ca): 1/2-1/2 {Draw by 3-fold repetition}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 16 - 10 - 12  [0.579] 38
-Started game 42 of 50 (Floyd 0.8 vs Floyd x7c96b2ca)
-Finished game 39 (Floyd x7c96b2ca vs Floyd 0.8): 1-0 {White mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 17 - 10 - 12  [0.590] 39
-Started game 43 of 50 (Floyd x7c96b2ca vs Floyd 0.8)
-Finished game 41 (Floyd x7c96b2ca vs Floyd 0.8): 1-0 {White mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 18 - 10 - 12  [0.600] 40
-Started game 44 of 50 (Floyd 0.8 vs Floyd x7c96b2ca)
-Finished game 40 (Floyd 0.8 vs Floyd x7c96b2ca): 1/2-1/2 {Draw by 3-fold repetition}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 18 - 10 - 13  [0.598] 41
-Started game 45 of 50 (Floyd x7c96b2ca vs Floyd 0.8)
-Finished game 42 (Floyd 0.8 vs Floyd x7c96b2ca): 1/2-1/2 {Draw by 3-fold repetition}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 18 - 10 - 14  [0.595] 42
-Started game 46 of 50 (Floyd 0.8 vs Floyd x7c96b2ca)
-Finished game 43 (Floyd x7c96b2ca vs Floyd 0.8): 1-0 {White mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 19 - 10 - 14  [0.605] 43
-Started game 47 of 50 (Floyd x7c96b2ca vs Floyd 0.8)
-Finished game 44 (Floyd 0.8 vs Floyd x7c96b2ca): 1-0 {White mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 19 - 11 - 14  [0.591] 44
-Started game 48 of 50 (Floyd 0.8 vs Floyd x7c96b2ca)
-Finished game 45 (Floyd x7c96b2ca vs Floyd 0.8): 1-0 {White mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 20 - 11 - 14  [0.600] 45
-Started game 49 of 50 (Floyd x7c96b2ca vs Floyd 0.8)
-Finished game 46 (Floyd 0.8 vs Floyd x7c96b2ca): 1/2-1/2 {Draw by 3-fold repetition}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 20 - 11 - 15  [0.598] 46
-Started game 50 of 50 (Floyd 0.8 vs Floyd x7c96b2ca)
-Finished game 47 (Floyd x7c96b2ca vs Floyd 0.8): 0-1 {Black mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 20 - 12 - 15  [0.585] 47
-Finished game 48 (Floyd 0.8 vs Floyd x7c96b2ca): 0-1 {Black mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 21 - 12 - 15  [0.594] 48
-Finished game 49 (Floyd x7c96b2ca vs Floyd 0.8): 1-0 {White mates}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 22 - 12 - 15  [0.602] 49
-Finished game 50 (Floyd 0.8 vs Floyd x7c96b2ca): 1/2-1/2 {Draw by insufficient mating material}
-Score of Floyd x7c96b2ca vs Floyd 0.8: 22 - 12 - 16  [0.600] 50
-ELO difference: 70
+Started game 3 of 50 (Floyd xe10a938d vs Floyd 0.8)
+Started game 1 of 50 (Floyd xe10a938d vs Floyd 0.8)
+Started game 2 of 50 (Floyd 0.8 vs Floyd xe10a938d)
+Started game 4 of 50 (Floyd 0.8 vs Floyd xe10a938d)
+Finished game 1 (Floyd xe10a938d vs Floyd 0.8): 1/2-1/2 {Draw by 3-fold repetition}
+Score of Floyd xe10a938d vs Floyd 0.8: 0 - 0 - 1  [0.500] 1
+Started game 5 of 50 (Floyd xe10a938d vs Floyd 0.8)
+Finished game 3 (Floyd xe10a938d vs Floyd 0.8): 1-0 {White mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 1 - 0 - 1  [0.750] 2
+Started game 6 of 50 (Floyd 0.8 vs Floyd xe10a938d)
+Finished game 2 (Floyd 0.8 vs Floyd xe10a938d): 1/2-1/2 {Draw by insufficient mating material}
+Score of Floyd xe10a938d vs Floyd 0.8: 1 - 0 - 2  [0.667] 3
+Started game 7 of 50 (Floyd xe10a938d vs Floyd 0.8)
+Finished game 5 (Floyd xe10a938d vs Floyd 0.8): 1/2-1/2 {Draw by 3-fold repetition}
+Score of Floyd xe10a938d vs Floyd 0.8: 1 - 0 - 3  [0.625] 4
+Started game 8 of 50 (Floyd 0.8 vs Floyd xe10a938d)
+Finished game 4 (Floyd 0.8 vs Floyd xe10a938d): 1/2-1/2 {Draw by fifty moves rule}
+Score of Floyd xe10a938d vs Floyd 0.8: 1 - 0 - 4  [0.600] 5
+Started game 9 of 50 (Floyd xe10a938d vs Floyd 0.8)
+Finished game 6 (Floyd 0.8 vs Floyd xe10a938d): 1-0 {White mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 1 - 1 - 4  [0.500] 6
+Started game 10 of 50 (Floyd 0.8 vs Floyd xe10a938d)
+Finished game 7 (Floyd xe10a938d vs Floyd 0.8): 1/2-1/2 {Draw by 3-fold repetition}
+Score of Floyd xe10a938d vs Floyd 0.8: 1 - 1 - 5  [0.500] 7
+Started game 11 of 50 (Floyd xe10a938d vs Floyd 0.8)
+Finished game 8 (Floyd 0.8 vs Floyd xe10a938d): 1/2-1/2 {Draw by 3-fold repetition}
+Score of Floyd xe10a938d vs Floyd 0.8: 1 - 1 - 6  [0.500] 8
+Started game 12 of 50 (Floyd 0.8 vs Floyd xe10a938d)
+Finished game 9 (Floyd xe10a938d vs Floyd 0.8): 1-0 {White mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 2 - 1 - 6  [0.556] 9
+Started game 13 of 50 (Floyd xe10a938d vs Floyd 0.8)
+Finished game 10 (Floyd 0.8 vs Floyd xe10a938d): 0-1 {Black mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 3 - 1 - 6  [0.600] 10
+Started game 14 of 50 (Floyd 0.8 vs Floyd xe10a938d)
+Finished game 11 (Floyd xe10a938d vs Floyd 0.8): 0-1 {Black mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 3 - 2 - 6  [0.545] 11
+Started game 15 of 50 (Floyd xe10a938d vs Floyd 0.8)
+Finished game 12 (Floyd 0.8 vs Floyd xe10a938d): 1-0 {White mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 3 - 3 - 6  [0.500] 12
+Started game 16 of 50 (Floyd 0.8 vs Floyd xe10a938d)
+Finished game 13 (Floyd xe10a938d vs Floyd 0.8): 1-0 {White mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 4 - 3 - 6  [0.538] 13
+Started game 17 of 50 (Floyd xe10a938d vs Floyd 0.8)
+Finished game 15 (Floyd xe10a938d vs Floyd 0.8): 1-0 {White mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 5 - 3 - 6  [0.571] 14
+Started game 18 of 50 (Floyd 0.8 vs Floyd xe10a938d)
+Finished game 14 (Floyd 0.8 vs Floyd xe10a938d): 0-1 {Black mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 6 - 3 - 6  [0.600] 15
+Started game 19 of 50 (Floyd xe10a938d vs Floyd 0.8)
+Finished game 16 (Floyd 0.8 vs Floyd xe10a938d): 1/2-1/2 {Draw by fifty moves rule}
+Score of Floyd xe10a938d vs Floyd 0.8: 6 - 3 - 7  [0.594] 16
+Started game 20 of 50 (Floyd 0.8 vs Floyd xe10a938d)
+Finished game 18 (Floyd 0.8 vs Floyd xe10a938d): 1-0 {White mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 6 - 4 - 7  [0.559] 17
+Started game 21 of 50 (Floyd xe10a938d vs Floyd 0.8)
+Finished game 17 (Floyd xe10a938d vs Floyd 0.8): 1-0 {White mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 7 - 4 - 7  [0.583] 18
+Started game 22 of 50 (Floyd 0.8 vs Floyd xe10a938d)
+Finished game 19 (Floyd xe10a938d vs Floyd 0.8): 1/2-1/2 {Draw by 3-fold repetition}
+Score of Floyd xe10a938d vs Floyd 0.8: 7 - 4 - 8  [0.579] 19
+Started game 23 of 50 (Floyd xe10a938d vs Floyd 0.8)
+Finished game 21 (Floyd xe10a938d vs Floyd 0.8): 1-0 {White mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 8 - 4 - 8  [0.600] 20
+Started game 24 of 50 (Floyd 0.8 vs Floyd xe10a938d)
+Finished game 22 (Floyd 0.8 vs Floyd xe10a938d): 0-1 {Black mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 9 - 4 - 8  [0.619] 21
+Started game 25 of 50 (Floyd xe10a938d vs Floyd 0.8)
+Finished game 23 (Floyd xe10a938d vs Floyd 0.8): 1-0 {White mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 10 - 4 - 8  [0.636] 22
+Started game 26 of 50 (Floyd 0.8 vs Floyd xe10a938d)
+Finished game 20 (Floyd 0.8 vs Floyd xe10a938d): 0-1 {Black mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 11 - 4 - 8  [0.652] 23
+Started game 27 of 50 (Floyd xe10a938d vs Floyd 0.8)
+Finished game 24 (Floyd 0.8 vs Floyd xe10a938d): 0-1 {Black mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 12 - 4 - 8  [0.667] 24
+Started game 28 of 50 (Floyd 0.8 vs Floyd xe10a938d)
+Finished game 27 (Floyd xe10a938d vs Floyd 0.8): 1/2-1/2 {Draw by 3-fold repetition}
+Score of Floyd xe10a938d vs Floyd 0.8: 12 - 4 - 9  [0.660] 25
+Started game 29 of 50 (Floyd xe10a938d vs Floyd 0.8)
+Finished game 26 (Floyd 0.8 vs Floyd xe10a938d): 0-1 {Black mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 13 - 4 - 9  [0.673] 26
+Started game 30 of 50 (Floyd 0.8 vs Floyd xe10a938d)
+Finished game 25 (Floyd xe10a938d vs Floyd 0.8): 1/2-1/2 {Draw by fifty moves rule}
+Score of Floyd xe10a938d vs Floyd 0.8: 13 - 4 - 10  [0.667] 27
+Started game 31 of 50 (Floyd xe10a938d vs Floyd 0.8)
+Finished game 28 (Floyd 0.8 vs Floyd xe10a938d): 1/2-1/2 {Draw by insufficient mating material}
+Score of Floyd xe10a938d vs Floyd 0.8: 13 - 4 - 11  [0.661] 28
+Started game 32 of 50 (Floyd 0.8 vs Floyd xe10a938d)
+Finished game 29 (Floyd xe10a938d vs Floyd 0.8): 1/2-1/2 {Draw by insufficient mating material}
+Score of Floyd xe10a938d vs Floyd 0.8: 13 - 4 - 12  [0.655] 29
+Started game 33 of 50 (Floyd xe10a938d vs Floyd 0.8)
+Finished game 31 (Floyd xe10a938d vs Floyd 0.8): 1/2-1/2 {Draw by 3-fold repetition}
+Score of Floyd xe10a938d vs Floyd 0.8: 13 - 4 - 13  [0.650] 30
+Started game 34 of 50 (Floyd 0.8 vs Floyd xe10a938d)
+Finished game 30 (Floyd 0.8 vs Floyd xe10a938d): 0-1 {Black mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 14 - 4 - 13  [0.661] 31
+Started game 35 of 50 (Floyd xe10a938d vs Floyd 0.8)
+Finished game 33 (Floyd xe10a938d vs Floyd 0.8): 1/2-1/2 {Draw by 3-fold repetition}
+Score of Floyd xe10a938d vs Floyd 0.8: 14 - 4 - 14  [0.656] 32
+Started game 36 of 50 (Floyd 0.8 vs Floyd xe10a938d)
+Finished game 32 (Floyd 0.8 vs Floyd xe10a938d): 0-1 {Black mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 15 - 4 - 14  [0.667] 33
+Started game 37 of 50 (Floyd xe10a938d vs Floyd 0.8)
+Finished game 34 (Floyd 0.8 vs Floyd xe10a938d): 0-1 {Black mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 16 - 4 - 14  [0.676] 34
+Started game 38 of 50 (Floyd 0.8 vs Floyd xe10a938d)
+Finished game 35 (Floyd xe10a938d vs Floyd 0.8): 1-0 {White mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 17 - 4 - 14  [0.686] 35
+Started game 39 of 50 (Floyd xe10a938d vs Floyd 0.8)
+Finished game 36 (Floyd 0.8 vs Floyd xe10a938d): 1/2-1/2 {Draw by 3-fold repetition}
+Score of Floyd xe10a938d vs Floyd 0.8: 17 - 4 - 15  [0.681] 36
+Started game 40 of 50 (Floyd 0.8 vs Floyd xe10a938d)
+Finished game 39 (Floyd xe10a938d vs Floyd 0.8): 1/2-1/2 {Draw by 3-fold repetition}
+Score of Floyd xe10a938d vs Floyd 0.8: 17 - 4 - 16  [0.676] 37
+Started game 41 of 50 (Floyd xe10a938d vs Floyd 0.8)
+Finished game 37 (Floyd xe10a938d vs Floyd 0.8): 0-1 {Black mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 17 - 5 - 16  [0.658] 38
+Started game 42 of 50 (Floyd 0.8 vs Floyd xe10a938d)
+Finished game 38 (Floyd 0.8 vs Floyd xe10a938d): 1/2-1/2 {Draw by 3-fold repetition}
+Score of Floyd xe10a938d vs Floyd 0.8: 17 - 5 - 17  [0.654] 39
+Started game 43 of 50 (Floyd xe10a938d vs Floyd 0.8)
+Finished game 40 (Floyd 0.8 vs Floyd xe10a938d): 0-1 {Black mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 18 - 5 - 17  [0.662] 40
+Started game 44 of 50 (Floyd 0.8 vs Floyd xe10a938d)
+Finished game 41 (Floyd xe10a938d vs Floyd 0.8): 0-1 {Black mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 18 - 6 - 17  [0.646] 41
+Started game 45 of 50 (Floyd xe10a938d vs Floyd 0.8)
+Finished game 42 (Floyd 0.8 vs Floyd xe10a938d): 0-1 {Black mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 19 - 6 - 17  [0.655] 42
+Started game 46 of 50 (Floyd 0.8 vs Floyd xe10a938d)
+Finished game 43 (Floyd xe10a938d vs Floyd 0.8): 1-0 {White mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 20 - 6 - 17  [0.663] 43
+Started game 47 of 50 (Floyd xe10a938d vs Floyd 0.8)
+Finished game 45 (Floyd xe10a938d vs Floyd 0.8): 1-0 {White mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 21 - 6 - 17  [0.670] 44
+Started game 48 of 50 (Floyd 0.8 vs Floyd xe10a938d)
+Finished game 44 (Floyd 0.8 vs Floyd xe10a938d): 1-0 {White mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 21 - 7 - 17  [0.656] 45
+Started game 49 of 50 (Floyd xe10a938d vs Floyd 0.8)
+Finished game 48 (Floyd 0.8 vs Floyd xe10a938d): 0-1 {Black mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 22 - 7 - 17  [0.663] 46
+Started game 50 of 50 (Floyd 0.8 vs Floyd xe10a938d)
+Finished game 47 (Floyd xe10a938d vs Floyd 0.8): 1-0 {White mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 23 - 7 - 17  [0.670] 47
+Finished game 49 (Floyd xe10a938d vs Floyd 0.8): 1/2-1/2 {Draw by 3-fold repetition}
+Score of Floyd xe10a938d vs Floyd 0.8: 23 - 7 - 18  [0.667] 48
+Finished game 50 (Floyd 0.8 vs Floyd xe10a938d): 0-1 {Black mates}
+Score of Floyd xe10a938d vs Floyd 0.8: 24 - 7 - 18  [0.673] 49
+Finished game 46 (Floyd 0.8 vs Floyd xe10a938d): 1/2-1/2 {Draw by insufficient mating material}
+Score of Floyd xe10a938d vs Floyd 0.8: 24 - 7 - 19  [0.670] 50
+ELO difference: 123
 Finished match
 
 *** Tactics:
@@ -678,76 +677,76 @@ test result OK passed 44 total 45
 test result OK passed 45 total 46
 test result OK passed 46 total 47
 test result OK passed 47 total 48
-test result OK passed 48 total 49
-test result OK passed 49 total 50
-test result OK passed 50 total 51
-test result OK passed 51 total 52
-test result OK passed 52 total 53
-test result OK passed 53 total 54
-test result OK passed 54 total 55
-test result OK passed 55 total 56
-test result OK passed 56 total 57
-test result OK passed 57 total 58
-test result OK passed 58 total 59
-test result OK passed 59 total 60
-test result OK passed 60 total 61
-test result OK passed 61 total 62
-test result OK passed 62 total 63
-test result OK passed 63 total 64
-test result OK passed 64 total 65
-test result OK passed 65 total 66
-test result OK passed 66 total 67
-test result OK passed 67 total 68
-test result OK passed 68 total 69
-test result OK passed 69 total 70
-test result FAILED passed 69 total 71
-test result OK passed 70 total 72
-test result OK passed 71 total 73
-test result OK passed 72 total 74
-test result OK passed 73 total 75
-test result OK passed 74 total 76
-test result OK passed 75 total 77
-test result OK passed 76 total 78
-test result OK passed 77 total 79
-test result OK passed 78 total 80
-test result OK passed 79 total 81
-test result OK passed 80 total 82
-test result OK passed 81 total 83
-test result OK passed 82 total 84
-test result OK passed 83 total 85
-test result OK passed 84 total 86
-test result FAILED passed 84 total 87
-test result OK passed 85 total 88
-test result OK passed 86 total 89
-test result OK passed 87 total 90
-test result OK passed 88 total 91
-test result OK passed 89 total 92
-test result OK passed 90 total 93
-test result OK passed 91 total 94
-test result OK passed 92 total 95
-test result OK passed 93 total 96
-test result OK passed 94 total 97
-test result OK passed 95 total 98
-test result OK passed 96 total 99
-test result FAILED passed 96 total 100
-test result FAILED passed 96 total 101
-test result OK passed 97 total 102
-test result OK passed 98 total 103
-test result OK passed 99 total 104
-test result OK passed 100 total 105
-test result OK passed 101 total 106
-test result OK passed 102 total 107
-test result OK passed 103 total 108
-test result OK passed 104 total 109
-test result OK passed 105 total 110
-test result OK passed 106 total 111
-test result OK passed 107 total 112
-test result OK passed 108 total 113
-test result OK passed 109 total 114
-test result OK passed 110 total 115
-test result OK passed 111 total 116
-test result OK passed 112 total 117
-test result OK passed 113 total 118
+test result FAILED passed 47 total 49
+test result OK passed 48 total 50
+test result OK passed 49 total 51
+test result OK passed 50 total 52
+test result OK passed 51 total 53
+test result OK passed 52 total 54
+test result OK passed 53 total 55
+test result OK passed 54 total 56
+test result OK passed 55 total 57
+test result OK passed 56 total 58
+test result OK passed 57 total 59
+test result OK passed 58 total 60
+test result OK passed 59 total 61
+test result OK passed 60 total 62
+test result OK passed 61 total 63
+test result OK passed 62 total 64
+test result OK passed 63 total 65
+test result OK passed 64 total 66
+test result OK passed 65 total 67
+test result OK passed 66 total 68
+test result OK passed 67 total 69
+test result OK passed 68 total 70
+test result FAILED passed 68 total 71
+test result OK passed 69 total 72
+test result OK passed 70 total 73
+test result OK passed 71 total 74
+test result OK passed 72 total 75
+test result OK passed 73 total 76
+test result OK passed 74 total 77
+test result OK passed 75 total 78
+test result OK passed 76 total 79
+test result OK passed 77 total 80
+test result OK passed 78 total 81
+test result OK passed 79 total 82
+test result OK passed 80 total 83
+test result OK passed 81 total 84
+test result OK passed 82 total 85
+test result OK passed 83 total 86
+test result FAILED passed 83 total 87
+test result OK passed 84 total 88
+test result OK passed 85 total 89
+test result OK passed 86 total 90
+test result OK passed 87 total 91
+test result OK passed 88 total 92
+test result OK passed 89 total 93
+test result OK passed 90 total 94
+test result OK passed 91 total 95
+test result OK passed 92 total 96
+test result OK passed 93 total 97
+test result OK passed 94 total 98
+test result OK passed 95 total 99
+test result OK passed 96 total 100
+test result OK passed 97 total 101
+test result OK passed 98 total 102
+test result OK passed 99 total 103
+test result OK passed 100 total 104
+test result OK passed 101 total 105
+test result OK passed 102 total 106
+test result OK passed 103 total 107
+test result OK passed 104 total 108
+test result OK passed 105 total 109
+test result OK passed 106 total 110
+test result OK passed 107 total 111
+test result OK passed 108 total 112
+test result OK passed 109 total 113
+test result OK passed 110 total 114
+test result OK passed 111 total 115
+test result OK passed 112 total 116
+test result OK passed 113 total 117
+test result FAILED passed 113 total 118
 test result OK passed 114 total 119
 test result OK passed 115 total 120
 test result OK passed 116 total 121
@@ -786,399 +785,399 @@ test result OK passed 145 total 153
 test result OK passed 146 total 154
 test result OK passed 147 total 155
 test result OK passed 148 total 156
-test result OK passed 149 total 157
-test result OK passed 150 total 158
-test result OK passed 151 total 159
-test result OK passed 152 total 160
-test result OK passed 153 total 161
-test result OK passed 154 total 162
-test result FAILED passed 154 total 163
-test result OK passed 155 total 164
-test result OK passed 156 total 165
-test result OK passed 157 total 166
-test result OK passed 158 total 167
-test result OK passed 159 total 168
-test result OK passed 160 total 169
-test result OK passed 161 total 170
-test result OK passed 162 total 171
-test result OK passed 163 total 172
-test result OK passed 164 total 173
-test result OK passed 165 total 174
-test result OK passed 166 total 175
-test result OK passed 167 total 176
-test result OK passed 168 total 177
-test result OK passed 169 total 178
-test result OK passed 170 total 179
-test result FAILED passed 170 total 180
-test result OK passed 171 total 181
-test result OK passed 172 total 182
-test result OK passed 173 total 183
-test result OK passed 174 total 184
-test result OK passed 175 total 185
-test result OK passed 176 total 186
-test result OK passed 177 total 187
-test result OK passed 178 total 188
-test result OK passed 179 total 189
-test result OK passed 180 total 190
-test result OK passed 181 total 191
-test result OK passed 182 total 192
-test result FAILED passed 182 total 193
-test result OK passed 183 total 194
-test result OK passed 184 total 195
-test result OK passed 185 total 196
-test result OK passed 186 total 197
-test result OK passed 187 total 198
-test result OK passed 188 total 199
-test result FAILED passed 188 total 200
-test result OK passed 189 total 201
-test result OK passed 190 total 202
-test result OK passed 191 total 203
-test result OK passed 192 total 204
-test result OK passed 193 total 205
-test result OK passed 194 total 206
-test result FAILED passed 194 total 207
-test result OK passed 195 total 208
-test result OK passed 196 total 209
-test result FAILED passed 196 total 210
-test result OK passed 197 total 211
-test result OK passed 198 total 212
-test result FAILED passed 198 total 213
-test result OK passed 199 total 214
-test result OK passed 200 total 215
-test result OK passed 201 total 216
-test result OK passed 202 total 217
-test result OK passed 203 total 218
-test result OK passed 204 total 219
-test result OK passed 205 total 220
-test result OK passed 206 total 221
-test result FAILED passed 206 total 222
-test result OK passed 207 total 223
-test result OK passed 208 total 224
-test result OK passed 209 total 225
-test result OK passed 210 total 226
-test result OK passed 211 total 227
-test result OK passed 212 total 228
-test result FAILED passed 212 total 229
-test result FAILED passed 212 total 230
-test result OK passed 213 total 231
-test result OK passed 214 total 232
-test result OK passed 215 total 233
-test result OK passed 216 total 234
-test result OK passed 217 total 235
-test result OK passed 218 total 236
-test result FAILED passed 218 total 237
-test result OK passed 219 total 238
-test result OK passed 220 total 239
-test result OK passed 221 total 240
-test result FAILED passed 221 total 241
-test result OK passed 222 total 242
-test result OK passed 223 total 243
-test result OK passed 224 total 244
-test result OK passed 225 total 245
-test result OK passed 226 total 246
-test result FAILED passed 226 total 247
-test result OK passed 227 total 248
-test result OK passed 228 total 249
-test result OK passed 229 total 250
-test result OK passed 230 total 251
-test result FAILED passed 230 total 252
-test result OK passed 231 total 253
-test result OK passed 232 total 254
-test result OK passed 233 total 255
-test result FAILED passed 233 total 256
-test result OK passed 234 total 257
-test result OK passed 235 total 258
-test result OK passed 236 total 259
-test result OK passed 237 total 260
-test result OK passed 238 total 261
-test result OK passed 239 total 262
-test result OK passed 240 total 263
-test result OK passed 241 total 264
-test result FAILED passed 241 total 265
-test result OK passed 242 total 266
-test result OK passed 243 total 267
-test result OK passed 244 total 268
-test result OK passed 245 total 269
-test result OK passed 246 total 270
-test result OK passed 247 total 271
-test result OK passed 248 total 272
-test result OK passed 249 total 273
-test result OK passed 250 total 274
-test result OK passed 251 total 275
-test result OK passed 252 total 276
-test result OK passed 253 total 277
-test result OK passed 254 total 278
-test result OK passed 255 total 279
-test result FAILED passed 255 total 280
-test result OK passed 256 total 281
-test result OK passed 257 total 282
-test result FAILED passed 257 total 283
-test result OK passed 258 total 284
-test result OK passed 259 total 285
-test result OK passed 260 total 286
-test result OK passed 261 total 287
-test result OK passed 262 total 288
-test result OK passed 263 total 289
-test result OK passed 264 total 290
-test result FAILED passed 264 total 291
-test result OK passed 265 total 292
-test result FAILED passed 265 total 293
-test result FAILED passed 265 total 294
-test result OK passed 266 total 295
-test result FAILED passed 266 total 296
-test result FAILED passed 266 total 297
-test result OK passed 267 total 298
-test result OK passed 268 total 299
-test result OK passed 269 total 300
+test result FAILED passed 148 total 157
+test result OK passed 149 total 158
+test result OK passed 150 total 159
+test result OK passed 151 total 160
+test result OK passed 152 total 161
+test result OK passed 153 total 162
+test result FAILED passed 153 total 163
+test result OK passed 154 total 164
+test result OK passed 155 total 165
+test result OK passed 156 total 166
+test result OK passed 157 total 167
+test result OK passed 158 total 168
+test result OK passed 159 total 169
+test result OK passed 160 total 170
+test result OK passed 161 total 171
+test result OK passed 162 total 172
+test result OK passed 163 total 173
+test result OK passed 164 total 174
+test result OK passed 165 total 175
+test result OK passed 166 total 176
+test result OK passed 167 total 177
+test result OK passed 168 total 178
+test result OK passed 169 total 179
+test result FAILED passed 169 total 180
+test result OK passed 170 total 181
+test result OK passed 171 total 182
+test result OK passed 172 total 183
+test result OK passed 173 total 184
+test result OK passed 174 total 185
+test result OK passed 175 total 186
+test result OK passed 176 total 187
+test result OK passed 177 total 188
+test result OK passed 178 total 189
+test result OK passed 179 total 190
+test result OK passed 180 total 191
+test result OK passed 181 total 192
+test result FAILED passed 181 total 193
+test result OK passed 182 total 194
+test result OK passed 183 total 195
+test result FAILED passed 183 total 196
+test result OK passed 184 total 197
+test result OK passed 185 total 198
+test result OK passed 186 total 199
+test result FAILED passed 186 total 200
+test result OK passed 187 total 201
+test result OK passed 188 total 202
+test result OK passed 189 total 203
+test result OK passed 190 total 204
+test result OK passed 191 total 205
+test result OK passed 192 total 206
+test result FAILED passed 192 total 207
+test result OK passed 193 total 208
+test result OK passed 194 total 209
+test result FAILED passed 194 total 210
+test result OK passed 195 total 211
+test result OK passed 196 total 212
+test result FAILED passed 196 total 213
+test result OK passed 197 total 214
+test result OK passed 198 total 215
+test result OK passed 199 total 216
+test result OK passed 200 total 217
+test result OK passed 201 total 218
+test result OK passed 202 total 219
+test result OK passed 203 total 220
+test result OK passed 204 total 221
+test result FAILED passed 204 total 222
+test result OK passed 205 total 223
+test result OK passed 206 total 224
+test result OK passed 207 total 225
+test result OK passed 208 total 226
+test result OK passed 209 total 227
+test result OK passed 210 total 228
+test result FAILED passed 210 total 229
+test result FAILED passed 210 total 230
+test result OK passed 211 total 231
+test result OK passed 212 total 232
+test result OK passed 213 total 233
+test result OK passed 214 total 234
+test result OK passed 215 total 235
+test result OK passed 216 total 236
+test result FAILED passed 216 total 237
+test result OK passed 217 total 238
+test result OK passed 218 total 239
+test result OK passed 219 total 240
+test result FAILED passed 219 total 241
+test result FAILED passed 219 total 242
+test result OK passed 220 total 243
+test result OK passed 221 total 244
+test result OK passed 222 total 245
+test result OK passed 223 total 246
+test result FAILED passed 223 total 247
+test result OK passed 224 total 248
+test result OK passed 225 total 249
+test result OK passed 226 total 250
+test result OK passed 227 total 251
+test result FAILED passed 227 total 252
+test result OK passed 228 total 253
+test result OK passed 229 total 254
+test result OK passed 230 total 255
+test result FAILED passed 230 total 256
+test result FAILED passed 230 total 257
+test result OK passed 231 total 258
+test result OK passed 232 total 259
+test result OK passed 233 total 260
+test result OK passed 234 total 261
+test result OK passed 235 total 262
+test result OK passed 236 total 263
+test result OK passed 237 total 264
+test result FAILED passed 237 total 265
+test result OK passed 238 total 266
+test result OK passed 239 total 267
+test result OK passed 240 total 268
+test result OK passed 241 total 269
+test result OK passed 242 total 270
+test result OK passed 243 total 271
+test result OK passed 244 total 272
+test result OK passed 245 total 273
+test result OK passed 246 total 274
+test result OK passed 247 total 275
+test result OK passed 248 total 276
+test result FAILED passed 248 total 277
+test result OK passed 249 total 278
+test result OK passed 250 total 279
+test result FAILED passed 250 total 280
+test result OK passed 251 total 281
+test result OK passed 252 total 282
+test result FAILED passed 252 total 283
+test result OK passed 253 total 284
+test result OK passed 254 total 285
+test result OK passed 255 total 286
+test result OK passed 256 total 287
+test result OK passed 257 total 288
+test result OK passed 258 total 289
+test result OK passed 259 total 290
+test result FAILED passed 259 total 291
+test result OK passed 260 total 292
+test result FAILED passed 260 total 293
+test result OK passed 261 total 294
+test result OK passed 262 total 295
+test result OK passed 263 total 296
+test result FAILED passed 263 total 297
+test result OK passed 264 total 298
+test result OK passed 265 total 299
+test result OK passed 266 total 300
 
 *** Strategy:
-01-Undermining.epd                      : 48
+01-Undermining.epd                      : 49
 02-Open_Files_and_Diagonals.epd         : 47
-03-Knight_Outposts.epd                  : 52
-04-Square_Vacancy.epd                   : 43
-05-Bishop_vs_Knight.epd                 : 60
-06-Re-Capturing.epd                     : 61
-07-Offering_of_Simplification.epd       : 45
-08-Advancement_of_fgh_Pawns.epd         : 30
-09-Advancement_of_abc_Pawns.epd         : 37
+03-Knight_Outposts.epd                  : 49
+04-Square_Vacancy.epd                   : 41
+05-Bishop_vs_Knight.epd                 : 58
+06-Re-Capturing.epd                     : 57
+07-Offering_of_Simplification.epd       : 47
+08-Advancement_of_fgh_Pawns.epd         : 31
+09-Advancement_of_abc_Pawns.epd         : 39
 10-Simplification.epd                   : 63
-11_Activity_of_the_King.epd             : 40
+11_Activity_of_the_King.epd             : 41
 12_Center_Control.epd                   : 51
-13_Pawn_Play_in_the_Center.epd          : 47
-14_Queens_and_Rooks_to_the_7th_Rank.epd : 49
-Total score: 673 (48.1%)
+13_Pawn_Play_in_the_Center.epd          : 49
+14_Queens_and_Rooks_to_the_7th_Rank.epd : 48
+Total score: 670 (47.9%)
 
 *** Check mate:
-       82.59 real        82.53 user         0.05 sys
-test result OK passed 1 total 1
-test result OK passed 2 total 2
-test result OK passed 3 total 3
-test result OK passed 4 total 4
-test result FAILED passed 4 total 5
-test result OK passed 5 total 6
-test result OK passed 6 total 7
-test result FAILED passed 6 total 8
-test result OK passed 7 total 9
-test result OK passed 8 total 10
-test result OK passed 9 total 11
-test result OK passed 10 total 12
-test result OK passed 11 total 13
-test result OK passed 12 total 14
-test result OK passed 13 total 15
-test result OK passed 14 total 16
-test result OK passed 15 total 17
-test result OK passed 16 total 18
-test result OK passed 17 total 19
-test result OK passed 18 total 20
-test result OK passed 19 total 21
-test result OK passed 20 total 22
-test result OK passed 21 total 23
-test result OK passed 22 total 24
-test result OK passed 23 total 25
-test result OK passed 24 total 26
-test result OK passed 25 total 27
-test result OK passed 26 total 28
-test result OK passed 27 total 29
-test result OK passed 28 total 30
-test result OK passed 29 total 31
-test result OK passed 30 total 32
-test result OK passed 31 total 33
-test result OK passed 32 total 34
-test result FAILED passed 32 total 35
-test result OK passed 33 total 36
-test result FAILED passed 33 total 37
-test result OK passed 34 total 38
-test result OK passed 35 total 39
-test result OK passed 36 total 40
-test result OK passed 37 total 41
-test result OK passed 38 total 42
-test result OK passed 39 total 43
-test result OK passed 40 total 44
-test result OK passed 41 total 45
-test result OK passed 42 total 46
-test result OK passed 43 total 47
-test result OK passed 44 total 48
-test result OK passed 45 total 49
-test result FAILED passed 45 total 50
-test result OK passed 46 total 51
-test result OK passed 47 total 52
-test result OK passed 48 total 53
-test result OK passed 49 total 54
-test result OK passed 50 total 55
-test result OK passed 51 total 56
-test result OK passed 52 total 57
-test result OK passed 53 total 58
-test result OK passed 54 total 59
-test result OK passed 55 total 60
-test result OK passed 56 total 61
-test result OK passed 57 total 62
-test result OK passed 58 total 63
-test result OK passed 59 total 64
-test result OK passed 60 total 65
-test result OK passed 61 total 66
-test result OK passed 62 total 67
-test result OK passed 63 total 68
-test result OK passed 64 total 69
-test result OK passed 65 total 70
-test result OK passed 66 total 71
-test result OK passed 67 total 72
-test result OK passed 68 total 73
-test result OK passed 69 total 74
-test result OK passed 70 total 75
-test result OK passed 71 total 76
-test result OK passed 72 total 77
-test result OK passed 73 total 78
-test result OK passed 74 total 79
-test result OK passed 75 total 80
-test result OK passed 76 total 81
-test result OK passed 77 total 82
-test result OK passed 78 total 83
-test result OK passed 79 total 84
-test result OK passed 80 total 85
-test result OK passed 81 total 86
-test result OK passed 82 total 87
-test result OK passed 83 total 88
-test result OK passed 84 total 89
-test result OK passed 85 total 90
-test result OK passed 86 total 91
-test result OK passed 87 total 92
-test result OK passed 88 total 93
-test result OK passed 89 total 94
-test result OK passed 90 total 95
-test result OK passed 91 total 96
-test result OK passed 92 total 97
-test result OK passed 93 total 98
-test result OK passed 94 total 99
-test result OK passed 95 total 100
+       72.20 real        72.14 user         0.05 sys
+test result FAILED passed 0 total 1
+test result OK passed 1 total 2
+test result OK passed 2 total 3
+test result OK passed 3 total 4
+test result FAILED passed 3 total 5
+test result OK passed 4 total 6
+test result OK passed 5 total 7
+test result FAILED passed 5 total 8
+test result OK passed 6 total 9
+test result OK passed 7 total 10
+test result OK passed 8 total 11
+test result OK passed 9 total 12
+test result OK passed 10 total 13
+test result OK passed 11 total 14
+test result OK passed 12 total 15
+test result OK passed 13 total 16
+test result OK passed 14 total 17
+test result OK passed 15 total 18
+test result OK passed 16 total 19
+test result OK passed 17 total 20
+test result OK passed 18 total 21
+test result OK passed 19 total 22
+test result OK passed 20 total 23
+test result OK passed 21 total 24
+test result OK passed 22 total 25
+test result OK passed 23 total 26
+test result OK passed 24 total 27
+test result OK passed 25 total 28
+test result OK passed 26 total 29
+test result OK passed 27 total 30
+test result OK passed 28 total 31
+test result OK passed 29 total 32
+test result OK passed 30 total 33
+test result OK passed 31 total 34
+test result FAILED passed 31 total 35
+test result OK passed 32 total 36
+test result FAILED passed 32 total 37
+test result OK passed 33 total 38
+test result OK passed 34 total 39
+test result OK passed 35 total 40
+test result OK passed 36 total 41
+test result OK passed 37 total 42
+test result OK passed 38 total 43
+test result OK passed 39 total 44
+test result OK passed 40 total 45
+test result OK passed 41 total 46
+test result OK passed 42 total 47
+test result OK passed 43 total 48
+test result OK passed 44 total 49
+test result FAILED passed 44 total 50
+test result OK passed 45 total 51
+test result OK passed 46 total 52
+test result OK passed 47 total 53
+test result OK passed 48 total 54
+test result OK passed 49 total 55
+test result OK passed 50 total 56
+test result OK passed 51 total 57
+test result OK passed 52 total 58
+test result OK passed 53 total 59
+test result OK passed 54 total 60
+test result FAILED passed 54 total 61
+test result OK passed 55 total 62
+test result OK passed 56 total 63
+test result OK passed 57 total 64
+test result OK passed 58 total 65
+test result OK passed 59 total 66
+test result OK passed 60 total 67
+test result OK passed 61 total 68
+test result OK passed 62 total 69
+test result OK passed 63 total 70
+test result OK passed 64 total 71
+test result OK passed 65 total 72
+test result OK passed 66 total 73
+test result OK passed 67 total 74
+test result OK passed 68 total 75
+test result OK passed 69 total 76
+test result OK passed 70 total 77
+test result OK passed 71 total 78
+test result OK passed 72 total 79
+test result OK passed 73 total 80
+test result OK passed 74 total 81
+test result OK passed 75 total 82
+test result OK passed 76 total 83
+test result OK passed 77 total 84
+test result OK passed 78 total 85
+test result OK passed 79 total 86
+test result FAILED passed 79 total 87
+test result OK passed 80 total 88
+test result OK passed 81 total 89
+test result OK passed 82 total 90
+test result OK passed 83 total 91
+test result OK passed 84 total 92
+test result OK passed 85 total 93
+test result OK passed 86 total 94
+test result OK passed 87 total 95
+test result OK passed 88 total 96
+test result OK passed 89 total 97
+test result OK passed 90 total 98
+test result OK passed 91 total 99
+test result OK passed 92 total 100
 
 *** Speed:
 
-Floyd Chess Engine - Version x7c96b2ca
+Floyd Chess Engine - Version xe10a938d
 Copyright (C) 2015-2016, Marcel van Kervinck
 All rights reserved
 
 Type "help" for more information, or "quit" to leave.
 
 egt class KPK check OK
-time 3004 nps 485881 fen r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -
-time 3005 nps 559147 fen 4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -
-time 3002 nps 496396 fen 3rk2r/1pq1bpp1/p1n1p1n1/3pP3/3P2P1/1PPQNNB1/5P2/R3R1K1 b k -
-time 3001 nps 658166 fen 7k/8/1p1Q2pp/1p3b2/3p3P/P3q3/BP4PK/8 b - -
-time 3000 nps 504057 fen 2r1rnk1/4qppp/p3b3/1p4P1/4p2P/2N1PN2/PP1Q1P2/1KR4R w - -
-time 3005 nps 466405 fen 2rk3r/p2n1pp1/bqn1p2p/1p1pP3/3P1N1P/bP1BBN2/P3QPP1/2R1R1K1 w - -
-time 3005 nps 645232 fen 1nr2rk1/p3Qppp/1p2p1n1/8/3P4/2N2N2/PP3PPP/2R2RK1 b - -
-time 3004 nps 849530 fen 3nr1k1/1p1r3p/pR1pNpp1/3P4/4P3/3P3P/6P1/1R5K b - -
-time 3005 nps 562065 fen 4r1k1/pp3ppp/3n4/2n1r3/2P2NP1/4KB2/PP2P2P/R5R1 w - -
-time 3005 nps 926965 fen 8/p5pk/1p6/5R1p/P7/5PPK/5r2/8 b - -
-time 3002 nps 872647 fen 8/2Q2p2/5qpk/4p3/8/5P1P/6K1/8 w - -
-time 3004 nps 613872 fen 5rk1/1pr2bbp/pNp1n1p1/2P1p3/1PBpP3/1N5P/1P3PP1/3RR1K1 b - -
-time 3001 nps 789003 fen 8/1b3pk1/rp5p/6p1/6B1/1R4P1/4P2P/4K3 w - -
-time 3005 nps 544539 fen r1bqk2r/pp2ppbp/3p1np1/8/2PQP3/2N5/PP2BPPP/R1B1K2R w KQkq -
-time 3005 nps 677349 fen 8/1b4pk/7q/p3pP2/1p2P3/1Pp5/2P1Q3/5BK1 b - -
-time 3005 nps 543956 fen r2qkb1r/2p2ppp/p1p5/3pP3/4n1b1/3Q1N2/PPP2PPP/RNB2RK1 w kq -
-time 3004 nps 563460 fen 4r1k1/pp2pp1n/3p2p1/6Bp/2rN1P1P/q1P5/2PQ2P1/1K1RR3 b - -
-time 3005 nps 543685 fen rnbq1rk1/pp3pbp/2pp1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - -
-time 3005 nps 760741 fen 8/8/p3k1p1/Bb5p/1P5P/5P2/1r4P1/3R2K1 b - -
-time 3004 nps 720085 fen 4k3/q4p2/2n1p1p1/p1Np4/3P1QP1/PP3P2/6K1/8 b - -
-time 3005 nps 959730 fen 3bn3/4k3/2p3p1/ppN2P2/P5P1/1P1KB3/8/8 b - -
-time 3001 nps 571061 fen r1b1r1k1/5pbp/pp1p1np1/2qPn3/P1p1P3/2N1BPN1/1P1QB1PP/R1R4K b - -
-time 3004 nps 643063 fen r1q1rnk1/p1p2pp1/bp2p2p/n2pP3/Q1PP1N1B/P1PB1P2/6PP/R4RK1 w - d6
-time 3000 nps 559969 fen r3r1k1/1bpnqppp/1p1p4/p2Pp3/1PP1P3/P5P1/1BQ2PBP/1R1R2K1 b - -
-time 3003 nps 928508 fen 1r6/4Pk2/1p1p1P2/p7/8/1P1K2p1/P7/5R2 b - -
-time 3005 nps 517989 fen 1rbqk2r/2pp1ppp/p1n2n2/1pb1p3/P3P3/1B3N2/1PPP1PPP/RNBQ1RK1 w k -
-time 3002 nps 687234 fen r4bk1/6pp/1B2n3/4P3/pp6/1P2N1P1/P5KP/3R4 w - -
-time 3005 nps 439826 fen r1bqkb1r/pp1n1ppp/2n5/2ppP3/3P1P2/5N2/PP4PP/RNBQKB1R w KQkq -
-time 3003 nps 596500 fen r1qr2k1/2p2pPp/p3n3/1p6/8/4BQ2/PP3PPP/R2R2K1 w - -
-time 3000 nps 832305 fen 4r3/1p4k1/p1p1P1pp/3p4/1P1N4/P6B/7P/4K3 w - -
-time 3005 nps 624279 fen 8/R4pk1/4pbq1/8/2P4p/5Q2/8/5K2 b - -
-time 3005 nps 825619 fen 4k3/R4pp1/P7/4P2p/5P2/3p2P1/r7/4K3 w - -
-time 3002 nps 586355 fen 2r3k1/1p4p1/p3bp2/8/N3Pb1p/2R4P/1PP1Q1P1/2q3BK b - -
-time 3005 nps 486420 fen rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -
-time 3005 nps 1488669 fen 8/6N1/8/1k4K1/3n4/8/5P2/8 b - -
-time 3002 nps 557583 fen rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -
-time 3005 nps 878003 fen 8/PRn5/3k4/r4p2/5PB1/8/5P2/6K1 w - -
-time 3004 nps 964731 fen r5k1/4Rpp1/3p3p/2pP4/p1P3P1/1P6/P4PP1/5K2 w - -
-time 3003 nps 1055965 fen 5n2/2k1KB2/7P/8/3n1P2/8/p1N5/8 w - -
-time 3005 nps 494234 fen rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -
-time 3005 nps 492007 fen r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -
-time 3002 nps 556751 fen 4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -
-time 3005 nps 496284 fen 3rk2r/1pq1bpp1/p1n1p1n1/3pP3/3P2P1/1PPQNNB1/5P2/R3R1K1 b k -
-time 3005 nps 658021 fen 7k/8/1p1Q2pp/1p3b2/3p3P/P3q3/BP4PK/8 b - -
-time 3002 nps 508721 fen 2r1rnk1/4qppp/p3b3/1p4P1/4p2P/2N1PN2/PP1Q1P2/1KR4R w - -
-time 3004 nps 469371 fen 2rk3r/p2n1pp1/bqn1p2p/1p1pP3/3P1N1P/bP1BBN2/P3QPP1/2R1R1K1 w - -
-time 3003 nps 641998 fen 1nr2rk1/p3Qppp/1p2p1n1/8/3P4/2N2N2/PP3PPP/2R2RK1 b - -
-time 3004 nps 841503 fen 3nr1k1/1p1r3p/pR1pNpp1/3P4/4P3/3P3P/6P1/1R5K b - -
-time 3003 nps 563048 fen 4r1k1/pp3ppp/3n4/2n1r3/2P2NP1/4KB2/PP2P2P/R5R1 w - -
-time 3004 nps 927106 fen 8/p5pk/1p6/5R1p/P7/5PPK/5r2/8 b - -
-time 3005 nps 877758 fen 8/2Q2p2/5qpk/4p3/8/5P1P/6K1/8 w - -
-time 3003 nps 613508 fen 5rk1/1pr2bbp/pNp1n1p1/2P1p3/1PBpP3/1N5P/1P3PP1/3RR1K1 b - -
-time 3005 nps 795302 fen 8/1b3pk1/rp5p/6p1/6B1/1R4P1/4P2P/4K3 w - -
-time 3005 nps 536979 fen r1bqk2r/pp2ppbp/3p1np1/8/2PQP3/2N5/PP2BPPP/R1B1K2R w KQkq -
-time 3005 nps 671555 fen 8/1b4pk/7q/p3pP2/1p2P3/1Pp5/2P1Q3/5BK1 b - -
-time 3004 nps 546809 fen r2qkb1r/2p2ppp/p1p5/3pP3/4n1b1/3Q1N2/PPP2PPP/RNB2RK1 w kq -
-time 3003 nps 563882 fen 4r1k1/pp2pp1n/3p2p1/6Bp/2rN1P1P/q1P5/2PQ2P1/1K1RR3 b - -
-time 3001 nps 541056 fen rnbq1rk1/pp3pbp/2pp1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - -
-time 3003 nps 756170 fen 8/8/p3k1p1/Bb5p/1P5P/5P2/1r4P1/3R2K1 b - -
-time 3001 nps 723359 fen 4k3/q4p2/2n1p1p1/p1Np4/3P1QP1/PP3P2/6K1/8 b - -
-time 3000 nps 956995 fen 3bn3/4k3/2p3p1/ppN2P2/P5P1/1P1KB3/8/8 b - -
-time 3005 nps 571522 fen r1b1r1k1/5pbp/pp1p1np1/2qPn3/P1p1P3/2N1BPN1/1P1QB1PP/R1R4K b - -
-time 3002 nps 652962 fen r1q1rnk1/p1p2pp1/bp2p2p/n2pP3/Q1PP1N1B/P1PB1P2/6PP/R4RK1 w - d6
-time 3005 nps 562332 fen r3r1k1/1bpnqppp/1p1p4/p2Pp3/1PP1P3/P5P1/1BQ2PBP/1R1R2K1 b - -
-time 3003 nps 933984 fen 1r6/4Pk2/1p1p1P2/p7/8/1P1K2p1/P7/5R2 b - -
-time 3000 nps 522280 fen 1rbqk2r/2pp1ppp/p1n2n2/1pb1p3/P3P3/1B3N2/1PPP1PPP/RNBQ1RK1 w k -
-time 3005 nps 693029 fen r4bk1/6pp/1B2n3/4P3/pp6/1P2N1P1/P5KP/3R4 w - -
-time 3005 nps 438983 fen r1bqkb1r/pp1n1ppp/2n5/2ppP3/3P1P2/5N2/PP4PP/RNBQKB1R w KQkq -
-time 3003 nps 593399 fen r1qr2k1/2p2pPp/p3n3/1p6/8/4BQ2/PP3PPP/R2R2K1 w - -
-time 3005 nps 834968 fen 4r3/1p4k1/p1p1P1pp/3p4/1P1N4/P6B/7P/4K3 w - -
-time 3005 nps 625831 fen 8/R4pk1/4pbq1/8/2P4p/5Q2/8/5K2 b - -
-time 3002 nps 800399 fen 4k3/R4pp1/P7/4P2p/5P2/3p2P1/r7/4K3 w - -
-time 3003 nps 583093 fen 2r3k1/1p4p1/p3bp2/8/N3Pb1p/2R4P/1PP1Q1P1/2q3BK b - -
-time 3004 nps 482344 fen rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -
-time 3005 nps 1479326 fen 8/6N1/8/1k4K1/3n4/8/5P2/8 b - -
-time 3003 nps 555853 fen rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -
-time 3004 nps 873719 fen 8/PRn5/3k4/r4p2/5PB1/8/5P2/6K1 w - -
-time 3004 nps 951671 fen r5k1/4Rpp1/3p3p/2pP4/p1P3P1/1P6/P4PP1/5K2 w - -
-time 3003 nps 1053303 fen 5n2/2k1KB2/7P/8/3n1P2/8/p1N5/8 w - -
-time 3000 nps 495547 fen rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -
-time 3004 nps 493057 fen r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -
-time 3000 nps 553596 fen 4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -
-time 3002 nps 495867 fen 3rk2r/1pq1bpp1/p1n1p1n1/3pP3/3P2P1/1PPQNNB1/5P2/R3R1K1 b k -
-time 3005 nps 661359 fen 7k/8/1p1Q2pp/1p3b2/3p3P/P3q3/BP4PK/8 b - -
-time 3004 nps 505773 fen 2r1rnk1/4qppp/p3b3/1p4P1/4p2P/2N1PN2/PP1Q1P2/1KR4R w - -
-time 3005 nps 469627 fen 2rk3r/p2n1pp1/bqn1p2p/1p1pP3/3P1N1P/bP1BBN2/P3QPP1/2R1R1K1 w - -
-time 3002 nps 643144 fen 1nr2rk1/p3Qppp/1p2p1n1/8/3P4/2N2N2/PP3PPP/2R2RK1 b - -
-time 3005 nps 850214 fen 3nr1k1/1p1r3p/pR1pNpp1/3P4/4P3/3P3P/6P1/1R5K b - -
-time 3005 nps 562679 fen 4r1k1/pp3ppp/3n4/2n1r3/2P2NP1/4KB2/PP2P2P/R5R1 w - -
-time 3001 nps 929476 fen 8/p5pk/1p6/5R1p/P7/5PPK/5r2/8 b - -
-time 3005 nps 874926 fen 8/2Q2p2/5qpk/4p3/8/5P1P/6K1/8 w - -
-time 3005 nps 614718 fen 5rk1/1pr2bbp/pNp1n1p1/2P1p3/1PBpP3/1N5P/1P3PP1/3RR1K1 b - -
-time 3005 nps 794265 fen 8/1b3pk1/rp5p/6p1/6B1/1R4P1/4P2P/4K3 w - -
-time 3004 nps 543376 fen r1bqk2r/pp2ppbp/3p1np1/8/2PQP3/2N5/PP2BPPP/R1B1K2R w KQkq -
-time 3005 nps 684278 fen 8/1b4pk/7q/p3pP2/1p2P3/1Pp5/2P1Q3/5BK1 b - -
-time 3005 nps 542620 fen r2qkb1r/2p2ppp/p1p5/3pP3/4n1b1/3Q1N2/PPP2PPP/RNB2RK1 w kq -
-time 3002 nps 562027 fen 4r1k1/pp2pp1n/3p2p1/6Bp/2rN1P1P/q1P5/2PQ2P1/1K1RR3 b - -
-time 3003 nps 546468 fen rnbq1rk1/pp3pbp/2pp1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - -
-time 3005 nps 759713 fen 8/8/p3k1p1/Bb5p/1P5P/5P2/1r4P1/3R2K1 b - -
-time 3001 nps 715409 fen 4k3/q4p2/2n1p1p1/p1Np4/3P1QP1/PP3P2/6K1/8 b - -
-time 3005 nps 963700 fen 3bn3/4k3/2p3p1/ppN2P2/P5P1/1P1KB3/8/8 b - -
-time 3004 nps 572606 fen r1b1r1k1/5pbp/pp1p1np1/2qPn3/P1p1P3/2N1BPN1/1P1QB1PP/R1R4K b - -
-time 3002 nps 647234 fen r1q1rnk1/p1p2pp1/bp2p2p/n2pP3/Q1PP1N1B/P1PB1P2/6PP/R4RK1 w - d6
-time 3001 nps 562555 fen r3r1k1/1bpnqppp/1p1p4/p2Pp3/1PP1P3/P5P1/1BQ2PBP/1R1R2K1 b - -
-time 3005 nps 929447 fen 1r6/4Pk2/1p1p1P2/p7/8/1P1K2p1/P7/5R2 b - -
-time 3005 nps 521823 fen 1rbqk2r/2pp1ppp/p1n2n2/1pb1p3/P3P3/1B3N2/1PPP1PPP/RNBQ1RK1 w k -
-time 3005 nps 692140 fen r4bk1/6pp/1B2n3/4P3/pp6/1P2N1P1/P5KP/3R4 w - -
-time 3003 nps 438779 fen r1bqkb1r/pp1n1ppp/2n5/2ppP3/3P1P2/5N2/PP4PP/RNBQKB1R w KQkq -
-time 3005 nps 593120 fen r1qr2k1/2p2pPp/p3n3/1p6/8/4BQ2/PP3PPP/R2R2K1 w - -
-time 3005 nps 830883 fen 4r3/1p4k1/p1p1P1pp/3p4/1P1N4/P6B/7P/4K3 w - -
-time 3002 nps 620251 fen 8/R4pk1/4pbq1/8/2P4p/5Q2/8/5K2 b - -
-time 3001 nps 818327 fen 4k3/R4pp1/P7/4P2p/5P2/3p2P1/r7/4K3 w - -
-time 3001 nps 587302 fen 2r3k1/1p4p1/p3bp2/8/N3Pb1p/2R4P/1PP1Q1P1/2q3BK b - -
-time 3005 nps 482942 fen rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -
-time 3001 nps 1487920 fen 8/6N1/8/1k4K1/3n4/8/5P2/8 b - -
-time 3003 nps 561689 fen rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -
-time 3002 nps 871921 fen 8/PRn5/3k4/r4p2/5PB1/8/5P2/6K1 w - -
-time 3004 nps 962352 fen r5k1/4Rpp1/3p3p/2pP4/p1P3P1/1P6/P4PP1/5K2 w - -
-time 3005 nps 1054584 fen 5n2/2k1KB2/7P/8/3n1P2/8/p1N5/8 w - -
-time 3005 nps 495773 fen rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -
-result nps 689413
+time 3005 nps 493949 fen r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -
+time 3005 nps 545117 fen 4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -
+time 3004 nps 476910 fen 3rk2r/1pq1bpp1/p1n1p1n1/3pP3/3P2P1/1PPQNNB1/5P2/R3R1K1 b k -
+time 3005 nps 648758 fen 7k/8/1p1Q2pp/1p3b2/3p3P/P3q3/BP4PK/8 b - -
+time 3003 nps 502689 fen 2r1rnk1/4qppp/p3b3/1p4P1/4p2P/2N1PN2/PP1Q1P2/1KR4R w - -
+time 3004 nps 463297 fen 2rk3r/p2n1pp1/bqn1p2p/1p1pP3/3P1N1P/bP1BBN2/P3QPP1/2R1R1K1 w - -
+time 3004 nps 617662 fen 1nr2rk1/p3Qppp/1p2p1n1/8/3P4/2N2N2/PP3PPP/2R2RK1 b - -
+time 3005 nps 835818 fen 3nr1k1/1p1r3p/pR1pNpp1/3P4/4P3/3P3P/6P1/1R5K b - -
+time 3003 nps 557235 fen 4r1k1/pp3ppp/3n4/2n1r3/2P2NP1/4KB2/PP2P2P/R5R1 w - -
+time 3005 nps 923075 fen 8/p5pk/1p6/5R1p/P7/5PPK/5r2/8 b - -
+time 3005 nps 891935 fen 8/2Q2p2/5qpk/4p3/8/5P1P/6K1/8 w - -
+time 3002 nps 600232 fen 5rk1/1pr2bbp/pNp1n1p1/2P1p3/1PBpP3/1N5P/1P3PP1/3RR1K1 b - -
+time 3005 nps 771076 fen 8/1b3pk1/rp5p/6p1/6B1/1R4P1/4P2P/4K3 w - -
+time 3005 nps 525145 fen r1bqk2r/pp2ppbp/3p1np1/8/2PQP3/2N5/PP2BPPP/R1B1K2R w KQkq -
+time 3000 nps 684314 fen 8/1b4pk/7q/p3pP2/1p2P3/1Pp5/2P1Q3/5BK1 b - -
+time 3005 nps 530758 fen r2qkb1r/2p2ppp/p1p5/3pP3/4n1b1/3Q1N2/PPP2PPP/RNB2RK1 w kq -
+time 3005 nps 548358 fen 4r1k1/pp2pp1n/3p2p1/6Bp/2rN1P1P/q1P5/2PQ2P1/1K1RR3 b - -
+time 3005 nps 523895 fen rnbq1rk1/pp3pbp/2pp1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - -
+time 3005 nps 755795 fen 8/8/p3k1p1/Bb5p/1P5P/5P2/1r4P1/3R2K1 b - -
+time 3005 nps 699559 fen 4k3/q4p2/2n1p1p1/p1Np4/3P1QP1/PP3P2/6K1/8 b - -
+time 3003 nps 904431 fen 3bn3/4k3/2p3p1/ppN2P2/P5P1/1P1KB3/8/8 b - -
+time 3005 nps 553548 fen r1b1r1k1/5pbp/pp1p1np1/2qPn3/P1p1P3/2N1BPN1/1P1QB1PP/R1R4K b - -
+time 3001 nps 614576 fen r1q1rnk1/p1p2pp1/bp2p2p/n2pP3/Q1PP1N1B/P1PB1P2/6PP/R4RK1 w - d6
+time 3005 nps 554338 fen r3r1k1/1bpnqppp/1p1p4/p2Pp3/1PP1P3/P5P1/1BQ2PBP/1R1R2K1 b - -
+time 3003 nps 926161 fen 1r6/4Pk2/1p1p1P2/p7/8/1P1K2p1/P7/5R2 b - -
+time 3001 nps 507020 fen 1rbqk2r/2pp1ppp/p1n2n2/1pb1p3/P3P3/1B3N2/1PPP1PPP/RNBQ1RK1 w k -
+time 3005 nps 674136 fen r4bk1/6pp/1B2n3/4P3/pp6/1P2N1P1/P5KP/3R4 w - -
+time 3005 nps 429728 fen r1bqkb1r/pp1n1ppp/2n5/2ppP3/3P1P2/5N2/PP4PP/RNBQKB1R w KQkq -
+time 3002 nps 604636 fen r1qr2k1/2p2pPp/p3n3/1p6/8/4BQ2/PP3PPP/R2R2K1 w - -
+time 3005 nps 835414 fen 4r3/1p4k1/p1p1P1pp/3p4/1P1N4/P6B/7P/4K3 w - -
+time 3005 nps 600943 fen 8/R4pk1/4pbq1/8/2P4p/5Q2/8/5K2 b - -
+time 3002 nps 807541 fen 4k3/R4pp1/P7/4P2p/5P2/3p2P1/r7/4K3 w - -
+time 3005 nps 574761 fen 2r3k1/1p4p1/p3bp2/8/N3Pb1p/2R4P/1PP1Q1P1/2q3BK b - -
+time 3004 nps 472529 fen rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -
+time 3004 nps 1466287 fen 8/6N1/8/1k4K1/3n4/8/5P2/8 b - -
+time 3005 nps 552782 fen rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -
+time 3005 nps 848435 fen 8/PRn5/3k4/r4p2/5PB1/8/5P2/6K1 w - -
+time 3003 nps 949552 fen r5k1/4Rpp1/3p3p/2pP4/p1P3P1/1P6/P4PP1/5K2 w - -
+time 3005 nps 1079076 fen 5n2/2k1KB2/7P/8/3n1P2/8/p1N5/8 w - -
+time 3005 nps 488264 fen rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -
+time 3000 nps 493488 fen r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -
+time 3005 nps 543956 fen 4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -
+time 3001 nps 477885 fen 3rk2r/1pq1bpp1/p1n1p1n1/3pP3/3P2P1/1PPQNNB1/5P2/R3R1K1 b k -
+time 3005 nps 649929 fen 7k/8/1p1Q2pp/1p3b2/3p3P/P3q3/BP4PK/8 b - -
+time 3005 nps 501666 fen 2r1rnk1/4qppp/p3b3/1p4P1/4p2P/2N1PN2/PP1Q1P2/1KR4R w - -
+time 3005 nps 465910 fen 2rk3r/p2n1pp1/bqn1p2p/1p1pP3/3P1N1P/bP1BBN2/P3QPP1/2R1R1K1 w - -
+time 3003 nps 621827 fen 1nr2rk1/p3Qppp/1p2p1n1/8/3P4/2N2N2/PP3PPP/2R2RK1 b - -
+time 3005 nps 836588 fen 3nr1k1/1p1r3p/pR1pNpp1/3P4/4P3/3P3P/6P1/1R5K b - -
+time 3005 nps 556467 fen 4r1k1/pp3ppp/3n4/2n1r3/2P2NP1/4KB2/PP2P2P/R5R1 w - -
+time 3002 nps 917067 fen 8/p5pk/1p6/5R1p/P7/5PPK/5r2/8 b - -
+time 3003 nps 885506 fen 8/2Q2p2/5qpk/4p3/8/5P1P/6K1/8 w - -
+time 3005 nps 599198 fen 5rk1/1pr2bbp/pNp1n1p1/2P1p3/1PBpP3/1N5P/1P3PP1/3RR1K1 b - -
+time 3004 nps 777235 fen 8/1b3pk1/rp5p/6p1/6B1/1R4P1/4P2P/4K3 w - -
+time 3005 nps 525663 fen r1bqk2r/pp2ppbp/3p1np1/8/2PQP3/2N5/PP2BPPP/R1B1K2R w KQkq -
+time 3002 nps 686179 fen 8/1b4pk/7q/p3pP2/1p2P3/1Pp5/2P1Q3/5BK1 b - -
+time 3005 nps 529212 fen r2qkb1r/2p2ppp/p1p5/3pP3/4n1b1/3Q1N2/PPP2PPP/RNB2RK1 w kq -
+time 3004 nps 551300 fen 4r1k1/pp2pp1n/3p2p1/6Bp/2rN1P1P/q1P5/2PQ2P1/1K1RR3 b - -
+time 3005 nps 525568 fen rnbq1rk1/pp3pbp/2pp1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - -
+time 3003 nps 752909 fen 8/8/p3k1p1/Bb5p/1P5P/5P2/1r4P1/3R2K1 b - -
+time 3005 nps 698970 fen 4k3/q4p2/2n1p1p1/p1Np4/3P1QP1/PP3P2/6K1/8 b - -
+time 3005 nps 902668 fen 3bn3/4k3/2p3p1/ppN2P2/P5P1/1P1KB3/8/8 b - -
+time 3002 nps 552457 fen r1b1r1k1/5pbp/pp1p1np1/2qPn3/P1p1P3/2N1BPN1/1P1QB1PP/R1R4K b - -
+time 3005 nps 615020 fen r1q1rnk1/p1p2pp1/bp2p2p/n2pP3/Q1PP1N1B/P1PB1P2/6PP/R4RK1 w - d6
+time 3005 nps 551355 fen r3r1k1/1bpnqppp/1p1p4/p2Pp3/1PP1P3/P5P1/1BQ2PBP/1R1R2K1 b - -
+time 3002 nps 924966 fen 1r6/4Pk2/1p1p1P2/p7/8/1P1K2p1/P7/5R2 b - -
+time 3005 nps 507862 fen 1rbqk2r/2pp1ppp/p1n2n2/1pb1p3/P3P3/1B3N2/1PPP1PPP/RNBQ1RK1 w k -
+time 3005 nps 677878 fen r4bk1/6pp/1B2n3/4P3/pp6/1P2N1P1/P5KP/3R4 w - -
+time 3002 nps 428029 fen r1bqkb1r/pp1n1ppp/2n5/2ppP3/3P1P2/5N2/PP4PP/RNBQKB1R w KQkq -
+time 3004 nps 574157 fen r1qr2k1/2p2pPp/p3n3/1p6/8/4BQ2/PP3PPP/R2R2K1 w - -
+time 3000 nps 761569 fen 4r3/1p4k1/p1p1P1pp/3p4/1P1N4/P6B/7P/4K3 w - -
+time 3005 nps 555211 fen 8/R4pk1/4pbq1/8/2P4p/5Q2/8/5K2 b - -
+time 3005 nps 745517 fen 4k3/R4pp1/P7/4P2p/5P2/3p2P1/r7/4K3 w - -
+time 3001 nps 532465 fen 2r3k1/1p4p1/p3bp2/8/N3Pb1p/2R4P/1PP1Q1P1/2q3BK b - -
+time 3000 nps 442515 fen rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -
+time 3005 nps 1332348 fen 8/6N1/8/1k4K1/3n4/8/5P2/8 b - -
+time 3001 nps 507130 fen rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -
+time 3000 nps 780606 fen 8/PRn5/3k4/r4p2/5PB1/8/5P2/6K1 w - -
+time 3004 nps 882827 fen r5k1/4Rpp1/3p3p/2pP4/p1P3P1/1P6/P4PP1/5K2 w - -
+time 3004 nps 982695 fen 5n2/2k1KB2/7P/8/3n1P2/8/p1N5/8 w - -
+time 3003 nps 443796 fen rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -
+time 3004 nps 453384 fen r1bqk1nr/pp3ppp/2nb4/1B1p4/8/1N3N2/PPP2PPP/R1BQ1RK1 b kq -
+time 3000 nps 510190 fen 4rrk1/ppqb1ppn/3p2np/2pP4/2P1P3/2PBN1B1/P5PP/1R1Q1RK1 w - -
+time 3002 nps 442360 fen 3rk2r/1pq1bpp1/p1n1p1n1/3pP3/3P2P1/1PPQNNB1/5P2/R3R1K1 b k -
+time 3003 nps 599170 fen 7k/8/1p1Q2pp/1p3b2/3p3P/P3q3/BP4PK/8 b - -
+time 3002 nps 464567 fen 2r1rnk1/4qppp/p3b3/1p4P1/4p2P/2N1PN2/PP1Q1P2/1KR4R w - -
+time 3005 nps 425733 fen 2rk3r/p2n1pp1/bqn1p2p/1p1pP3/3P1N1P/bP1BBN2/P3QPP1/2R1R1K1 w - -
+time 3000 nps 582392 fen 1nr2rk1/p3Qppp/1p2p1n1/8/3P4/2N2N2/PP3PPP/2R2RK1 b - -
+time 3002 nps 772752 fen 3nr1k1/1p1r3p/pR1pNpp1/3P4/4P3/3P3P/6P1/1R5K b - -
+time 3002 nps 518945 fen 4r1k1/pp3ppp/3n4/2n1r3/2P2NP1/4KB2/PP2P2P/R5R1 w - -
+time 3002 nps 840173 fen 8/p5pk/1p6/5R1p/P7/5PPK/5r2/8 b - -
+time 3003 nps 825438 fen 8/2Q2p2/5qpk/4p3/8/5P1P/6K1/8 w - -
+time 3005 nps 552297 fen 5rk1/1pr2bbp/pNp1n1p1/2P1p3/1PBpP3/1N5P/1P3PP1/3RR1K1 b - -
+time 3001 nps 714494 fen 8/1b3pk1/rp5p/6p1/6B1/1R4P1/4P2P/4K3 w - -
+time 3001 nps 488780 fen r1bqk2r/pp2ppbp/3p1np1/8/2PQP3/2N5/PP2BPPP/R1B1K2R w KQkq -
+time 3000 nps 627664 fen 8/1b4pk/7q/p3pP2/1p2P3/1Pp5/2P1Q3/5BK1 b - -
+time 3004 nps 486427 fen r2qkb1r/2p2ppp/p1p5/3pP3/4n1b1/3Q1N2/PPP2PPP/RNB2RK1 w kq -
+time 3002 nps 504123 fen 4r1k1/pp2pp1n/3p2p1/6Bp/2rN1P1P/q1P5/2PQ2P1/1K1RR3 b - -
+time 3002 nps 490753 fen rnbq1rk1/pp3pbp/2pp1np1/4p3/2PPP3/2N2N2/PP2BPPP/R1BQ1RK1 w - -
+time 3002 nps 684460 fen 8/8/p3k1p1/Bb5p/1P5P/5P2/1r4P1/3R2K1 b - -
+time 3002 nps 644140 fen 4k3/q4p2/2n1p1p1/p1Np4/3P1QP1/PP3P2/6K1/8 b - -
+time 3002 nps 828884 fen 3bn3/4k3/2p3p1/ppN2P2/P5P1/1P1KB3/8/8 b - -
+time 3002 nps 513135 fen r1b1r1k1/5pbp/pp1p1np1/2qPn3/P1p1P3/2N1BPN1/1P1QB1PP/R1R4K b - -
+time 3003 nps 563070 fen r1q1rnk1/p1p2pp1/bp2p2p/n2pP3/Q1PP1N1B/P1PB1P2/6PP/R4RK1 w - d6
+time 3004 nps 506590 fen r3r1k1/1bpnqppp/1p1p4/p2Pp3/1PP1P3/P5P1/1BQ2PBP/1R1R2K1 b - -
+time 3001 nps 851173 fen 1r6/4Pk2/1p1p1P2/p7/8/1P1K2p1/P7/5R2 b - -
+time 3002 nps 473843 fen 1rbqk2r/2pp1ppp/p1n2n2/1pb1p3/P3P3/1B3N2/1PPP1PPP/RNBQ1RK1 w k -
+time 3002 nps 620625 fen r4bk1/6pp/1B2n3/4P3/pp6/1P2N1P1/P5KP/3R4 w - -
+time 3003 nps 400345 fen r1bqkb1r/pp1n1ppp/2n5/2ppP3/3P1P2/5N2/PP4PP/RNBQKB1R w KQkq -
+time 3003 nps 557946 fen r1qr2k1/2p2pPp/p3n3/1p6/8/4BQ2/PP3PPP/R2R2K1 w - -
+time 3002 nps 765237 fen 4r3/1p4k1/p1p1P1pp/3p4/1P1N4/P6B/7P/4K3 w - -
+time 3003 nps 563192 fen 8/R4pk1/4pbq1/8/2P4p/5Q2/8/5K2 b - -
+time 3005 nps 733140 fen 4k3/R4pp1/P7/4P2p/5P2/3p2P1/r7/4K3 w - -
+time 3004 nps 532292 fen 2r3k1/1p4p1/p3bp2/8/N3Pb1p/2R4P/1PP1Q1P1/2q3BK b - -
+time 3005 nps 434800 fen rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -
+time 3000 nps 1340103 fen 8/6N1/8/1k4K1/3n4/8/5P2/8 b - -
+time 3000 nps 506233 fen rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -
+time 3001 nps 784916 fen 8/PRn5/3k4/r4p2/5PB1/8/5P2/6K1 w - -
+time 3001 nps 877957 fen r5k1/4Rpp1/3p3p/2pP4/p1P3P1/1P6/P4PP1/5K2 w - -
+time 3002 nps 1061441 fen 5n2/2k1KB2/7P/8/3n1P2/8/p1N5/8 w - -
+time 3003 nps 486994 fen rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -
+result nps 676690
 

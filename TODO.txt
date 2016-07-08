@@ -9,6 +9,7 @@ Floud 0.9 dev status:
  5 Floyd xb171e499  74 evaluation-guarded null move, i.s.o. node type
  6 Floyd x7c96b2ca  82 unconditional null move, i.s.o. evaluation
  8 Floyd xc6c5dae2  86 simple delta pruning
+ 9 Floyd x354d5f3a  93 delta pruning option 3 (pseudo fail-soft)
 
 Rank Name              Elo    +    - games score oppo. draws 
    1 Fruit 2.1         325    3    3 76543   83%    24   10% 
@@ -29,6 +30,8 @@ Target +200
 ------------------------------------------------------------------------
 
 |Todo| Collect statistics for delta pruning [search]
+
+|Todo| Inverse delta pruning [search]
 
 |Todo| Exponential history counters [search]
 

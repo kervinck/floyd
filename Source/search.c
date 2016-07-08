@@ -357,17 +357,26 @@ static int qSearch(Engine_t self, int alpha)
         nrMoves = filterAndSort(self, moveList, nrMoves, check ? minInt : 0);
         moveToFront(moveList, nrMoves, slot.move);
 
+#if 0
+        if (nrMoves > 0 && !check) {
+                // Inverse delta pruning
+                assert(moveList[0] >= 0);
+                int minDelta = (moveList[0] >> 26) * 1000 - 1000;
+                if (minDelta > alpha - bestScore) {
+                        slot.move = moveList[0] & moveMask;
+                        return ttWrite(self, slot, 0, bestScore + minDelta, alpha, alpha+1);
+                }
+        }
+#endif
+
         // Try if any generated move can improve the result
         for (int i=0; i<nrMoves && bestScore<=alpha; i++) {
-                // Delta pruning
                 if (!check) {
+                        // Regular delta pruning
                         assert(moveList[i] >= 0);
                         int maxDelta = (moveList[i] >> 26) * 1500 + 1500;
-                        if (maxDelta <= alpha - bestScore) {
-                                break;                 // Option 1: return eval()
-                                bestScore = alpha;     // Option 2: fail hard
-                                bestScore += maxDelta; // Option 3: fail semi-hard
-                        }
+                        if (maxDelta <= alpha - bestScore)
+                                return ttWrite(self, slot, 0, bestScore + maxDelta, alpha, alpha+1);
                 }
 
                 // Search deeper

@@ -6,8 +6,10 @@ Floyd study engine
 Floyd is not a stand-alone chess program. It can be loaded as an engine
 in chess GUIs such as Winboard, Arena, XBoard, Shredder and others.
 
-In addition to the UCI interface, a Python interface is
-provided for study purposes.
+In addition to the UCI interface, a Python interface is provided
+for study purposes. I try to keep the code as simple and clean as
+possible. Speed is therefore not as important as clarity and ease
+of change.
 
 This is the source code archive. Binaries for Windows, Linux
 and Mac can be downloaded from https://marcelk.net/floyd/
@@ -129,4 +131,33 @@ Hierarchy for source modules is as follows:
   |     `--- geometry.h                 Definition of board layout
   `--- cplus.h
         `--- cplus.c                    A loose collection of utility functions
+
+Make targets
+------------
+all                        # Compile both as Python module and as native UCI engine
+floyd                      # Compile as native UCI engine
+pgo                        # Compile with profile-guided optimization
+win                        # Cross-compile as Win32 UCI engine
+easy wac krk5 tt eg ece3   # Run 1 second position tests
+hard draw nodraw bk        # Run 10 second position tests
+mate mated qmate           # Run 100 second position tests
+nolot                      # Run 1000 second position tests
+sts                        # Run the Strategic Test Suite
+nodes                      # Run node count regression test
+residual                   # Calculate residual of evaluation function
+tune                       # Run one standard iteration of the evaluation tuner
+ptune                      # One standard iteration only for the parameters listed in `params'
+ctune                      # Coarse tuning (1M positions)
+xtune                      # Extended tuning (10M positions)
+dtune                      # Deep tuning (1M positions at 2 ply)
+tables                     # Plot evaluation tables for easy inspection
+update                     # Update source code with the tuned coefficients
+install                    # Install Python module for the current user
+sysinstall                 # Install Python module for all system users ('sudo make sysinstall')
+clean                      # Remove compilation intermediates and results
+todo                       # Show all open to-do items
+fingerprint                # Make fingerprint for regression testing
+shootout                   # Shootout against last version, 1000 games 10+0.15
+log                        # Show simplified git log
+help                       # Show summary of make targets
 ```

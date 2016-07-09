@@ -10,28 +10,13 @@ Floud 0.9 dev status:
  6 Floyd x7c96b2ca  82 unconditional null move, i.s.o. evaluation
  8 Floyd xc6c5dae2  86 simple delta pruning
  9 Floyd x354d5f3a  93 delta pruning option 3 (pseudo fail-soft)
-
-Rank Name              Elo    +    - games score oppo. draws 
-   1 Fruit 2.1         325    3    3 76543   83%    24   10% 
-   2 Floyd xc6c5dae2    83    5    5 14220   41%   163   19% 
-   3 Floyd x7c96b2ca    81    4    4 24000   41%   163   20% 
-   4 Floyd xb171e499    74    7    7  9486   40%   163   19% 
-   5 Floyd x32aa5271    72    7    7  9375   40%   163   19% 
-   6 Floyd x0e0dc088    62    4    4 24000   39%   163   19% 
-   7 Floyd x800ecb47    55    4    4 24000   38%   163   19% 
-   8 Floyd 0.8           0    2    2 76538   41%    75   23% 
-   9 Floyd 0.7        -151    4    4 36000   38%   -10   13% 
-  10 Floyd 0.6        -355    6    6 12000   24%  -151   18% 
-
-Target +200
+10 Floyd xaef137c2  98 Slightly tighter bound (tested as xa416cb63)
 
 ------------------------------------------------------------------------
         Search
 ------------------------------------------------------------------------
 
 |Todo| Collect statistics for delta pruning [search]
-
-|Todo| Inverse delta pruning [search]
 
 |Todo| Exponential history counters [search]
 
@@ -76,8 +61,6 @@ Then also cache evaluation in ttable
 |Todo| Checks in qsearch, at least in PV and after null move
 
 #define minDepth -7
-
-|Todo| Upcoming repetition detection
 
 |Todo| Introduce move flags for 32 bit
 
@@ -153,6 +136,18 @@ if (depth >= 12)
         }
 
 Test with zugzwang positions
+
+|Todo| Inverse delta pruning [search]
+
+        if (nrMoves > 0 && !inCheck) {
+                // Inverse delta pruning
+                assert(moveList[0] >= 0);
+                int minDelta = (moveList[0] >> 26) * 1000 - 1000;
+                if (minDelta > alpha - bestScore)
+                        return ttWrite(self, slot, 0, bestScore + minDelta, alpha, alpha+1);
+        }
+
+|Todo| Upcoming repetition detection
 
 ------------------------------------------------------------------------
         Evaluate

@@ -12,6 +12,19 @@ Floud 0.9 dev status:
  9 Floyd x354d5f3a  93 delta pruning option 3 (pseudo fail-soft)
 10 Floyd xaef137c2  98 Slightly tighter bound (tested as xa416cb63)
 
+Finished game 998 (Floyd xec39d0d0 vs Floyd xaef137c2): 1/2-1/2 {Draw by 3-fold repetition}
+Score of Floyd xaef137c2 vs Floyd xec39d0d0: 302 - 336 - 362  [0.483] 1000
+ELO difference: -12
+Finished match
+
+marcelk@beobook3:~> los 302 336 362
+Winning fraction: 0.483
+Elo difference: -11.8174
+p-value: 0.0891395
+
+Inconclusive
+
+
 ------------------------------------------------------------------------
         Search
 ------------------------------------------------------------------------
@@ -61,6 +74,22 @@ Then also cache evaluation in ttable
 |Todo| Checks in qsearch, at least in PV and after null move
 
 #define minDepth -7
+
+scout:
+        if (inCheck)
+                qSearchWithCheck
+        else
+                qSearch
+
+qSearchWithCheck() # No TT?
+        filter, keep good checks and good captures
+        for (move in moves)
+                if (inCheck || giveCheck)
+                        qSearchWithCheck
+                else
+                        qSearch
+
+qsearch()
 
 |Todo| Introduce move flags for 32 bit
 

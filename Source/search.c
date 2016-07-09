@@ -136,12 +136,12 @@ void rootSearch(Engine_t self)
 }
 
 /*----------------------------------------------------------------------+
- |      gameEndScore / drawScore                                        |
+ |      gameOverScore / drawScore                                       |
  +----------------------------------------------------------------------*/
 
-static inline int gameEndScore(Engine_t self, bool check)
+static inline int gameOverScore(Engine_t self, bool inCheck)
 {
-        return check ? minMate + ply(self) : 0;
+        return inCheck ? minMate + ply(self) : 0;
 }
 
 static inline int drawScore(Engine_t self)
@@ -175,12 +175,12 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                  || (slot.isUpperBound && slot.isLowerBound && alpha < slot.score && slot.score < beta))
                         return cutPv(), slot.score;
 
-        int check = inCheck(board(self));
+        int inCheck = isInCheck(board(self));
         int moveFilter = minInt; // All moves
         int bestScore = minInt;
 
         // Quiescence search
-        if (depth == 0 && !check) {
+        if (depth == 0 && !inCheck) {
                 bestScore = eval;
                 if (bestScore >= beta) {
                         self->pv.len = pvIndex;
@@ -210,7 +210,7 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
 
                 bool recapture = moveScore(move) > 0 && to(move) == recaptureSquare(board(self));
                 makeMove(board(self), move);
-                int extension = (check || recapture) + (nrMoves == 1 && (depth > 0));
+                int extension = (inCheck || recapture) + (nrMoves == 1 && (depth > 0));
                 int newDepth = max(0, depth - 1 + extension);
                 int newAlpha = max(alpha, bestScore);
                 int score = -pvSearch(self, newDepth, -beta, -newAlpha, pvIndex + 1);
@@ -229,7 +229,7 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                 int move = moveList[i];
                 bool recapture = moveScore(move) > 0 && to(move) == recaptureSquare(board(self));
                 makeMove(board(self), move);
-                int extension = (check || recapture);
+                int extension = (inCheck || recapture);
                 int newDepth = max(0, depth - 1 + extension - reduction);
                 int newAlpha = max(alpha, bestScore);
                 int score = -scout(self, newDepth, -(newAlpha+1), 1);
@@ -254,7 +254,7 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
         }
 
         if (bestScore == minInt) // No legal moves
-                bestScore = gameEndScore(self, check);
+                bestScore = gameOverScore(self, inCheck);
 
         return ttWrite(self, slot, depth, bestScore, alpha, beta);
 }
@@ -288,9 +288,9 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
                         return node.slot.score;
 
         // Null move pruning
-        int check = inCheck(board(self));
+        int inCheck = isInCheck(board(self));
         if (depth >= 2 && minEval <= alpha && alpha < maxEval
-         && !check && allowNullMove(board(self))) {
+         && !inCheck && allowNullMove(board(self))) {
                 makeNullMove(board(self));
                 int reduction = min((depth + 1) / 2, 3);
                 int score = -scout(self, max(0, depth - reduction - 1), -(alpha+1), nodeType+1);
@@ -306,7 +306,7 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
         }
 
         // Recursively search all other moves until exhausted or one fails high
-        int extension = check;
+        int extension = inCheck;
         int bestScore = minInt;
         for (int move=makeFirstMove(self,&node), j=0; move; move=makeNextMove(self,&node), j++) {
                 int newDepth = max(0, depth - 1 + extension);
@@ -328,7 +328,7 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
         }
 
         if (bestScore == minInt) // No legal moves
-                bestScore = gameEndScore(self, check);
+                bestScore = gameOverScore(self, inCheck);
 
         return ttWrite(self, node.slot, depth, bestScore, alpha, alpha+1);
 }
@@ -346,32 +346,30 @@ static int qSearch(Engine_t self, int alpha)
                 return slot.score;
 
         // Stand pat if evaluation is good and not in check
-        int check = inCheck(board(self));
-        int bestScore = check ? minInt : evaluate(board(self));
+        int inCheck = isInCheck(board(self));
+        int bestScore = inCheck ? minInt : evaluate(board(self));
         if (bestScore > alpha)
                 return ttWrite(self, slot, 0, bestScore, alpha, alpha+1);
 
         // Generate good captures, or all escapes when in check
         int moveList[maxMoves];
         int nrMoves = generateMoves(board(self), moveList);
-        nrMoves = filterAndSort(self, moveList, nrMoves, check ? minInt : 0);
+        nrMoves = filterAndSort(self, moveList, nrMoves, inCheck ? minInt : 0);
         moveToFront(moveList, nrMoves, slot.move);
 
 #if 0
-        if (nrMoves > 0 && !check) {
+        if (nrMoves > 0 && !inCheck) {
                 // Inverse delta pruning
                 assert(moveList[0] >= 0);
                 int minDelta = (moveList[0] >> 26) * 1000 - 1000;
-                if (minDelta > alpha - bestScore) {
-                        slot.move = moveList[0] & moveMask;
+                if (minDelta > alpha - bestScore)
                         return ttWrite(self, slot, 0, bestScore + minDelta, alpha, alpha+1);
-                }
         }
 #endif
 
         // Try if any generated move can improve the result
         for (int i=0; i<nrMoves && bestScore<=alpha; i++) {
-                if (!check) {
+                if (!inCheck) {
                         // Regular delta pruning
                         assert(moveList[i] >= 0);
                         int maxDelta = (moveList[i] >> 26) * 1500 + 1500;
@@ -392,7 +390,7 @@ static int qSearch(Engine_t self, int alpha)
         }
 
         if (bestScore == minInt) // No legal moves
-                bestScore = gameEndScore(self, check);
+                bestScore = gameOverScore(self, inCheck);
 
         return ttWrite(self, slot, 0, bestScore, alpha, alpha+1);
 }

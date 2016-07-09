@@ -162,7 +162,7 @@ int setupBoard(Board_t self, const char *fen);
 
 /*
  *  Update attack tables and king locations. To be used after
- *  setupBoard or makeMove. Used by generateMoves, inCheck.
+ *  setupBoard or makeMove. Used by generateMoves, isInCheck.
  *  Can be invalidated by moveToStandardAlgebraic,
  *  getCheckMark, isLegalMove, normalizeEnPassantStatus.
  */
@@ -228,7 +228,7 @@ extern int parseUciMove(Board_t self, const char *line, int xmoves[maxMoves], in
 extern void normalizeEnPassantStatus(Board_t self);
 
 // Side to move in check?
-extern int inCheck(Board_t self);
+extern int isInCheck(Board_t self);
 
 // Is move legal? Move must come from generateMoves, so be safe to make.
 extern bool isLegalMove(Board_t self, int move);

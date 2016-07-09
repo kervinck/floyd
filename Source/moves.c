@@ -359,7 +359,7 @@ extern int generateMoves(Board_t self, int moveList[maxMoves])
         /*
          *  Generate castling moves
          */
-        if (self->castleFlags && !inCheck(self)) {
+        if (self->castleFlags && !isInCheck(self)) {
                 static const int flags[2][2] = {
                         { castleFlagWhiteKside, castleFlagWhiteQside },
                         { castleFlagBlackKside, castleFlagBlackQside }
@@ -833,10 +833,10 @@ bool isLegalMove(Board_t self, int move)
 }
 
 /*----------------------------------------------------------------------+
- |      inCheck                                                         |
+ |      isInCheck                                                       |
  +----------------------------------------------------------------------*/
 
-int inCheck(Board_t self)
+int isInCheck(Board_t self)
 {
         updateSideInfo(self);
         int side = sideToMove(self);

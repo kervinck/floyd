@@ -77,6 +77,8 @@ Then also cache evaluation in ttable
 
 #define minDepth -7
 
+|Todo| Upcoming repetition detection
+
 |Todo| Introduce move flags for 32 bit
 
 - Simplify UCI move formatting
@@ -491,9 +493,4 @@ Candidates:
         pawnHash
         slowHash
         coarseHash
-
-|Todo| Proper solution for patch 0.8.1
-
-- Atomic printing of info lines by uciSearchInfo()
-- Remove the extra \n before readyok
 

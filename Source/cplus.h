@@ -144,6 +144,7 @@ typedef List(void)      voidList;
         })
 
 err_t listEnsureMaxLen(voidList *list, int itemSize, int minLen, int minSize);
+void listPrintf(charList *list, const char *format, ...);
 
 /*----------------------------------------------------------------------+
  |      Functions                                                       |

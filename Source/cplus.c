@@ -21,6 +21,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <math.h>
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -89,6 +90,24 @@ err_t listEnsureMaxLen(voidList *list, int itemSize, int minLen, int minSize)
         }
 cleanup:
         return err;
+}
+
+/*
+ *  Formatted printing into a char list.
+ *  A trailing zero is written but not counted as part of list->len
+ */
+void listPrintf(charList *list, const char *format, ...)
+{
+        va_list args;
+        va_start(args, format);
+        int len = vsnprintf(null, 0, format, args);
+        if (len == -1) xAbort(errno, "vsnprintf");
+        va_end(args);
+        preparePushList(*list, len+1); // include trailing '\0'
+        va_start(args, format); // MUST redo this!
+        vsprintf(&list->v[list->len], format, args);
+        va_end(args);
+        list->len += len;
 }
 
 /*----------------------------------------------------------------------+

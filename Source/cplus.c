@@ -101,8 +101,8 @@ void listPrintf(charList *list, const char *format, ...)
         va_list args;
         va_start(args, format);
         int len = vsnprintf(null, 0, format, args);
-        if (len == -1) xAbort(errno, "vsnprintf");
         va_end(args);
+        if (len == -1) xAbort(errno, "vsnprintf");
         preparePushList(*list, len+1); // include trailing '\0'
         va_start(args, format); // MUST redo this!
         vsprintf(&list->v[list->len], format, args);

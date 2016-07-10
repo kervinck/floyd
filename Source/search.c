@@ -182,10 +182,8 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
         // Quiescence search
         if (depth == 0 && !inCheck) {
                 bestScore = eval;
-                if (bestScore >= beta) {
-                        self->pv.len = pvIndex;
-                        return ttWrite(self, slot, depth, bestScore, alpha, beta);
-                }
+                if (bestScore >= beta)
+                        return cutPv(), ttWrite(self, slot, depth, bestScore, alpha, beta);
                 moveFilter = 0; // Only good captures
         }
 

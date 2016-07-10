@@ -367,7 +367,7 @@ void uciSearchInfo(void *uciInfoData)
         for (int i=0; i<self->pv.len; i++) {
                 char moveString[maxMoveSize];
                 int move = self->pv.v[i];
-                assert(move != 0);
+                assert(board(self)->squares[from(move)] != empty); // Very simple sanity check
                 moveToUci(board(self), moveString, move);
                 listPrintf(&infoLine, "%s %s", (i == 0) ? " pv" : "", moveString);
                 makeMove(board(self), move); // TODO: uci notation shouldn't need this

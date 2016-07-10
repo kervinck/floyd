@@ -1,34 +1,4 @@
-
-Rank Name              Elo    +    - games score oppo. draws
-   1 Fruit 2.1         329    2    2 105433   82%    45   10%
-   2 Floyd xa416cb63   100    4    4 24000   43%   164   19%
-   3 Floyd x354d5f3a    93    4    4 24000   42%   164   19%
-   4 Floyd xc6c5dae2    87    4    4 24000   42%   164   19%
-   5 Floyd x7c96b2ca    83    4    4 24000   41%   164   20%
-   6 Floyd xb171e499    75    7    7  9486   40%   164   19%
-   7 Floyd x32aa5271    73    7    7  9375   40%   164   19%
-   8 Floyd x0e0dc088    63    4    4 24000   39%   164   19%
-   9 Floyd x800ecb47    56    4    4 24000   38%   164   19%
-  10 Floyd 0.8           0    2    2 105428   39%    82   23%
-  11 Floyd 0.7        -150    4    4 36000   38%    -8   13%
-  12 Floyd 0.6        -354    6    6 12000   24%  -150   18%
-                 Fr Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl
-Fruit 2.1          100100100100100100100100100100100
-Floyd xa416cb63   0    98 99 99 99 99100100100100100
-Floyd x354d5f3a   0  1    98 99 99 99100100100100100
-Floyd xc6c5dae2   0  0  1    89 99 99 99100100100100
-Floyd x7c96b2ca   0  0  0 10    97 99 99100100100100
-Floyd xb171e499   0  0  0  0  2    65 99 99100100100
-Floyd x32aa5271   0  0  0  0  0 34    99 99100100100
-Floyd x0e0dc088   0  0  0  0  0  0  0    98100100100
-Floyd x800ecb47   0  0  0  0  0  0  0  1   100100100
-Floyd 0.8         0  0  0  0  0  0  0  0  0   100100
-Floyd 0.7         0  0  0  0  0  0  0  0  0  0   100
-Floyd 0.6         0  0  0  0  0  0  0  0  0  0  0
-
-
-
-Floud 0.9 dev status:
+Floyd 0.9 dev status:
    Version         Elo Change
  0 Floyd 0.8         0 reference
  1 Floyd x42835a08  11 uniform reductions
@@ -40,51 +10,32 @@ Floud 0.9 dev status:
  8 Floyd xc6c5dae2  87 simple delta pruning
  9 Floyd x354d5f3a  93 delta pruning option 3 (pseudo fail-soft, aka xec39d0d0) 
 10 Floyd xaef137c2 100 Slightly tighter bound (aka as xa416cb63)
-11 Floyd x9xxxxxxx     see * 1500 + 1500
-
---
-Score of Floyd xaef137c2 vs Floyd xec39d0d0: 302 - 336 - 362  [0.483] 1000
-ELO difference: -12
-Finished match
-
-marcelk@beobook3:~> los 302 336 362
-Winning fraction: 0.483
-Elo difference: -11.8174
-p-value: 0.0891395
-
-Inconclusive
---
-Score of Floyd xdc1f8c8e vs Floyd xec39d0d0: 318 - 357 - 325  [0.480] 1000
-ELO difference: -14
-Finished match
-
-marcelk@beobook3:~> los 318 357 325
-Winning fraction: 0.4805
-Elo difference: -13.5569
-p-value: 0.0666635
---
-But...:
-marcelk@beobook3:~> los 620 693 687
-Winning fraction: 0.48175
-Elo difference: -12.687
-p-value: 0.0219729
 
 ------------------------------------------------------------------------
         Search
 ------------------------------------------------------------------------
 
-|Todo| Try (see * 1500 + 1500) again as in xec39d0d0 [search]
+|Todo| Remove makeMove() from UCI PV printing [qa,uci]
+
+Simplify UCI move formatting
+moveToUci() only needs to board to check if move is a promotion.
+But this should be clear from the special bit and ranks.
+isPromotion() is not used anywhere else. Can be removed.
+
+|Todo| History with (piece, to) instead of (from, to) [search]
+
+Redesignate special bits as follows:
+        P  RB Q  K
+        =B =R =N =Q
 
 |Todo| Checks in qsearch, at least in PV and after null move [search]
 
 #define minDepth -7
-
 scout:
         if (inCheck)
                 qSearchWithCheck // horizon()
         else
                 qSearch
-
 qSearchWithCheck() # No TT?
         filter, keep good checks and good captures
         for (move in moves)
@@ -92,14 +43,15 @@ qSearchWithCheck() # No TT?
                         qSearchWithCheck
                 else
                         qSearch
-
 qsearch()
+
+|Todo| Basic counter move [search]
 
 |Todo| Checks after null move [search]
 
 |Todo| Collect statistics for delta pruning [search]
 
-|Todo| Exponential history counters [search]
+|Todo| Simple futility-1 and futility-2 [search]
 
 |Todo| Retry evaluation filtering for null move [search]
 
@@ -125,8 +77,6 @@ Winning fraction: 0.491
 Elo difference: -6.25452
 p-value: 0.248759
 
-|Todo| Futility qSearch
-
 |Todo| Futility search
 
 |Todo| More agressuve null move tuning
@@ -136,12 +86,6 @@ p-value: 0.248759
 |Todo| Move ordering based on delta eval [search]
 
 Then also cache evaluation in ttable
-
-|Todo| Basic counter move [search]
-
-|Todo| Introduce move flags for 32 bit
-
-- Simplify UCI move formatting
 
 |Todo| Extend move flags
 

@@ -202,12 +202,11 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
 
         // Search the first move with open alpha-beta window
         if (nrMoves > 0) {
-                int move = moveList[0];
                 if (pvIndex < self->pv.len)
                         moveToFront(moveList, nrMoves, self->pv.v[pvIndex]); // Follow the PV
                 else
-                        pushList(self->pv, move); // Expand the PV
-
+                        pushList(self->pv, moveList[0]); // Expand the PV
+                int move = moveList[0];
                 bool recapture = moveScore(move) > 0 && to(move) == recaptureSquare(board(self));
                 makeMove(board(self), move);
                 int extension = (inCheck || recapture) + (nrMoves == 1 && (depth > 0));

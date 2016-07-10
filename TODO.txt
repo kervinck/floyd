@@ -507,14 +507,17 @@ Floyd(C)(2244)[327] whispers: depth=12 score=8.23 time=20.49 node=1876960 speed=
 Because we want to add bishop colors as well, and
 reduce the king component to their files.
 
-Candidates:
+Candidates (best first):
         subHash <-- looks best
         miniHash
+        pkbHash
+        coarseHash
+        hash2
+        pawnHash
         structHash
         xHash
         pHash
-        pkbHash
-        pawnHash
         slowHash
-        coarseHash
+
+|Todo| Test that all UCI pv moves are fully legal [qa]
 

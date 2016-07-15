@@ -811,16 +811,6 @@ uint64_t pawnKingHash(Board_t self)
 }
 
 /*----------------------------------------------------------------------+
- |      isPromotion                                                     |
- +----------------------------------------------------------------------*/
-
-bool isPromotion(Board_t self, int from, int to)
-{
-        return (self->squares[from] == whitePawn && rank(to) == rank8)
-            || (self->squares[from] == blackPawn && rank(to) == rank1);
-}
-
-/*----------------------------------------------------------------------+
  |      isLegalMove                                                     |
  +----------------------------------------------------------------------*/
 

@@ -134,7 +134,7 @@ void uciMoves(Board_t self, int depth)
         long long totalCount = 0;
         for (int i=0; i<nrMoves; i++) {
                 char moveString[maxMoveSize];
-                moveToUci(self, moveString, moveList[i]);
+                moveToUci(moveString, moveList[i]);
                 makeMove(self, moveList[i]);
                 if (wasLegalMove(self)) {
                         long long count = moveTest(self, depth - 1);

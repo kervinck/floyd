@@ -69,7 +69,7 @@ static const char promotionPieceToChar[] = { 'Q', 'R', 'B', 'N' };
 /*
  *  Convert into UCI notation
  */
-extern char *moveToUci(Board_t self, char moveString[maxMoveSize], int move)
+extern char *moveToUci(char moveString[maxMoveSize], int move)
 {
         int from = from(move);
         int to   = to(move);
@@ -78,7 +78,8 @@ extern char *moveToUci(Board_t self, char moveString[maxMoveSize], int move)
         *moveString++ = rankToChar(rank(from));
         *moveString++ = fileToChar(file(to));
         *moveString++ = rankToChar(rank(to));
-        if (isPromotion(self, from, to))
+        if (((move & specialMoveFlag) && rank(from) == rank7 && rank(to) == rank8)
+         || ((move & specialMoveFlag) && rank(from) == rank2 && rank(to) == rank1))
                 *moveString++ = tolower(promotionPieceToChar[(move>>promotionBits)&3]);
         *moveString = '\0';
 

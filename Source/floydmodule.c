@@ -209,7 +209,7 @@ floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
         PyObject *bestMove;
         if (engine.bestMove != 0) {
                 char moveString[maxMoveSize];
-                moveToUci(&engine.board, moveString, engine.bestMove);
+                moveToUci(moveString, engine.bestMove);
                 bestMove = PyString_FromString(moveString);
         } else {
                 bestMove = Py_None;

@@ -19,17 +19,11 @@ Under the hood:
 - Increased null move performance
 - Introduction of history counters for move ordering
 - Minor evaluation weight tuning
+- Simplified UCI move printing
 
 ------------------------------------------------------------------------
         Search
 ------------------------------------------------------------------------
-
-|Todo| Remove makeMove() from UCI PV printing [qa,uci]
-
-Simplify UCI move formatting
-moveToUci() only needs to board to check if move is a promotion.
-But this should be clear from the special bit and ranks.
-isPromotion() is not used anywhere else. Can be removed.
 
 |Todo| History with (piece, to) instead of (from, to) [search]
 
@@ -578,4 +572,8 @@ Candidates (best first):
         xHash
         pHash
         slowHash
+
+|Todo| Validate correctness of PV [qa]
+
+At least in debugging mode.
 

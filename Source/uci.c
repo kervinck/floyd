@@ -366,15 +366,9 @@ void uciSearchInfo(void *uciInfoData)
 
         for (int i=0; i<self->pv.len; i++) {
                 char moveString[maxMoveSize];
-                int move = self->pv.v[i];
-                assert(board(self)->squares[from(move)] != empty); // Very simple sanity check
-                moveToUci(board(self), moveString, move);
+                moveToUci(moveString, self->pv.v[i]);
                 listPrintf(&infoLine, "%s %s", (i == 0) ? " pv" : "", moveString);
-                makeMove(board(self), move); // TODO: uci notation shouldn't need this
         }
-
-        for (int i=0; i<self->pv.len; i++)
-                undoMove(board(self));
 
         puts(infoLine.v); // Should be atomic and adds a newline
         if (self->seconds >= 0.1)
@@ -391,13 +385,13 @@ static void uciBestMove(Engine_t self)
         char moveString[maxMoveSize];
 
         if (self->bestMove) {
-                moveToUci(board(self), moveString, self->bestMove);
+                moveToUci(moveString, self->bestMove);
                 printf("bestmove %s", moveString);
         } else
                 printf("bestmove 0000"); // When in doubt, do as Shredder
 
         if (self->ponderMove) {
-                moveToUci(board(self), moveString, self->ponderMove);
+                moveToUci(moveString, self->ponderMove);
                 printf(" ponder %s", moveString);
         }
         putchar('\n');

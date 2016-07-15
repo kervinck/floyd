@@ -45,7 +45,7 @@ struct Node {
 };
 
 #define moveMask ((int) ones(15))
-#define moveScore(longMove) ((longMove) >> 16) // Extract score from move list entry
+#define moveScore(longMove) ((longMove) >> 26) // Extract score from move list entry
 #define historyBits 11 // 15 for a move and 6 for SEE leaves 11 for history
 #define historyIndex(move) ((int) ((move) & ones(12)))
 
@@ -546,10 +546,10 @@ static void killersToFront(Engine_t self, int ply, int moveList[], int nrMoves)
         while (self->killers.len <= ply) // Expand table when needed
                 pushList(self->killers, (killersTuple) {.v={0}});
 
-        int j = 0;
+        int j = 0; // Find insertion place: after any (very) good captures
         while (j < nrMoves && moveScore(moveList[j]) >= 3) j++;
 
-        for (int i=nrKillers-1; i>=0; i--)
+        for (int i=nrKillers-1; i>=0; i--) // Bring killers forward, one by one in reverse order
                 moveToFront(moveList+j, nrMoves-j, self->killers.v[ply].v[i]);
 }
 

@@ -11,6 +11,15 @@ Floyd 0.9 dev status:
  9 Floyd x354d5f3a  93 delta pruning option 3 (pseudo fail-soft, aka xec39d0d0) 
 10 Floyd xaef137c2 100 Slightly tighter bound (aka as xa416cb63)
 
+Tentative release notes for v0.9:
+- Fixed bug causing illegal moves in PV (reported by Dirk-Jan D.)
+- Full solution for 0readyok problem: don't mangle info lines anymore
+Under the hood:
+- Improved move ordering for killers
+- Increased null move performance
+- Introduction of history counters for move ordering
+- Minor evaluation weight tuning
+
 ------------------------------------------------------------------------
         Search
 ------------------------------------------------------------------------
@@ -25,8 +34,37 @@ isPromotion() is not used anywhere else. Can be removed.
 |Todo| History with (piece, to) instead of (from, to) [search]
 
 Redesignate special bits as follows:
-        P  RB Q  K
+        P  NBR Q  K
         =B =R =N =Q
+
+ enum {
+   movePawnTag,                 000
+   moveKnightBishopRookTag,     001
+   moveQueenTag,                010
+   moveKingTag,                 011
+   promoteBishopTag,            100     specialDoublePush from=2, specialEnPassant from=5, specialCastling from=1
+   promoteRookTag,              101
+   promoteKnightTag,            110
+   promoteQueenTag,             111
+ }
+
+|Todo| Move classes [search]
+
+  tactical      Discover from to-square and board
+  safe          From SEE bits
+  strong        Discover after makeMove (from evaluate)
+  check         Discover after makeMove (from attacks)
+  pawn          From special bits
+
+  strong: moveScore == -1 and deltaEval > 0
+  weak:   moveScore < -1 or deltaEval <= 0
+
+  isPromotion(move)    (moveTag(move) >= promoteBishopTag)
+  isTacticalMove(move) (board[to(move)] != empty or isPromotion(move))
+  isSafeMove(move)     (moveScore(move) >= -1)
+  isStrongMove(move)   (deltaEval > 0) // after makeMove
+  isCheckingMove(move) (inCheck())     // after makeMove
+  isPawnMove(move)     (moveTag(move) == movePawnTag)
 
 |Todo| Checks in qsearch, at least in PV and after null move [search]
 
@@ -45,11 +83,23 @@ qSearchWithCheck() # No TT?
                         qSearch
 qsearch()
 
+|Todo| Underpromotion pruning [search]
+
+In qsearch
+ Only queening and knights that give check
+ If depth >= xxx, add underpromotions, but reduce depth
+
+ Problem with reducing underpromotions could be that the can
+ transpose into the same line as queening, and then wreck the
+ hash table?  Not if queen goes first? Higher depth etc
+
 |Todo| Basic counter move [search]
 
 |Todo| Checks after null move [search]
 
 |Todo| Collect statistics for delta pruning [search]
+
+|Todo| Razoring [search]
 
 |Todo| Simple futility-1 and futility-2 [search]
 
@@ -82,6 +132,21 @@ p-value: 0.248759
 |Todo| More agressuve null move tuning
 
 |Todo| More agressive LMR tuning
+
+1. Hash move            No reduction
+2. Very good captures   No reduction
+3. Killer moves         No reduction
+5. Good captures        No reduction
+4. Counter move         No reduction
+7. Safe checks          No reduction
+6. Bad captures         No reduction
+8. Strong moves (sorted by history) No reduction
+9. Weak moves, sorted by history
+
+ Reduction for
+   weakquiet moves or bad checks
+
+--> Register the likelihood that the move fails high
 
 |Todo| Move ordering based on delta eval [search]
 
@@ -157,6 +222,7 @@ if (depth >= 12)
         }
 
 Test with zugzwang positions
+http://www.stmintz.com/ccc/index.php?id=392369
 
 |Todo| Inverse delta pruning [search]
 

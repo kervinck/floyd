@@ -547,7 +547,7 @@ static void killersToFront(Engine_t self, int ply, int moveList[], int nrMoves)
                 pushList(self->killers, (killersTuple) {.v={0}});
 
         int j = 0; // Find insertion place: after any (very) good captures
-        while (j < nrMoves && moveScore(moveList[j]) >= 1) j++;
+        while (j < nrMoves && moveScore(moveList[j]) >= 0) j++;
 
         for (int i=nrKillers-1; i>=0; i--) // Bring killers forward, one by one in reverse order
                 moveToFront(moveList+j, nrMoves-j, self->killers.v[ply].v[i]);

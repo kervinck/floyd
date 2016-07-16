@@ -21,6 +21,10 @@ Under the hood:
 - Minor evaluation weight tuning
 - Simplified UCI move printing
 
+Score of Floyd xdccb7895 vs Rookie 3.9b1 (1 core): 102 - 269 - 129  [0.333] 500
+ELO difference: -121
+Finished match
+
 ------------------------------------------------------------------------
         Search
 ------------------------------------------------------------------------
@@ -233,8 +237,6 @@ http://www.stmintz.com/ccc/index.php?id=392369
 ------------------------------------------------------------------------
         Evaluate
 ------------------------------------------------------------------------
-
-|Todo| Sync KPK from pfkpk updates [qa]
 
 |Todo| Rook or Queen and/vs pawn span [evaluate]
 

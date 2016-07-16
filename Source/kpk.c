@@ -121,8 +121,8 @@ int kpkGenerate(void)
 
                 // Valid positions after black move, pawn capture allowed
                 valid[ix] = ~allKing(bit(wKing));
-                if (file(wPawn) != fileA) valid[ix] &= ~bit(wPawn+N+W);
-                if (file(wPawn) != fileH) valid[ix] &= ~bit(wPawn+N+E);
+                if (rank(wPawn) != rank8 && file(wPawn) != fileA) valid[ix] &= ~bit(wPawn+N+W);
+                if (rank(wPawn) != rank8 && file(wPawn) != fileH) valid[ix] &= ~bit(wPawn+N+E);
         }
 
         int changed;

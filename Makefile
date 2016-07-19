@@ -79,11 +79,11 @@ $(win32_exe): $(wildcard Source/*) Makefile versions.json
 	$(xcc_win32) $(CFLAGS) $(win32_flags) -o $@ $(uciSources)
 
 # Run 1 second position tests
-easy wac krk5 tt eg ece3 zz: .module
+easy wac krk5 tt eg ece3: .module
 	python Tools/epdtest.py 1 < Data/$@.epd
 
 # Run 10 second position tests
-hard draw nodraw bk: .module
+hard draw nodraw bk zz: .module
 	python Tools/epdtest.py 10 < Data/$@.epd
 
 # Run 100 second position tests

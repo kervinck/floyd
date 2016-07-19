@@ -79,6 +79,10 @@ echo "*** Check mate:"
 head -100 Data/qmate.epd | time python Tools/epdtest.py 10 | grep result
 echo
 
+echo "*** Zugzwang:"
+make zz | grep result
+echo
+
 echo "*** Speed:"
 echo 'bench movetime 3000 bestof 3' | ./floyd-pgo2
 echo

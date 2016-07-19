@@ -7,16 +7,45 @@ Floyd 0.9 dev status:
  4 Floyd x32aa5271  73 depth-dependent null reduction
  5 Floyd xb171e499  75 evaluation-guarded null move, i.s.o. node type
  6 Floyd x7c96b2ca  83 unconditional null move, i.s.o. evaluation
- 8 Floyd xc6c5dae2  87 simple delta pruning
- 9 Floyd x354d5f3a  93 delta pruning option 3 (pseudo fail-soft, aka xec39d0d0) 
-10 Floyd xaef137c2 100 Slightly tighter bound (aka as xa416cb63)
+ 8 Floyd xc6c5dae2  86 simple delta pruning
+ 9 Floyd x354d5f3a  93 delta pruning option 3 (pseudo fail-soft, aka xec39d0d0)
+10 Floyd xa416cb63 100 Slightly tighter bound (aka xaef137c2)
+11 Floyd x8399a075 104 SEE>0 before killers; PV bug fix
+12 Floyd x4318fa13 xxx Avoid double null move
+
+--
+Rank Name              Elo    +    - games score oppo. draws
+   1 Fruit 2.1         329    2    2 108000  82%    49   10%
+   2 Floyd x8399a075   104    4    4 24000   44%   165   19%
+   3 Floyd xa416cb63   100    4    4 24000   43%   165   19%
+   4 Floyd x354d5f3a    93    4    4 24000   42%   165   19%
+   5 Floyd xc6c5dae2    87    4    4 24000   42%   165   19%
+   6 Floyd x7c96b2ca    83    4    4 24000   41%   165   20%
+   7 Floyd x0e0dc088    63    4    4 24000   39%   165   19%
+   8 Floyd x800ecb47    56    4    4 24000   38%   165   19%
+   9 Floyd 0.8           0    2    2 108000  39%    85   23%
+  10 Floyd 0.7        -150    4    4 36000   38%    -8   13%
+  11 Floyd 0.6        -354    6    6 12000   24%  -150   18%
+                 Fr Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl
+Fruit 2.1          100100100100100100100100100100
+Floyd x8399a075   0    91 99 99 99100100100100100 <-- dev
+Floyd xa416cb63   0  8    98 99 99100100100100100
+Floyd x354d5f3a   0  0  1    98 99100100100100100
+Floyd xc6c5dae2   0  0  0  1    89 99100100100100
+Floyd x7c96b2ca   0  0  0  0 10    99100100100100
+Floyd x0e0dc088   0  0  0  0  0  0    98100100100
+Floyd x800ecb47   0  0  0  0  0  0  1   100100100
+Floyd 0.8         0  0  0  0  0  0  0  0   100100
+Floyd 0.7         0  0  0  0  0  0  0  0  0   100
+Floyd 0.6         0  0  0  0  0  0  0  0  0  0
+--
 
 Tentative release notes for v0.9:
 - Fixed bug causing illegal moves in PV (reported by Dirk-Jan D.)
 - Full solution for 0readyok problem: don't mangle info lines anymore
 Under the hood:
 - Improved move ordering for killers
-- Increased null move performance
+- Improved null move pruning
 - Introduction of history counters for move ordering
 - Minor evaluation weight tuning
 - Simplified UCI move printing
@@ -26,80 +55,22 @@ ELO difference: -121
 Finished match
 
 ------------------------------------------------------------------------
+        Priority
+------------------------------------------------------------------------
+
+|Todo| Hanging piece evaluation [evaluate]
+
+- SEE or guard heuristic for each attacked piece
+- Sort descending
+- Give #1, #2 (and perhaps #3) a weight
+- Weights depend on side to move: total 6 parameters to tune
+- Rethink mobility as well
+
+------------------------------------------------------------------------
         Search
 ------------------------------------------------------------------------
 
-|Todo| History with (piece, to) instead of (from, to) [search]
-
-Redesignate special bits as follows:
-        P  NBR Q  K
-        =B =R =N =Q
-
- enum {
-   movePawnTag,                 000
-   moveKnightBishopRookTag,     001
-   moveQueenTag,                010
-   moveKingTag,                 011
-   promoteBishopTag,            100     specialDoublePush from=2, specialEnPassant from=5, specialCastling from=1
-   promoteRookTag,              101
-   promoteKnightTag,            110
-   promoteQueenTag,             111
- }
-
-|Todo| Move classes [search]
-
-  tactical      Discover from to-square and board
-  safe          From SEE bits
-  strong        Discover after makeMove (from evaluate)
-  check         Discover after makeMove (from attacks)
-  pawn          From special bits
-
-  strong: moveScore == -1 and deltaEval > 0
-  weak:   moveScore < -1 or deltaEval <= 0
-
-  isPromotion(move)    (moveTag(move) >= promoteBishopTag)
-  isTacticalMove(move) (board[to(move)] != empty or isPromotion(move))
-  isSafeMove(move)     (moveScore(move) >= -1)
-  isStrongMove(move)   (deltaEval > 0) // after makeMove
-  isCheckingMove(move) (inCheck())     // after makeMove
-  isPawnMove(move)     (moveTag(move) == movePawnTag)
-
-|Todo| Checks in qsearch, at least in PV and after null move [search]
-
-#define minDepth -7
-scout:
-        if (inCheck)
-                qSearchWithCheck // horizon()
-        else
-                qSearch
-qSearchWithCheck() # No TT?
-        filter, keep good checks and good captures
-        for (move in moves)
-                if (inCheck || giveCheck)
-                        qSearchWithCheck
-                else
-                        qSearch
-qsearch()
-
-|Todo| Underpromotion pruning [search]
-
-In qsearch
- Only queening and knights that give check
- If depth >= xxx, add underpromotions, but reduce depth
-
- Problem with reducing underpromotions could be that the can
- transpose into the same line as queening, and then wreck the
- hash table?  Not if queen goes first? Higher depth etc
-
-|Todo| Basic counter move [search]
-
-|Todo| Checks after null move [search]
-
-|Todo| Collect statistics for delta pruning [search]
-
-|Todo| Razoring [search]
-
-|Todo| Simple futility-1 and futility-2 [search]
+|Todo| Null move verification [search]
 
 |Todo| Retry evaluation filtering for null move [search]
 
@@ -125,102 +96,109 @@ Winning fraction: 0.491
 Elo difference: -6.25452
 p-value: 0.248759
 
-|Todo| Futility search
+|Todo| Move classes [search]
 
-|Todo| More agressuve null move tuning
+  tactical      Discover from to-square and board
+  safe          From SEE bits
+  strong        Discover after makeMove (from evaluate)
+  check         Discover after makeMove (from attacks)
+  pawn          From special bits
+
+  strong: moveScore == -1 and deltaEval > 0
+  weak:   moveScore < -1 or deltaEval <= 0
+
+  isPromotion(move)    (moveTag(move) >= promoteBishopTag)
+  isTacticalMove(move) (board[to(move)] != empty or isPromotion(move))
+  isSafeMove(move)     (moveScore(move) >= -1)
+  isStrongMove(move)   (deltaEval > 0) // after makeMove
+  isCheckingMove(move) (inCheck())     // after makeMove
+  isPawnMove(move)     (moveTag(move) == movePawnTag)
+
+Flags must support more ordering:
+1. Hash move
+2. Good captures
+3. Killer moves
+4. Counter moves (1st and 2nd order), connected moves
+5. Safe checks
+6. Bad captures
+7. Strong moves
+8. Weak moves
+
+|Todo| Checks after null move [search]
+
+|Todo| Checks in qsearch, at least in PV [search]
+
+#define minDepth -7
+scout:
+        if (inCheck)
+                qSearchWithCheck // horizon()
+        else
+                qSearch
+qSearchWithCheck() # No TT?
+        filter, keep good checks and good captures
+        for (move in moves)
+                if (inCheck || giveCheck)
+                        qSearchWithCheck
+                else
+                        qSearch
+qsearch()
+
+|Todo| History with (piece, to) instead of (from, to) [search]
+
+At least include color
+
+Redesignate special bits as follows:
+        P  NBR Q  K
+        =B =R =N =Q
+
+ enum {
+   movePawnTag,                 000
+   moveKnightBishopRookTag,     001
+   moveQueenTag,                010
+   moveKingTag,                 011
+   promoteBishopTag,            100     specialDoublePush from=2, specialEnPassant from=5, specialCastling from=1
+   promoteRookTag,              101
+   promoteKnightTag,            110
+   promoteQueenTag,             111
+ }
+
+|Todo| Collect statistics for delta pruning [search]
+
+|Todo| Simple futility-1 and futility-2 [search]
+
+|Todo| Razoring [search]
+
+|Todo| Undo reductions for difficult sub-trees [search]
+
+Positions with biggest subtree should be unreduced and retried?
+
+|Todo| Don't reduce and then drop directly into qsearch [search]
+
+But allow this for futility?
+
+|Todo| Remember more than 1 good move in PV nodes
+
+|Todo| More agressive null move tuning
 
 |Todo| More agressive LMR tuning
 
 1. Hash move            No reduction
-2. Very good captures   No reduction
+2. Good captures        No reduction
 3. Killer moves         No reduction
-5. Good captures        No reduction
 4. Counter move         No reduction
-7. Safe checks          No reduction
+5. Safe checks          No reduction
 6. Bad captures         No reduction
-8. Strong moves (sorted by history) No reduction
-9. Weak moves, sorted by history
+7. Strong moves (sorted by history) No reduction
+8. Weak moves, sorted by history
 
  Reduction for
    weakquiet moves or bad checks
 
 --> Register the likelihood that the move fails high
 
-|Todo| Move ordering based on delta eval [search]
-
-Then also cache evaluation in ttable
-
-|Todo| Extend move flags
-
-- Extend flags beyond
-
-Concept choice: keep flags with move or in seperate table?
-
-staticMoveScore (SEE) range
-min: -18
-max: +17
---> 6 bits
-
-          search                     board
-+------------+------------+------------+-------------+
-| SEE/killer |   history  | properties |     move    |
-+------------+------------+------------+-------------+
-      16            16          16           16
-
-                                        fedcba9876543210
-                                        ----------xxxxxx to square
-                                        ----xxxxxx------ from square
-                                        ---x------------ specialMove
-                                        -xx------------- promotion piece
-                                        -xx------------- piece type: K Q RB P
-
-                             upCapture (always good)
-                             trade
-                             downCapture
-                             gives check
-                             safe move
-                             strong move
-                             weak move
-                             piece type (KQRNBP)
-                           fedcba9876543210
-                           -----------x----
-                           -----------x----
-                           ------------x---
-                           -------------xxx
- fedcba9876543210
- -x-------------- hash table move
- --xxxx---------- SEE
- --xxxx---------- SEE
- ----------------
- ------------xxxx
-
-1. Sort a long key.
-        - Makes everyone migrate to Move_t
-        + Can use standard qsort
-2. Sort only the scores, with back reference to the move (index)
-3. Sort through a history table, requires modified qsort
-4. Hide all in a move picker object
-5. Place scores at index+256
-        - Doesn't work with qsort
-
-Desirable properties
-- generateMoves still generates ints (32bit)
-- can use stdlib qsort
-
 |Todo| Introduction of material table [speed]
 
 Floyd is slow, but we should aim to keep it above 1Mnps
-
-|Todo| Null move verification
-
-if (depth >= 12)
-        verificationDepth = max(0, depth/2 - 6)
-        if (verificationDepth > 2) {
-
-        }
-
-Test with zugzwang positions
-http://www.stmintz.com/ccc/index.php?id=392369
 
 |Todo| Inverse delta pruning [search]
 
@@ -233,6 +211,16 @@ http://www.stmintz.com/ccc/index.php?id=392369
         }
 
 |Todo| Upcoming repetition detection
+
+|Todo| Underpromotion pruning [search]
+
+In qsearch
+ Only queening and knights that give check
+ If depth >= xxx, add underpromotions, but reduce depth
+
+ Problem with reducing underpromotions could be that the can
+ transpose into the same line as queening, and then wreck the
+ hash table?  Not if queen goes first? Higher depth etc
 
 ------------------------------------------------------------------------
         Evaluate
@@ -578,4 +566,16 @@ Candidates (best first):
 |Todo| Validate correctness of PV [qa]
 
 At least in debugging mode.
+
+|Todo| Easy move, hard move [playing]
+
+|Todo| Cleanup header files [qa]
+
+Strip function explanation away and move to C files.
+
+|Todo| Remove cplus.h stuff that is not used [qa]
+
+|Todo| Allow Ctrl-C from Python [module]
+
+When doing a search be open to receive signal and abort the search.
 

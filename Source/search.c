@@ -54,7 +54,7 @@ struct Node {
  +----------------------------------------------------------------------*/
 
 static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex);
-static int scout(Engine_t self, int depth, int alpha, int nodeType);
+static int scout(Engine_t self, int depth, int alpha, int nodeType, int lastMove);
 static int qSearch(Engine_t self, int alpha);
 
 static int updateBestAndPonderMove(Engine_t self);
@@ -229,7 +229,7 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                 int extension = (inCheck || recapture);
                 int newDepth = max(0, depth - 1 + extension - reduction);
                 int newAlpha = max(alpha, bestScore);
-                int score = -scout(self, newDepth, -(newAlpha+1), 1);
+                int score = -scout(self, newDepth, -(newAlpha+1), 1, move);
                 if (!isMateScore(score) && !isDrawScore(score))
                         self->mateStop = false; // Shortest mate not yet proven
                 if (score > bestScore) {
@@ -264,7 +264,7 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
 #define isAllNode(nodeType) ((~nodeType) & 1)
 
 // TODO: futility
-static int scout(Engine_t self, int depth, int alpha, int nodeType)
+static int scout(Engine_t self, int depth, int alpha, int nodeType, int lastMove)
 {
         self->nodeCount++;
         if (repetition(self)) return drawScore(self);
@@ -287,10 +287,10 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
         // Null move pruning
         int inCheck = isInCheck(board(self));
         if (depth >= 2 && minEval <= alpha && alpha < maxEval
-         && !inCheck && allowNullMove(board(self))) {
+         && lastMove != 0000 && !inCheck && allowNullMove(board(self))) {
                 makeNullMove(board(self));
-                int reduction = min((depth + 1) / 2, 3);
-                int score = -scout(self, max(0, depth - reduction - 1), -(alpha+1), nodeType+1);
+                int reduction = min((depth + 1) / 2, 3); // R = 1..3
+                int score = -scout(self, max(0, depth - reduction - 1), -(alpha+1), nodeType+1, 0000);
                 undoMove(board(self));
                 if (score > alpha)
                         return ttWrite(self, node.slot, depth, score, alpha, alpha+1);
@@ -298,7 +298,7 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
 
         // Internal iterative deepening
         if (depth >= 3 && isCutNode(nodeType) && !node.slot.move) {
-                scout(self, depth - 2, alpha, nodeType);
+                scout(self, depth - 2, alpha, nodeType, lastMove);
                 node.slot = ttRead(self);
         }
 
@@ -309,9 +309,9 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
                 int newDepth = max(0, depth - 1 + extension);
                 int reduction = (depth >= 4) && (j >= 1) && (move < 0);
                 int reducedDepth = max(0, newDepth - reduction);
-                int score = -scout(self, reducedDepth, -(alpha+1), nodeType+1);
+                int score = -scout(self, reducedDepth, -(alpha+1), nodeType+1, move);
                 if (score > alpha && reducedDepth < newDepth)
-                        score = -scout(self, newDepth, -(alpha+1), nodeType+1);
+                        score = -scout(self, newDepth, -(alpha+1), nodeType+1, move);
                 undoMove(board(self));
                 bestScore = max(bestScore, score);
                 if (score > alpha) { // Fail high

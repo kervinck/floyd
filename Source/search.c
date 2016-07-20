@@ -284,16 +284,22 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType, int lastMove
                  || (node.slot.isLowerBound && node.slot.score > alpha))
                         return node.slot.score;
 
-        // Null move pruning
+        // Null move pruning or reduction (aka verification)
         int inCheck = isInCheck(board(self));
         if (depth >= 2 && minEval <= alpha && alpha < maxEval
          && lastMove != 0000 && !inCheck && allowNullMove(board(self))) {
                 makeNullMove(board(self));
                 int reduction = min((depth + 1) / 2, 3); // R = 1..3
-                int score = -scout(self, max(0, depth - reduction - 1), -(alpha+1), nodeType+1, 0000);
+                int score = -scout(self,  depth - reduction - 1, -(alpha+1), nodeType+1, 0000);
                 undoMove(board(self));
-                if (score > alpha)
+                if (score > alpha) {
+                        if (depth >= 5) { // Verification
+                                int vDepth = depth - reduction; // Same tree but with own move re-inserted
+                                vDepth -= ~vDepth & 1; // Remove opponent last ply (bias towards fail-high)
+                                return scout(self, vDepth, alpha, nodeType, 0000);
+                        }
                         return ttWrite(self, node.slot, depth, score, alpha, alpha+1);
+                }
         }
 
         // Internal iterative deepening

@@ -72,6 +72,31 @@ Finished match
 
 |Todo| Null move verification [search]
 
+// In case of detected zugzwang, fail low and let upstream care about it.
+// If it needs to be researched PVS will come back here anyway.
+// If it doesn't come back here we didn't waste more time than we already did.
+// TODO: shouldn't we disable null move if it fails low on verification?
+
+tc 10+0.15
+Score of Floyd x92fabd87 vs Floyd x8399a075: 325 - 324 - 351  [0.500] 1000
+ELO difference: 0
+Finished match
+
+tc 120+2
+Score of Floyd x92fabd87 vs Floyd x8399a075: 30 - 19 - 43  [0.560] 92
+ELO difference: 42
+
+|Todo| Is ZPTS.24 cooked? [qa]
+
+8/8/8/2p5/1pp5/brpp4/1pprp2P/qnkbK3 w - - bm h3; c0 "CCC post by Joachim Rang, mate in 15, h4 is only draw"; id "ZPTS.24";
+
+info time 781650 depth 49 score mate 15 nodes 895975666 nps 1146261
+hashfull 1000 pv h2h4 a1a2 h4h5 a2a1 h5h6 a1a2 h6h7 a2a1 h7h8n a1a2
+h8g6 a2a1 g6f8 a1a2 f8e6 a2a1 e6c5 a1a2 c5d7 a2a1 d7e5 a1a2 e5c4
+a2a1 c4e5 a1a2 e5f3 a2a1 f3h4 a1a2 e1f2 e2e1n f2g1 d1g4 g1h1 a2a1
+                                   ^^^^?
+h4g6 g4e2 h1g1 c1d1 g6f4 c2c1q f4d5 a1a2 d5e3
+
 |Todo| Retry evaluation filtering for null move [search]
 
 Cache evaluations to prevent the NPS drop
@@ -468,8 +493,6 @@ Platform: UNKNOWN
 6RQ/6pP/p5K1/1r2p2N/p3k3/R7/B7/B7 w - - acn 106602; acs 0; bm Qxg7 Rc3; ce 32758; dm 5; pv Rc3 Rb6+ Kg5 Rg6+ Kxg6 a3 Rd8 a5 Bb1#;
 
 |Todo| Move logit() from evaluate to rootSearch [speed]
-
-|Todo| Null move for zugzwang
 
 |Todo| Calculate the impact of each parameter [tune]
 

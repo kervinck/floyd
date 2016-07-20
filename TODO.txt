@@ -11,33 +11,35 @@ Floyd 0.9 dev status:
  9 Floyd x354d5f3a  93 delta pruning option 3 (pseudo fail-soft, aka xec39d0d0)
 10 Floyd xa416cb63 100 Slightly tighter bound (aka xaef137c2)
 11 Floyd x8399a075 104 SEE>0 before killers; PV bug fix
-12 Floyd x4318fa13 xxx Avoid double null move
+12 Floyd x4318fa13 102 Avoid double null move
 
 --
 Rank Name              Elo    +    - games score oppo. draws
-   1 Fruit 2.1         329    2    2 108000  82%    49   10%
-   2 Floyd x8399a075   104    4    4 24000   44%   165   19%
-   3 Floyd xa416cb63   100    4    4 24000   43%   165   19%
-   4 Floyd x354d5f3a    93    4    4 24000   42%   165   19%
-   5 Floyd xc6c5dae2    87    4    4 24000   42%   165   19%
-   6 Floyd x7c96b2ca    83    4    4 24000   41%   165   20%
-   7 Floyd x0e0dc088    63    4    4 24000   39%   165   19%
-   8 Floyd x800ecb47    56    4    4 24000   38%   165   19%
-   9 Floyd 0.8           0    2    2 108000  39%    85   23%
-  10 Floyd 0.7        -150    4    4 36000   38%    -8   13%
-  11 Floyd 0.6        -354    6    6 12000   24%  -150   18%
-                 Fr Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl
-Fruit 2.1          100100100100100100100100100100
-Floyd x8399a075   0    91 99 99 99100100100100100 <-- dev
-Floyd xa416cb63   0  8    98 99 99100100100100100
-Floyd x354d5f3a   0  0  1    98 99100100100100100
-Floyd xc6c5dae2   0  0  0  1    89 99100100100100
-Floyd x7c96b2ca   0  0  0  0 10    99100100100100
-Floyd x0e0dc088   0  0  0  0  0  0    98100100100
-Floyd x800ecb47   0  0  0  0  0  0  1   100100100
-Floyd 0.8         0  0  0  0  0  0  0  0   100100
-Floyd 0.7         0  0  0  0  0  0  0  0  0   100
-Floyd 0.6         0  0  0  0  0  0  0  0  0  0
+   1 Fruit 2.1         332    2    2 120000   81%    55   11%
+   2 Floyd x8399a075   105    4    4 24000   44%   166   19%
+   3 Floyd x4318fa13   102    4    4 24000   43%   166   19% <-- dev regression?
+   4 Floyd xa416cb63   101    4    4 24000   43%   166   19%
+   5 Floyd x354d5f3a    94    4    4 24000   42%   166   19%
+   6 Floyd xc6c5dae2    88    4    4 24000   42%   166   19%
+   7 Floyd x7c96b2ca    84    4    4 24000   41%   166   20%
+   8 Floyd x0e0dc088    64    4    4 24000   39%   166   19%
+   9 Floyd x800ecb47    58    4    4 24000   38%   166   19%
+  10 Floyd 0.8           0    2    2 120000   38%    88   24%
+  11 Floyd 0.7        -149    4    4 36000   38%    -7   13%
+  12 Floyd 0.6        -353    6    6 12000   24%  -149   18%
+                 Fr Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl
+Fruit 2.1          100100100100100100100100100100100
+Floyd x8399a075   0    83 91 99 99 99100100100100100
+Floyd x4318fa13   0 16    65 99 99 99100100100100100
+Floyd xa416cb63   0  8 34    98 99 99100100100100100
+Floyd x354d5f3a   0  0  0  1    98 99100100100100100
+Floyd xc6c5dae2   0  0  0  0  1    89 99100100100100
+Floyd x7c96b2ca   0  0  0  0  0 10    99100100100100
+Floyd x0e0dc088   0  0  0  0  0  0  0    98100100100
+Floyd x800ecb47   0  0  0  0  0  0  0  1   100100100
+Floyd 0.8         0  0  0  0  0  0  0  0  0   100100
+Floyd 0.7         0  0  0  0  0  0  0  0  0  0   100
+Floyd 0.6         0  0  0  0  0  0  0  0  0  0  0
 --
 
 Tentative release notes for v0.9:
@@ -85,6 +87,26 @@ Finished match
 tc 120+2
 Score of Floyd x92fabd87 vs Floyd x8399a075: 30 - 19 - 43  [0.560] 92
 ELO difference: 42
+
+But:
+
+tc 60+1
+Finished game 355 (Floyd x92fabd87 vs Floyd x8399a075): 1-0 {White wins by adjudication}
+Score of Floyd x92fabd87 vs Floyd x8399a075: 96 - 117 - 142  [0.470] 355
+ELO difference: -21
+los 96 117 142
+Winning fraction: 0.470423
+Elo difference: -20.5766
+p-value: 0.07509
+
+
+|Todo| Reconsider double null move prevention [search]
+
+   2 Floyd x8399a075   105    4    4 24000   44%   166   19%
+   3 Floyd x4318fa13   102    4    4 24000   43%   166   19% <-- might be regression
+
+Floyd x8399a075   0    83 91 99 99 99100100100100100
+Floyd x4318fa13   0 16    65 99 99 99100100100100100 <-- might be regression
 
 |Todo| Is ZPTS.24 cooked? [qa]
 

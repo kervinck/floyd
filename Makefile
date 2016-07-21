@@ -31,7 +31,12 @@ ifeq "$(osType)" "Darwin"
  GCC:=gcc-mp-4.8 # From MacPorts
 endif
 ifeq "$(osType)" "Linux"
- GCC:=gcc-4.8 # Ubuntu default
+ ifneq "$(shell which gcc-4.8)" ""
+   GCC:=gcc-4.8
+ endif
+ ifneq "$(shell which gcc-4.9)" ""
+   GCC:=gcc-4.9
+ endif
 endif
 
 ifeq "$(osType)" "Linux"
@@ -55,7 +60,7 @@ export PYTHONPATH:=build/lib/python:${PYTHONPATH}
 all: .module floyd
 
 # Compile as Python module
-.module: $(wildcard Source/*) Makefile versions.json
+.module: $(wildcard Source/*) Makefile setup.py versions.json
 	env CC="$(CC)" CFLAGS="$(CFLAGS)" floydVersion="$(floydVersion)" python setup.py build
 	env floydVersion="$(floydVersion)" python setup.py install --home=build && touch .module
 
@@ -72,6 +77,7 @@ floyd-pgo1: $(wildcard Source/*) Makefile versions.json
 
 floyd-pgo2: $(wildcard Source/*) Makefile versions.json floyd-pgo1
 	$(GCC) $(CFLAGS) -DNDEBUG -o $@ $(uciSources) $(LDFLAGS) -fprofile-use
+	cp -p $@ floyd-$(floydVersion)
 
 # Cross-compile as Win32 UCI engine
 win: $(win32_exe)

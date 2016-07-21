@@ -292,7 +292,7 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType, int lastMove
                 int reduction = min((depth + 1) / 2, 3); // R = 1..3
                 int score = -scout(self,  depth - reduction - 1, -(alpha+1), nodeType+1, 0000);
                 undoMove(board(self));
-                if (score > alpha && depth >= 5) // Verification
+                if (score > alpha && depth >= 5 && isOdd(nodeType)) // Verification
                         #define reduceIfEven(d) ((((d) + 1) & ~1) - 1) // Chop off the last reply
                         return scout(self, reduceIfEven(depth - reduction), alpha, nodeType, 0000);
                 if (score > alpha) // Pruning

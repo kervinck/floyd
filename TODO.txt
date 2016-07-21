@@ -10,36 +10,39 @@ Floyd 0.9 dev status:
  8 Floyd xc6c5dae2  86 simple delta pruning
  9 Floyd x354d5f3a  93 delta pruning option 3 (pseudo fail-soft, aka xec39d0d0)
 10 Floyd xa416cb63 100 Slightly tighter bound (aka xaef137c2)
-11 Floyd x8399a075 104 SEE>0 before killers; PV bug fix
+11 Floyd x8399a075 105 SEE>0 before killers; PV bug fix
 12 Floyd x4318fa13 102 Avoid double null move
+13 Floyd xa882bde3 107 Null move verification 1
+14 Floyd           xxx Null move verification 2 (odd nodes only)
 
---
 Rank Name              Elo    +    - games score oppo. draws
-   1 Fruit 2.1         332    2    2 120000   81%    55   11%
-   2 Floyd x8399a075   105    4    4 24000   44%   166   19%
-   3 Floyd x4318fa13   102    4    4 24000   43%   166   19% <-- dev regression?
-   4 Floyd xa416cb63   101    4    4 24000   43%   166   19%
-   5 Floyd x354d5f3a    94    4    4 24000   42%   166   19%
-   6 Floyd xc6c5dae2    88    4    4 24000   42%   166   19%
-   7 Floyd x7c96b2ca    84    4    4 24000   41%   166   20%
-   8 Floyd x0e0dc088    64    4    4 24000   39%   166   19%
-   9 Floyd x800ecb47    58    4    4 24000   38%   166   19%
-  10 Floyd 0.8           0    2    2 120000   38%    88   24%
-  11 Floyd 0.7        -149    4    4 36000   38%    -7   13%
-  12 Floyd 0.6        -353    6    6 12000   24%  -149   18%
-                 Fr Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl
-Fruit 2.1          100100100100100100100100100100100
-Floyd x8399a075   0    83 91 99 99 99100100100100100
-Floyd x4318fa13   0 16    65 99 99 99100100100100100
-Floyd xa416cb63   0  8 34    98 99 99100100100100100
-Floyd x354d5f3a   0  0  0  1    98 99100100100100100
-Floyd xc6c5dae2   0  0  0  0  1    89 99100100100100
-Floyd x7c96b2ca   0  0  0  0  0 10    99100100100100
-Floyd x0e0dc088   0  0  0  0  0  0  0    98100100100
-Floyd x800ecb47   0  0  0  0  0  0  0  1   100100100
-Floyd 0.8         0  0  0  0  0  0  0  0  0   100100
-Floyd 0.7         0  0  0  0  0  0  0  0  0  0   100
-Floyd 0.6         0  0  0  0  0  0  0  0  0  0  0
+   1 Fruit 2.1         333    2    2 132000   81%    60   11%
+   2 Floyd xa882bde3   107    4    4 24000   44%   167   19% <--.
+   3 Floyd x8399a075   106    4    4 24000   44%   167   19%    | Null move verification 1
+   4 Floyd x4318fa13   103    4    4 24000   43%   167   19% ---'
+   5 Floyd xa416cb63   102    4    4 24000   43%   167   19%
+   6 Floyd x354d5f3a    95    4    4 24000   42%   167   19%
+   7 Floyd xc6c5dae2    89    4    4 24000   42%   167   19%
+   8 Floyd x7c96b2ca    85    4    4 24000   41%   167   20%
+   9 Floyd x0e0dc088    65    4    4 24000   39%   167   19%
+  10 Floyd x800ecb47    58    4    4 24000   38%   167   19%
+  11 Floyd 0.8           0    2    2 132000   38%    90   24%
+  12 Floyd 0.7        -149    4    4 36000   38%    -7   13%
+  13 Floyd 0.6        -353    6    6 12000   24%  -149   18%
+                 Fr Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl
+Fruit 2.1          100100100100100100100100100100100100
+Floyd xa882bde3   0    63 90 95 99 99 99100100100100100
+Floyd x8399a075   0 36    84 92 99 99 99100100100100100
+Floyd x4318fa13   0  9 15    65 99 99 99100100100100100
+Floyd xa416cb63   0  4  7 34    98 99 99100100100100100
+Floyd x354d5f3a   0  0  0  0  1    98 99100100100100100
+Floyd xc6c5dae2   0  0  0  0  0  1    89 99100100100100
+Floyd x7c96b2ca   0  0  0  0  0  0 10    99100100100100
+Floyd x0e0dc088   0  0  0  0  0  0  0  0    98100100100
+Floyd x800ecb47   0  0  0  0  0  0  0  0  1   100100100
+Floyd 0.8         0  0  0  0  0  0  0  0  0  0   100100
+Floyd 0.7         0  0  0  0  0  0  0  0  0  0  0   100
+Floyd 0.6         0  0  0  0  0  0  0  0  0  0  0  0
 --
 
 Tentative release notes for v0.9:
@@ -72,6 +75,23 @@ Finished match
         Search
 ------------------------------------------------------------------------
 
+|Todo| Verification null move only in odd node types
+
+A FH in an even node triggers a research anyway from PVS
+
+Results on zz.epd:
+ 4/11 No change
+ 5/11 isOddNode condition
+ 0/11 isEvenNode condition
+Todo: test with 100s
+
+tc 30+0.5
+Score of Floyd xe4a5ace5 vs Floyd x8399a075: 144 - 150 - 162  [0.493] 456
+ELO difference: -5
+Winning fraction: 0.493421
+Elo difference: -4.57178
+p-value: 0.363197
+
 |Todo| Null move verification [search]
 
 // In case of detected zugzwang, fail low and let upstream care about it.
@@ -87,6 +107,8 @@ Finished match
 tc 120+2
 Score of Floyd x92fabd87 vs Floyd x8399a075: 30 - 19 - 43  [0.560] 92
 ELO difference: 42
+Score of Floyd x1f444cbb vs Floyd x8399a075: 190 - 188 - 255  [0.502] 633
+ELO difference: 1
 
 But:
 
@@ -98,7 +120,6 @@ los 96 117 142
 Winning fraction: 0.470423
 Elo difference: -20.5766
 p-value: 0.07509
-
 
 |Todo| Reconsider double null move prevention [search]
 

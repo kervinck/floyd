@@ -51,6 +51,8 @@
 #define bitTest(w,i) (((w) >> (i)) & 1)
 #define bitIndex8(w) (((w) & 0xf0 ? 4 : 0) + ((w) & 0xcc ? 2 : 0) + ((w) & 0xaa ? 1 : 0))
 #define equalSign(a, b) (((a) ^ (b)) >= 0)
+#define isOdd(n) ((n) & 1)
+#define isEven(n) ((~n) & 1)
 
 #define unused(a) ((void)(a))
 

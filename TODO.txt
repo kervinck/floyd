@@ -13,42 +13,45 @@ Floyd 0.9 dev status:
 11 Floyd x8399a075 105 SEE>0 before killers; PV bug fix
 12 Floyd x4318fa13 102 Avoid double null move
 13 Floyd xa882bde3 107 Null move verification 1
-14 Floyd           xxx Null move verification 2 (odd nodes only)
+14 Floyd x3c65e794 101 Null move verification 2 (Only odd nodes)
 
 Rank Name              Elo    +    - games score oppo. draws
-   1 Fruit 2.1         333    2    2 132000   81%    60   11%
-   2 Floyd xa882bde3   107    4    4 24000   44%   167   19% <--.
+   1 Fruit 2.1         334    2    2 138870   81%    62   11%
+   2 Floyd xa882bde3   107    4    4 24000   44%   167   19% <--.---.
    3 Floyd x8399a075   106    4    4 24000   44%   167   19%    | Null move verification 1
-   4 Floyd x4318fa13   103    4    4 24000   43%   167   19% ---'
-   5 Floyd xa416cb63   102    4    4 24000   43%   167   19%
-   6 Floyd x354d5f3a    95    4    4 24000   42%   167   19%
-   7 Floyd xc6c5dae2    89    4    4 24000   42%   167   19%
-   8 Floyd x7c96b2ca    85    4    4 24000   41%   167   20%
-   9 Floyd x0e0dc088    65    4    4 24000   39%   167   19%
-  10 Floyd x800ecb47    58    4    4 24000   38%   167   19%
-  11 Floyd 0.8           0    2    2 132000   38%    90   24%
-  12 Floyd 0.7        -149    4    4 36000   38%    -7   13%
-  13 Floyd 0.6        -353    6    6 12000   24%  -149   18%
-                 Fr Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl
-Fruit 2.1          100100100100100100100100100100100100
-Floyd xa882bde3   0    63 90 95 99 99 99100100100100100
-Floyd x8399a075   0 36    84 92 99 99 99100100100100100
-Floyd x4318fa13   0  9 15    65 99 99 99100100100100100
-Floyd xa416cb63   0  4  7 34    98 99 99100100100100100
-Floyd x354d5f3a   0  0  0  0  1    98 99100100100100100
-Floyd xc6c5dae2   0  0  0  0  0  1    89 99100100100100
-Floyd x7c96b2ca   0  0  0  0  0  0 10    99100100100100
-Floyd x0e0dc088   0  0  0  0  0  0  0  0    98100100100
-Floyd x800ecb47   0  0  0  0  0  0  0  0  1   100100100
-Floyd 0.8         0  0  0  0  0  0  0  0  0  0   100100
-Floyd 0.7         0  0  0  0  0  0  0  0  0  0  0   100
-Floyd 0.6         0  0  0  0  0  0  0  0  0  0  0  0
+   4 Floyd x4318fa13   103    4    4 24000   43%   167   19% ---'   |
+   5 Floyd xa416cb63   102    4    4 24000   43%   167   19%        | Only odd nodes
+   6 Floyd x3c65e794   101    5    5 13740   43%   167   19% <------'
+   7 Floyd x354d5f3a    95    4    4 24000   42%   167   19%
+   8 Floyd xc6c5dae2    89    4    4 24000   42%   167   19%
+   9 Floyd x7c96b2ca    85    4    4 24000   41%   167   20%
+  10 Floyd x0e0dc088    65    4    4 24000   39%   167   19%
+  11 Floyd x800ecb47    58    4    4 24000   38%   167   19%
+  12 Floyd 0.8           0    2    2 138870   38%    91   24%
+  13 Floyd 0.7        -149    4    4 36000   38%    -6   13%
+  14 Floyd 0.6        -353    6    6 12000   24%  -149   18%
+                 Fr Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl
+Fruit 2.1          100100100100100100100100100100100100100
+Floyd xa882bde3   0    63 90 95 95 99 99 99100100100100100
+Floyd x8399a075   0 36    84 92 92 99 99 99100100100100100
+Floyd x4318fa13   0  9 15    65 71 99 99 99100100100100100
+Floyd xa416cb63   0  4  7 34    58 98 99 99100100100100100
+Floyd x3c65e794   0  4  7 28 41    96 99 99100100100100100
+Floyd x354d5f3a   0  0  0  0  1  3    98 99100100100100100
+Floyd xc6c5dae2   0  0  0  0  0  0  1    89 99100100100100
+Floyd x7c96b2ca   0  0  0  0  0  0  0 10    99100100100100
+Floyd x0e0dc088   0  0  0  0  0  0  0  0  0    98100100100
+Floyd x800ecb47   0  0  0  0  0  0  0  0  0  1   100100100
+Floyd 0.8         0  0  0  0  0  0  0  0  0  0  0   100100
+Floyd 0.7         0  0  0  0  0  0  0  0  0  0  0  0   100
+Floyd 0.6         0  0  0  0  0  0  0  0  0  0  0  0  0
 --
 
 Tentative release notes for v0.9:
 - Fixed bug causing illegal moves in PV (reported by Dirk-Jan D.)
 - Full solution for 0readyok problem: don't mangle info lines anymore
 - Abort search in Python module when detecting a signal (e.g. by Ctrl-C)
+- Improved handling of zugzwang positions
 Under the hood:
 - Improved move ordering for killers
 - Improved null move pruning
@@ -76,7 +79,7 @@ Finished match
         Search
 ------------------------------------------------------------------------
 
-|Todo| Verification null move only in odd node types
+|Todo| Verification null move only in odd node types [search]
 
 A FH in an even node triggers a research anyway from PVS
 
@@ -86,41 +89,21 @@ Results on zz.epd:
  0/11 isEvenNode condition
 Todo: test with 100s
 
-tc 30+0.5
-Score of Floyd xe4a5ace5 vs Floyd x8399a075: 144 - 150 - 162  [0.493] 456
-ELO difference: -5
-Winning fraction: 0.493421
-Elo difference: -4.57178
-p-value: 0.363197
-
-|Todo| Null move verification [search]
-
-// In case of detected zugzwang, fail low and let upstream care about it.
-// If it needs to be researched PVS will come back here anyway.
-// If it doesn't come back here we didn't waste more time than we already did.
-// TODO: shouldn't we disable null move if it fails low on verification?
-
-tc 10+0.15
-Score of Floyd x92fabd87 vs Floyd x8399a075: 325 - 324 - 351  [0.500] 1000
-ELO difference: 0
-Finished match
-
-tc 120+2
-Score of Floyd x92fabd87 vs Floyd x8399a075: 30 - 19 - 43  [0.560] 92
-ELO difference: 42
-Score of Floyd x1f444cbb vs Floyd x8399a075: 190 - 188 - 255  [0.502] 633
-ELO difference: 1
-
-But:
-
 tc 60+1
-Finished game 355 (Floyd x92fabd87 vs Floyd x8399a075): 1-0 {White wins by adjudication}
-Score of Floyd x92fabd87 vs Floyd x8399a075: 96 - 117 - 142  [0.470] 355
-ELO difference: -21
-los 96 117 142
-Winning fraction: 0.470423
-Elo difference: -20.5766
-p-value: 0.07509
+Score of Floyd x3c65e794 vs Floyd xa882bde3: 313 - 297 - 390  [0.508] 1000
+ELO difference: 6
+Winning fraction: 0.464052
+Elo difference: -25.0222
+p-value: 0.0020376
+
+However, regression in 10+0.15 testing.
+
+Investigate these better.
+ Double null move (off,on)
+ Null move verification (any,odd,none)
+--> 6 combinations, tc 60+1
+
+Might take a while
 
 |Todo| Reconsider double null move prevention [search]
 

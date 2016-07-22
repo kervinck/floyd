@@ -17,7 +17,8 @@ floydModule = Extension(
                 'Source/ttable.c',
                 'Source/uci.c',
                 'Source/zobrist.c' ],
-        undef_macros = ['NDEBUG']
+        undef_macros = ['NDEBUG'],
+        define_macros = [('PYTHON_MODULE', None)]
 )
 
 setup(

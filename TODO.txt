@@ -48,6 +48,7 @@ Floyd 0.6         0  0  0  0  0  0  0  0  0  0  0  0
 Tentative release notes for v0.9:
 - Fixed bug causing illegal moves in PV (reported by Dirk-Jan D.)
 - Full solution for 0readyok problem: don't mangle info lines anymore
+- Abort search in Python module when detecting a signal (e.g. by Ctrl-C)
 Under the hood:
 - Improved move ordering for killers
 - Improved null move pruning
@@ -640,8 +641,3 @@ At least in debugging mode.
 Strip function explanation away and move to C files.
 
 |Todo| Remove cplus.h stuff that is not used [qa]
-
-|Todo| Allow Ctrl-C from Python [module]
-
-When doing a search be open to receive signal and abort the search.
-

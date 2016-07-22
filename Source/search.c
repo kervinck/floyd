@@ -17,6 +17,13 @@
  |      Includes                                                        |
  +----------------------------------------------------------------------*/
 
+// Python API (must come first)
+#ifdef PYTHON_MODULE
+#include "Python.h"
+#else
+ #define PyErr_CheckSignals() 0 // Stub
+#endif
+
 // C standard
 #include <assert.h>
 #include <math.h>
@@ -269,7 +276,7 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType, int lastMove
         self->nodeCount++;
         if (repetition(self)) return drawScore(self);
         if (depth == 0) return qSearch(self, alpha);
-        if (self->nodeCount >= self->target.nodeCount)
+        if (self->nodeCount >= self->target.nodeCount || PyErr_CheckSignals() == -1)
                 longjmp(self->abortTarget, 1); // Raise abort
 
         // Mate distance pruning

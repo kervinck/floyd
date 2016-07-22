@@ -196,6 +196,10 @@ floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
         engine.infoData = infoData;
 
         rootSearch(&engine);
+        cleanupEngine(&engine);
+
+        if (PyErr_Occurred())
+                return null;
 
         PyObject *result = PyTuple_New(2);
         if (!result)
@@ -221,8 +225,6 @@ floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
                 Py_DECREF(result);
                 return null;
         }
-
-        cleanupEngine(&engine);
 
         return result;
 }

@@ -47,7 +47,7 @@ echo help | ./floyd
 echo
 
 echo "*** Smoke tests:"
-make easy | grep result
+make easy | sort -n
 echo bench | ./floyd
 echo bench | wine ./floyd.w32.exe
 echo
@@ -58,7 +58,7 @@ echo
 
 echo "*** Evaluation residual:"
 make residual
-echo
+#echo
 
 echo "*** Game playing:"
 cutechess-cli -concurrency 4 -rounds 50 -repeat -each tc=10+0.15\
@@ -68,7 +68,7 @@ cutechess-cli -concurrency 4 -rounds 50 -repeat -each tc=10+0.15\
 echo
 
 echo "*** Tactics:"
-make wac | grep result
+make wac | sort -n
 echo
 
 echo "*** Strategy:"
@@ -76,11 +76,11 @@ make sts
 echo
 
 echo "*** Check mate:"
-head -100 Data/qmate.epd | time python Tools/epdtest.py 10 | grep result
+head -100 Data/qmate.epd | time python Tools/epdtest.py 10 | sort -n
 echo
 
 echo "*** Zugzwang:"
-make zz | grep result
+python Tools/epdtest.py -n 1 10 < Data/zz.epd
 echo
 
 echo "*** Speed:"

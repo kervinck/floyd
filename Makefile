@@ -86,30 +86,30 @@ $(win32_exe): $(wildcard Source/*) Makefile versions.json
 
 # Run 1 second position tests
 easy wac krk5 tt eg ece3: .module
-	python Tools/epdtest.py 1 < Data/$@.epd
+	@python Tools/epdtest.py 1 < Data/$@.epd
 
 # Run 10 second position tests
 hard draw nodraw bk zz: .module
-	python Tools/epdtest.py 10 < Data/$@.epd
+	@python Tools/epdtest.py 10 < Data/$@.epd
 
 # Run 100 second position tests
 mate mated qmate: .module
-	python Tools/epdtest.py 100 < Data/$@.epd
+	@python Tools/epdtest.py 100 < Data/$@.epd
 
 # Run 1000 second position tests
 nolot: .module
-	python Tools/epdtest.py 1000 < Data/$@.epd
+	@python Tools/epdtest.py 1000 < Data/$@.epd
 
 # Run the Strategic Test Suite
 sts: .module
 	@for STS in Data/STS/*.epd; do\
 	 printf "%-40s: " `basename $${STS}`;\
-	 python Tools/epdtest.py 0.15 < "$${STS}" | awk '/total 100$$/{print $$5}';\
+	 python Tools/epdtest.py 0.15 < "$${STS}" | awk '/total 100$$/{print $$2}';\
 	done | awk '{print;n++;s+=$$NF}END{printf "Total score: %d (%.1f%%)\n", s, s/n}'
 
 # Run node count regression test
 nodes: .module
-	python Tools/nodetest.py 8 < Data/thousand.epd | awk '\
+	@python Tools/nodetest.py 8 < Data/thousand.epd | awk '\
 	/ nodes / { n[$$5] += $$10; n[-1] += !$$5 }\
 	END       { for (d=0; n[d]; d++) print d, n[d], n[d] / n[d-1] }'
 
@@ -119,7 +119,7 @@ bench: floyd-pgo2 floyd
 
 # Calculate residual of evaluation function
 residual: .module
-	bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/tune.py -q Tuning/vector.json
+	@bzcat Data/ccrl-shuffled-3M.epd.bz2 | python Tools/tune.py -q Tuning/vector.json
 
 # Run one standard iteration of the evaluation tuner
 tune: .module
@@ -167,7 +167,7 @@ sysinstall: .module
 # Remove compilation intermediates and results
 clean:
 	env floydVersion=$(floydVersion) python setup.py clean --all
-	rm -f floyd $(win32_exe) floyd-pgo[12] *.gcda .module
+	rm -f floyd $(win32_exe) floyd-pgo[12] *.gcda .module *.tmp
 	rm -rf build
 
 # Show all open to-do items
@@ -178,6 +178,14 @@ todo: # xtodo
 fingerprint: clean
 	@env floydVersion=$(floydVersion) sh Tools/fingerprint.sh 2>&1 | tee fingerprint
 	[ `uname -s` != 'Darwin' ] || opendiff Docs/fingerprint fingerprint
+
+# Run search test (20,000 positions at 1 second)
+search: .module floyd
+	./floyd | grep Version > $@.tmp < /dev/null
+	python -u Tools/epdtest.py 1 < Data/$@.epd | tee -a $@.tmp
+	sort -n $@.tmp > $@.out
+	rm $@.tmp
+	[ `uname -s` != 'Darwin' ] || opendiff Docs/search.out search.out
 
 # Shootout against last version, 1000 games 10+0.15
 shootout: floyd-pgo2

@@ -1,45 +1,43 @@
 Floyd 0.9 dev status:
    Version         Elo Change
- 0 Floyd 0.8         0 reference
- 1 Floyd x42835a08  11 uniform reductions
- 2 Floyd x800ecb47  56 history counters
- 3 Floyd x0e0dc088  63 integrate older tuning
- 4 Floyd x32aa5271  73 depth-dependent null reduction
- 5 Floyd xb171e499  75 evaluation-guarded null move, i.s.o. node type
- 6 Floyd x7c96b2ca  83 unconditional null move, i.s.o. evaluation
- 8 Floyd xc6c5dae2  86 simple delta pruning
- 9 Floyd x354d5f3a  93 delta pruning option 3 (pseudo fail-soft, aka xec39d0d0)
-10 Floyd xa416cb63 100 Slightly tighter bound (aka xaef137c2)
-11 Floyd x8399a075 105 SEE>0 before killers; PV bug fix
-12 Floyd x4318fa13 102 Avoid double null move
-13 Floyd xa882bde3 107 Null move verification 1
-14 Floyd x3c65e794 101 Null move verification 2 (Only odd nodes)
+ 0 Floyd 0.8         0 Reference
+ 2 Floyd x800ecb47  58 History counters
+ 3 Floyd x0e0dc088  65 Integrate older tuning
+ 6 Floyd x7c96b2ca  85 Unconditional null move, i.s.o. evaluation
+ 8 Floyd xc6c5dae2  89 Simple delta pruning
+ 9 Floyd x354d5f3a  95 Delta pruning option 3 (pseudo fail-soft, aka xec39d0d0)
+10 Floyd xa416cb63 102 Slightly tighter bound (aka xaef137c2)
+11 Floyd x8399a075 104 SEE>0 before killers; PV bug fix
+12 Floyd x4318fa13 104 Avoid double null move
+13 Floyd xa882bde3 108 Null move verification 1
+14 Floyd x3c65e794 104 Only odd nodes
 
+--
 Rank Name              Elo    +    - games score oppo. draws
-   1 Fruit 2.1         334    2    2 138870   81%    62   11%
-   2 Floyd xa882bde3   107    4    4 24000   44%   167   19% <--.---.
-   3 Floyd x8399a075   106    4    4 24000   44%   167   19%    | Null move verification 1
-   4 Floyd x4318fa13   103    4    4 24000   43%   167   19% ---'   |
-   5 Floyd xa416cb63   102    4    4 24000   43%   167   19%        | Only odd nodes
-   6 Floyd x3c65e794   101    5    5 13740   43%   167   19% <------'
+   1 Fruit 2.1         334    2    2 144000   81%    64   11%
+   2 Floyd xa882bde3   108    4    4 24000   44%   167   19% <--.---.  Null move verification 1
+   3 Floyd x8399a075   106    4    4 24000   44%   167   19%    |   |
+   4 Floyd x3c65e794   104    4    4 24000   43%   167   19% <--' Only odd moves
+   5 Floyd x4318fa13   104    4    4 24000   43%   167   19% -------'
+   6 Floyd xa416cb63   102    4    4 24000   43%   167   19%
    7 Floyd x354d5f3a    95    4    4 24000   42%   167   19%
    8 Floyd xc6c5dae2    89    4    4 24000   42%   167   19%
    9 Floyd x7c96b2ca    85    4    4 24000   41%   167   20%
   10 Floyd x0e0dc088    65    4    4 24000   39%   167   19%
   11 Floyd x800ecb47    58    4    4 24000   38%   167   19%
-  12 Floyd 0.8           0    2    2 138870   38%    91   24%
+  12 Floyd 0.8           0    2    2 144000   38%    92   24%
   13 Floyd 0.7        -149    4    4 36000   38%    -6   13%
   14 Floyd 0.6        -353    6    6 12000   24%  -149   18%
                  Fr Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl
 Fruit 2.1          100100100100100100100100100100100100100
-Floyd xa882bde3   0    63 90 95 95 99 99 99100100100100100
-Floyd x8399a075   0 36    84 92 92 99 99 99100100100100100
-Floyd x4318fa13   0  9 15    65 71 99 99 99100100100100100
-Floyd xa416cb63   0  4  7 34    58 98 99 99100100100100100
-Floyd x3c65e794   0  4  7 28 41    96 99 99100100100100100
-Floyd x354d5f3a   0  0  0  0  1  3    98 99100100100100100
-Floyd xc6c5dae2   0  0  0  0  0  0  1    89 99100100100100
-Floyd x7c96b2ca   0  0  0  0  0  0  0 10    99100100100100
+Floyd xa882bde3   0    63 87 90 95 99 99 99100100100100100
+Floyd x8399a075   0 36    79 84 92 99 99 99100100100100100
+Floyd x3c65e794   0 12 20    56 71 99 99 99100100100100100
+Floyd x4318fa13   0  9 15 43    66 99 99 99100100100100100
+Floyd xa416cb63   0  4  7 28 33    98 99 99100100100100100
+Floyd x354d5f3a   0  0  0  0  0  1    98 99100100100100100
+Floyd xc6c5dae2   0  0  0  0  0  0  1    90 99100100100100
+Floyd x7c96b2ca   0  0  0  0  0  0  0  9    99100100100100
 Floyd x0e0dc088   0  0  0  0  0  0  0  0  0    98100100100
 Floyd x800ecb47   0  0  0  0  0  0  0  0  0  1   100100100
 Floyd 0.8         0  0  0  0  0  0  0  0  0  0  0   100100
@@ -64,56 +62,46 @@ ELO difference: -121
 Finished match
 
 ------------------------------------------------------------------------
-        Priority
-------------------------------------------------------------------------
-
-|Todo| Hanging piece evaluation [evaluate]
-
-- SEE or guard heuristic for each attacked piece
-- Sort descending
-- Give #1, #2 (and perhaps #3) a weight
-- Weights depend on side to move: total 6 parameters to tune
-- Rethink mobility as well
-
-------------------------------------------------------------------------
         Search
 ------------------------------------------------------------------------
 
-|Todo| Verification null move only in odd node types [search]
+|Ongoing| Search test suite [qa,search]
 
-A FH in an even node triggers a research anyway from PVS
+7041 -149 v0.7      Release
+7522    0 v0.8.1    Release
+7751   58 x800ecb47 History counters
+7785   65 x0e0dc088 Integrate older tuning
+7807   85 x7c96b2ca Unconditional null move, i.s.o. evaluation
+7875   89 xc6c5dae2 Simple delta pruning
+7898  104 x0dac97eb Only odd moves + CtrlC
+7900  102 xa416cb63 Slightly tighter bound (aka xaef137c2)
+7904  108 xa882bde3 Null move verification 1
+7932  104 x4318fa13 Avoid double null move
 
-Results on zz.epd:
- 4/11 No change
- 5/11 isOddNode condition
- 0/11 isEvenNode condition
-Todo: test with 100s
+|Todo| Checks after null move [search]
 
-tc 60+1
-Score of Floyd x3c65e794 vs Floyd xa882bde3: 313 - 297 - 390  [0.508] 1000
-ELO difference: 6
-Winning fraction: 0.464052
-Elo difference: -25.0222
-p-value: 0.0020376
+|Todo| Checks in qsearch, at least in PV [search]
 
-However, regression in 10+0.15 testing.
+#define minDepth -7
+scout:
+        if (inCheck)
+                qSearchWithCheck // horizon()
+        else
+                qSearch
+qSearchWithCheck() # No TT?
+        filter, keep good checks and good captures
+        for (move in moves)
+                if (inCheck || giveCheck)
+                        qSearchWithCheck
+                else
+                        qSearch
+qsearch()
 
-Investigate these better.
- Double null move (off,on)
- Null move verification (any,odd,none)
---> 6 combinations, tc 60+1
+|Todo| Strong moves in PV qsearch [search]
 
-Might take a while
+Simplest is to keep all moves and let recursion+evaluation cull the bad ones.
 
-|Todo| Reconsider double null move prevention [search]
-
-   2 Floyd x8399a075   105    4    4 24000   44%   166   19%
-   3 Floyd x4318fa13   102    4    4 24000   43%   166   19% <-- might be regression
-
-Floyd x8399a075   0    83 91 99 99 99100100100100100
-Floyd x4318fa13   0 16    65 99 99 99100100100100100 <-- might be regression
-
-|Todo| Is ZPTS.24 cooked? [qa]
+|Todo| Is ZPTS.24 cooked? [bug]
 
 8/8/8/2p5/1pp5/brpp4/1pprp2P/qnkbK3 w - - bm h3; c0 "CCC post by Joachim Rang, mate in 15, h4 is only draw"; id "ZPTS.24";
 
@@ -124,29 +112,9 @@ a2a1 c4e5 a1a2 e5f3 a2a1 f3h4 a1a2 e1f2 e2e1n f2g1 d1g4 g1h1 a2a1
                                    ^^^^?
 h4g6 g4e2 h1g1 c1d1 g6f4 c2c1q f4d5 a1a2 d5e3
 
-|Todo| Retry evaluation filtering for null move [search]
+|Todo| Evaluation filtering for null move (retry) [search]
 
 Cache evaluations to prevent the NPS drop
-
-|Todo| Staged null move [search]
-
-One with large reduction, second with lower R
-
-        R1 = 4, R2 = 2
-Score of Floyd x833a9c04 vs Floyd 0.8: 459 - 260 - 281  [0.600] 1000
-ELO difference: 70
-Finished match
-
-floyd1 x0e0dc088 vanilla nullmove (R=2)
-floyd2 x833a9c04 staged nullmove (R=4, R=2)
-
-Score of floyd1 vs floyd2: 343 - 361 - 296  [0.491] 1000
-ELO difference: -6
-Finished match
-
-Winning fraction: 0.491
-Elo difference: -6.25452
-p-value: 0.248759
 
 |Todo| Move classes [search]
 
@@ -176,24 +144,23 @@ Flags must support more ordering:
 7. Strong moves
 8. Weak moves
 
-|Todo| Checks after null move [search]
+|Todo| Simple futility-1 and futility-2 [search]
 
-|Todo| Checks in qsearch, at least in PV [search]
+Precondition: hanging piece evaluation is done
 
-#define minDepth -7
-scout:
-        if (inCheck)
-                qSearchWithCheck // horizon()
-        else
-                qSearch
-qSearchWithCheck() # No TT?
-        filter, keep good checks and good captures
-        for (move in moves)
-                if (inCheck || giveCheck)
-                        qSearchWithCheck
-                else
-                        qSearch
-qsearch()
+|Todo| Razoring [search]
+
+Precondition: hanging piece evaluation is done
+
+|Todo| Collect statistics for delta pruning [search]
+
+|Todo| Undo reductions for difficult sub-trees [search]
+
+Positions with biggest subtree should be unreduced and retried?
+
+|Todo| Don't reduce and then drop directly into qsearch [search]
+
+But allow this for futility?
 
 |Todo| History with (piece, to) instead of (from, to) [search]
 
@@ -213,20 +180,6 @@ Redesignate special bits as follows:
    promoteKnightTag,            110
    promoteQueenTag,             111
  }
-
-|Todo| Collect statistics for delta pruning [search]
-
-|Todo| Simple futility-1 and futility-2 [search]
-
-|Todo| Razoring [search]
-
-|Todo| Undo reductions for difficult sub-trees [search]
-
-Positions with biggest subtree should be unreduced and retried?
-
-|Todo| Don't reduce and then drop directly into qsearch [search]
-
-But allow this for futility?
 
 |Todo| Remember more than 1 good move in PV nodes
 
@@ -274,9 +227,72 @@ In qsearch
  transpose into the same line as queening, and then wreck the
  hash table?  Not if queen goes first? Higher depth etc
 
+|Todo| Extended testing of null move options [search]
+
+-- 1. isOdd() condition might be a slight regression in 10+0.15 testing
+
+However:
+tc 60+1
+Score of Floyd x3c65e794 vs Floyd xa882bde3: 313 - 297 - 390  [0.508] 1000
+ELO difference: 6
+Winning fraction: 0.464052
+Elo difference: -25.0222
+p-value: 0.0020376
+
+tc 30+0.5
+Score of Floyd x3c65e794 vs Floyd xa882bde3: 1880 - 1820 - 2300  [0.505] 6000
+ELO difference: 3
+Winning fraction: 0.505
+Elo difference: +3.47447
+p-value: 0.83803
+
+--> 2. Same for double nullmove avoidance
+
+   2 Floyd x8399a075   105    4    4 24000   44%   166   19%
+   3 Floyd x4318fa13   102    4    4 24000   43%   166   19% <-- might be regression
+
+Floyd x8399a075   0    83 91 99 99 99100100100100100
+Floyd x4318fa13   0 16    65 99 99 99100100100100100 <-- might be regression
+
+--> Conclusion: Investigate these better.
+
+ Double null move (off,on)
+ Null move verification (any,odd,none)
+6 combinations, tc 60+1
+
+Might take a while
+
+|Todo| Staged null move [search]
+
+One with large reduction, second with lower R
+
+        R1 = 4, R2 = 2
+Score of Floyd x833a9c04 vs Floyd 0.8: 459 - 260 - 281  [0.600] 1000
+ELO difference: 70
+Finished match
+
+floyd1 x0e0dc088 vanilla nullmove (R=2)
+floyd2 x833a9c04 staged nullmove (R=4, R=2)
+
+Score of floyd1 vs floyd2: 343 - 361 - 296  [0.491] 1000
+ELO difference: -6
+Finished match
+
+Winning fraction: 0.491
+Elo difference: -6.25452
+p-value: 0.248759
+
 ------------------------------------------------------------------------
         Evaluate
 ------------------------------------------------------------------------
+
+|Todo| Hanging piece evaluation [evaluate]
+
+- SEE or guard heuristic for each attacked piece
+- Sort descending
+- Give #1, #2 (and perhaps #3) a weight
+- Weights depend on side to move: total 6 parameters to tune
+- Rethink mobility as well
 
 |Todo| Rook or Queen and/vs pawn span [evaluate]
 
@@ -624,3 +640,5 @@ At least in debugging mode.
 Strip function explanation away and move to C files.
 
 |Todo| Remove cplus.h stuff that is not used [qa]
+
+|Todo| Renamne isOdd() and isEven() to odd() and even() [qa]

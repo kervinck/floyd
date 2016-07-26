@@ -15,9 +15,9 @@ Floyd 0.9 dev status:
 --
 Rank Name              Elo    +    - games score oppo. draws
    1 Fruit 2.1         334    2    2 144000   81%    64   11%
-   2 Floyd xa882bde3   108    4    4 24000   44%   167   19% <--.---.  Null move verification 1
+   2 Floyd xa882bde3   108    4    4 24000   44%   167   19% <------.Null move verification 1
    3 Floyd x8399a075   106    4    4 24000   44%   167   19%    |   |
-   4 Floyd x3c65e794   104    4    4 24000   43%   167   19% <--' Only odd moves
+   4 Floyd x3c65e794   104    4    4 24000   43%   167   19% <--'Only odd moves
    5 Floyd x4318fa13   104    4    4 24000   43%   167   19% -------'
    6 Floyd xa416cb63   102    4    4 24000   43%   167   19%
    7 Floyd x354d5f3a    95    4    4 24000   42%   167   19%
@@ -46,14 +46,16 @@ Floyd 0.6         0  0  0  0  0  0  0  0  0  0  0  0  0
 --
 
 Tentative release notes for v0.9:
-- Fixed bug causing illegal moves in PV (reported by Dirk-Jan D.)
-- Full solution for 0readyok problem: don't mangle info lines anymore
-- Abort search in Python module when detecting a signal (e.g. by Ctrl-C)
-- Improved handling of zugzwang positions
+- Gained approximately 100 elo at fast time controls
+- Better handling of zugzwang positions
+- Fixed illegal moves deep in PV (reported by Dirk-Jan D.)
+- Full solution for the "0readyok" problem: also don't split info lines
+- Able to abort search in Python module (e.g. by Ctrl-C)
 Under the hood:
+- Added history counters for move ordering
 - Improved move ordering for killers
-- Improved null move pruning
-- Introduction of history counters for move ordering
+- Improved null move pruning/reductions (aka verification)
+- Added delta pruning
 - Minor evaluation weight tuning
 - Simplified UCI move printing
 
@@ -64,6 +66,17 @@ Finished match
 ------------------------------------------------------------------------
         Search
 ------------------------------------------------------------------------
+
+|Todo| Is ZPTS.24 cooked? [bug]
+
+8/8/8/2p5/1pp5/brpp4/1pprp2P/qnkbK3 w - - bm h3; c0 "CCC post by Joachim Rang, mate in 15, h4 is only draw"; id "ZPTS.24";
+
+info time 781650 depth 49 score mate 15 nodes 895975666 nps 1146261
+hashfull 1000 pv h2h4 a1a2 h4h5 a2a1 h5h6 a1a2 h6h7 a2a1 h7h8n a1a2
+h8g6 a2a1 g6f8 a1a2 f8e6 a2a1 e6c5 a1a2 c5d7 a2a1 d7e5 a1a2 e5c4
+a2a1 c4e5 a1a2 e5f3 a2a1 f3h4 a1a2 e1f2 e2e1n f2g1 d1g4 g1h1 a2a1
+                                   ^^^^?
+h4g6 g4e2 h1g1 c1d1 g6f4 c2c1q f4d5 a1a2 d5e3
 
 |Ongoing| Search test suite [qa,search]
 
@@ -77,8 +90,6 @@ Finished match
 7900  102 xa416cb63 Slightly tighter bound (aka xaef137c2)
 7904  108 xa882bde3 Null move verification 1
 7932  104 x4318fa13 Avoid double null move
-
-|Todo| Checks after null move [search]
 
 |Todo| Checks in qsearch, at least in PV [search]
 
@@ -101,20 +112,15 @@ qsearch()
 
 Simplest is to keep all moves and let recursion+evaluation cull the bad ones.
 
-|Todo| Is ZPTS.24 cooked? [bug]
-
-8/8/8/2p5/1pp5/brpp4/1pprp2P/qnkbK3 w - - bm h3; c0 "CCC post by Joachim Rang, mate in 15, h4 is only draw"; id "ZPTS.24";
-
-info time 781650 depth 49 score mate 15 nodes 895975666 nps 1146261
-hashfull 1000 pv h2h4 a1a2 h4h5 a2a1 h5h6 a1a2 h6h7 a2a1 h7h8n a1a2
-h8g6 a2a1 g6f8 a1a2 f8e6 a2a1 e6c5 a1a2 c5d7 a2a1 d7e5 a1a2 e5c4
-a2a1 c4e5 a1a2 e5f3 a2a1 f3h4 a1a2 e1f2 e2e1n f2g1 d1g4 g1h1 a2a1
-                                   ^^^^?
-h4g6 g4e2 h1g1 c1d1 g6f4 c2c1q f4d5 a1a2 d5e3
+|Todo| Checks after null move [search]
 
 |Todo| Evaluation filtering for null move (retry) [search]
 
 Cache evaluations to prevent the NPS drop
+
+|Todo| Simple futility-1 and futility-2 [search]
+
+Precondition: hanging piece evaluation is done
 
 |Todo| Move classes [search]
 
@@ -143,10 +149,6 @@ Flags must support more ordering:
 6. Bad captures
 7. Strong moves
 8. Weak moves
-
-|Todo| Simple futility-1 and futility-2 [search]
-
-Precondition: hanging piece evaluation is done
 
 |Todo| Razoring [search]
 
@@ -227,7 +229,7 @@ In qsearch
  transpose into the same line as queening, and then wreck the
  hash table?  Not if queen goes first? Higher depth etc
 
-|Todo| Extended testing of null move options [search]
+|Ongoing| Extended testing of null move options [search]
 
 -- 1. isOdd() condition might be a slight regression in 10+0.15 testing
 
@@ -246,6 +248,17 @@ Winning fraction: 0.505
 Elo difference: +3.47447
 p-value: 0.83803
 
+tc 60+1 (fx8350-1)
+Score of Floyd x3c65e794 vs Floyd xa882bde3: 3633 - 3535 - 4832  [0.504] 12000
+ELO difference: 3
+marcelk@fx8350-1:~/floyd$ los 3633 3534 4832
+Winning fraction: 0.504125
+Elo difference: +2.86665
+p-value: 0.878881
+
+tc 180+3
+Ongoing
+
 --> 2. Same for double nullmove avoidance
 
    2 Floyd x8399a075   105    4    4 24000   44%   166   19%
@@ -258,7 +271,7 @@ Floyd x4318fa13   0 16    65 99 99 99100100100100100 <-- might be regression
 
  Double null move (off,on)
  Null move verification (any,odd,none)
-6 combinations, tc 60+1
+6 combinations, tc 60+1?
 
 Might take a while
 
@@ -438,10 +451,6 @@ http://talkchess.com/forum/viewtopic.php?p=665703#665703
         Other
 ------------------------------------------------------------------------
 
-|Todo| Sync KPK with pfkpk git archive
-
-Geometry bug
-
 |Todo| Another minor parsing hickup [bug]
 
 debug on
@@ -508,14 +517,6 @@ https://en.wikipedia.org/wiki/Rosenbrock_function
 |Todo| Accept a lambda as value to `info' in search() [python]
 
 As a callback interface with the search info data
-
-|Todo| Consider persistent alarm thread [speed]
-
-Profile first
-
-|Todo| Consider persistent search thread [speed]
-
-Profile first
 
 |Todo| Implement 50 move rule [50move]
 
@@ -642,3 +643,8 @@ Strip function explanation away and move to C files.
 |Todo| Remove cplus.h stuff that is not used [qa]
 
 |Todo| Renamne isOdd() and isEven() to odd() and even() [qa]
+
+|Todo| Endgame logic
+
+Distance to weak pawns
+Counting arguments

@@ -303,7 +303,7 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType, int lastMove
                         #define reduceIfEven(d) ((((d) + 1) & ~1) - 1) // Chop off the last reply
                         return scout(self, reduceIfEven(depth - reduction), alpha, nodeType, 0000);
                 if (score > alpha) // Pruning
-                        return ttWrite(self, node.slot, depth, score, alpha, alpha+1);
+                        return ttWrite(self, node.slot, depth, min(score, maxEval), alpha, alpha+1);
         }
 
         // Internal iterative deepening

@@ -181,11 +181,10 @@ fingerprint: clean
 
 # Run search test (20,000 positions at 1 second)
 search: .module floyd
-	./floyd | grep Version > $@.tmp < /dev/null
+	./floyd < /dev/null | grep Version > $@.tmp
 	python -u Tools/epdtest.py 1 < Data/$@.epd | tee -a $@.tmp
 	sort -n $@.tmp > $@.out
 	rm $@.tmp
-	[ `uname -s` != 'Darwin' ] || opendiff Docs/search.out search.out
 
 # Shootout against last version, 1000 games 10+0.15
 shootout: floyd-pgo2

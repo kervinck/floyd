@@ -369,7 +369,7 @@ static int qSearch(Engine_t self, int alpha)
                 if (!inCheck) {
                         // Regular delta pruning
                         assert(moveList[i] >= 0);
-                        int maxDelta = (moveList[i] >> 26) * 1200 + 1200;
+                        int maxDelta = (moveList[i] >> 26) * 1200 + 1450;
                         if (maxDelta <= alpha - bestScore)
                                 return ttWrite(self, slot, 0, bestScore + maxDelta, alpha, alpha+1);
                 }

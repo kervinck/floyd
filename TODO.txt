@@ -240,13 +240,21 @@ p-value: 0.83803
 tc 60+1 (fx8350-1)
 Score of Floyd x3c65e794 vs Floyd xa882bde3: 3633 - 3535 - 4832  [0.504] 12000
 ELO difference: 3
-marcelk@fx8350-1:~/floyd$ los 3633 3534 4832
 Winning fraction: 0.504125
 Elo difference: +2.86665
 p-value: 0.878881
 
 tc 180+3
-Ongoing
+Score of Floyd x3c65e794 vs Floyd xa882bde3: 701 - 726 - 1118  [0.495] 2545
+Rank Name              Elo    +    - games score oppo. draws
+   1 Floyd xa882bde3     2   11   11  2545   50%    -2   44%
+   2 Floyd x3c65e794    -2   11   11  2545   50%     2   44%
+                 Fl Fl
+Floyd xa882bde3     71
+Floyd x3c65e794  28
+Winning fraction: 0.495088
+Elo difference: -3.41303
+p-value: 0.254049
 
 --> 2. Same for double nullmove avoidance
 
@@ -288,7 +296,7 @@ p-value: 0.248759
         Evaluate
 ------------------------------------------------------------------------
 
-|Todo| Hanging piece evaluation [evaluate]
+|Ongoing| Hanging piece evaluation [evaluate]
 
 - SEE or guard heuristic for each attacked piece
 - Sort descending

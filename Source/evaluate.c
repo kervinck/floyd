@@ -328,6 +328,11 @@ int evaluate(Board_t self)
                 || (sq)==e3 ||                         (sq)==e6 \
                 || (sq)==f3 || (sq)==f4 || (sq)==f5 || (sq)==f6)
 
+        int hangingPieces[][3] = { // Top hanging pieces (values) per side
+                [white] = { 0, 0, 0 },
+                [black] = { 0, 0, 0 },
+        };
+
         for (int square=0; square<boardSize; square++) {
                 int wAttack = self->sides[white].attacks[square];
                 int bAttack = self->sides[black].attacks[square];
@@ -345,6 +350,36 @@ int evaluate(Board_t self)
 
                 if (wAttack < bAttack)
                         wiloScore[black] += controlValue;
+
+                // Tabulate hanging pieces
+                int piece = self->squares[square];
+                if (piece != empty) {
+                        int side = pieceColor(piece);
+                        int attackers = self->sides[other(side)].attacks[square];
+                        if (attackers != 0) {
+                                static const int threatValue[] = {
+                                        [whiteKing]   = 27, [whiteQueen]  = 9, [whiteRook] = 5,
+                                        [whiteBishop] = 3,  [whiteKnight] = 3, [whitePawn] = 1,
+                                        [blackKing]   = 27, [blackQueen]  = 9, [blackRook] = 5,
+                                        [blackBishop] = 3,  [blackKnight] = 3, [blackPawn] = 1,
+                                };
+                                int threat = threatValue[piece];
+                                int defenders = self->sides[side].attacks[square];
+                                if (defenders != 0) {
+                                        if      (attackers >= attackPawn)  threat -= 1;
+                                        else if (attackers >= attackMinor) threat -= 3;
+                                        else if (attackers >= attackRook)  threat -= 5;
+                                        else if (attackers >= attackQueen) threat -= 9;
+                                        else /* attackers >= attackKing */ threat -= 27;
+                                        threat = max(0, threat);
+                                }
+                                // Keep top-3 in descending order per side
+                                for (int i=3; i>0 && threat>hangingPieces[side][i-1]; i--) {
+                                        if (i < 3) hangingPieces[side][i] = hangingPieces[side][i-1];
+                                        hangingPieces[side][i-1] = threat;
+                                }
+                        }
+                }
         }
 
         /*--------------------------------------------------------------+
@@ -482,6 +517,14 @@ int evaluate(Board_t self)
         int xside = other(side);
 
         wiloScore[side] += v[tempo]; // side to move bonus
+
+        wiloScore[side] += hangingPieces[side][0]  * v[hanging_0] // side to move
+                         + hangingPieces[side][1]  * v[hanging_1]
+                         + hangingPieces[side][2]  * v[hanging_2]
+                         + hangingPieces[xside][0] * v[hanging_0x] // opponent
+                         + hangingPieces[xside][1] * v[hanging_1x]
+                         + hangingPieces[xside][2] * v[hanging_2x];
+
         wiloScore[white] += self->eloDiff * v[eloDiff] / 10; // contempt
 
         int wiloSum = wiloScore[side] - wiloScore[xside];

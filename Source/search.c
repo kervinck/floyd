@@ -312,7 +312,7 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType, int lastMove
                 node.slot = ttRead(self);
         }
 
-        // Recursively search all other moves until exhausted or one fails high
+        // Recursively search all moves until exhausted or one fails high
         int extension = inCheck;
         int bestScore = minInt;
         for (int move=makeFirstMove(self,&node), j=0; move; move=makeNextMove(self,&node), j++) {

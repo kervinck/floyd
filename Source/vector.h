@@ -29,6 +29,12 @@
 // {
         P(eloDiff, 51),
         P(tempo, 42),
+        P(hanging_0, -18), // Side to move
+        P(hanging_1, -102),
+        P(hanging_2, -75),
+        P(hanging_0x, 18), // Other side
+        P(hanging_1x, -18),
+        P(hanging_2x, 133),
         P(winBonus, 1498),
 
         P(castleK, -136),

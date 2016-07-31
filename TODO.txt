@@ -201,10 +201,6 @@ Redesignate special bits as follows:
 
 --> Register the likelihood that the move fails high
 
-|Todo| Introduction of material table [speed]
-
-Floyd is slow, but we should aim to keep it above 1Mnps
-
 |Todo| Inverse delta pruning [search]
 
         if (nrMoves > 0 && !inCheck) {
@@ -456,6 +452,13 @@ http://talkchess.com/forum/viewtopic.php?p=665703#665703
 ------------------------------------------------------------------------
         Other
 ------------------------------------------------------------------------
+
+|Todo| Replace 'double' with 'float' or even 'short' evaluate [speed]
+
+- assert(sizeof(struct mSlot) <= 32)
+- replace wiloScore[2] with a single value
+
+Floyd is slow, but we should aim to keep it above 1Mnps
 
 |Todo| Another minor parsing hickup [bug]
 

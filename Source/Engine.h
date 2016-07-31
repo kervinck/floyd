@@ -130,7 +130,7 @@ struct Engine {
 extern int globalVector[];
 extern const int vectorLen;
 extern const char * const vectorLabels[];
-extern uint64_t globalVectorBaseHash;
+extern bool globalVectorChanged;
 
 /*----------------------------------------------------------------------+
  |      Functions                                                       |
@@ -146,6 +146,7 @@ void abortSearch(void *engine);
 /*
  *  Evaluate
  */
+void resetEvaluate(void);
 int evaluate(Board_t self);
 
 /*

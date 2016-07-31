@@ -23,6 +23,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 // C extension
 #include "cplus.h"
@@ -54,12 +55,13 @@ enum vector {
         #undef P
 };
 
-/* struct material {
+struct mSlot {
         uint64_t materialKey;
-        int wiloScore, drawScore;
+        int wiloScore[2];
+        int drawScore;
         double passerScaling[2];
         double safetyScaling[2];
-}; */
+};
 
 struct pkSlot {
         uint64_t pawnKingHash;
@@ -88,7 +90,13 @@ struct pkSlot {
 #define nrQueens(side)     (int)((self->materialKey >> (((side) << 2) + 32)) & 15)
 #define nrBishopsD(side)   (int)((self->materialKey >> (((side) << 2) + 40)) & 15)
 #define nrBishopsL(side)   (nrBishops(side) - nrBishopsD(side))
-#define materialHash(side) (((materialKey) >> 48) & 0xffff)
+#define materialHash(key)  (((key) >> 48) & 0xffff)
+
+#define allQueens  (nrQueens(white)  + nrQueens(black))
+#define allRooks   (nrRooks(white)   + nrRooks(black))
+#define allBishops (nrBishops(white) + nrBishops(black))
+#define allKnights (nrKnights(white) + nrKnights(black))
+#define allPawns   (nrPawns(white)   + nrPawns(black))
 
 #define nrMinors(side)     (nrKnights(side) + nrBishops(side))
 #define nrMajors(side)     (nrRooks(side)   + nrQueens(side))
@@ -110,7 +118,7 @@ int globalVector[] = {
         #include "vector.h"
         #undef P
 };
-uint64_t globalVectorBaseHash; // TODO: move to Python engine object
+bool globalVectorChanged = false; // TODO: move to Python engine object
 
 static const int firstRank[] = { rank1, rank8 }; // white, black
 static const int pawnStep[] = { a3 - a2, a6 - a7 };
@@ -136,10 +144,13 @@ static const int kingZoneCenter[] = {
 #define pawnKingLen (1L << 17) // must be power of 2
 static struct pkSlot pawnKingTable[pawnKingLen];
 
+static struct mSlot materialTable[1L<<16]; // size is really fixed
+
 /*----------------------------------------------------------------------+
  |      Functions                                                       |
  +----------------------------------------------------------------------*/
 
+static void evaluateMaterial(Board_t self, struct mSlot *mSlot);
 static void extractPawnStructure(Board_t self, const int v[vectorLen], struct pkSlot *pawns);
 // TODO: cleanup these function prototypes
 static void evaluatePawnFile(Board_t self, const int v[vectorLen], struct pkSlot *pawns, int file, int side, int maxPawnFromFirst[2][10][2]);
@@ -157,17 +168,24 @@ static double logit(double p);
 static int squareOf(Board_t self, int piece);
 
 /*----------------------------------------------------------------------+
+ |      resetEvaluate                                                   |
+ +----------------------------------------------------------------------*/
+
+// Reset evaluation caches (only needed after setCoefficient)
+void resetEvaluate(void)
+{
+        memset(materialTable, 0, sizeof materialTable);
+        memset(pawnKingTable, 0, sizeof pawnKingTable);
+        globalVectorChanged = false;
+}
+
+/*----------------------------------------------------------------------+
  |      evaluate                                                        |
  +----------------------------------------------------------------------*/
 
 int evaluate(Board_t self)
 {
         const int *v = globalVector;
-
-        int wiloScore[2]; // Accumulators
-        double passerScaling[2];
-        double safetyScaling[2];
-        int passerSquare[2][8];
 
         /*--------------------------------------------------------------+
          |      Feature extraction                                      |
@@ -180,97 +198,21 @@ int evaluate(Board_t self)
          |      Material balance                                        |
          +--------------------------------------------------------------*/
 
-        // Useful piece counters
-        int nrQueens  = nrQueens(white)  + nrQueens(black);
-        int nrRooks   = nrRooks(white)   + nrRooks(black);
-        int nrBishops = nrBishops(white) + nrBishops(black);
-        int nrKnights = nrKnights(white) + nrKnights(black);
-        int nrPawns   = nrPawns(white)   + nrPawns(black);
+        struct mSlot *mSlot = &materialTable[materialHash(self->materialKey)];
+        if (mSlot->materialKey != self->materialKey)
+                evaluateMaterial(self, mSlot);
 
-        for (int side=white; side<=black; side++) {
-                int xside = other(side);
-
-                wiloScore[side] =
-                        nrQueens(side) * (
-                                + v[queenValue]
-                                + v[queenAndQueen]  * (nrQueens(side) - 1)
-                                + v[queenAndPawn_1] * nrPawns(side)
-                                + v[queenAndPawn_2] * nrPawns(side) * nrPawns(side) / 8
-                                + v[queenVsPawn_1]  * nrPawns(xside)
-                                + v[queenVsPawn_2]  * nrPawns(xside) * nrPawns(xside) / 8)
-
-                        + v[queenAndRook]   * min(nrQueens(side), nrRooks(side))
-                        + v[queenAndBishop] * min(nrQueens(side), nrBishops(side))
-                        + v[queenAndKnight] * min(nrQueens(side), nrKnights(side))
-                        + v[queenVsRook]    * min(nrQueens(side), nrRooks(xside))
-                        + v[queenVsBishop]  * min(nrQueens(side), nrBishops(xside))
-                        + v[queenVsKnight]  * min(nrQueens(side), nrKnights(xside))
-
-                        + nrRooks(side) * (
-                                + v[rookValue]
-                                + v[rookAndRook]   * (nrRooks(side) - 1)
-                                + v[rookAndPawn_1] * nrPawns(side)
-                                + v[rookAndPawn_2] * nrPawns(side) * nrPawns(side) / 8
-                                + v[rookVsPawn_1]  * nrPawns(xside)
-                                + v[rookVsPawn_2]  * nrPawns(xside) * nrPawns(xside) / 8)
-
-                        + v[rookAndBishop] * min(nrRooks(side), nrBishops(side))
-                        + v[rookAndKnight] * min(nrRooks(side), nrKnights(side))
-                        + v[rookVsBishop]  * min(nrRooks(side), nrBishops(xside))
-                        + v[rookVsKnight]  * min(nrRooks(side), nrKnights(xside))
-
-                        + nrBishops(side) * (
-                                + v[bishopValue]
-                                + v[bishopAndBishop] * (nrBishops(side) - 1)
-                                + v[bishopAndPawn_1] * nrPawns(side)
-                                + v[bishopAndPawn_2] * nrPawns(side) * nrPawns(side) / 8
-                                + v[bishopVsPawn_1]  * nrPawns(xside)
-                                + v[bishopVsPawn_2]  * nrPawns(xside) * nrPawns(xside) / 8)
-
-                        + v[bishopAndKnight] * min(nrBishops(side), nrKnights(side))
-                        + v[bishopVsKnight]  * min(nrBishops(side), nrKnights(xside))
-
-                        + nrKnights(side) * (
-                                + v[knightValue]
-                                + v[knightAndKnight] * (nrKnights(side) - 1)
-                                + v[knightAndPawn_1] * nrPawns(side)
-                                + v[knightAndPawn_2] * nrPawns(side) * nrPawns(side) / 8
-                                + v[knightVsPawn_1]  * nrPawns(xside)
-                                + v[knightVsPawn_2]  * nrPawns(xside) * nrPawns(xside) / 8);
-
-                if (nrPawns(side) > 0)
-                        wiloScore[side] += v[pawnValue1 + nrPawns(side) - 1];
-
-                passerScaling[side] = sigmoid(1e-3 * (v[passerScalingOffset]
-                        + nrQueens(side)   * v[passerAndQueen]
-                        + nrRooks(side)    * v[passerAndRook]
-                        + nrBishops(side)  * v[passerAndBishop]
-                        + nrKnights(side)  * v[passerAndKnight]
-                        + nrPawns(side)    * v[passerAndPawn]
-                        + nrQueens(xside)  * v[passerVsQueen]
-                        + nrRooks(xside)   * v[passerVsRook]
-                        + nrBishops(xside) * v[passerVsBishop]
-                        + nrKnights(xside) * v[passerVsKnight]
-                        + nrPawns(xside)   * v[passerVsPawn]));
-
-                safetyScaling[side] = sigmoid(1e-3 * (v[safetyScalingOffset]
-                        + nrQueens(side)   * v[safetyAndQueen]
-                        + nrRooks(side)    * v[safetyAndRook]
-                        + nrBishops(side)  * v[safetyAndBishop]
-                        + nrKnights(side)  * v[safetyAndKnight]
-                        + nrPawns(side)    * v[safetyAndPawn]
-                        + nrQueens(xside)  * v[safetyVsQueen]
-                        + nrRooks(xside)   * v[safetyVsRook]
-                        + nrBishops(xside) * v[safetyVsBishop]
-                        + nrKnights(xside) * v[safetyVsKnight]
-                        + nrPawns(xside)   * v[safetyVsPawn]));
-        }
+        int wiloScore[2]; // Accumulators
+        wiloScore[white] = mSlot->wiloScore[white];
+        wiloScore[black] = mSlot->wiloScore[black];
 
         /*--------------------------------------------------------------+
          |      Pawn structure                                          |
          +--------------------------------------------------------------*/
 
-        long pkIndex = (self->pawnKingHash ^ globalVectorBaseHash) & (pawnKingLen - 1);
+        int passerSquare[2][8]; // Mark down passers per file
+
+        long pkIndex = self->pawnKingHash & (pawnKingLen - 1);
         struct pkSlot *pawns = &pawnKingTable[pkIndex];
         if (pawns->pawnKingHash != self->pawnKingHash)
                 extractPawnStructure(self, v, pawns);
@@ -278,7 +220,7 @@ int evaluate(Board_t self)
         for (int side=white; side<=black; side++) {
                 wiloScore[side] += pawns->wiloScore[side];
 
-                wiloScore[side] += round(pawns->passerScore[side] * passerScaling[side]);
+                wiloScore[side] += round(pawns->passerScore[side] * mSlot->passerScaling[side]);
                 for (int files=pawns->passerOnFile[side]; files; files&=files-1)
                         wiloScore[side] += evaluatePasser(self, v, files & -files, side, passerSquare);
         }
@@ -301,7 +243,7 @@ int evaluate(Board_t self)
                         break;
                 case whiteRook: case blackRook:
                         side = pieceColor(piece);
-                        wiloScore[side] += evaluateRook(self, v, pawns, square, side, safetyScaling, passerSquare);
+                        wiloScore[side] += evaluateRook(self, v, pawns, square, side, &mSlot->safetyScaling[0], passerSquare);
                         break;
                 case whiteBishop: case blackBishop:
                         side = pieceColor(piece);
@@ -443,71 +385,8 @@ int evaluate(Board_t self)
                 int shelter = pawns->shelter[side];
                 if (rank(king) != firstRank[side])
                         shelter += v[shelterWalkingKing];
-                wiloScore[xside] += trunc(safetyScaling[side] * (shelter + attack));
+                wiloScore[xside] += trunc(mSlot->safetyScaling[side] * (shelter + attack));
         }
-
-        /*--------------------------------------------------------------+
-         |      Draw rate (drawScore)                                   |
-         +--------------------------------------------------------------*/
-
-        int drawScore = v[drawOffset]
-                + nrQueens  * v[drawQueen]
-                + nrRooks   * v[drawRook]
-                + nrBishops * v[drawBishop]
-                + nrKnights * v[drawKnight]
-                + nrPawns   * v[drawPawn]
-                + pawns->drawScore;
-
-        if (nrQueens > 0 && nrRooks + nrBishops + nrKnights == 0)
-                drawScore += v[drawQueenEnding];
-
-        if (nrRooks > 0 && nrQueens + nrBishops + nrKnights == 0)
-                drawScore += v[drawRookEnding];
-
-        if (nrBishops > 0 && nrQueens + nrRooks + nrKnights == 0)
-                drawScore += v[drawBishopEnding];
-
-        if (nrKnights > 0 && nrQueens + nrRooks + nrBishops == 0)
-                drawScore += v[drawKnightEnding];
-
-        if (nrPawns > 0 && nrQueens + nrRooks + nrBishops + nrKnights == 0)
-                drawScore += v[drawPawnEnding];
-
-        if (nrPawns == 0)
-                drawScore += v[drawPawnless];
-
-        // Unlike bishops
-        int wUnlikeL = nrBishopsL(white) > 0;
-        int wUnlikeD = nrBishopsD(white) > 0;
-        int bUnlikeL = nrBishopsL(black) > 0;
-        int bUnlikeD = nrBishopsD(black) > 0;
-        if (abs(wUnlikeL + bUnlikeD - wUnlikeD - bUnlikeL) == 2) {
-                if (nrQueens > 0)
-                        drawScore += v[drawUnlikeBishopsAndQueens];
-                else if (nrRooks > 0)
-                        drawScore += v[drawUnlikeBishopsAndRooks];
-                else if (nrKnights > 0)
-                        drawScore += v[drawUnlikeBishopsAndKnights];
-                else
-                        drawScore += v[drawUnlikeBishops];
-        }
-
-        // In an imbalance each side has a piece the other doesn't have
-        int dQ = nrQueens(white) - nrQueens(black);
-        int dR = nrRooks(white)  - nrRooks(black);
-        int dM = nrMinors(white) - nrMinors(black);
-        if (min(min(dQ, dR), dM) < 0
-         && max(max(dQ, dR), dM) > 0) {
-                if (dQ) drawScore += v[drawQueenImbalance];
-                if (dR) drawScore += v[drawRookImbalance];
-                if (dM) drawScore += v[drawMinorImbalance];
-        }
-
-        for (int side=white; side<=black; side++)
-                if ((self->materialKey & materialMaskPiecesAndPawns[side]) == 0) { // bare king
-                        wiloScore[other(side)] += v[winBonus];
-                        drawScore -= v[winBonus];
-                }
 
         /*--------------------------------------------------------------+
          |      Subtotal                                                |
@@ -529,6 +408,8 @@ int evaluate(Board_t self)
 
         int wiloSum = wiloScore[side] - wiloScore[xside];
 
+        int drawScore = mSlot->drawScore + pawns->drawScore;
+
         /*--------------------------------------------------------------+
          |      Special endgames                                        |
          +--------------------------------------------------------------*/
@@ -538,7 +419,7 @@ int evaluate(Board_t self)
                 (nrBishopsL(side) > 0) + (nrBishopsD(side) > 0))
 
         int nrEffectiveBishops = nrEffectiveBishops(white) + nrEffectiveBishops(black);
-        int nrEffectivePieces = 2 + nrQueens + nrRooks + nrEffectiveBishops + nrKnights + nrPawns;
+        int nrEffectivePieces = 2 + allQueens + allRooks + nrEffectiveBishops + allKnights + allPawns;
 
         if (nrEffectivePieces == 2)
                 return 0; // Insufficient mating material (KK)
@@ -554,10 +435,10 @@ int evaluate(Board_t self)
                         drawScore -= v[winBonus];
                 }
 
-                if (nrBishops + nrKnights > 0)
+                if (allBishops + allKnights > 0)
                         return 0; // Insufficient mating material (KNK, KB...K of like-bishops)
 
-                if (nrPawns > 0) { // KPK
+                if (allPawns > 0) { // KPK
                         int egtSide, wKing, wPawn, bKing;
 
                         if (nrPawns(white) == 1) {
@@ -614,6 +495,160 @@ int evaluate(Board_t self)
          +--------------------------------------------------------------*/
 
         return score;
+}
+
+/*----------------------------------------------------------------------+
+ |      evaluateMaterial                                                |
+ +----------------------------------------------------------------------*/
+
+static void evaluateMaterial(Board_t self, struct mSlot *mSlot)
+{
+        const int *v = globalVector;
+
+        for (int side=white; side<=black; side++) {
+                int xside = other(side);
+
+                // Material balance
+                mSlot->wiloScore[side] =
+                        nrQueens(side) * (
+                                + v[queenValue]
+                                + v[queenAndQueen]  * (nrQueens(side) - 1)
+                                + v[queenAndPawn_1] * nrPawns(side)
+                                + v[queenAndPawn_2] * nrPawns(side) * nrPawns(side) / 8
+                                + v[queenVsPawn_1]  * nrPawns(xside)
+                                + v[queenVsPawn_2]  * nrPawns(xside) * nrPawns(xside) / 8)
+
+                        + v[queenAndRook]   * min(nrQueens(side), nrRooks(side))
+                        + v[queenAndBishop] * min(nrQueens(side), nrBishops(side))
+                        + v[queenAndKnight] * min(nrQueens(side), nrKnights(side))
+                        + v[queenVsRook]    * min(nrQueens(side), nrRooks(xside))
+                        + v[queenVsBishop]  * min(nrQueens(side), nrBishops(xside))
+                        + v[queenVsKnight]  * min(nrQueens(side), nrKnights(xside))
+
+                        + nrRooks(side) * (
+                                + v[rookValue]
+                                + v[rookAndRook]   * (nrRooks(side) - 1)
+                                + v[rookAndPawn_1] * nrPawns(side)
+                                + v[rookAndPawn_2] * nrPawns(side) * nrPawns(side) / 8
+                                + v[rookVsPawn_1]  * nrPawns(xside)
+                                + v[rookVsPawn_2]  * nrPawns(xside) * nrPawns(xside) / 8)
+
+                        + v[rookAndBishop] * min(nrRooks(side), nrBishops(side))
+                        + v[rookAndKnight] * min(nrRooks(side), nrKnights(side))
+                        + v[rookVsBishop]  * min(nrRooks(side), nrBishops(xside))
+                        + v[rookVsKnight]  * min(nrRooks(side), nrKnights(xside))
+
+                        + nrBishops(side) * (
+                                + v[bishopValue]
+                                + v[bishopAndBishop] * (nrBishops(side) - 1)
+                                + v[bishopAndPawn_1] * nrPawns(side)
+                                + v[bishopAndPawn_2] * nrPawns(side) * nrPawns(side) / 8
+                                + v[bishopVsPawn_1]  * nrPawns(xside)
+                                + v[bishopVsPawn_2]  * nrPawns(xside) * nrPawns(xside) / 8)
+
+                        + v[bishopAndKnight] * min(nrBishops(side), nrKnights(side))
+                        + v[bishopVsKnight]  * min(nrBishops(side), nrKnights(xside))
+
+                        + nrKnights(side) * (
+                                + v[knightValue]
+                                + v[knightAndKnight] * (nrKnights(side) - 1)
+                                + v[knightAndPawn_1] * nrPawns(side)
+                                + v[knightAndPawn_2] * nrPawns(side) * nrPawns(side) / 8
+                                + v[knightVsPawn_1]  * nrPawns(xside)
+                                + v[knightVsPawn_2]  * nrPawns(xside) * nrPawns(xside) / 8);
+
+                if (nrPawns(side) > 0)
+                        mSlot->wiloScore[side] += v[pawnValue1 + nrPawns(side) - 1];
+
+                // Passer scaling
+                mSlot->passerScaling[side] = sigmoid(1e-3 * (v[passerScalingOffset]
+                        + nrQueens(side)   * v[passerAndQueen]
+                        + nrRooks(side)    * v[passerAndRook]
+                        + nrBishops(side)  * v[passerAndBishop]
+                        + nrKnights(side)  * v[passerAndKnight]
+                        + nrPawns(side)    * v[passerAndPawn]
+                        + nrQueens(xside)  * v[passerVsQueen]
+                        + nrRooks(xside)   * v[passerVsRook]
+                        + nrBishops(xside) * v[passerVsBishop]
+                        + nrKnights(xside) * v[passerVsKnight]
+                        + nrPawns(xside)   * v[passerVsPawn]));
+
+                // King safety scaling
+                mSlot->safetyScaling[side] = sigmoid(1e-3 * (v[safetyScalingOffset]
+                        + nrQueens(side)   * v[safetyAndQueen]
+                        + nrRooks(side)    * v[safetyAndRook]
+                        + nrBishops(side)  * v[safetyAndBishop]
+                        + nrKnights(side)  * v[safetyAndKnight]
+                        + nrPawns(side)    * v[safetyAndPawn]
+                        + nrQueens(xside)  * v[safetyVsQueen]
+                        + nrRooks(xside)   * v[safetyVsRook]
+                        + nrBishops(xside) * v[safetyVsBishop]
+                        + nrKnights(xside) * v[safetyVsKnight]
+                        + nrPawns(xside)   * v[safetyVsPawn]));
+        }
+
+        // Draw rate (drawScore)
+        int drawScore = v[drawOffset]
+                + allQueens  * v[drawQueen]
+                + allRooks   * v[drawRook]
+                + allBishops * v[drawBishop]
+                + allKnights * v[drawKnight]
+                + allPawns   * v[drawPawn];
+
+        if (allQueens > 0 && allRooks + allBishops + allKnights == 0)
+                drawScore += v[drawQueenEnding];
+
+        if (allRooks > 0 && allQueens + allBishops + allKnights == 0)
+                drawScore += v[drawRookEnding];
+
+        if (allBishops > 0 && allQueens + allRooks + allKnights == 0)
+                drawScore += v[drawBishopEnding];
+
+        if (allKnights > 0 && allQueens + allRooks + allBishops == 0)
+                drawScore += v[drawKnightEnding];
+
+        if (allPawns > 0 && allQueens + allRooks + allBishops + allKnights == 0)
+                drawScore += v[drawPawnEnding];
+
+        if (allPawns == 0)
+                drawScore += v[drawPawnless];
+
+        // Unlike bishops
+        int wUnlikeL = nrBishopsL(white) > 0;
+        int wUnlikeD = nrBishopsD(white) > 0;
+        int bUnlikeL = nrBishopsL(black) > 0;
+        int bUnlikeD = nrBishopsD(black) > 0;
+        if (abs(wUnlikeL + bUnlikeD - wUnlikeD - bUnlikeL) == 2) {
+                if (allQueens > 0)
+                        drawScore += v[drawUnlikeBishopsAndQueens];
+                else if (allRooks > 0)
+                        drawScore += v[drawUnlikeBishopsAndRooks];
+                else if (allKnights > 0)
+                        drawScore += v[drawUnlikeBishopsAndKnights];
+                else
+                        drawScore += v[drawUnlikeBishops];
+        }
+
+        // In an imbalance each side has a piece the other doesn't have
+        int dQ = nrQueens(white) - nrQueens(black);
+        int dR = nrRooks(white)  - nrRooks(black);
+        int dM = nrMinors(white) - nrMinors(black);
+        if (min(min(dQ, dR), dM) < 0
+         && max(max(dQ, dR), dM) > 0) {
+                if (dQ) drawScore += v[drawQueenImbalance];
+                if (dR) drawScore += v[drawRookImbalance];
+                if (dM) drawScore += v[drawMinorImbalance];
+        }
+
+        for (int side=white; side<=black; side++)
+                if ((self->materialKey & materialMaskPiecesAndPawns[side]) == 0) { // bare king
+                        mSlot->wiloScore[other(side)] += v[winBonus];
+                        drawScore -= v[winBonus];
+                }
+
+        // Wrap-up
+        mSlot->drawScore = drawScore;
+        mSlot->materialKey = self->materialKey;
 }
 
 /*----------------------------------------------------------------------+

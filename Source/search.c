@@ -19,7 +19,7 @@
 
 // Python API (must come first)
 #ifdef PYTHON_MODULE
-#include "Python.h"
+ #include "Python.h"
 #else
  #define PyErr_CheckSignals() 0 // Stub
 #endif

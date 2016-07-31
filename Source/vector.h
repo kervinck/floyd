@@ -154,12 +154,6 @@
         P(attackByQueen, 181),
         P(attackByKing, -268),
 
-        P(attackPieces_0, 0),
-        P(attackPieces_1, 0),
-        P(attackPieces_2, 0),
-        P(attackPieces_3, 0),
-        P(attackPieces_4, 0),
-
         // TODO: pawn storm
 
         // king mobility
@@ -224,13 +218,13 @@
         P(backwardPawnClosedByRank_1, 12),
         P(backwardPawnClosedByRank_2, -13),
         P(backwardPawnClosedByRank_3, -3),
-        P(backwardPawnClosedByRank_4, 0),
+        P(backwardPawnClosedByRank_4, 0), // Doesn't occur
 
         P(backwardPawnOpenByRank_0, 28),
         P(backwardPawnOpenByRank_1, 18),
         P(backwardPawnOpenByRank_2, 5),
         P(backwardPawnOpenByRank_3, 43),
-        P(backwardPawnOpenByRank_4, 0),
+        P(backwardPawnOpenByRank_4, 0), // Doesn't occur
 
         P(backwardPawnClosedA, 54),
         P(backwardPawnClosedB, -8),
@@ -295,23 +289,23 @@
         P(sidePawnOpenG, 54),
         P(sidePawnOpenH, 52),
 
-        P(middlePawnClosedA, 0),
+        P(middlePawnClosedA, 0), // Doesn't occur
         P(middlePawnClosedB, 11),
         P(middlePawnClosedC, 76),
         P(middlePawnClosedD, -37),
         P(middlePawnClosedE, -12),
         P(middlePawnClosedF, -10),
         P(middlePawnClosedG, -77),
-        P(middlePawnClosedH, 0),
+        P(middlePawnClosedH, 0), // Doesn't occur
 
-        P(middlePawnOpenA, 0),
+        P(middlePawnOpenA, 0), // Doesn't occur
         P(middlePawnOpenB, -71),
         P(middlePawnOpenC, 27),
         P(middlePawnOpenD, 6),
         P(middlePawnOpenE, 39),
         P(middlePawnOpenF, -8),
         P(middlePawnOpenG, -30),
-        P(middlePawnOpenH, 0),
+        P(middlePawnOpenH, 0), // Doesn't occur
 
         P(duoPawnA, 10),
         P(duoPawnB, -8),
@@ -333,8 +327,8 @@
         P(stoppedPawn_1, 29),
         P(stoppedPawn_2, 21),
         P(stoppedPawn_3, -15),
-        P(stoppedPawn_4, 0),
-        P(stoppedPawn_5, 0),
+        P(stoppedPawn_4, 0), // Doesn't occur
+        P(stoppedPawn_5, 0), // Doesn't occur
 
         P(duoPawn_0, 1),
         P(duoPawn_1, -2),
@@ -357,27 +351,26 @@
         P(capturePawn_4, 277),
         P(capturePawn_5, 0),
 
-        P(defendedPawn_0, 0),
+        P(defendedPawn_0, 0), // Doesn't occur
         P(defendedPawn_1, 61),
         P(defendedPawn_2, 8),
         P(defendedPawn_3, 117),
         P(defendedPawn_4, 246),
         P(defendedPawn_5, 254),
 
-        P(pawnLever_0, 0),
-        P(pawnLever_1, 0),
+        P(pawnLever_0, 0), // Doesn't occur
+        P(pawnLever_1, 0), // Doesn't occur
         P(pawnLever_2, -29),
         P(pawnLever_3, -35),
         P(pawnLever_4, -32),
         P(pawnLever_5, -21),
-        P(pawnLever_6, 0),
 
         P(rammedPawn_0, -72),
         P(rammedPawn_1, -2),
         P(rammedPawn_2, 12),
         P(rammedPawn_3, -56),
         P(rammedPawn_4, 15),
-        P(rammedPawn_5, 0),
+        P(rammedPawn_5, 0), // Doesn't occur
 
         P(mobilePawn_0, 12),
         P(mobilePawn_1, 29),

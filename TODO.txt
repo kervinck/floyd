@@ -88,6 +88,8 @@ Finished match
 7900  102 xa416cb63 Slightly tighter bound (aka xaef137c2)
 7904  108 xa882bde3 Null move verification 1
 7932  104 x4318fa13 Avoid double null move
+8024  xxx x51f810f6 Hanging pieces with 1 round of xtune
+8045  xxx x8dae39c2 Material table (small speedup)
 
 |Todo| Checks in qsearch, at least in PV [search]
 
@@ -618,7 +620,3 @@ For v1.0?
 |Todo| Lazy SMP [search]
 
 For v1.0?
-
-|Todo| Remove unused parameters [evaluate,qa]
-
-attackPieces_x

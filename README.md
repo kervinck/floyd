@@ -1,9 +1,9 @@
 Floyd study engine
 ==================
 
-`Floyd' is a simple, bare-bones, chess engine study by Marcel van
+*Floyd* is a simple, bare-bones, chess engine study by Marcel van
 Kervinck.  It is designed for Windows, Linux and OSX and distributed
-under the permissive, `2-clause' or `simplified', open source BSD
+under the permissive, "2-clause" or "simplified", open source BSD
 license.
 
 Floyd is not a stand-alone chess application. It can be loaded as
@@ -54,6 +54,7 @@ Make targets
 ============
 
 Some tips:
+
 1. Mind to use ``make pgo`` for the best result.
 2. If the default compiler doesn't support --std=c11 yet, install gcc-4.8 and type ``make CC=gcc-4.8``
 3. If you get "fatal error: Python.h: No such file or directory", install the python-dev package: ``sudo apt-get install python-dev``

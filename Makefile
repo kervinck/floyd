@@ -77,7 +77,7 @@ floyd-pgo1: $(wildcard Source/*) Makefile versions.json
 
 floyd-pgo2: $(wildcard Source/*) Makefile versions.json floyd-pgo1
 	$(GCC) $(CFLAGS) -DNDEBUG -o $@ $(uciSources) $(LDFLAGS) -fprofile-use
-	cp -p $@ floyd-$(floydVersion)
+	mkdir -p build && cp -p $@ build/floyd-$(floydVersion) # Keep old versions
 
 # Cross-compile as Win32 UCI engine
 win: $(win32_exe)

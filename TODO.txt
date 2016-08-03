@@ -13,10 +13,11 @@ Floyd 0.9 dev status:
 14 Floyd x3c65e794 104 Only odd nodes
 15 Floyd x1f1cd580 102 Delta pruning tuning
 16 Floyd x6302ff3a 108 Hanging pieces with basic tuning
-17 Floyd x8dae39c2 122 Extended tuning
+17 Floyd x8dae39c2 122 Extended tuning and material table
+18 Floyd xc9494dd4 125 Second run of extended tuning
 
 Tentative release notes for v0.9:
-- Gained approximately 120 elo at fast time controls
+- Gained approximately 125 elo at fast time controls
 - Better handling of zugzwang positions
 - Fixed illegal moves deep in PV (reported by Dirk-Jan D.)
 - Full solution for the "0readyok" problem: also don't split info lines
@@ -27,47 +28,50 @@ Under the hood:
 - Improved null move pruning/reductions (aka verification)
 - Added delta pruning
 - Hanging piece evaluation
+- Simple futility pruning
 - Minor evaluation weight tuning
 - Simplified UCI move printing
 
 Rank Name              Elo    +    - games score oppo. draws
-   1 Fruit 2.1         338    2    2 192000   80%    77   11%
-   2 Floyd x8dae39c2   122    4    4 24000   45%   169   19% <-- last
-   3 Floyd x51f810f6   111    4    4 24000   44%   169   19%
-   4 Floyd xa882bde3   109    4    4 24000   44%   169   19%
-   5 Floyd x6302ff3a   108    4    4 24000   44%   169   19% <-- prev
-   6 Floyd x8399a075   108    4    4 24000   44%   169   19%
-   7 Floyd x3c65e794   106    4    4 24000   43%   169   19%
-   8 Floyd x4318fa13   105    4    4 24000   43%   169   19%
-   9 Floyd xa416cb63   104    4    4 24000   43%   169   19%
-  10 Floyd x1f1cd580   103    4    4 24000   43%   169   19%
-  11 Floyd x354d5f3a    97    4    4 24000   42%   169   19%
-  12 Floyd xc6c5dae2    90    4    4 24000   42%   169   19%
-  13 Floyd x7c96b2ca    87    4    4 24000   41%   169   20%
-  14 Floyd x0e0dc088    67    4    4 24000   39%   169   19%
-  15 Floyd x800ecb47    60    4    4 24000   38%   169   19%
-  16 Floyd 0.8           0    1    1 192000   37%    98   24%
-  17 Floyd 0.7        -148    4    4 36000   38%    -5   13%
-  18 Floyd 0.6        -352    6    6 12000   24%  -148   18%
-                 Fr Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl
-Fruit 2.1          100100100100100100100100100100100100100100100100100
-Floyd x8dae39c2   0    99 99 99 99 99 99 99 99100100100100100100100100
-Floyd x51f810f6   0  0    68 76 79 95 96 98 99 99 99 99100100100100100
-Floyd xa882bde3   0  0 31    59 63 87 90 96 97 99 99 99100100100100100
-Floyd x6302ff3a   0  0 23 40    54 82 86 93 95 99 99 99100100100100100
-Floyd x8399a075   0  0 20 36 45    79 84 92 93 99 99 99100100100100100
-Floyd x3c65e794   0  0  4 12 17 20    56 71 76 99 99 99100100100100100
-Floyd x4318fa13   0  0  3  9 13 15 43    66 70 99 99 99100100100100100
-Floyd xa416cb63   0  0  1  3  6  7 28 33    55 99 99 99100100100100100
-Floyd x1f1cd580   0  0  0  2  4  6 23 29 44    98 99 99100100100100100
-Floyd x354d5f3a   0  0  0  0  0  0  0  0  0  1    98 99100100100100100
-Floyd xc6c5dae2   0  0  0  0  0  0  0  0  0  0  1    90 99100100100100
-Floyd x7c96b2ca   0  0  0  0  0  0  0  0  0  0  0  9    99100100100100
-Floyd x0e0dc088   0  0  0  0  0  0  0  0  0  0  0  0  0    98100100100
-Floyd x800ecb47   0  0  0  0  0  0  0  0  0  0  0  0  0  1   100100100
-Floyd 0.8         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0   100100
-Floyd 0.7         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0   100
-Floyd 0.6         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+   1 Fruit 2.1         338    2    2 204000   80%    80   11%
+   2 Floyd xc9494dd4   125    4    4 24000   46%   169   19%
+   3 Floyd x8dae39c2   122    4    4 24000   45%   169   19%
+   4 Floyd x51f810f6   111    4    4 24000   44%   169   19%
+   5 Floyd xa882bde3   109    4    4 24000   44%   169   19%
+   6 Floyd x6302ff3a   109    4    4 24000   44%   169   19%
+   7 Floyd x8399a075   108    4    4 24000   44%   169   19%
+   8 Floyd x3c65e794   106    4    4 24000   43%   169   19%
+   9 Floyd x4318fa13   105    4    4 24000   43%   169   19%
+  10 Floyd xa416cb63   104    4    4 24000   43%   169   19%
+  11 Floyd x1f1cd580   104    4    4 24000   43%   169   19%
+  12 Floyd x354d5f3a    97    4    4 24000   42%   169   19%
+  13 Floyd xc6c5dae2    91    4    4 24000   42%   169   19%
+  14 Floyd x7c96b2ca    87    4    4 24000   41%   169   20%
+  15 Floyd x0e0dc088    67    4    4 24000   39%   169   19%
+  16 Floyd x800ecb47    60    4    4 24000   38%   169   19%
+  17 Floyd 0.8           0    1    1 204000   36%   100   24%
+  18 Floyd 0.7        -148    4    4 36000   38%    -5   13%
+  19 Floyd 0.6        -352    6    6 12000   24%  -148   18%
+                 Fr Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl
+Fruit 2.1          100100100100100100100100100100100100100100100100100100
+Floyd xc9494dd4   0    87 99 99 99 99 99 99 99 99100100100100100100100100
+Floyd x8dae39c2   0 12    99 99 99 99 99 99 99 99100100100100100100100100
+Floyd x51f810f6   0  0  0    68 76 79 95 96 98 99 99 99 99100100100100100
+Floyd xa882bde3   0  0  0 31    59 63 87 90 96 97 99 99 99100100100100100
+Floyd x6302ff3a   0  0  0 23 40    54 82 86 93 95 99 99 99100100100100100
+Floyd x8399a075   0  0  0 20 36 45    79 84 92 93 99 99 99100100100100100
+Floyd x3c65e794   0  0  0  4 12 17 20    56 71 76 99 99 99100100100100100
+Floyd x4318fa13   0  0  0  3  9 13 15 43    66 70 99 99 99100100100100100
+Floyd xa416cb63   0  0  0  1  3  6  7 28 33    55 99 99 99100100100100100
+Floyd x1f1cd580   0  0  0  0  2  4  6 23 29 44    98 99 99100100100100100
+Floyd x354d5f3a   0  0  0  0  0  0  0  0  0  0  1    98 99100100100100100
+Floyd xc6c5dae2   0  0  0  0  0  0  0  0  0  0  0  1    90 99100100100100
+Floyd x7c96b2ca   0  0  0  0  0  0  0  0  0  0  0  0  9    99100100100100
+Floyd x0e0dc088   0  0  0  0  0  0  0  0  0  0  0  0  0  0    98100100100
+Floyd x800ecb47   0  0  0  0  0  0  0  0  0  0  0  0  0  0  1   100100100
+Floyd 0.8         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0   100100
+Floyd 0.7         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0   100
+Floyd 0.6         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
 
 ------------------------------------------------------------------------
         Search
@@ -85,14 +89,25 @@ Floyd 0.6         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
 7900  102 xa416cb63 Slightly tighter bound (aka xaef137c2)
 7904  108 xa882bde3 Null move verification 1
 7932  104 x4318fa13 Avoid double null move
-8024  xxx x51f810f6 Hanging pieces with 1 round of xtune
-8045  xxx x8dae39c2 Material table (small speedup)
+8024  111 x51f810f6 Hanging pieces with 1 round of xtune
+8045  122 x8dae39c2 Extended tuning and material table
+8064  125 xc9494dd4 Second run of extended tuning
 
 Score of Floyd x8dae39c2 vs Floyd xa882bde3: 1109 - 899 - 992  [0.535] 3000
 ELO difference: 24
 Winning fraction: 0.535
 Elo difference: +24.3603
 p-value: 0.999999
+
+|Todo| Simple futility-1 and futility-2 [search]
+
+|Todo| Razoring [search]
+
+|Todo| Evaluation cache [search]
+
+At least avoid double evaluation, eg after null move.
+(Or: evaluate both sides at the same time, bacause of w/b
+difference due to tempo and hanging piece component?)
 
 |Todo| Checks in qsearch, at least in PV [search]
 
@@ -121,10 +136,6 @@ Simplest is to keep all moves and let recursion+evaluation cull the bad ones.
 
 Cache evaluations to prevent the NPS drop
 
-|Todo| Simple futility-1 and futility-2 [search]
-
-Precondition: hanging piece evaluation is done
-
 |Todo| Move classes [search]
 
   tactical      Discover from to-square and board
@@ -152,10 +163,6 @@ Flags must support more ordering:
 6. Bad captures
 7. Strong moves
 8. Weak moves
-
-|Todo| Razoring [search]
-
-Precondition: hanging piece evaluation is done
 
 |Todo| Collect statistics for delta pruning [search]
 
@@ -602,8 +609,6 @@ At least in debugging mode.
 Strip function explanation away and move to C files.
 
 |Todo| Remove cplus.h stuff that is not used [qa]
-
-|Todo| Rename isOdd() and isEven() to odd() and even() [qa]
 
 |Todo| Endgame logic [evaluate]
 

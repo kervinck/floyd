@@ -270,7 +270,6 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
 #define isCutNode(nodeType) (( nodeType) & 1)
 #define isAllNode(nodeType) ((~nodeType) & 1)
 
-// TODO: futility
 static int scout(Engine_t self, int depth, int alpha, int nodeType, int lastMove)
 {
         self->nodeCount++;
@@ -304,6 +303,13 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType, int lastMove
                         return scout(self, reduceIfEven(depth - reduction), alpha, nodeType, 0000);
                 if (score > alpha) // Pruning
                         return ttWrite(self, node.slot, depth, min(score, maxEval), alpha, alpha+1);
+        }
+
+        // Reverse futility pruning (aka static null move)
+        if (depth == 1 && minEval <= alpha && alpha < maxEval && !inCheck) {
+                int eval = evaluate(board(self));
+                if (eval > alpha)
+                        return ttWrite(self, node.slot, depth, eval, alpha, alpha+1);
         }
 
         // Internal iterative deepening

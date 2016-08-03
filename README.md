@@ -1,21 +1,96 @@
 Floyd study engine
 ==================
 
-`floyd' is a chess engine study by Marcel van Kervinck.
+`Floyd' is a simple, bare-bones, chess engine study by Marcel van
+Kervinck.  It is designed for Windows, Linux and OSX and distributed
+under the permissive, `2-clause' or `simplified', open source BSD
+license.
 
-Floyd is not a stand-alone chess program. It can be loaded as an engine
-in chess GUIs such as Winboard, Arena, XBoard, Shredder and others.
+Floyd is not a stand-alone chess application. It can be loaded as
+an engine in chess GUIs such as Winboard, Arena, XBoard, Shredder
+and others. For this Floyd provides a fully compliant UCI interface.
+In addition there is also a Python module extension interface for
+programming. Just type ``import floyd`` in Python.  Floyd is written
+in plain standard C which should be easy to port to other languages
+if so desired.
 
-In addition to the UCI interface, a Python interface is provided
-for study purposes. I try to keep the code as simple and clean as
-possible. Speed is therefore not as important as clarity and ease
-of change.
+This is the source code archive. Binaries for Windows, Linux and
+OSX can be downloaded from https://marcelk.net/floyd/, or you can
+compile them yourself from these sources.
 
-This is the source code archive. Binaries for Windows, Linux
-and Mac can be downloaded from https://marcelk.net/floyd/
+Project
+=======
 
-Python interface
-----------------
+The Floyd project is primarily intended as a platform for
+experimentation.  This means that emphasis is on ease of change,
+clarity, soundness and preferably a very low code count. There are
+now only about 4,000 lines of real code. Raw search speed is of a
+lesser importance.  Still most, if not all, modern evaluation and
+search techniques are present in their basic form and therefore
+Floyd can play very strong chess. The project's target, for v1.0,
+is to reach 2900 elo at the CCRL 40/40 list, or at least somewhere
+in the top-50. Versions 0.x are intermediate stepping stones towards
+that.
+
+Outlook after v1.0
+==================
+
+After v1.0 it is not clear yet how Floyd will continue as a project.
+Additional elo can easily come from making the code faster and
+search tuning.
+
+It should be easy to speed it up by a factor of 3. The move generator
+design uses a simple mailbox approach because that has advantages
+for trying out new evaluation features. Not much is optimized here,
+for example, there are no piece lists and capture generation is
+done by generating all moves and then filtering out the non-captures.
+
+Also there is no multiprocessing yet. One of the objectives of Floyd
+is to use it to explore probability density search (PDS) instead
+of traditional SMP search. For that a single-threaded engine is
+sufficient. Lazy SMP might be added after v1.0.
+
+Make targets
+============
+
+Some tips:
+1. Mind to use ``make pgo`` for the best result.
+2. If the default compiler doesn't support --std=c11 yet, install gcc-4.8 and type ``make CC=gcc-4.8``
+3. If you get "fatal error: Python.h: No such file or directory", install the python-dev package: ``sudo apt-get install python-dev``
+
+Makefile targets are:
+```
+all                        # Compile both as Python module and as native UCI engine
+floyd                      # Compile as native UCI engine
+pgo                        # Compile with profile-guided optimization
+win                        # Cross-compile as Win32 UCI engine
+easy wac krk5 tt eg ece3   # Run 1 second position tests
+hard draw nodraw bk        # Run 10 second position tests
+mate mated qmate           # Run 100 second position tests
+nolot                      # Run 1000 second position tests
+sts                        # Run the Strategic Test Suite
+nodes                      # Run node count regression test
+residual                   # Calculate residual of evaluation function
+tune                       # Run one standard iteration of the evaluation tuner
+ptune                      # One standard iteration only for the parameters listed in `params'
+ctune                      # Coarse tuning (1M positions)
+xtune                      # Extended tuning (10M positions)
+dtune                      # Deep tuning (1M positions at 2 ply)
+tables                     # Plot evaluation tables for easy inspection
+update                     # Update source code with the tuned coefficients
+install                    # Install Python module for the current user
+sysinstall                 # Install Python module for all system users ('sudo make sysinstall')
+clean                      # Remove compilation intermediates and results
+todo                       # Show all open to-do items
+fingerprint                # Make fingerprint for regression testing
+shootout                   # Shootout against last version, 1000 games 10+0.15
+log                        # Show simplified git log
+help                       # Show summary of make targets
+```
+
+Python interface (v0.x)
+=======================
+Note: This interface is planned to change with v1.0 to a class interface!
 ```
 >>> import floyd
 >>> help(floyd)
@@ -37,12 +112,9 @@ FUNCTIONS
         setCoefficient(coef, newValue) -> oldValue, name
 ```
 
-Command interface
------------------
+Command interface (UCI)
+=======================
 ```
-$ make
-$ ./floyd 
-
 Floyd Chess Engine - Version 0.x
 Copyright (C) 2015-2016, Marcel van Kervinck
 All rights reserved
@@ -105,9 +177,9 @@ Unknown commands and options are silently ignored, except in debug mode.
 ```
 
 Organization
-------------
-Hierarchy for source modules is as follows:
+============
 
+Hierarchy for source modules is as follows:
 ```
  floydmain.c                            main() for a stand-alone program
  floydmodule.c                          Python interface to search and evaluate
@@ -131,33 +203,5 @@ Hierarchy for source modules is as follows:
   |     `--- geometry.h                 Definition of board layout
   `--- cplus.h
         `--- cplus.c                    A loose collection of utility functions
-
-Make targets
-------------
-all                        # Compile both as Python module and as native UCI engine
-floyd                      # Compile as native UCI engine
-pgo                        # Compile with profile-guided optimization
-win                        # Cross-compile as Win32 UCI engine
-easy wac krk5 tt eg ece3   # Run 1 second position tests
-hard draw nodraw bk        # Run 10 second position tests
-mate mated qmate           # Run 100 second position tests
-nolot                      # Run 1000 second position tests
-sts                        # Run the Strategic Test Suite
-nodes                      # Run node count regression test
-residual                   # Calculate residual of evaluation function
-tune                       # Run one standard iteration of the evaluation tuner
-ptune                      # One standard iteration only for the parameters listed in `params'
-ctune                      # Coarse tuning (1M positions)
-xtune                      # Extended tuning (10M positions)
-dtune                      # Deep tuning (1M positions at 2 ply)
-tables                     # Plot evaluation tables for easy inspection
-update                     # Update source code with the tuned coefficients
-install                    # Install Python module for the current user
-sysinstall                 # Install Python module for all system users ('sudo make sysinstall')
-clean                      # Remove compilation intermediates and results
-todo                       # Show all open to-do items
-fingerprint                # Make fingerprint for regression testing
-shootout                   # Shootout against last version, 1000 games 10+0.15
-log                        # Show simplified git log
-help                       # Show summary of make targets
 ```
+

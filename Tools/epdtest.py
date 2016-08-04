@@ -8,6 +8,8 @@ def parseEpd(rawLine):
         # 4-field FEN
         line = rawLine.strip().split(' ', 4)
         pos = ' '.join(line[0:4])
+        if len(line) < 5:
+                line.append('')
 
         # EPD fields
         operations = {'bm': '', 'am': '', 'dm': ''}

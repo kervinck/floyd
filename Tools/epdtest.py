@@ -74,5 +74,5 @@ if __name__ == '__main__':
                 cpu = cpu // 2 if cpu > 1 else 1
         moveTime = float(sys.argv[argi])
         lines = sys.stdin.readlines()
-        workers = startWorkers(cpu, lines, moveTime)
+        workers = startWorkers(min(cpu, len(lines)), lines, moveTime)
         stopWorkers(workers)

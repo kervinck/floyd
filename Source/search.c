@@ -305,12 +305,15 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType, int lastMove
                         return ttWrite(self, node.slot, depth, min(score, maxEval), alpha, alpha+1);
         }
 
-        // Reverse futility pruning (aka static null move)
+#define TRACE 0
+#if !TRACE
+        // Futility pruning (aka static null move)
         if (depth == 1 && minEval <= alpha && alpha < maxEval && !inCheck) {
                 int eval = evaluate(board(self));
-                if (eval > alpha)
-                        return ttWrite(self, node.slot, depth, eval, alpha, alpha+1);
+                if (eval > alpha + board(self)->futilityMargin)
+                        return ttWrite(self, node.slot, depth, alpha+1, alpha, alpha+1);
         }
+#endif
 
         // Internal iterative deepening
         if (depth >= 3 && isCutNode(nodeType) && !node.slot.move) {
@@ -339,6 +342,16 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType, int lastMove
                         break;
                 }
         }
+
+#if TRACE
+        if (depth == 1 && -3500 <= alpha && alpha < 3500 && !inCheck && bestScore != minInt) {
+                int eval = evaluate(board(self));
+                char fen[maxFenSize];
+                boardToFen(board(self), fen);
+                int margin = board(self)->futilityMargin;
+                printf("trace %d %d %d %s\n", eval, bestScore, margin, fen);
+        }
+#endif
 
         if (bestScore == minInt) // No legal moves
                 bestScore = gameOverScore(self, inCheck);

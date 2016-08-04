@@ -78,6 +78,7 @@ struct Board {
         sByteList undoStack;
 
         int *movePtr; // Used only during move generation
+        int futilityMargin; // Side effect of evaluate()
 };
 
 /*

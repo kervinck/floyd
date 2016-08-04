@@ -100,6 +100,7 @@ struct pkSlot {
 
 #define nrMinors(side)     (nrKnights(side) + nrBishops(side))
 #define nrMajors(side)     (nrRooks(side)   + nrQueens(side))
+#define nrSliders(side)    (nrBishops(side) + nrRooks(side) + nrQueens(side))
 
 /*----------------------------------------------------------------------+
  |      Data                                                            |
@@ -397,18 +398,25 @@ int evaluate(Board_t self)
 
         wiloScore[side] += v[tempo]; // side to move bonus
 
-        wiloScore[side] += hangingPieces[side][0]  * v[hanging_0] // side to move
-                         + hangingPieces[side][1]  * v[hanging_1]
-                         + hangingPieces[side][2]  * v[hanging_2]
-                         + hangingPieces[xside][0] * v[hanging_0x] // opponent
-                         + hangingPieces[xside][1] * v[hanging_1x]
-                         + hangingPieces[xside][2] * v[hanging_2x];
+        int hangScore = hangingPieces[side][0] * v[hanging_0]
+                      + hangingPieces[side][1] * v[hanging_1]
+                      + hangingPieces[side][2] * v[hanging_2];
+        int xhangScore = hangingPieces[xside][0] * v[hanging_0x]
+                       + hangingPieces[xside][1] * v[hanging_1x]
+                       + hangingPieces[xside][2] * v[hanging_2x];
+        wiloScore[side] += hangScore + xhangScore;
 
         wiloScore[white] += self->eloDiff * v[eloDiff] / 10; // contempt
 
         int wiloSum = wiloScore[side] - wiloScore[xside];
 
         int drawScore = mSlot->drawScore + pawns->drawScore;
+
+        /*--------------------------------------------------------------+
+         |      Safety margin for futility pruning                      |
+         +--------------------------------------------------------------*/
+
+        self->futilityMargin = (nrSliders(side) > 1) ? v[tempo] - 5*hangScore : 2500;
 
         /*--------------------------------------------------------------+
          |      Special endgames                                        |

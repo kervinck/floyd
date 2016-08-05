@@ -1,20 +1,23 @@
 Floyd 0.9 dev status:
-   Version         Elo Change
- 0 Floyd 0.8         0 Reference
- 2 Floyd x800ecb47  58 History counters
- 3 Floyd x0e0dc088  65 Integrate older tuning
- 6 Floyd x7c96b2ca  85 Unconditional null move, i.s.o. evaluation
- 8 Floyd xc6c5dae2  89 Simple delta pruning
- 9 Floyd x354d5f3a  95 Delta pruning option 3 (pseudo fail-soft, aka xec39d0d0)
-10 Floyd xa416cb63 102 Slightly tighter bound (aka xaef137c2)
-11 Floyd x8399a075 104 SEE>0 before killers; PV bug fix
-12 Floyd x4318fa13 104 Avoid double null move
-13 Floyd xa882bde3 108 Null move verification 1
-14 Floyd x3c65e794 104 Only odd nodes
-15 Floyd x1f1cd580 102 Delta pruning tuning
-16 Floyd x6302ff3a 108 Hanging pieces with basic tuning
-17 Floyd x8dae39c2 122 Extended tuning and material table
-18 Floyd xc9494dd4 125 Second run of extended tuning
+ Elo Test Version         EloChange
+-149 7041 Floyd 0.7       Older version
+   0 7522 Floyd 0.8       Reference
+  58 7751 Floyd x800ecb47 History counters
+  65 7785 Floyd x0e0dc088 Integrate older tuning
+  85 7807 Floyd x7c96b2ca Unconditional null move, i.s.o. evaluation
+  89 7875 Floyd xc6c5dae2 Simple delta pruning
+  95      Floyd x354d5f3a Delta pruning option 3 (pseudo fail-soft, aka xec39d0d0)
+ 102 7900 Floyd xa416cb63 Slightly tighter bound (aka xaef137c2)
+ 104      Floyd x8399a075 SEE>0 before killers; PV bug fix
+ 104 7932 Floyd x4318fa13 Avoid double null move
+ 108 7904 Floyd xa882bde3 Null move verification 1
+ 104      Floyd x3c65e794 Only odd nodes
+ 102      Floyd x1f1cd580 Delta pruning tuning
+ 108      Floyd x6302ff3a  Hanging pieces with basic tuning
+ 122 8045 Floyd x8dae39c2 Extended tuning and material table
+ 125 8064 Floyd xc9494dd4 Second run of extended tuning
+ 120 8030 Floyd xdedb91e0 Simplistic futility
+ 140 8195 Floyd xbfe5344c Simple dynamic futility pruning
 
 Tentative release notes for v0.9:
 - Gained approximately 125 elo at fast time controls
@@ -28,78 +31,84 @@ Under the hood:
 - Improved null move pruning/reductions (aka verification)
 - Added delta pruning
 - Hanging piece evaluation
-- Simple futility pruning
+- Simple dynamic futility pruning
 - Minor evaluation weight tuning
 - Simplified UCI move printing
 
 Rank Name              Elo    +    - games score oppo. draws
-   1 Fruit 2.1         338    2    2 204000   80%    80   11%
-   2 Floyd xc9494dd4   125    4    4 24000   46%   169   19%
-   3 Floyd x8dae39c2   122    4    4 24000   45%   169   19%
-   4 Floyd x51f810f6   111    4    4 24000   44%   169   19%
-   5 Floyd xa882bde3   109    4    4 24000   44%   169   19%
-   6 Floyd x6302ff3a   109    4    4 24000   44%   169   19%
-   7 Floyd x8399a075   108    4    4 24000   44%   169   19%
-   8 Floyd x3c65e794   106    4    4 24000   43%   169   19%
-   9 Floyd x4318fa13   105    4    4 24000   43%   169   19%
-  10 Floyd xa416cb63   104    4    4 24000   43%   169   19%
-  11 Floyd x1f1cd580   104    4    4 24000   43%   169   19%
-  12 Floyd x354d5f3a    97    4    4 24000   42%   169   19%
-  13 Floyd xc6c5dae2    91    4    4 24000   42%   169   19%
-  14 Floyd x7c96b2ca    87    4    4 24000   41%   169   20%
-  15 Floyd x0e0dc088    67    4    4 24000   39%   169   19%
-  16 Floyd x800ecb47    60    4    4 24000   38%   169   19%
-  17 Floyd 0.8           0    1    1 204000   36%   100   24%
-  18 Floyd 0.7        -148    4    4 36000   38%    -5   13%
-  19 Floyd 0.6        -352    6    6 12000   24%  -148   18%
-                 Fr Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl
-Fruit 2.1          100100100100100100100100100100100100100100100100100100
-Floyd xc9494dd4   0    87 99 99 99 99 99 99 99 99100100100100100100100100
-Floyd x8dae39c2   0 12    99 99 99 99 99 99 99 99100100100100100100100100
-Floyd x51f810f6   0  0  0    68 76 79 95 96 98 99 99 99 99100100100100100
-Floyd xa882bde3   0  0  0 31    59 63 87 90 96 97 99 99 99100100100100100
-Floyd x6302ff3a   0  0  0 23 40    54 82 86 93 95 99 99 99100100100100100
-Floyd x8399a075   0  0  0 20 36 45    79 84 92 93 99 99 99100100100100100
-Floyd x3c65e794   0  0  0  4 12 17 20    56 71 76 99 99 99100100100100100
-Floyd x4318fa13   0  0  0  3  9 13 15 43    66 70 99 99 99100100100100100
-Floyd xa416cb63   0  0  0  1  3  6  7 28 33    55 99 99 99100100100100100
-Floyd x1f1cd580   0  0  0  0  2  4  6 23 29 44    98 99 99100100100100100
-Floyd x354d5f3a   0  0  0  0  0  0  0  0  0  0  1    98 99100100100100100
-Floyd xc6c5dae2   0  0  0  0  0  0  0  0  0  0  0  1    90 99100100100100
-Floyd x7c96b2ca   0  0  0  0  0  0  0  0  0  0  0  0  9    99100100100100
-Floyd x0e0dc088   0  0  0  0  0  0  0  0  0  0  0  0  0  0    98100100100
-Floyd x800ecb47   0  0  0  0  0  0  0  0  0  0  0  0  0  0  1   100100100
-Floyd 0.8         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0   100100
-Floyd 0.7         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0   100
-Floyd 0.6         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+   1 Fruit 2.1         339    2    2 228000   80%    85   11%
+   2 Floyd xbfe5344c   140    4    4 24000   47%   169   19%
+   3 Floyd xc9494dd4   126    4    4 24000   46%   169   19%
+   4 Floyd x8dae39c2   122    4    4 24000   45%   169   19%
+   5 Floyd xdedb91e0   120    4    4 24000   45%   169   19%
+   6 Floyd x51f810f6   111    4    4 24000   44%   169   19%
+   7 Floyd xa882bde3   110    4    4 24000   44%   169   19%
+   8 Floyd x6302ff3a   109    4    4 24000   44%   169   19%
+   9 Floyd x8399a075   109    4    4 24000   44%   169   19%
+  10 Floyd x3c65e794   106    4    4 24000   43%   169   19%
+  11 Floyd x4318fa13   106    4    4 24000   43%   169   19%
+  12 Floyd xa416cb63   104    4    4 24000   43%   169   19%
+  13 Floyd x1f1cd580   104    4    4 24000   43%   169   19%
+  14 Floyd x354d5f3a    97    4    4 24000   42%   169   19%
+  15 Floyd xc6c5dae2    91    4    4 24000   42%   169   19%
+  16 Floyd x7c96b2ca    87    4    4 24000   41%   169   20%
+  17 Floyd x0e0dc088    67    4    4 24000   39%   169   19%
+  18 Floyd x800ecb47    60    4    4 24000   38%   169   19%
+  19 Floyd 0.8           0    1    1 228000   36%   103   24%
+  20 Floyd 0.7        -147    4    4 36000   38%    -4   13%
+  21 Floyd 0.6        -352    6    6 12000   24%  -147   18%
+                 Fr Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl
+Fruit 2.1          100100100100100100100100100100100100100100100100100100100100
+Floyd xbfe5344c   0    99 99 99100100100100100100100100100100100100100100100100
+Floyd xc9494dd4   0  0    87 97 99 99 99 99 99 99 99 99100100100100100100100100
+Floyd x8dae39c2   0  0 12    81 99 99 99 99 99 99 99 99100100100100100100100100
+Floyd xdedb91e0   0  0  2 18    99 99 99 99 99 99 99 99 99100100100100100100100
+Floyd x51f810f6   0  0  0  0  0    68 76 79 95 96 98 99 99 99 99100100100100100
+Floyd xa882bde3   0  0  0  0  0 31    59 63 87 90 96 97 99 99 99100100100100100
+Floyd x6302ff3a   0  0  0  0  0 23 40    54 82 86 93 95 99 99 99100100100100100
+Floyd x8399a075   0  0  0  0  0 20 36 45    79 84 92 93 99 99 99100100100100100
+Floyd x3c65e794   0  0  0  0  0  4 12 17 20    56 71 76 99 99 99100100100100100
+Floyd x4318fa13   0  0  0  0  0  3  9 13 15 43    66 70 99 99 99100100100100100
+Floyd xa416cb63   0  0  0  0  0  1  3  6  7 28 33    55 99 99 99100100100100100
+Floyd x1f1cd580   0  0  0  0  0  0  2  4  6 23 29 44    98 99 99100100100100100
+Floyd x354d5f3a   0  0  0  0  0  0  0  0  0  0  0  0  1    98 99100100100100100
+Floyd xc6c5dae2   0  0  0  0  0  0  0  0  0  0  0  0  0  1    90 99100100100100
+Floyd x7c96b2ca   0  0  0  0  0  0  0  0  0  0  0  0  0  0  9    99100100100100
+Floyd x0e0dc088   0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0    98100100100
+Floyd x800ecb47   0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1   100100100
+Floyd 0.8         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0   100100
+Floyd 0.7         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0   100
+Floyd 0.6         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
 
 ------------------------------------------------------------------------
         Search
 ------------------------------------------------------------------------
 
-|Ongoing| Search test suite [qa,search]
+|Ongoing| Simple futility-1 [search]
 
-7041 -149 v0.7      Release
-7522    0 v0.8.1    Release
-7751   58 x800ecb47 History counters
-7785   65 x0e0dc088 Integrate older tuning
-7807   85 x7c96b2ca Unconditional null move, i.s.o. evaluation
-7875   89 xc6c5dae2 Simple delta pruning
-7898  104 x0dac97eb Only odd moves + CtrlC
-7900  102 xa416cb63 Slightly tighter bound (aka xaef137c2)
-7904  108 xa882bde3 Null move verification 1
-7932  104 x4318fa13 Avoid double null move
-8024  111 x51f810f6 Hanging pieces with 1 round of xtune
-8045  122 x8dae39c2 Extended tuning and material table
-8064  125 xc9494dd4 Second run of extended tuning
+Score of Floyd xfac140c7 vs Floyd xc9494dd4: 1114 - 884 - 1002  [0.538] 3000
+ELO difference: 27
+Finished match
+marcelk@beobook3:~/Projects/floyd> los 1114 884 1002
+Winning fraction: 0.538333
+Elo difference: +26.6891
+p-value: 1
 
-Score of Floyd x8dae39c2 vs Floyd xa882bde3: 1109 - 899 - 992  [0.535] 3000
-ELO difference: 24
-Winning fraction: 0.535
-Elo difference: +24.3603
-p-value: 0.999999
+Consider
+- Tempo
+- Threats
+- Passers
+- King attacks
+- Node type parity
 
-|Todo| Simple futility-1 and futility-2 [search]
+|Todo| Depth promotion of qsearch entries [search,ttable]
+
+Use "depth 0 fail highs with a move" also when probing with depth 1
+
+For example, do this by storing them as depth 1, so they also stay
+in the table a bit longer.
+
+|Todo| Simple futility-2 [search]
 
 |Todo| Razoring [search]
 
@@ -124,7 +133,6 @@ qSearchWithCheck() # No TT?
                         qSearchWithCheck
                 else
                         qSearch
-qsearch()
 
 |Todo| Strong moves in PV qsearch [search]
 
@@ -235,7 +243,7 @@ In qsearch
  transpose into the same line as queening, and then wreck the
  hash table?  Not if queen goes first? Higher depth etc
 
-|Ongoing| Extended testing of null move options [search]
+|Todo| Extended testing of null move options [search]
 
 -- 1. isOdd() condition might be a slight regression in 10+0.15 testing
 

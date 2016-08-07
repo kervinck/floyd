@@ -416,7 +416,7 @@ int evaluate(Board_t self)
          |      Safety margin for futility pruning                      |
          +--------------------------------------------------------------*/
 
-        self->futilityMargin = (nrSliders(side) > 1) ? v[tempo] - 5*hangScore : 2500;
+        self->futilityMargin = (nrSliders(side) > 1) ? 2*v[tempo] - 7*hangScore : 1500;
 
         /*--------------------------------------------------------------+
          |      Special endgames                                        |

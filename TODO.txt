@@ -18,6 +18,7 @@ Floyd 0.9 dev status:
  125 8064 Floyd xc9494dd4 Second run of extended tuning
  120 8030 Floyd xdedb91e0 Simplistic futility
  140 8195 Floyd xbfe5344c Simple dynamic futility pruning
+          Floyd x037c4310 Manual tuning of futiliy margin
 
 Tentative release notes for v0.9:
 - Gained approximately 125 elo at fast time controls
@@ -86,15 +87,18 @@ Floyd 0.6         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
 
 |Ongoing| Simple futility-1 [search]
 
-Score of Floyd xfac140c7 vs Floyd xc9494dd4: 1114 - 884 - 1002  [0.538] 3000
-ELO difference: 27
-Finished match
-marcelk@beobook3:~/Projects/floyd> los 1114 884 1002
-Winning fraction: 0.538333
-Elo difference: +26.6891
-p-value: 1
+Tune manually:
 
-Consider
+        2*v[tempo] - 7*hangScore : 1500;
+Score of Floyd x037c4310 vs Floyd xbfe5344c: 1030 - 938 - 1032  [0.515] 3000
+ELO difference: 11
+Finished match
+Winning fraction: 0.515333
+Elo difference: +10.658
+p-value: 0.980953
+
+Consider finer model:
+
 - Tempo
 - Threats
 - Passers

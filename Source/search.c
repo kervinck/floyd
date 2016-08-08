@@ -61,7 +61,7 @@ struct Node {
  +----------------------------------------------------------------------*/
 
 static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex);
-static int scout(Engine_t self, int depth, int alpha, int nodeType, int lastMove);
+static int scout(Engine_t self, int depth, int alpha, int pvDistance, int lastMove);
 static int qSearch(Engine_t self, int alpha);
 
 static int updateBestAndPonderMove(Engine_t self);
@@ -267,14 +267,14 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
  |      scout                                                           |
  +----------------------------------------------------------------------*/
 
-#define isCutNode(nodeType) (( nodeType) & 1)
-#define isAllNode(nodeType) ((~nodeType) & 1)
+#define isCutNode(pvDistance) (( pvDistance) & 1)
+#define isAllNode(pvDistance) ((~pvDistance) & 1)
 
-static int scout(Engine_t self, int depth, int alpha, int nodeType, int lastMove)
+static int scout(Engine_t self, int depth, int alpha, int pvDistance, int lastMove)
 {
         self->nodeCount++;
         if (repetition(self)) return drawScore(self);
-        if (depth == 0) return qSearch(self, alpha);
+        if (depth == 0) return qSearch(self, alpha); // TODO: we can put horizon stuff here
         if (self->nodeCount >= self->target.nodeCount || PyErr_CheckSignals() == -1)
                 longjmp(self->abortTarget, 1); // Raise abort
 
@@ -290,34 +290,31 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType, int lastMove
                  || (node.slot.isLowerBound && node.slot.score > alpha))
                         return node.slot.score;
 
-        // Null move pruning or reduction (aka verification)
+        // Futility pruning (aka static null move)
         int inCheck = isInCheck(board(self));
+        if (depth == 1 && minEval <= alpha && alpha < maxEval && !inCheck) {
+                int eval = evaluate(board(self));
+                if (eval - board(self)->futilityMargin > alpha)
+                        return ttWrite(self, node.slot, depth, alpha+1, alpha, alpha+1);
+        }
+
+        // Null move pruning or reduction (aka verification)
         if (depth >= 2 && minEval <= alpha && alpha < maxEval
          && lastMove != 0000 && !inCheck && allowNullMove(board(self))) {
                 makeNullMove(board(self));
                 int reduction = min((depth + 1) / 2, 3); // R = 1..3
-                int score = -scout(self,  depth - reduction - 1, -(alpha+1), nodeType+1, 0000);
+                int score = -scout(self,  depth - reduction - 1, -(alpha+1), pvDistance+1, 0000);
                 undoMove(board(self));
-                if (score > alpha && depth >= 5 && isOdd(nodeType)) // Verification
+                if (score > alpha && depth >= 5 && isOdd(pvDistance)) // Verification
                         #define reduceIfEven(d) ((((d) + 1) & ~1) - 1) // Chop off the last reply
-                        return scout(self, reduceIfEven(depth - reduction), alpha, nodeType, 0000);
+                        return scout(self, reduceIfEven(depth - reduction), alpha, pvDistance, 0000);
                 if (score > alpha) // Pruning
                         return ttWrite(self, node.slot, depth, min(score, maxEval), alpha, alpha+1);
         }
 
-#define TRACE 0
-#if !TRACE
-        // Futility pruning (aka static null move)
-        if (depth == 1 && minEval <= alpha && alpha < maxEval && !inCheck) {
-                int eval = evaluate(board(self));
-                if (eval > alpha + board(self)->futilityMargin)
-                        return ttWrite(self, node.slot, depth, alpha+1, alpha, alpha+1);
-        }
-#endif
-
         // Internal iterative deepening
-        if (depth >= 3 && isCutNode(nodeType) && !node.slot.move) {
-                scout(self, depth - 2, alpha, nodeType, lastMove);
+        if (depth >= 3 && isCutNode(pvDistance) && !node.slot.move) {
+                scout(self, depth - 2, alpha, pvDistance, lastMove);
                 node.slot = ttRead(self);
         }
 
@@ -328,9 +325,9 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType, int lastMove
                 int newDepth = max(0, depth - 1 + extension);
                 int reduction = (depth >= 4) && (j >= 1) && (move < 0);
                 int reducedDepth = max(0, newDepth - reduction);
-                int score = -scout(self, reducedDepth, -(alpha+1), nodeType+1, move);
+                int score = -scout(self, reducedDepth, -(alpha+1), pvDistance+1, move);
                 if (score > alpha && reducedDepth < newDepth)
-                        score = -scout(self, newDepth, -(alpha+1), nodeType+1, move);
+                        score = -scout(self, newDepth, -(alpha+1), pvDistance+1, move);
                 undoMove(board(self));
                 bestScore = max(bestScore, score);
                 if (score > alpha) { // Fail high
@@ -342,16 +339,6 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType, int lastMove
                         break;
                 }
         }
-
-#if TRACE
-        if (depth == 1 && -3500 <= alpha && alpha < 3500 && !inCheck && bestScore != minInt) {
-                int eval = evaluate(board(self));
-                char fen[maxFenSize];
-                boardToFen(board(self), fen);
-                int margin = board(self)->futilityMargin;
-                printf("trace %d %d %d %s\n", eval, bestScore, margin, fen);
-        }
-#endif
 
         if (bestScore == minInt) // No legal moves
                 bestScore = gameOverScore(self, inCheck);

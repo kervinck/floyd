@@ -18,10 +18,10 @@ Floyd 0.9 dev status:
  125 8064 Floyd xc9494dd4 Second run of extended tuning
  120 8030 Floyd xdedb91e0 Simplistic futility
  140 8195 Floyd xbfe5344c Simple dynamic futility pruning
-          Floyd x037c4310 Manual tuning of futiliy margin
+ 150 8242 Floyd x0c9ee9d5 Manual tuning of futility margin
 
 Tentative release notes for v0.9:
-- Gained approximately 125 elo at fast time controls
+- Gained approximately 150 elo at fast time controls
 - Better handling of zugzwang positions
 - Fixed illegal moves deep in PV (reported by Dirk-Jan D.)
 - Full solution for the "0readyok" problem: also don't split info lines
@@ -37,73 +37,108 @@ Under the hood:
 - Simplified UCI move printing
 
 Rank Name              Elo    +    - games score oppo. draws
-   1 Fruit 2.1         339    2    2 228000   80%    85   11%
-   2 Floyd xbfe5344c   140    4    4 24000   47%   169   19%
-   3 Floyd xc9494dd4   126    4    4 24000   46%   169   19%
-   4 Floyd x8dae39c2   122    4    4 24000   45%   169   19%
-   5 Floyd xdedb91e0   120    4    4 24000   45%   169   19%
-   6 Floyd x51f810f6   111    4    4 24000   44%   169   19%
-   7 Floyd xa882bde3   110    4    4 24000   44%   169   19%
-   8 Floyd x6302ff3a   109    4    4 24000   44%   169   19%
-   9 Floyd x8399a075   109    4    4 24000   44%   169   19%
-  10 Floyd x3c65e794   106    4    4 24000   43%   169   19%
-  11 Floyd x4318fa13   106    4    4 24000   43%   169   19%
-  12 Floyd xa416cb63   104    4    4 24000   43%   169   19%
-  13 Floyd x1f1cd580   104    4    4 24000   43%   169   19%
-  14 Floyd x354d5f3a    97    4    4 24000   42%   169   19%
-  15 Floyd xc6c5dae2    91    4    4 24000   42%   169   19%
-  16 Floyd x7c96b2ca    87    4    4 24000   41%   169   20%
-  17 Floyd x0e0dc088    67    4    4 24000   39%   169   19%
-  18 Floyd x800ecb47    60    4    4 24000   38%   169   19%
-  19 Floyd 0.8           0    1    1 228000   36%   103   24%
-  20 Floyd 0.7        -147    4    4 36000   38%    -4   13%
-  21 Floyd 0.6        -352    6    6 12000   24%  -147   18%
-                 Fr Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl
-Fruit 2.1          100100100100100100100100100100100100100100100100100100100100
-Floyd xbfe5344c   0    99 99 99100100100100100100100100100100100100100100100100
-Floyd xc9494dd4   0  0    87 97 99 99 99 99 99 99 99 99100100100100100100100100
-Floyd x8dae39c2   0  0 12    81 99 99 99 99 99 99 99 99100100100100100100100100
-Floyd xdedb91e0   0  0  2 18    99 99 99 99 99 99 99 99 99100100100100100100100
-Floyd x51f810f6   0  0  0  0  0    68 76 79 95 96 98 99 99 99 99100100100100100
-Floyd xa882bde3   0  0  0  0  0 31    59 63 87 90 96 97 99 99 99100100100100100
-Floyd x6302ff3a   0  0  0  0  0 23 40    54 82 86 93 95 99 99 99100100100100100
-Floyd x8399a075   0  0  0  0  0 20 36 45    79 84 92 93 99 99 99100100100100100
-Floyd x3c65e794   0  0  0  0  0  4 12 17 20    56 71 76 99 99 99100100100100100
-Floyd x4318fa13   0  0  0  0  0  3  9 13 15 43    66 70 99 99 99100100100100100
-Floyd xa416cb63   0  0  0  0  0  1  3  6  7 28 33    55 99 99 99100100100100100
-Floyd x1f1cd580   0  0  0  0  0  0  2  4  6 23 29 44    98 99 99100100100100100
-Floyd x354d5f3a   0  0  0  0  0  0  0  0  0  0  0  0  1    98 99100100100100100
-Floyd xc6c5dae2   0  0  0  0  0  0  0  0  0  0  0  0  0  1    90 99100100100100
-Floyd x7c96b2ca   0  0  0  0  0  0  0  0  0  0  0  0  0  0  9    99100100100100
-Floyd x0e0dc088   0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0    98100100100
-Floyd x800ecb47   0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1   100100100
-Floyd 0.8         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0   100100
-Floyd 0.7         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0   100
-Floyd 0.6         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+   1 Fruit 2.1         339    1    1 240000   79%    89   11%
+   2 Floyd x0c9ee9d5   150    4    4 24000   48%   170   18%
+   3 Floyd xbfe5344c   140    4    4 24000   47%   170   19%
+   4 Floyd xc9494dd4   126    4    4 24000   46%   170   19%
+   5 Floyd x8dae39c2   123    4    4 24000   45%   170   19%
+   6 Floyd xdedb91e0   120    4    4 24000   45%   170   19%
+   7 Floyd x51f810f6   111    4    4 24000   44%   170   19%
+   8 Floyd xa882bde3   110    4    4 24000   44%   170   19%
+   9 Floyd x6302ff3a   109    4    4 24000   44%   170   19%
+  10 Floyd x8399a075   109    4    4 24000   44%   170   19%
+  11 Floyd x3c65e794   106    4    4 24000   43%   170   19%
+  12 Floyd x4318fa13   106    4    4 24000   43%   170   19%
+  13 Floyd xa416cb63   105    4    4 24000   43%   170   19%
+  14 Floyd x1f1cd580   104    4    4 24000   43%   170   19%
+  15 Floyd x354d5f3a    98    4    4 24000   42%   170   19%
+  16 Floyd xc6c5dae2    91    4    4 24000   42%   170   19%
+  17 Floyd x7c96b2ca    87    4    4 24000   41%   170   20%
+  18 Floyd x0e0dc088    67    4    4 24000   39%   170   19%
+  19 Floyd x800ecb47    61    4    4 24000   38%   170   19%
+  20 Floyd 0.8           0    1    1 240000   36%   106   24%
+  21 Floyd 0.7        -147    4    4 36000   38%    -4   13%
+  22 Floyd 0.6        -352    6    6 12000   24%  -147   18%
+                 Fr Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl
+Fruit 2.1          100100100100100100100100100100100100100100100100100100100100100
+Floyd x0c9ee9d5   0    99 99100100100100100100100100100100100100100100100100100100
+Floyd xbfe5344c   0  0    99 99 99100100100100100100100100100100100100100100100100
+Floyd xc9494dd4   0  0  0    87 97 99 99 99 99 99 99 99 99100100100100100100100100
+Floyd x8dae39c2   0  0  0 12    81 99 99 99 99 99 99 99 99100100100100100100100100
+Floyd xdedb91e0   0  0  0  2 18    99 99 99 99 99 99 99 99 99100100100100100100100
+Floyd x51f810f6   0  0  0  0  0  0    68 76 79 95 96 98 99 99 99 99100100100100100
+Floyd xa882bde3   0  0  0  0  0  0 31    59 63 87 90 96 97 99 99 99100100100100100
+Floyd x6302ff3a   0  0  0  0  0  0 23 40    54 82 86 93 95 99 99 99100100100100100
+Floyd x8399a075   0  0  0  0  0  0 20 36 45    79 84 92 93 99 99 99100100100100100
+Floyd x3c65e794   0  0  0  0  0  0  4 12 17 20    56 71 76 99 99 99100100100100100
+Floyd x4318fa13   0  0  0  0  0  0  3  9 13 15 43    66 70 99 99 99100100100100100
+Floyd xa416cb63   0  0  0  0  0  0  1  3  6  7 28 33    55 99 99 99100100100100100
+Floyd x1f1cd580   0  0  0  0  0  0  0  2  4  6 23 29 44    98 99 99100100100100100
+Floyd x354d5f3a   0  0  0  0  0  0  0  0  0  0  0  0  0  1    98 99100100100100100
+Floyd xc6c5dae2   0  0  0  0  0  0  0  0  0  0  0  0  0  0  1    90 99100100100100
+Floyd x7c96b2ca   0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  9    99100100100100
+Floyd x0e0dc088   0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0    98100100100
+Floyd x800ecb47   0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1   100100100
+Floyd 0.8         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0   100100
+Floyd 0.7         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0   100
+Floyd 0.6         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+
+|Todo| Spurious draw offer under icsdrone [ics]
+
+Floyd (2372) vs. Sillycon (2387) --- Mon Aug  8, 09:34 ??? 2016
+Rated standard match, initial time: 15 minutes, increment: 0 seconds.
+
+Floyd(C)(2372)[35] kibitzes: 5. g1f3 (book), score 1
+fics%
+Floyd(C)(2372)[35] kibitzes: 6. e4f6 (book), score 1
+fics%
+Floyd(C)(2372)[35] kibitzes: 7. f3e5 (book), score 1
+fics%
+Floyd(C)(2372)[35] kibitzes: 8. e5f3 (book), score 1
+fics%
+Floyd(C)(2372)[35] kibitzes: 9. f3e5 (book), score 1
+fics%
+Floyd(C)(2372)[35] kibitzes: 10. e5f3 (book), score 1
+fics%
+Floyd(C)(2372)[35] kibitzes: 11. h2h3 (book), score 1
+fics%
+Game 35: Floyd offers a draw.
+
+Floyd (2372) vs. Sillycon (2387) --- Mon Aug  8, 09:34 ??? 2016
+Rated standard match, initial time: 15 minutes, increment: 0 seconds.
+
+Move  Floyd                   Sillycon
+----  ---------------------   ---------------------
+  1.  e4      (0:00.000)      c6      (0:00.000)
+  2.  d4      (0:00.100)      d5      (0:00.100)
+  3.  Nc3     (0:00.100)      dxe4    (0:00.100)
+  4.  Nxe4    (0:00.100)      Nd7     (0:00.100)
+  5.  Nf3     (0:00.100)      Ngf6    (0:00.100)
+  6.  Nxf6+   (0:00.100)      Nxf6    (0:00.100)
+  7.  Ne5     (0:00.100)      Nd7     (0:00.100)
+  8.  Nf3     (0:00.100)      Nf6     (0:00.100)
+  9.  Ne5     (0:00.100)      Nd7     (0:00.100)
+ 10.  Nf3     (0:00.100)      Nf6     (0:00.100)
+ 11.  h3      (0:00.100)
+
+Mon Aug  8 09:34:33 2016:DEBUG:icsdrone->ics: kibitz 11. h2h3 (book), score 1\012
+Mon Aug  8 09:34:33 2016:DEBUG:icsdrone->ics: h2h3\012
+Mon Aug  8 09:34:33 2016:DEBUG:icsdrone->engine: usermove h2h3\012
+Mon Aug  8 09:34:33 2016:DEBUG:ics->icsdrone: \012\015
+Mon Aug  8 09:34:33 2016:DEBUG:engine->icsdrone: 1/2-1/2 {Draw by repetition}\012
+Mon Aug  8 09:34:33 2016:DEBUG:icsdrone->ics: draw\012
+
+It comes out of polyglot
 
 ------------------------------------------------------------------------
         Search
 ------------------------------------------------------------------------
 
-|Ongoing| Simple futility-1 [search]
+|Todo| Futility at depth 1 for bad positions [search]
 
-Tune manually:
+|Todo| Futility at depth 2 for bad positions [search]
 
-        2*v[tempo] - 7*hangScore : 1500;
-Score of Floyd x037c4310 vs Floyd xbfe5344c: 1030 - 938 - 1032  [0.515] 3000
-ELO difference: 11
-Finished match
-Winning fraction: 0.515333
-Elo difference: +10.658
-p-value: 0.980953
-
-Consider finer model:
-
-- Tempo
-- Threats
-- Passers
-- King attacks
-- Node type parity
+Basically preselecting for standing pat at depth 1
 
 |Todo| Depth promotion of qsearch entries [search,ttable]
 
@@ -112,7 +147,14 @@ Use "depth 0 fail highs with a move" also when probing with depth 1
 For example, do this by storing them as depth 1, so they also stay
 in the table a bit longer.
 
-|Todo| Simple futility-2 [search]
+return ttWrite(self, slot, (slot.move && bestScore > alpha) ? 1 : 0, bestScore, alpha, alpha+1)
+
+Score of Floyd xf463760a vs Floyd x0c9ee9d5: 69 - 80 - 96  [0.478] 245
+ELO difference: -16
+Finished match
+Winning fraction: 0.477551
+Elo difference: -15.6096
+p-value: 0.183753
 
 |Todo| Razoring [search]
 
@@ -320,6 +362,14 @@ Finished match
 Winning fraction: 0.491
 Elo difference: -6.25452
 p-value: 0.248759
+
+|Todo| Try a finer model for dynamic futility margin [search]
+
+- Tempo
+- Threats, 1 weight for each hangingPiece[0..2]
+- Passers
+- King attacks
+- Node type parity
 
 ------------------------------------------------------------------------
         Evaluate

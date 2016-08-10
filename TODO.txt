@@ -19,6 +19,7 @@ Floyd 0.9 dev status:
  120 8030 Floyd xdedb91e0 Simplistic futility
  140 8195 Floyd xbfe5344c Simple dynamic futility pruning
  150 8242 Floyd x0c9ee9d5 Manual tuning of futility margin
+ 144 8249 Floyd xaab4c50a QSearch slot promotion
 
 Tentative release notes for v0.9:
 - Gained approximately 150 elo at fast time controls
@@ -37,51 +38,53 @@ Under the hood:
 - Simplified UCI move printing
 
 Rank Name              Elo    +    - games score oppo. draws
-   1 Fruit 2.1         339    1    1 240000   79%    89   11%
+   1 Fruit 2.1         340    1    1 252000   79%    91   11%
    2 Floyd x0c9ee9d5   150    4    4 24000   48%   170   18%
-   3 Floyd xbfe5344c   140    4    4 24000   47%   170   19%
-   4 Floyd xc9494dd4   126    4    4 24000   46%   170   19%
-   5 Floyd x8dae39c2   123    4    4 24000   45%   170   19%
-   6 Floyd xdedb91e0   120    4    4 24000   45%   170   19%
-   7 Floyd x51f810f6   111    4    4 24000   44%   170   19%
-   8 Floyd xa882bde3   110    4    4 24000   44%   170   19%
-   9 Floyd x6302ff3a   109    4    4 24000   44%   170   19%
-  10 Floyd x8399a075   109    4    4 24000   44%   170   19%
-  11 Floyd x3c65e794   106    4    4 24000   43%   170   19%
-  12 Floyd x4318fa13   106    4    4 24000   43%   170   19%
-  13 Floyd xa416cb63   105    4    4 24000   43%   170   19%
-  14 Floyd x1f1cd580   104    4    4 24000   43%   170   19%
-  15 Floyd x354d5f3a    98    4    4 24000   42%   170   19%
-  16 Floyd xc6c5dae2    91    4    4 24000   42%   170   19%
-  17 Floyd x7c96b2ca    87    4    4 24000   41%   170   20%
-  18 Floyd x0e0dc088    67    4    4 24000   39%   170   19%
-  19 Floyd x800ecb47    61    4    4 24000   38%   170   19%
-  20 Floyd 0.8           0    1    1 240000   36%   106   24%
-  21 Floyd 0.7        -147    4    4 36000   38%    -4   13%
-  22 Floyd 0.6        -352    6    6 12000   24%  -147   18%
-                 Fr Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl
-Fruit 2.1          100100100100100100100100100100100100100100100100100100100100100
-Floyd x0c9ee9d5   0    99 99100100100100100100100100100100100100100100100100100100
-Floyd xbfe5344c   0  0    99 99 99100100100100100100100100100100100100100100100100
-Floyd xc9494dd4   0  0  0    87 97 99 99 99 99 99 99 99 99100100100100100100100100
-Floyd x8dae39c2   0  0  0 12    81 99 99 99 99 99 99 99 99100100100100100100100100
-Floyd xdedb91e0   0  0  0  2 18    99 99 99 99 99 99 99 99 99100100100100100100100
-Floyd x51f810f6   0  0  0  0  0  0    68 76 79 95 96 98 99 99 99 99100100100100100
-Floyd xa882bde3   0  0  0  0  0  0 31    59 63 87 90 96 97 99 99 99100100100100100
-Floyd x6302ff3a   0  0  0  0  0  0 23 40    54 82 86 93 95 99 99 99100100100100100
-Floyd x8399a075   0  0  0  0  0  0 20 36 45    79 84 92 93 99 99 99100100100100100
-Floyd x3c65e794   0  0  0  0  0  0  4 12 17 20    56 71 76 99 99 99100100100100100
-Floyd x4318fa13   0  0  0  0  0  0  3  9 13 15 43    66 70 99 99 99100100100100100
-Floyd xa416cb63   0  0  0  0  0  0  1  3  6  7 28 33    55 99 99 99100100100100100
-Floyd x1f1cd580   0  0  0  0  0  0  0  2  4  6 23 29 44    98 99 99100100100100100
-Floyd x354d5f3a   0  0  0  0  0  0  0  0  0  0  0  0  0  1    98 99100100100100100
-Floyd xc6c5dae2   0  0  0  0  0  0  0  0  0  0  0  0  0  0  1    90 99100100100100
-Floyd x7c96b2ca   0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  9    99100100100100
-Floyd x0e0dc088   0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0    98100100100
-Floyd x800ecb47   0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1   100100100
-Floyd 0.8         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0   100100
-Floyd 0.7         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0   100
-Floyd 0.6         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+   3 Floyd xaab4c50a   144    4    4 24000   48%   170   18%
+   4 Floyd xbfe5344c   140    4    4 24000   47%   170   19%
+   5 Floyd xc9494dd4   126    4    4 24000   46%   170   19%
+   6 Floyd x8dae39c2   123    4    4 24000   45%   170   19%
+   7 Floyd xdedb91e0   120    4    4 24000   45%   170   19%
+   8 Floyd x51f810f6   111    4    4 24000   44%   170   19%
+   9 Floyd xa882bde3   110    4    4 24000   44%   170   19%
+  10 Floyd x6302ff3a   109    4    4 24000   44%   170   19%
+  11 Floyd x8399a075   109    4    4 24000   44%   170   19%
+  12 Floyd x3c65e794   106    4    4 24000   43%   170   19%
+  13 Floyd x4318fa13   106    4    4 24000   43%   170   19%
+  14 Floyd xa416cb63   105    4    4 24000   43%   170   19%
+  15 Floyd x1f1cd580   104    4    4 24000   43%   170   19%
+  16 Floyd x354d5f3a    98    4    4 24000   42%   170   19%
+  17 Floyd xc6c5dae2    91    4    4 24000   42%   170   19%
+  18 Floyd x7c96b2ca    87    4    4 24000   41%   170   20%
+  19 Floyd x0e0dc088    67    4    4 24000   39%   170   19%
+  20 Floyd x800ecb47    61    4    4 24000   38%   170   19%
+  21 Floyd 0.8           0    1    1 252000   35%   108   24%
+  22 Floyd 0.7        -147    4    4 36000   38%    -4   13%
+  23 Floyd 0.6        -352    6    6 12000   24%  -147   18%
+                 Fr Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl
+Fruit 2.1          100100100100100100100100100100100100100100100100100100100100100100
+Floyd x0c9ee9d5   0    97 99 99100100100100100100100100100100100100100100100100100100
+Floyd xaab4c50a   0  2    89 99 99 99100100100100100100100100100100100100100100100100
+Floyd xbfe5344c   0  0 10    99 99 99100100100100100100100100100100100100100100100100
+Floyd xc9494dd4   0  0  0  0    87 97 99 99 99 99 99 99 99 99100100100100100100100100
+Floyd x8dae39c2   0  0  0  0 12    81 99 99 99 99 99 99 99 99100100100100100100100100
+Floyd xdedb91e0   0  0  0  0  2 18    99 99 99 99 99 99 99 99 99100100100100100100100
+Floyd x51f810f6   0  0  0  0  0  0  0    68 76 79 95 96 98 99 99 99 99100100100100100
+Floyd xa882bde3   0  0  0  0  0  0  0 31    59 63 87 90 96 97 99 99 99100100100100100
+Floyd x6302ff3a   0  0  0  0  0  0  0 23 40    54 82 86 93 95 99 99 99100100100100100
+Floyd x8399a075   0  0  0  0  0  0  0 20 36 45    79 84 92 93 99 99 99100100100100100
+Floyd x3c65e794   0  0  0  0  0  0  0  4 12 17 20    56 71 76 99 99 99100100100100100
+Floyd x4318fa13   0  0  0  0  0  0  0  3  9 13 15 43    66 70 99 99 99100100100100100
+Floyd xa416cb63   0  0  0  0  0  0  0  1  3  6  7 28 33    55 99 99 99100100100100100
+Floyd x1f1cd580   0  0  0  0  0  0  0  0  2  4  6 23 29 44    98 99 99100100100100100
+Floyd x354d5f3a   0  0  0  0  0  0  0  0  0  0  0  0  0  0  1    98 99100100100100100
+Floyd xc6c5dae2   0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1    90 99100100100100
+Floyd x7c96b2ca   0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  9    99100100100100
+Floyd x0e0dc088   0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0    98100100100
+Floyd x800ecb47   0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1   100100100
+Floyd 0.8         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0   100100
+Floyd 0.7         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0   100
+Floyd 0.6         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
 
 |Todo| Spurious draw offer under icsdrone [ics]
 
@@ -139,22 +142,6 @@ It comes out of polyglot
 |Todo| Futility at depth 2 for bad positions [search]
 
 Basically preselecting for standing pat at depth 1
-
-|Todo| Depth promotion of qsearch entries [search,ttable]
-
-Use "depth 0 fail highs with a move" also when probing with depth 1
-
-For example, do this by storing them as depth 1, so they also stay
-in the table a bit longer.
-
-return ttWrite(self, slot, (slot.move && bestScore > alpha) ? 1 : 0, bestScore, alpha, alpha+1)
-
-Score of Floyd xf463760a vs Floyd x0c9ee9d5: 69 - 80 - 96  [0.478] 245
-ELO difference: -16
-Finished match
-Winning fraction: 0.477551
-Elo difference: -15.6096
-p-value: 0.183753
 
 |Todo| Razoring [search]
 
@@ -370,6 +357,66 @@ p-value: 0.248759
 - Passers
 - King attacks
 - Node type parity
+
+|Todo| Depth promotion of qsearch entries [search,ttable]
+
+Revisit this failed idea:
+
+Use "depth 0 fail highs with a move" also when probing with depth 1
+
+For example, do this by storing them as depth 1, so they also stay
+in the table a bit longer.
+
+return ttWrite(self, slot, !inCheck && (slot.move && bestScore > alpha) ? 1 : 0, bestScore, alpha, alpha+1)
+
+Score of Floyd xf463760a vs Floyd x0c9ee9d5: 69 - 80 - 96  [0.478] 245
+ELO difference: -16
+Finished match
+Winning fraction: 0.477551
+Elo difference: -15.6096
+p-value: 0.183753
+
+passed 8192 total 20000 (ref: 8242)
+
+So this is 10-20 elo weaker. Why? Overwriting of more valuable entries?
+
+Try the other way: only bump up the depth when reading
+
+Floyd Chess Engine - Version xaab4c50a
+passed 8249 total 20000 (good!)
+
+But:
+
+Score of Floyd xaab4c50a vs Floyd x0c9ee9d5: 128 - 158 - 133  [0.464] 419
+ELO difference: -25
+Finished match
+Winning fraction: 0.4642
+Elo difference: -24.9187
+p-value: 0.0380368
+
+make wac look very good also:
+passed 275 total 300
+
+Conclusion: test longer
+
+--
+
+ 144 8249 Floyd xaab4c50a QSearch slot promotion
+
+Maybe slight regression comes from that
+
+Rank Name              Elo    +    - games score oppo. draws
+   2 Floyd x0c9ee9d5   150    4    4 24000   48%   170   18%
+   3 Floyd xaab4c50a   144    4    4 24000   48%   170   18% <-- not good enough
+
+                 Fr Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl
+Fruit 2.1          100100100100100100100100100100100100100100100100100100100100100100
+Floyd x0c9ee9d5   0    97 99 99100100100100100100100100100100100100100100100100100100
+Floyd xaab4c50a   0  2    89 99 99 99100100100100100100100100100100100100100100100100 <-- not good enough
+
+Nps before: 781676
+Nps after: 777086 (99.4%) --> Not sufficient to explain the difference
+
 
 ------------------------------------------------------------------------
         Evaluate

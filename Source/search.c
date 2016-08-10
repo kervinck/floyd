@@ -296,6 +296,8 @@ static int scout(Engine_t self, int depth, int alpha, int pvDistance, int lastMo
                 int eval = evaluate(board(self));
                 if (eval - board(self)->futilityMargin > alpha)
                         return ttWrite(self, node.slot, depth, alpha+1, alpha, alpha+1);
+                if (node.slot.move != 0000 && node.slot.isLowerBound && node.slot.score > alpha)
+                        return ttWrite(self, node.slot, depth, node.slot.score, alpha, alpha+1);
         }
 
         // Null move pruning or reduction (aka verification)

@@ -36,6 +36,7 @@ Under the hood:
 - Simple dynamic futility pruning
 - Minor evaluation weight tuning
 - Simplified UCI move printing
+- Solve spurious "Illegal move" in debug mode
 
 Rank Name              Elo    +    - games score oppo. draws
    1 Fruit 2.1         340    1    1 252000   79%    91   11%

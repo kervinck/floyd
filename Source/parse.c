@@ -252,9 +252,9 @@ extern int parseUciMove(Board_t self, const char *line, int xMoves[maxMoves], in
         for (int i=0; i<xlen; i++) {
                 int xMove = xMoves[i];
                 if ((xMove & ~specialMoveFlag) == rawMove && isLegalMove(self, xMove))
-                        return *move = xMove, ix;
+                        return (*move = xMove), ix;
         }
-        return *move = -1, ix;
+        return (*move = -1), ix;
 }
 
 /*----------------------------------------------------------------------+

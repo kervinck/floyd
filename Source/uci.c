@@ -207,15 +207,14 @@ void uciMain(Engine_t self)
                                 line += n;
                         }
 
-                        if (scan("moves")) {
+                        if (scan("moves"))
                                 for (int n=1; n>0; line+=n) {
                                         int moves[maxMoves], move;
                                         int nrMoves = generateMoves(board(self), moves);
                                         n = parseUciMove(board(self), line, moves, nrMoves, &move);
-                                        if (n > 0) makeMove(board(self), move);
-                                        else if (debug) printf("info string Illegal move\n");
+                                        if (n > 0 && move > 0) makeMove(board(self), move);
+                                        else if (debug && n > 0) printf("info string Illegal move\n");
                                 }
-                        }
 
                         if (debug) { // dump FEN and board
                                 char fen[maxFenSize];
@@ -263,8 +262,8 @@ void uciMain(Engine_t self)
                                                 int moves[maxMoves], move;
                                                 int nrMoves = generateMoves(board(self), moves);
                                                 n = parseUciMove(board(self), line, moves, nrMoves, &move);
-                                                if (n > 0) pushList(self->searchMoves, move);
-                                                else if (debug) printf("info string Illegal move\n");
+                                                if (n > 0 && move > 0) pushList(self->searchMoves, move);
+                                                else if (debug && n > 0) printf("info string Illegal move\n");
                                         }
                                 else skipOneToken("Option");
 

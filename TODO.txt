@@ -86,56 +86,21 @@ Floyd 0.8         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0   1
 Floyd 0.7         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0   100
 Floyd 0.6         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
 
-|Todo| Spurious draw offer under icsdrone [ics]
-
-Floyd (2372) vs. Sillycon (2387) --- Mon Aug  8, 09:34 ??? 2016
-Rated standard match, initial time: 15 minutes, increment: 0 seconds.
-
-Floyd(C)(2372)[35] kibitzes: 5. g1f3 (book), score 1
-fics%
-Floyd(C)(2372)[35] kibitzes: 6. e4f6 (book), score 1
-fics%
-Floyd(C)(2372)[35] kibitzes: 7. f3e5 (book), score 1
-fics%
-Floyd(C)(2372)[35] kibitzes: 8. e5f3 (book), score 1
-fics%
-Floyd(C)(2372)[35] kibitzes: 9. f3e5 (book), score 1
-fics%
-Floyd(C)(2372)[35] kibitzes: 10. e5f3 (book), score 1
-fics%
-Floyd(C)(2372)[35] kibitzes: 11. h2h3 (book), score 1
-fics%
-Game 35: Floyd offers a draw.
-
-Floyd (2372) vs. Sillycon (2387) --- Mon Aug  8, 09:34 ??? 2016
-Rated standard match, initial time: 15 minutes, increment: 0 seconds.
-
-Move  Floyd                   Sillycon
-----  ---------------------   ---------------------
-  1.  e4      (0:00.000)      c6      (0:00.000)
-  2.  d4      (0:00.100)      d5      (0:00.100)
-  3.  Nc3     (0:00.100)      dxe4    (0:00.100)
-  4.  Nxe4    (0:00.100)      Nd7     (0:00.100)
-  5.  Nf3     (0:00.100)      Ngf6    (0:00.100)
-  6.  Nxf6+   (0:00.100)      Nxf6    (0:00.100)
-  7.  Ne5     (0:00.100)      Nd7     (0:00.100)
-  8.  Nf3     (0:00.100)      Nf6     (0:00.100)
-  9.  Ne5     (0:00.100)      Nd7     (0:00.100)
- 10.  Nf3     (0:00.100)      Nf6     (0:00.100)
- 11.  h3      (0:00.100)
-
-Mon Aug  8 09:34:33 2016:DEBUG:icsdrone->ics: kibitz 11. h2h3 (book), score 1\012
-Mon Aug  8 09:34:33 2016:DEBUG:icsdrone->ics: h2h3\012
-Mon Aug  8 09:34:33 2016:DEBUG:icsdrone->engine: usermove h2h3\012
-Mon Aug  8 09:34:33 2016:DEBUG:ics->icsdrone: \012\015
-Mon Aug  8 09:34:33 2016:DEBUG:engine->icsdrone: 1/2-1/2 {Draw by repetition}\012
-Mon Aug  8 09:34:33 2016:DEBUG:icsdrone->ics: draw\012
-
-It comes out of polyglot
-
 ------------------------------------------------------------------------
         Search
 ------------------------------------------------------------------------
+
+|Ongoing| Investigae elo difference between x0c9ee9d5 and xb0fbc619 [qa]
+
+Rank Name                Elo    +    - games score oppo. draws
+   1 Fruit 2.1           340    1    1 268661   79%    95   12%
+   2 Floyd x0c9ee9d5-1   152    7    7  9321   49%   170   19% <-- repeat run
+   3 Floyd x0c9ee9d5     150    4    4 24000   48%   170   18% <-- reference
+   4 Floyd xaab4c50a     144    4    4 24000   48%   170   18%
+   5 Floyd xb0fbc619     144    4    4 24000   48%   170   18% <-- why lower?
+
+Todo: repeat run of xb0fbc619
+These versions should perform the same.
 
 |Todo| Futility at depth 1 for bad positions [search]
 
@@ -144,6 +109,13 @@ It comes out of polyglot
 Basically preselecting for standing pat at depth 1
 
 |Todo| Razoring [search]
+
+if depth == 3 and nullMove FL but "eval > alpha":
+        if search(2) > alpha // drop last move, reduceIfOdd
+                return
+
+Or use from last ply:
+        if depth=2 FH, then use as depth=3 result :-)
 
 |Todo| Evaluation cache [search]
 
@@ -417,6 +389,7 @@ Floyd xaab4c50a   0  2    89 99 99 991001001001001001001001001001001001001001001
 Nps before: 781676
 Nps after: 777086 (99.4%) --> Not sufficient to explain the difference
 
+|Todo| Sort all captures before non-captures [search]
 
 ------------------------------------------------------------------------
         Evaluate
@@ -581,13 +554,6 @@ http://talkchess.com/forum/viewtopic.php?p=665703#665703
 
 Floyd is slow, but we should aim to keep it above 1Mnps
 
-|Todo| Another minor parsing hickup [bug]
-
-debug on
-position fen 2rq1rk1/1b2ppbp/1p3np1/pN1p4/2PPn3/BQ2PN1P/P3BPP1/2R2RK1 w - - 5 15 moves f3e5 e4d2 b3c2 d2f1 g1f1
-info sting input position fen 2rq1rk1/1b2ppbp/1p3np1/pN1p4/2PPn3/BQ2PN1P/P3BPP1/2R2RK1 w - - 5 15 moves f3e5 e4d2 b3c2 d2f1 g1f1
-info string Illegal move
-
 |Todo| Win64 version from Makefile [win64]
 
 Joost: Intel C compiler versie 15
@@ -712,6 +678,11 @@ Candidates (best first):
 At least in debugging mode.
 
 |Todo| Easy move, hard move [playing]
+
+Keep track of PV stability
+Eg. number of moves unchanged per length
+
+Keep track of singularity in first iterations
 
 |Todo| Cleanup header files [qa]
 

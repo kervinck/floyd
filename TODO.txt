@@ -94,14 +94,20 @@ Floyd 0.6         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0 
 |Ongoing| Investigae elo difference between x0c9ee9d5 and xb0fbc619 [qa]
 
 Rank Name                Elo    +    - games score oppo. draws
-   1 Fruit 2.1           340    1    1 268661   79%    95   12%
-   2 Floyd x0c9ee9d5-1   152    7    7  9321   49%   170   19% <-- repeat run
-   3 Floyd x0c9ee9d5     150    4    4 24000   48%   170   18% <-- reference
+   1 Fruit 2.1           340    1    1 270401   79%    95   12%  <-- repeat run OK
+   2 Floyd x0c9ee9d5-1   151    6    6 12798   49%   170   19%  <-- reference
+   3 Floyd x0c9ee9d5     150    4    4 24000   48%   170   18%
    4 Floyd xaab4c50a     144    4    4 24000   48%   170   18%
    5 Floyd xb0fbc619     144    4    4 24000   48%   170   18% <-- why lower?
 
-Todo: repeat run of xb0fbc619
 These versions should perform the same.
+
+make search gives the difference:
+passed 8211 total 20000 (x0c9ee9d5)
+passed 8242 total 20000 (xb0fbc619)
+
+--> Swap the order in scout() back and test again
+Todo: repeat run of xb0fbc619, or the new version
 
 |Todo| Futility at depth 1 for bad positions [search]
 

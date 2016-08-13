@@ -290,17 +290,8 @@ static int scout(Engine_t self, int depth, int alpha, int pvDistance, int lastMo
                  || (node.slot.isLowerBound && node.slot.score > alpha))
                         return node.slot.score;
 
-        // Futility pruning (aka static null move)
-        int inCheck = isInCheck(board(self));
-        if (depth == 1 && minEval <= alpha && alpha < maxEval && !inCheck) {
-                int eval = evaluate(board(self));
-                if (eval - board(self)->futilityMargin > alpha)
-                        return ttWrite(self, node.slot, depth, alpha+1, alpha, alpha+1);
-                if (node.slot.move != 0000 && node.slot.isLowerBound && node.slot.score > alpha)
-                        return ttWrite(self, node.slot, depth, node.slot.score, alpha, alpha+1);
-        }
-
         // Null move pruning or reduction (aka verification)
+        int inCheck = isInCheck(board(self));
         if (depth >= 2 && minEval <= alpha && alpha < maxEval
          && lastMove != 0000 && !inCheck && allowNullMove(board(self))) {
                 makeNullMove(board(self));
@@ -312,6 +303,13 @@ static int scout(Engine_t self, int depth, int alpha, int pvDistance, int lastMo
                         return scout(self, reduceIfEven(depth - reduction), alpha, pvDistance, 0000);
                 if (score > alpha) // Pruning
                         return ttWrite(self, node.slot, depth, min(score, maxEval), alpha, alpha+1);
+        }
+
+        // Futility pruning (aka static null move)
+        if (depth == 1 && inRange(alpha, minEval, maxEval-1) && !inCheck) {
+                int eval = evaluate(board(self));
+                if (eval - board(self)->futilityMargin > alpha)
+                        return ttWrite(self, node.slot, depth, alpha+1, alpha, alpha+1);
         }
 
         // Internal iterative deepening

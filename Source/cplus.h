@@ -53,6 +53,7 @@
 #define equalSign(a, b) (((a) ^ (b)) >= 0)
 #define isOdd(n) ((n) & 1)
 #define isEven(n) ((~n) & 1)
+#define inRange(x, lo, hi) ((lo) <= (x) && (x) <= (hi))
 
 #define unused(a) ((void)(a))
 

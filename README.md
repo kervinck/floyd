@@ -41,10 +41,10 @@ and tuning the search.
 It should be easy to speed it up by a factor of 2 to 3. The move
 generator design uses a simple mailbox approach because that has
 advantages for trying out new evaluation features. It is just a
-cleaned-up version of MSPC's move generator. Not much is optimized
+cleaned-up version of MSCP's move generator. Not much is optimized
 here, for example, there are no piece lists and capture generation
 is done by generating all moves and then filtering out the non-captures.
-There is no check evading generator and no method to generate
+There is no check evasion generator and no method to generate
 checking moves efficiently.
 
 There is also no multiprocessing yet, except in the tuner and other

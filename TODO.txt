@@ -13,7 +13,7 @@ Floyd 0.9 dev status:
  108 7904 Floyd xa882bde3 Null move verification 1
  104      Floyd x3c65e794 Only odd nodes
  102      Floyd x1f1cd580 Delta pruning tuning
- 108      Floyd x6302ff3a  Hanging pieces with basic tuning
+ 108      Floyd x6302ff3a Hanging pieces with basic tuning
  122 8045 Floyd x8dae39c2 Extended tuning and material table
  125 8064 Floyd xc9494dd4 Second run of extended tuning
  120 8030 Floyd xdedb91e0 Simplistic futility
@@ -36,7 +36,7 @@ Under the hood:
 - Simple dynamic futility pruning
 - Minor evaluation weight tuning
 - Simplified UCI move printing
-- Solve spurious "Illegal move" in debug mode
+- Eliminate spurious "Illegal move" in debug mode
 
 Rank Name              Elo    +    - games score oppo. draws
    1 Fruit 2.1         340    1    1 252000   79%    91   11%
@@ -109,6 +109,18 @@ passed 8242 total 20000 (xb0fbc619)
 --> Swap the order in scout() back and test again
 Todo: repeat run of xb0fbc619, or the new version
 
+Speed (fingerprint):
+result nps 753157 (x0c9ee9d5)
+result nps 737016 (xb0fbc619)
+2% difference. That could be sufficient..
+(Material table was 6% and gave 14 elo. We're looking for ~6 elo)
+
+Test version
+xd1e0b3a5
+elo
+fingerprint
+make search
+
 |Todo| Futility at depth 1 for bad positions [search]
 
 |Todo| Futility at depth 2 for bad positions [search]
@@ -148,7 +160,10 @@ qSearchWithCheck() # No TT?
 
 |Todo| Strong moves in PV qsearch [search]
 
-Simplest is to keep all moves and let recursion+evaluation cull the bad ones.
+Good moves: those that improve eval more than the tempo loss
+aka PV tip extensions
+Simplest is to keep all moves and let recursion+evaluation cull the bad ones?
+This can work. But bad captures should still be pruned
 
 |Todo| Checks after null move [search]
 
@@ -402,13 +417,21 @@ Nps after: 777086 (99.4%) --> Not sufficient to explain the difference
         Evaluate
 ------------------------------------------------------------------------
 
-|Ongoing| Hanging piece evaluation [evaluate]
+|Todo| Hanging piece evaluation [evaluate]
 
-- SEE or guard heuristic for each attacked piece
-- Sort descending
-- Give #1, #2 (and perhaps #3) a weight
+- SEE for each attacked piece
+- Implement as lookup table [256][256] or [128][256]
 - Weights depend on side to move: total 6 parameters to tune
 - Rethink mobility as well
+
+|Todo| 4-piece eg heuristics [evaluate]
+
+        if (nrEffectivePieces == 4) {
+                if (nrMinors(side) > 0 && nrMinors(xside) > 0)
+                        return 0; // K+minor vs K+minor
+                if (nrKnights(side) == 2 || nrKnights(xside) == 2)
+                        return 0; // KNN vs K
+        }
 
 |Todo| Rook or Queen and/vs pawn span [evaluate]
 
@@ -473,9 +496,7 @@ Mobility = what can I actually move to a square, safely
 
 |Todo| Attacking a non-mobile pawn
 |Todo| Attacks on backward/weak pawns
-
 |Todo| Attack x piece matrix [evaluate]
-
 |Todo| Threats [evaluate]
 
 Threat: weaker attacks stronger piece or undefended piece
@@ -516,16 +537,17 @@ Ref: http://www.top-5000.nl/authors/rebel/chess840.htm
 "The only rule that applies in this ending: if the black king is
 in front of the white pawn the game is a draw"
 
+Recognize when either king is in split from the pawn
+
 |Todo| Pawn storm
 
 |Todo| Bring back the symmetry to reduce parameters
 |Todo| Simplify bishop tables again
 
 |Todo| Add white/black testing [qa,evaluate]
-
 |Todo| Add left/right testing [qa,evaluate]
 
-|Todo| Train specific exchange compensations
+|Todo| Train specific exchange compensations [evaluate,eg]
 
 R vs B
 R vs B+P
@@ -687,9 +709,13 @@ At least in debugging mode.
 |Todo| Easy move, hard move [playing]
 
 Keep track of PV stability
-Eg. number of moves unchanged per length
 
-Keep track of singularity in first iterations
+Idea 1: Keep track of singularity only in first iterations or nodes
+Idea 2: Maintain number of moves unchanged per length in rootSearch
+Idea 3: If second move is not disjoint, it is not an easy move.
+Disjoint means different from and to squares (maybe also include
+intermediate squares in this definition): moves that can be made in
+arbitrary order.
 
 |Todo| Cleanup header files [qa]
 

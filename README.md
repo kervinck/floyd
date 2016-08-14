@@ -1,16 +1,16 @@
-Floyd study engine
+Floyd chess engine
 ==================
 
-*Floyd* is a simple, bare-bones, chess engine study by Marcel van
-Kervinck.  It is designed for Windows, Linux and OSX and distributed
-under the permissive, "2-clause" or "simplified", open source BSD
-license.
+**Floyd** is a simple, bare-bones, chess engine by Marcel van
+Kervinck for study purposes. It is designed for Windows, Linux and
+OSX and distributed under the permissive, "2-clause" or "simplified",
+open source BSD license.
 
 Floyd is not a stand-alone chess application. It can be loaded as
 an engine in chess GUIs such as Winboard, Arena, XBoard, Shredder
 and others. For this Floyd provides a fully compliant UCI interface.
-In addition there is also a Python module extension interface for
-programming. Just type ``import floyd`` in Python.  Floyd is written
+In addition there is a Python module extension interface for
+programming. Just type ``import floyd`` in Python. Floyd is written
 in plain standard C which should be easy to port to other languages
 if so desired.
 
@@ -22,33 +22,36 @@ Project
 =======
 
 The Floyd project is primarily intended as a platform for
-experimentation.  This means that emphasis is on ease of change,
+experimentation. This means that emphasis is on ease of change,
 clarity, soundness and preferably a very low code count. There are
 now only about 4,000 lines of real code. Raw search speed is of a
-lesser importance.  Still most, if not all, modern evaluation and
+lesser importance. Still most, if not all, modern evaluation and
 search techniques are present in their basic form and therefore
-Floyd can play very strong chess. The project's target, for v1.0,
-is to reach 2900 elo at the CCRL 40/40 list, or at least somewhere
-in the top-50. Versions 0.x are intermediate stepping stones towards
-that.
+Floyd can play very strong chess. The project's target is to reach
+2900 elo at the CCRL 40/40 list, or somewhere in the top-50.
+Versions 0.x are intermediate stepping stones towards that.
 
-Outlook after v1.0
-==================
+Outlook after "v1.0"
+====================
 
-After v1.0 it is not clear yet how Floyd will continue as a project.
-Additional elo can easily come from making the code faster and
-search tuning.
+After "v1.0" it is not clear yet how Floyd will continue as a
+project. Additional elo can easily come from making the code faster
+and tuning the search.
 
-It should be easy to speed it up by a factor of 3. The move generator
-design uses a simple mailbox approach because that has advantages
-for trying out new evaluation features. Not much is optimized here,
-for example, there are no piece lists and capture generation is
-done by generating all moves and then filtering out the non-captures.
+It should be easy to speed it up by a factor of 2 to 3. The move
+generator design uses a simple mailbox approach because that has
+advantages for trying out new evaluation features. It is just a
+cleaned-up version of MSPC's move generator. Not much is optimized
+here, for example, there are no piece lists and capture generation
+is done by generating all moves and then filtering out the non-captures.
+There is no check evading generator and no method to generate
+checking moves efficiently.
 
-Also there is no multiprocessing yet. One of the objectives of Floyd
-is to use it to explore probability density search (PDS) instead
-of traditional SMP search. For that a single-threaded engine is
-sufficient. Lazy SMP might be added after v1.0.
+There is also no multiprocessing yet, except in the tuner and other
+support tools. One of the objectives of Floyd is to use it to explore
+probability density search (PDS) instead of traditional SMP search.
+For that a single-threaded engine is sufficient. Lazy SMP might
+still be added after v1.0. YBW-type is probably a bridge too far.
 
 Make targets
 ============
@@ -91,7 +94,7 @@ help                       # Show summary of make targets
 
 Python interface (v0.x)
 =======================
-Note: This interface is planned to change with v1.0 to a class interface!
+Note: This is planned to change into a proper class interface for v1.0!
 ```
 >>> import floyd
 >>> help(floyd)
@@ -102,13 +105,13 @@ NAME
 FUNCTIONS
     evaluate(...)
         evaluate(fen) -> score
-    
+
     search(...)
         search(fen, depth=120, movetime=0.0, info=None) -> score, move
         Valid options for `info' are:
                None    : No info
                'uci'   : Write UCI info lines to stdout
-    
+
     setCoefficient(...)
         setCoefficient(coef, newValue) -> oldValue, name
 ```
@@ -116,7 +119,7 @@ FUNCTIONS
 Command interface (UCI)
 =======================
 ```
-Floyd Chess Engine - Version 0.x
+Floyd Chess Engine - Version 0.9
 Copyright (C) 2015-2016, Marcel van Kervinck
 All rights reserved
 

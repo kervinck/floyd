@@ -161,7 +161,6 @@ static inline int drawScore(Engine_t self)
  |      pvSearch                                                        |
  +----------------------------------------------------------------------*/
 
-// TODO: killers
 // TODO: end game extension
 // TODO: singular extension
 static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
@@ -267,9 +266,6 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
  |      scout                                                           |
  +----------------------------------------------------------------------*/
 
-#define isCutNode(pvDistance) (( pvDistance) & 1)
-#define isAllNode(pvDistance) ((~pvDistance) & 1)
-
 static int scout(Engine_t self, int depth, int alpha, int pvDistance, int lastMove)
 {
         self->nodeCount++;
@@ -292,7 +288,7 @@ static int scout(Engine_t self, int depth, int alpha, int pvDistance, int lastMo
 
         // Null move pruning or reduction (aka verification)
         int inCheck = isInCheck(board(self));
-        if (depth >= 2 && minEval <= alpha && alpha < maxEval
+        if (depth >= 2 && inRange(alpha, minEval, maxEval-1)
          && lastMove != 0000 && !inCheck && allowNullMove(board(self))) {
                 makeNullMove(board(self));
                 int reduction = min((depth + 1) / 2, 3); // R = 1..3
@@ -313,6 +309,7 @@ static int scout(Engine_t self, int depth, int alpha, int pvDistance, int lastMo
         }
 
         // Internal iterative deepening
+        #define isCutNode(pvDistance) isOdd(pvDistance)
         if (depth >= 3 && isCutNode(pvDistance) && !node.slot.move) {
                 scout(self, depth - 2, alpha, pvDistance, lastMove);
                 node.slot = ttRead(self);
@@ -562,7 +559,7 @@ static void killersToFront(Engine_t self, int ply, int moveList[], int nrMoves)
         while (self->killers.len <= ply) // Expand table when needed
                 pushList(self->killers, (killersTuple) {.v={0}});
 
-        int j = 0; // Find insertion place: after any (very) good captures
+        int j = 0; // Find insertion place: after the good captures
         while (j < nrMoves && moveScore(moveList[j]) >= 0) j++;
 
         for (int i=nrKillers-1; i>=0; i--) // Bring killers forward, one by one in reverse order

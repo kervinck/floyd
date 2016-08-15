@@ -69,11 +69,12 @@ floyd                      # Compile as native UCI engine
 pgo                        # Compile with profile-guided optimization
 win                        # Cross-compile as Win32 UCI engine
 easy wac krk5 tt eg ece3   # Run 1 second position tests
-hard draw nodraw bk        # Run 10 second position tests
+hard draw nodraw bk zz     # Run 10 second position tests
 mate mated qmate           # Run 100 second position tests
 nolot                      # Run 1000 second position tests
 sts                        # Run the Strategic Test Suite
 nodes                      # Run node count regression test
+bench                      # Speed benchmark with increased repeatability
 residual                   # Calculate residual of evaluation function
 tune                       # Run one standard iteration of the evaluation tuner
 ptune                      # One standard iteration only for the parameters listed in `params'
@@ -87,6 +88,7 @@ sysinstall                 # Install Python module for all system users ('sudo m
 clean                      # Remove compilation intermediates and results
 todo                       # Show all open to-do items
 fingerprint                # Make fingerprint for regression testing
+search                     # Run search test (20,000 positions at 1 second)
 shootout                   # Shootout against last version, 1000 games 10+0.15
 log                        # Show simplified git log
 help                       # Show summary of make targets

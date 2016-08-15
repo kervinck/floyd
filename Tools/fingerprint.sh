@@ -84,5 +84,5 @@ python Tools/epdtest.py -n 1 10 < Data/zz.epd
 echo
 
 echo "*** Speed:"
-echo 'bench movetime 3000 bestof 3' | ./floyd-pgo2
+echo 'bench movetime 1500 bestof 5' | ./floyd-pgo2
 echo

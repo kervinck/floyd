@@ -113,9 +113,10 @@ nodes: .module
 	/ nodes / { n[$$5] += $$10; n[-1] += !$$5 }\
 	END       { for (d=0; n[d]; d++) print d, n[d], n[d] / n[d-1] }'
 
+# Speed benchmark with increased repeatability
 bench: floyd-pgo2 floyd
-	for N in 1 2 3; do echo bench | ./floyd-pgo2 | grep result; done
-	echo bench | ./floyd | grep result # for comparison
+	for N in 1 2 3; do echo bench movetime 333 bestof 9 | ./floyd-pgo2 | grep result; done
+	echo bench movetime 333 bestof 9 | ./floyd | grep result # Without PGO (for comparison)
 
 # Calculate residual of evaluation function
 residual: .module

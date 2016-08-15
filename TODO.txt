@@ -103,8 +103,8 @@ Rank Name                Elo    +    - games score oppo. draws
 These versions should perform the same.
 
 make search gives the difference:
-passed 8211 total 20000 (x0c9ee9d5)
-passed 8242 total 20000 (xb0fbc619)
+passed 8211 total 20000 (xb0fbc619)
+passed 8242 total 20000 (x0c9ee9d5)
 
 --> Swap the order in scout() back and test again
 Todo: repeat run of xb0fbc619, or the new version
@@ -119,7 +119,49 @@ Test version
 xd1e0b3a5
 elo
 fingerprint
+result nps 738183
+
 make search
+passed 8213 total 20000 NOK
+Repeat
+passed 8193 total 20000 NOK
+
+while true; do echo bench bestof 10 | ./floyd-pgo2 | grep result; done
+result nps 804374
+result nps 802387
+result nps 806831
+result nps 805318
+result nps 802247
+result nps 803789
+result nps 798920
+result nps 797032
+result nps 806452
+result nps 810335
+result nps 801364
+result nps 805963
+
+while true; do echo bench bestof 10 | ./floyd-pgo2 | grep result; done
+result nps 806308
+result nps 801695
+result nps 800509
+--> OK, same range
+
+Rank Name                Elo    +    - games score oppo. draws
+   1 Fruit 2.1           341    1    1 294401   78%   100   12%
+   2 Floyd x0c9ee9d5-1   151    6    6 12798   49%   171   19%
+   3 Floyd x0c9ee9d5     150    4    4 24000   48%   171   18%
+   4 Floyd xb0fbc619-1   149    4    4 24000   48%   171   19% <-- Hmm
+   5 Floyd xd1e0b3a5     148    4    4 24000   48%   171   19% <-- OK
+   6 Floyd xaab4c50a     145    4    4 24000   48%   171   18%
+   7 Floyd xb0fbc619     144    4    4 24000   48%   171   18% <-- NOK
+                   Fr Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl
+Fruit 2.1            100100100100100100100100100100100100100100100100100100100100100100100100100100
+Floyd x0c9ee9d5-1   0    58 75 83 96 97 99 99 99100100100100100100100100100100100100100100100100100
+Floyd x0c9ee9d5     0 41    71 81 97 98 99 99100100100100100100100100100100100100100100100100100100
+Floyd xb0fbc619-1   0 24 28    62 90 93 99 99100100100100100100100100100100100100100100100100100100 <-- Hmm
+Floyd xd1e0b3a5     0 16 18 37    84 87 98 99 99100100100100100100100100100100100100100100100100100 <-- OK
+Floyd xaab4c50a     0  3  2  9 15    56 89 99 99 99100100100100100100100100100100100100100100100100
+Floyd xb0fbc619     0  2  1  6 12 43    86 99 99 99100100100100100100100100100100100100100100100100 <-- NOK
 
 |Todo| Futility at depth 1 for bad positions [search]
 

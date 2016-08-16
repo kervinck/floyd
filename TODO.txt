@@ -83,14 +83,6 @@ Floyd xbfe5344c     0  0  0  0  0  1 10 13    99 99 9910010010010010010010010010
         Search
 ------------------------------------------------------------------------
 
-|Ongoing| Basic futilty pruning [search]
-Just look at good captures vs rest (not at the capture value)
-
-|Todo| Do futility filtering before makeMove [search]
-Need 'isCheckMove' function however
-
-|Ongoing| Futility at depth 1 for bad positions [search]
-
 |Todo| Futility at depth 2 for bad positions [search]
 
         else if (depth == 2 && inRange(alpha, minEval, maxEval-1) && !inCheck) {
@@ -125,6 +117,21 @@ Basically preselecting for standing pat at depth 1
 if depth == 3 and nullMove FL but "eval > alpha":
         if search(2) > alpha // drop last move, reduceIfOdd
                 return
+
+|Todo| Do futility filtering before makeMove [speed]
+
+Need 'isCheckMove' function however
+isCheckMove()
+{
+        1. New piece gives check on to-square
+        2. Piece discovers check
+                If it is attacked by the right type of slider, and
+                in the right direction, and
+                without path to king being blocked, and
+                and the move is away from that attacking line
+}
++12% nps expected
+
 
 |Todo| Evaluation cache [search]
 

@@ -19,7 +19,8 @@ Floyd 0.9 dev status:
  120 8030 Floyd xdedb91e0 Simplistic futility
  140 8195 Floyd xbfe5344c Simple dynamic futility pruning
  150 8242 Floyd x0c9ee9d5 Manual tuning of futility margin
- 144 8249 Floyd xaab4c50a QSearch slot promotion
+ 144 8249 Floyd xaab4c50a Qsearch slot promotion
+     8395 Floyd x2457e7c3 Basic futility pruning
 
 Tentative release notes for v0.9:
 - Gained approximately 150 elo at fast time controls
@@ -33,150 +34,97 @@ Under the hood:
 - Improved null move pruning/reductions (aka verification)
 - Added delta pruning
 - Hanging piece evaluation
-- Simple dynamic futility pruning
-- Minor evaluation weight tuning
+- Basic futility pruning, razoring and stand pat pruning
+- Some minor evaluation weight tuning
 - Simplified UCI move printing
 - Eliminate spurious "Illegal move" in debug mode
 
-Rank Name              Elo    +    - games score oppo. draws
-   1 Fruit 2.1         340    1    1 252000   79%    91   11%
-   2 Floyd x0c9ee9d5   150    4    4 24000   48%   170   18%
-   3 Floyd xaab4c50a   144    4    4 24000   48%   170   18%
-   4 Floyd xbfe5344c   140    4    4 24000   47%   170   19%
-   5 Floyd xc9494dd4   126    4    4 24000   46%   170   19%
-   6 Floyd x8dae39c2   123    4    4 24000   45%   170   19%
-   7 Floyd xdedb91e0   120    4    4 24000   45%   170   19%
-   8 Floyd x51f810f6   111    4    4 24000   44%   170   19%
-   9 Floyd xa882bde3   110    4    4 24000   44%   170   19%
-  10 Floyd x6302ff3a   109    4    4 24000   44%   170   19%
-  11 Floyd x8399a075   109    4    4 24000   44%   170   19%
-  12 Floyd x3c65e794   106    4    4 24000   43%   170   19%
-  13 Floyd x4318fa13   106    4    4 24000   43%   170   19%
-  14 Floyd xa416cb63   105    4    4 24000   43%   170   19%
-  15 Floyd x1f1cd580   104    4    4 24000   43%   170   19%
-  16 Floyd x354d5f3a    98    4    4 24000   42%   170   19%
-  17 Floyd xc6c5dae2    91    4    4 24000   42%   170   19%
-  18 Floyd x7c96b2ca    87    4    4 24000   41%   170   20%
-  19 Floyd x0e0dc088    67    4    4 24000   39%   170   19%
-  20 Floyd x800ecb47    61    4    4 24000   38%   170   19%
-  21 Floyd 0.8           0    1    1 252000   35%   108   24%
-  22 Floyd 0.7        -147    4    4 36000   38%    -4   13%
-  23 Floyd 0.6        -352    6    6 12000   24%  -147   18%
-                 Fr Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl
-Fruit 2.1          100100100100100100100100100100100100100100100100100100100100100100
-Floyd x0c9ee9d5   0    97 99 99100100100100100100100100100100100100100100100100100100
-Floyd xaab4c50a   0  2    89 99 99 99100100100100100100100100100100100100100100100100
-Floyd xbfe5344c   0  0 10    99 99 99100100100100100100100100100100100100100100100100
-Floyd xc9494dd4   0  0  0  0    87 97 99 99 99 99 99 99 99 99100100100100100100100100
-Floyd x8dae39c2   0  0  0  0 12    81 99 99 99 99 99 99 99 99100100100100100100100100
-Floyd xdedb91e0   0  0  0  0  2 18    99 99 99 99 99 99 99 99 99100100100100100100100
-Floyd x51f810f6   0  0  0  0  0  0  0    68 76 79 95 96 98 99 99 99 99100100100100100
-Floyd xa882bde3   0  0  0  0  0  0  0 31    59 63 87 90 96 97 99 99 99100100100100100
-Floyd x6302ff3a   0  0  0  0  0  0  0 23 40    54 82 86 93 95 99 99 99100100100100100
-Floyd x8399a075   0  0  0  0  0  0  0 20 36 45    79 84 92 93 99 99 99100100100100100
-Floyd x3c65e794   0  0  0  0  0  0  0  4 12 17 20    56 71 76 99 99 99100100100100100
-Floyd x4318fa13   0  0  0  0  0  0  0  3  9 13 15 43    66 70 99 99 99100100100100100
-Floyd xa416cb63   0  0  0  0  0  0  0  1  3  6  7 28 33    55 99 99 99100100100100100
-Floyd x1f1cd580   0  0  0  0  0  0  0  0  2  4  6 23 29 44    98 99 99100100100100100
-Floyd x354d5f3a   0  0  0  0  0  0  0  0  0  0  0  0  0  0  1    98 99100100100100100
-Floyd xc6c5dae2   0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1    90 99100100100100
-Floyd x7c96b2ca   0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  9    99100100100100
-Floyd x0e0dc088   0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0    98100100100
-Floyd x800ecb47   0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1   100100100
-Floyd 0.8         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0   100100
-Floyd 0.7         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0   100
-Floyd 0.6         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+Rank Name                Elo    +    - games score oppo. draws
+   1 Fruit 2.1           342    1    1 304815   78%   102   12%
+   2 Floyd x0c9ee9d5-1   151    6    6 12798   49%   171   19%
+   3 Floyd x0c9ee9d5     151    4    4 24000   48%   171   18%
+   4 Floyd xb3eba936     149    4    4 20827   48%   171   19% <-- last ok
+   5 Floyd xb0fbc619-1   149    4    4 24000   48%   171   19%
+   6 Floyd xd1e0b3a5     148    4    4 24000   48%   171   19%
+   7 Floyd xaab4c50a     145    4    4 24000   48%   171   18%
+   8 Floyd xb0fbc619     144    4    4 24000   48%   171   18%
+   9 Floyd xbfe5344c     141    4    4 24000   47%   171   19%
+  10 Floyd xc9494dd4     127    4    4 24000   46%   171   19%
+  11 Floyd x8dae39c2     123    4    4 24000   45%   171   19%
+  12 Floyd xdedb91e0     121    4    4 24000   45%   171   19%
+  13 Floyd x51f810f6     112    4    4 24000   44%   171   19%
+  14 Floyd xa882bde3     111    4    4 24000   44%   171   19%
+  15 Floyd x6302ff3a     110    4    4 24000   44%   171   19%
+  16 Floyd x8399a075     110    4    4 24000   44%   171   19%
+  17 Floyd x3c65e794     107    4    4 24000   43%   171   19%
+  18 Floyd x4318fa13     107    4    4 24000   43%   171   19%
+  19 Floyd xa416cb63     105    4    4 24000   43%   171   19%
+  20 Floyd x1f1cd580     105    4    4 24000   43%   171   19%
+  21 Floyd x354d5f3a      98    4    4 24000   42%   171   19%
+  22 Floyd xc6c5dae2      92    4    4 24000   42%   171   19%
+  23 Floyd x7c96b2ca      88    4    4 24000   41%   171   20%
+  24 Floyd x0e0dc088      68    4    4 24000   39%   171   19%
+  25 Floyd x800ecb47      61    4    4 24000   38%   171   19%
+  26 Floyd 0.8             0    1    1 304810   34%   115   24%
+  27 Floyd 0.7          -147    4    4 36000   38%    -3   13%
+  28 Floyd 0.6          -351    6    6 12000   24%  -147   18%
+                   Fr Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl
+Fruit 2.1            100100100100100100100100100100100100100100100100100100100100100100100100100100100
+Floyd x0c9ee9d5-1   0    58 71 75 83 96 97 99 99 99100100100100100100100100100100100100100100100100100
+Floyd x0c9ee9d5     0 41    66 71 81 97 98 99 99100100100100100100100100100100100100100100100100100100
+Floyd xb3eba936     0 28 33    55 66 92 94 99 99100100100100100100100100100100100100100100100100100100
+Floyd xb0fbc619-1   0 24 28 44    62 90 93 99 99100100100100100100100100100100100100100100100100100100
+Floyd xd1e0b3a5     0 16 18 33 37    84 87 98 99 99100100100100100100100100100100100100100100100100100
+Floyd xaab4c50a     0  3  2  7  9 15    56 89 99 99 99100100100100100100100100100100100100100100100100
+Floyd xb0fbc619     0  2  1  5  6 12 43    86 99 99 99100100100100100100100100100100100100100100100100
+Floyd xbfe5344c     0  0  0  0  0  1 10 13    99 99 99100100100100100100100100100100100100100100100100
 
 ------------------------------------------------------------------------
         Search
 ------------------------------------------------------------------------
 
-|Ongoing| Investigae elo difference between x0c9ee9d5 and xb0fbc619 [qa]
+|Ongoing| Basic futilty pruning [search]
+Just look at good captures vs rest (not at the capture value)
 
-Rank Name                Elo    +    - games score oppo. draws
-   1 Fruit 2.1           340    1    1 270401   79%    95   12%  <-- repeat run OK
-   2 Floyd x0c9ee9d5-1   151    6    6 12798   49%   170   19%  <-- reference
-   3 Floyd x0c9ee9d5     150    4    4 24000   48%   170   18%
-   4 Floyd xaab4c50a     144    4    4 24000   48%   170   18%
-   5 Floyd xb0fbc619     144    4    4 24000   48%   170   18% <-- why lower?
+|Todo| Do futility filtering before makeMove [search]
+Need 'isCheckMove' function however
 
-These versions should perform the same.
-
-make search gives the difference:
-passed 8211 total 20000 (xb0fbc619)
-passed 8242 total 20000 (x0c9ee9d5)
-
---> Swap the order in scout() back and test again
-Todo: repeat run of xb0fbc619, or the new version
-
-Speed (fingerprint):
-result nps 753157 (x0c9ee9d5)
-result nps 737016 (xb0fbc619)
-2% difference. That could be sufficient..
-(Material table was 6% and gave 14 elo. We're looking for ~6 elo)
-
-Test version
-xd1e0b3a5
-elo
-fingerprint
-result nps 738183
-
-make search
-passed 8213 total 20000 NOK
-Repeat
-passed 8193 total 20000 NOK
-
-while true; do echo bench bestof 10 | ./floyd-pgo2 | grep result; done
-result nps 804374
-result nps 802387
-result nps 806831
-result nps 805318
-result nps 802247
-result nps 803789
-result nps 798920
-result nps 797032
-result nps 806452
-result nps 810335
-result nps 801364
-result nps 805963
-
-while true; do echo bench bestof 10 | ./floyd-pgo2 | grep result; done
-result nps 806308
-result nps 801695
-result nps 800509
---> OK, same range
-
-Rank Name                Elo    +    - games score oppo. draws
-   1 Fruit 2.1           341    1    1 294401   78%   100   12%
-   2 Floyd x0c9ee9d5-1   151    6    6 12798   49%   171   19%
-   3 Floyd x0c9ee9d5     150    4    4 24000   48%   171   18%
-   4 Floyd xb0fbc619-1   149    4    4 24000   48%   171   19% <-- Hmm
-   5 Floyd xd1e0b3a5     148    4    4 24000   48%   171   19% <-- OK
-   6 Floyd xaab4c50a     145    4    4 24000   48%   171   18%
-   7 Floyd xb0fbc619     144    4    4 24000   48%   171   18% <-- NOK
-                   Fr Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl
-Fruit 2.1            100100100100100100100100100100100100100100100100100100100100100100100100100100
-Floyd x0c9ee9d5-1   0    58 75 83 96 97 99 99 99100100100100100100100100100100100100100100100100100
-Floyd x0c9ee9d5     0 41    71 81 97 98 99 99100100100100100100100100100100100100100100100100100100
-Floyd xb0fbc619-1   0 24 28    62 90 93 99 99100100100100100100100100100100100100100100100100100100 <-- Hmm
-Floyd xd1e0b3a5     0 16 18 37    84 87 98 99 99100100100100100100100100100100100100100100100100100 <-- OK
-Floyd xaab4c50a     0  3  2  9 15    56 89 99 99 99100100100100100100100100100100100100100100100100
-Floyd xb0fbc619     0  2  1  6 12 43    86 99 99 99100100100100100100100100100100100100100100100100 <-- NOK
-
-|Todo| Futility at depth 1 for bad positions [search]
+|Ongoing| Futility at depth 1 for bad positions [search]
 
 |Todo| Futility at depth 2 for bad positions [search]
 
-Basically preselecting for standing pat at depth 1
-
-|Todo| Razoring [search]
-
-if depth == 3 and nullMove FL but "eval > alpha":
-        if search(2) > alpha // drop last move, reduceIfOdd
-                return
+        else if (depth == 2 && inRange(alpha, minEval, maxEval-1) && !inCheck) {
+                // Extended futility at pre-frontier nodes
+                int eval = evaluate(board(self));
+                if (eval + 4000 <= alpha)
+                        moveFilter = 0, bestScore = eval + 4000;
+                        // TODO: try reduce depth or just drop into qSearch
+                        // TODO: margins dependent on node type and board features
+        }
 
 Or use from last ply:
         if depth=2 FH, then use as depth=3 result :-)
+
+|Todo| Razoring [search]
+
+        else if (depth == 3 && inRange(alpha, minEval, maxEval-1) && !inCheck) {
+                // Razoring at pre-pre-frontier nodes
+                int eval = evaluate(board(self));
+                if (eval + 6000 <= alpha) {
+                        int score = scout(self, depth-2, alpha, pvDistance, 0000);
+                        node.slot = ttRead(self);
+                        if (score <= alpha)
+                                return ttWrite(self, node.slot, depth, score, alpha, alpha+1);
+                }
+        }
+
+Potential:
+passed 8395 total 20000 (new high)
+
+Basically preselecting for standing pat at depth 1
+if depth == 3 and nullMove FL but "eval > alpha":
+        if search(2) > alpha // drop last move, reduceIfOdd
+                return
 
 |Todo| Evaluation cache [search]
 
@@ -455,6 +403,8 @@ Nps after: 777086 (99.4%) --> Not sufficient to explain the difference
 
 |Todo| Sort all captures before non-captures [search]
 
+|Todo| Don't reduce safe checks
+
 ------------------------------------------------------------------------
         Evaluate
 ------------------------------------------------------------------------
@@ -617,6 +567,15 @@ http://talkchess.com/forum/viewtopic.php?p=665703#665703
 ------------------------------------------------------------------------
         Other
 ------------------------------------------------------------------------
+
+|Todo| searchmoves would give "Illegal move" if followed by other directive [uci]
+
+debug on
+  debug on
+go searchmoves e2e4 movetime 1000
+  info string input go searchmoves e2e4 movetime 1000
+  info string Illegal move
+  ...etc...
 
 |Todo| Replace 'double' with 'float' or even 'short' evaluate [speed]
 

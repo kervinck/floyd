@@ -301,11 +301,15 @@ static int scout(Engine_t self, int depth, int alpha, int pvDistance, int lastMo
                         return ttWrite(self, node.slot, depth, min(score, maxEval), alpha, alpha+1);
         }
 
-        // Futility pruning (aka static null move)
+        // Futility pruning at frontier nodes
+        int bestScore = minInt;
+        int moveFilter = minInt;
         if (depth == 1 && inRange(alpha, minEval, maxEval-1) && !inCheck) {
                 int eval = evaluate(board(self));
-                if (eval - board(self)->futilityMargin > alpha)
+                if (eval - board(self)->futilityMargin > alpha) // Reverse futility (aka static null move)
                         return ttWrite(self, node.slot, depth, alpha+1, alpha, alpha+1);
+                if (eval + 2000 <= alpha) // Classic futility
+                        moveFilter = 0, bestScore = eval + 2000;
         }
 
         // Internal iterative deepening
@@ -317,8 +321,11 @@ static int scout(Engine_t self, int depth, int alpha, int pvDistance, int lastMo
 
         // Recursively search all moves until exhausted or one fails high
         int extension = inCheck;
-        int bestScore = minInt;
         for (int move=makeFirstMove(self,&node), j=0; move; move=makeNextMove(self,&node), j++) {
+                if (move < moveFilter && !isInCheck(board(self))) {
+                        undoMove(board(self)); // Move is futile and unlikely to a fail high
+                        continue;
+                }
                 int newDepth = max(0, depth - 1 + extension);
                 int reduction = (depth >= 4) && (j >= 1) && (move < 0);
                 int reducedDepth = max(0, newDepth - reduction);

@@ -308,7 +308,7 @@ static int scout(Engine_t self, int depth, int alpha, int pvDistance, int lastMo
                 int eval = evaluate(board(self));
                 if (eval - board(self)->futilityMargin > alpha) // Reverse futility (aka static null move)
                         return ttWrite(self, node.slot, depth, alpha+1, alpha, alpha+1);
-                static const int margin[]  = { 2000, 1000 };
+                static const int margin[]  = { 2000, 1500 };
                 if (eval + margin[pvDistance&1] <= alpha) // Futility
                         moveFilter = 0, bestScore = eval + margin[pvDistance&1];
         }

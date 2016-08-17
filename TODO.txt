@@ -20,7 +20,13 @@ Floyd 0.9 dev status:
  140 8195 Floyd xbfe5344c Simple dynamic futility pruning
  150 8242 Floyd x0c9ee9d5 Manual tuning of futility margin
  144 8249 Floyd xaab4c50a Qsearch slot promotion
-     8395 Floyd x2457e7c3 Basic futility pruning
+ 180 8315 Floyd x17e8d8d4 Basic futility pruning
+     8373 Floyd xb1a327b4 Extended futility pruning
+     8395 Floyd x2457e7c3 Razoring
+
+marcelk@beobook3:~/Projects/floyd> ./floyd
+
+Floyd Chess Engine - Version
 
 Tentative release notes for v0.9:
 - Gained approximately 150 elo at fast time controls
@@ -33,11 +39,11 @@ Under the hood:
 - Improved move ordering for killers
 - Improved null move pruning/reductions (aka verification)
 - Added delta pruning
-- Hanging piece evaluation
-- Basic futility pruning, razoring and stand pat pruning
+- Added hanging piece evaluation
+- Added basic futility pruning, razoring and stand pat pruning
 - Some minor evaluation weight tuning
 - Simplified UCI move printing
-- Eliminate spurious "Illegal move" in debug mode
+- Eliminated spurious "Illegal move" in debug mode
 
 Rank Name                Elo    +    - games score oppo. draws
    1 Fruit 2.1           342    1    1 304815   78%   102   12%

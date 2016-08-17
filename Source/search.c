@@ -51,6 +51,13 @@ struct Node {
         int moveList[maxMoves];
 };
 
+// 6 bits signed        11 bits        3 bits     6 bits       6 bits
+// +------------+---------------------+-------+------------+------------+
+// |  SEE score |    history score    |  tag  |    from    |     to     |
+// +------------+---------------------+-------+------------+------------+
+//  31        26 25                 15 14   12 11         6 5          0
+//                                    `---------------------------------'
+//                                             moveMask (15 bits)
 #define moveMask ((int) ones(15))
 #define moveScore(longMove) ((longMove) >> 26) // Extract score from move list entry
 #define historyBits 11 // 15 for a move and 6 for SEE leaves 11 for history
@@ -311,6 +318,12 @@ static int scout(Engine_t self, int depth, int alpha, int pvDistance, int lastMo
                 static const int margin[]  = { 2000, 1500 };
                 if (eval + margin[pvDistance&1] <= alpha) // Futility
                         moveFilter = 0, bestScore = eval + margin[pvDistance&1];
+        }
+        else if (depth == 2 && inRange(alpha, minEval, maxEval-1) && !inCheck) {
+                // Extended futility at pre-frontier nodes
+                int eval = evaluate(board(self));
+                if (eval + 4000 <= alpha)
+                        moveFilter = 0, bestScore = eval + 4000;
         }
 
         // Internal iterative deepening

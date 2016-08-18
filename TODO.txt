@@ -113,25 +113,17 @@ Or use from last ply:
 Potential:
 passed 8395 total 20000 (new high)
 
-     8395 Floyd x2457e7c3 Razoring
+ x2457e7c3 Razoring
 passed 8328 total 20000
 
+ x707b9383
 passed 8390 total 20000
-
+passed 8322 total 20000
 
 Basically preselecting for standing pat at depth 1
 if depth == 3 and nullMove FL but "eval > alpha":
         if search(2) > alpha // drop last move, reduceIfOdd
                 return
-
-|Todo| searchmoves would give "Illegal move" if followed by other directive [uci]
-
-debug on
-  debug on
-go searchmoves e2e4 movetime 1000
-  info string input go searchmoves e2e4 movetime 1000
-  info string Illegal move
-  ...etc...
 
 ------------------------------------------------------------------------
         Search

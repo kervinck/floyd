@@ -213,7 +213,7 @@ void uciMain(Engine_t self)
                                         int nrMoves = generateMoves(board(self), moves);
                                         n = parseUciMove(board(self), line, moves, nrMoves, &move);
                                         if (n > 0 && move > 0) makeMove(board(self), move);
-                                        else if (debug && n > 0) printf("info string Illegal move\n");
+                                        else if (n > 0) { skipOneToken("Illegal move"); break; }
                                 }
 
                         if (debug) { // dump FEN and board
@@ -257,15 +257,16 @@ void uciMain(Engine_t self)
                                  || scanValue("movetime %ld", &movetime)
                                  || (scan("infinite") && (self->pondering = true))) // as ponder
                                         pass;
-                                else if (scan("searchmoves"))
-                                        for (int n=1; n>0; line+=n) {
-                                                int moves[maxMoves], move;
-                                                int nrMoves = generateMoves(board(self), moves);
+                                else if (scan("searchmoves")) {
+                                        int moves[maxMoves], move;
+                                        int nrMoves = generateMoves(board(self), moves);
+                                        int n = parseUciMove(board(self), line, moves, nrMoves, &move);
+                                        while (n > 0) {
+                                                if (move > 0) { pushList(self->searchMoves, move); line += n; }
+                                                else skipOneToken("Illegal move");
                                                 n = parseUciMove(board(self), line, moves, nrMoves, &move);
-                                                if (n > 0 && move > 0) pushList(self->searchMoves, move);
-                                                else if (debug && n > 0) printf("info string Illegal move\n");
                                         }
-                                else skipOneToken("Option");
+                                } else skipOneToken("Option");
 
                         if (sideToMove(board(self)) == black)
                                 time = btime, inc = binc;

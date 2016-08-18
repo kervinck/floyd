@@ -325,6 +325,16 @@ static int scout(Engine_t self, int depth, int alpha, int pvDistance, int lastMo
                 if (eval + 4000 <= alpha)
                         moveFilter = 0, bestScore = eval + 4000;
         }
+        else if (depth == 3 && inRange(alpha, minEval, maxEval-1) && !inCheck) {
+                // Razoring at pre-pre-frontier nodes
+                int eval = evaluate(board(self));
+                if (eval + 6000 <= alpha) {
+                        int score = scout(self, depth-2, alpha, pvDistance, 0000);
+                        node.slot = ttRead(self);
+                        if (score <= alpha)
+                                return ttWrite(self, node.slot, depth, score, alpha, alpha+1);
+                }
+        }
 
         // Internal iterative deepening
         #define isCutNode(pvDistance) isOdd(pvDistance)

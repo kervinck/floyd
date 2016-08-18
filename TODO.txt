@@ -20,9 +20,9 @@ Floyd 0.9 dev status:
  140 8195 Floyd xbfe5344c Simple dynamic futility pruning
  150 8242 Floyd x0c9ee9d5 Manual tuning of futility margin
  144 8249 Floyd xaab4c50a Qsearch slot promotion
- 180 8315 Floyd x17e8d8d4 Basic futility pruning
-     8373 Floyd xb1a327b4 Extended futility pruning
-     8395 Floyd x2457e7c3 Razoring
+ 178 8315 Floyd x17e8d8d4 Basic futility pruning
+ 187 8373 Floyd xb1a327b4 Extended futility pruning
+     8390 Floyd x707b9383 Razoring
 
 marcelk@beobook3:~/Projects/floyd> ./floyd
 
@@ -86,19 +86,13 @@ Floyd xb0fbc619     0  2  1  5  6 12 43    86 99 99 9910010010010010010010010010
 Floyd xbfe5344c     0  0  0  0  0  1 10 13    99 99 99100100100100100100100100100100100100100100100100
 
 ------------------------------------------------------------------------
-        Search
+        Version 0.9
 ------------------------------------------------------------------------
 
-|Todo| Futility at depth 2 for bad positions [search]
+|Ongoing| Futility at depth 2 for bad positions [search]
 
-        else if (depth == 2 && inRange(alpha, minEval, maxEval-1) && !inCheck) {
-                // Extended futility at pre-frontier nodes
-                int eval = evaluate(board(self));
-                if (eval + 4000 <= alpha)
-                        moveFilter = 0, bestScore = eval + 4000;
-                        // TODO: try reduce depth or just drop into qSearch
-                        // TODO: margins dependent on node type and board features
-        }
+// TODO: try reduce depth or just drop into qSearch
+// TODO: margins dependent on node type and board features
 
 Or use from last ply:
         if depth=2 FH, then use as depth=3 result :-)
@@ -119,10 +113,29 @@ Or use from last ply:
 Potential:
 passed 8395 total 20000 (new high)
 
+     8395 Floyd x2457e7c3 Razoring
+passed 8328 total 20000
+
+passed 8390 total 20000
+
+
 Basically preselecting for standing pat at depth 1
 if depth == 3 and nullMove FL but "eval > alpha":
         if search(2) > alpha // drop last move, reduceIfOdd
                 return
+
+|Todo| searchmoves would give "Illegal move" if followed by other directive [uci]
+
+debug on
+  debug on
+go searchmoves e2e4 movetime 1000
+  info string input go searchmoves e2e4 movetime 1000
+  info string Illegal move
+  ...etc...
+
+------------------------------------------------------------------------
+        Search
+------------------------------------------------------------------------
 
 |Todo| Do futility filtering before makeMove [speed]
 
@@ -577,18 +590,12 @@ http://talkchess.com/forum/viewtopic.php?p=665703#665703
 
 |Todo| Rook doubling on open files [evaluate]
 
+|Todo| KBNK [eg,evaluate]
+|Todo| KP(a)KB of wrong color [eg,evaluate]
+
 ------------------------------------------------------------------------
         Other
 ------------------------------------------------------------------------
-
-|Todo| searchmoves would give "Illegal move" if followed by other directive [uci]
-
-debug on
-  debug on
-go searchmoves e2e4 movetime 1000
-  info string input go searchmoves e2e4 movetime 1000
-  info string Illegal move
-  ...etc...
 
 |Todo| Replace 'double' with 'float' or even 'short' evaluate [speed]
 

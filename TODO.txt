@@ -1,35 +1,11 @@
-Floyd 0.9 dev status:
- Elo Test Version         EloChange
--149 7041 Floyd 0.7       Older version
-   0 7522 Floyd 0.8       Reference
-  58 7751 Floyd x800ecb47 History counters
-  65 7785 Floyd x0e0dc088 Integrate older tuning
-  85 7807 Floyd x7c96b2ca Unconditional null move, i.s.o. evaluation
-  89 7875 Floyd xc6c5dae2 Simple delta pruning
-  95      Floyd x354d5f3a Delta pruning option 3 (pseudo fail-soft, aka xec39d0d0)
- 102 7900 Floyd xa416cb63 Slightly tighter bound (aka xaef137c2)
- 104      Floyd x8399a075 SEE>0 before killers; PV bug fix
- 104 7932 Floyd x4318fa13 Avoid double null move
- 108 7904 Floyd xa882bde3 Null move verification 1
- 104      Floyd x3c65e794 Only odd nodes
- 102      Floyd x1f1cd580 Delta pruning tuning
- 108      Floyd x6302ff3a Hanging pieces with basic tuning
- 122 8045 Floyd x8dae39c2 Extended tuning and material table
- 125 8064 Floyd xc9494dd4 Second run of extended tuning
- 120 8030 Floyd xdedb91e0 Simplistic futility
- 140 8195 Floyd xbfe5344c Simple dynamic futility pruning
- 150 8242 Floyd x0c9ee9d5 Manual tuning of futility margin
- 144 8249 Floyd xaab4c50a Qsearch slot promotion
- 178 8315 Floyd x17e8d8d4 Basic futility pruning
- 187 8373 Floyd xb1a327b4 Extended futility pruning
-     8390 Floyd x707b9383 Razoring
+Floyd is a simple, bare-bones, chess engine for study purposes. It
+is designed for Windows, Linux and OSX and distributed under the
+permissive, "2-clause" or "simplified", open source BSD license.
 
-marcelk@beobook3:~/Projects/floyd> ./floyd
+Version 0.9:
 
-Floyd Chess Engine - Version
-
-Tentative release notes for v0.9:
-- Gained approximately 150 elo at fast time controls
+Main changes:
+- Gained approximately 180 elo at fast time controls
 - Better handling of zugzwang positions
 - Fixed illegal moves deep in PV (reported by Dirk-Jan D.)
 - Full solution for the "0readyok" problem: also don't split info lines
@@ -44,46 +20,6 @@ Under the hood:
 - Some minor evaluation weight tuning
 - Simplified UCI move printing
 - Eliminated spurious "Illegal move" in debug mode
-
-Rank Name                Elo    +    - games score oppo. draws
-   1 Fruit 2.1           342    1    1 304815   78%   102   12%
-   2 Floyd x0c9ee9d5-1   151    6    6 12798   49%   171   19%
-   3 Floyd x0c9ee9d5     151    4    4 24000   48%   171   18%
-   4 Floyd xb3eba936     149    4    4 20827   48%   171   19% <-- last ok
-   5 Floyd xb0fbc619-1   149    4    4 24000   48%   171   19%
-   6 Floyd xd1e0b3a5     148    4    4 24000   48%   171   19%
-   7 Floyd xaab4c50a     145    4    4 24000   48%   171   18%
-   8 Floyd xb0fbc619     144    4    4 24000   48%   171   18%
-   9 Floyd xbfe5344c     141    4    4 24000   47%   171   19%
-  10 Floyd xc9494dd4     127    4    4 24000   46%   171   19%
-  11 Floyd x8dae39c2     123    4    4 24000   45%   171   19%
-  12 Floyd xdedb91e0     121    4    4 24000   45%   171   19%
-  13 Floyd x51f810f6     112    4    4 24000   44%   171   19%
-  14 Floyd xa882bde3     111    4    4 24000   44%   171   19%
-  15 Floyd x6302ff3a     110    4    4 24000   44%   171   19%
-  16 Floyd x8399a075     110    4    4 24000   44%   171   19%
-  17 Floyd x3c65e794     107    4    4 24000   43%   171   19%
-  18 Floyd x4318fa13     107    4    4 24000   43%   171   19%
-  19 Floyd xa416cb63     105    4    4 24000   43%   171   19%
-  20 Floyd x1f1cd580     105    4    4 24000   43%   171   19%
-  21 Floyd x354d5f3a      98    4    4 24000   42%   171   19%
-  22 Floyd xc6c5dae2      92    4    4 24000   42%   171   19%
-  23 Floyd x7c96b2ca      88    4    4 24000   41%   171   20%
-  24 Floyd x0e0dc088      68    4    4 24000   39%   171   19%
-  25 Floyd x800ecb47      61    4    4 24000   38%   171   19%
-  26 Floyd 0.8             0    1    1 304810   34%   115   24%
-  27 Floyd 0.7          -147    4    4 36000   38%    -3   13%
-  28 Floyd 0.6          -351    6    6 12000   24%  -147   18%
-                   Fr Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl
-Fruit 2.1            100100100100100100100100100100100100100100100100100100100100100100100100100100100
-Floyd x0c9ee9d5-1   0    58 71 75 83 96 97 99 99 99100100100100100100100100100100100100100100100100100
-Floyd x0c9ee9d5     0 41    66 71 81 97 98 99 99100100100100100100100100100100100100100100100100100100
-Floyd xb3eba936     0 28 33    55 66 92 94 99 99100100100100100100100100100100100100100100100100100100
-Floyd xb0fbc619-1   0 24 28 44    62 90 93 99 99100100100100100100100100100100100100100100100100100100
-Floyd xd1e0b3a5     0 16 18 33 37    84 87 98 99 99100100100100100100100100100100100100100100100100100
-Floyd xaab4c50a     0  3  2  7  9 15    56 89 99 99 99100100100100100100100100100100100100100100100100
-Floyd xb0fbc619     0  2  1  5  6 12 43    86 99 99 99100100100100100100100100100100100100100100100100
-Floyd xbfe5344c     0  0  0  0  0  1 10 13    99 99 99100100100100100100100100100100100100100100100100
 
 ------------------------------------------------------------------------
         Version 0.9

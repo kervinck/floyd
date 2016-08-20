@@ -191,7 +191,7 @@ void uciMain(Engine_t self)
                 }
                 else if (scan("isready")) {
                         updateOptions(self, &oldOptions, &newOptions);
-                        printf("\nreadyok\n");
+                        printf("readyok\n");
                 }
                 else if (scan("ucinewgame"))
                         pass;
@@ -207,15 +207,14 @@ void uciMain(Engine_t self)
                                 line += n;
                         }
 
-                        if (scan("moves")) {
+                        if (scan("moves"))
                                 for (int n=1; n>0; line+=n) {
                                         int moves[maxMoves], move;
                                         int nrMoves = generateMoves(board(self), moves);
                                         n = parseUciMove(board(self), line, moves, nrMoves, &move);
-                                        if (n > 0) makeMove(board(self), move);
-                                        else if (debug) printf("info string Illegal move\n");
+                                        if (n > 0 && move > 0) makeMove(board(self), move);
+                                        else if (n > 0) { skipOneToken("Illegal move"); break; }
                                 }
-                        }
 
                         if (debug) { // dump FEN and board
                                 char fen[maxFenSize];
@@ -258,15 +257,16 @@ void uciMain(Engine_t self)
                                  || scanValue("movetime %ld", &movetime)
                                  || (scan("infinite") && (self->pondering = true))) // as ponder
                                         pass;
-                                else if (scan("searchmoves"))
-                                        for (int n=1; n>0; line+=n) {
-                                                int moves[maxMoves], move;
-                                                int nrMoves = generateMoves(board(self), moves);
+                                else if (scan("searchmoves")) {
+                                        int moves[maxMoves], move;
+                                        int nrMoves = generateMoves(board(self), moves);
+                                        int n = parseUciMove(board(self), line, moves, nrMoves, &move);
+                                        while (n > 0) {
+                                                if (move > 0) { pushList(self->searchMoves, move); line += n; }
+                                                else skipOneToken("Illegal move");
                                                 n = parseUciMove(board(self), line, moves, nrMoves, &move);
-                                                if (n > 0) pushList(self->searchMoves, move);
-                                                else if (debug) printf("info string Illegal move\n");
                                         }
-                                else skipOneToken("Option");
+                                } else skipOneToken("Option");
 
                         if (sideToMove(board(self)) == black)
                                 time = btime, inc = binc;
@@ -343,42 +343,37 @@ static void updateOptions(Engine_t self,
 void uciSearchInfo(void *uciInfoData)
 {
         Engine_t self = uciInfoData;
+        charList infoLine = emptyList; // Construct the info line in a thread-safe manner
 
         long milliSeconds = round(self->seconds / ms);
-        printf("info time %ld", milliSeconds);
+        listPrintf(&infoLine, "info time %ld", milliSeconds);
 
         if (self->pv.len > 0 || self->depth == 0) {
-                char scoreString[16];
+                listPrintf(&infoLine, " depth %d score ", self->depth);
                 if (isMateScore(self->score))
-                        sprintf(scoreString, "mate %d",
+                        listPrintf(&infoLine, "mate %d",
                                 (self->score < 0) ? (minMate - self->score    ) / 2
                                                   : (maxMate - self->score + 1) / 2);
                 else
-                        sprintf(scoreString, "cp %.0f", round(self->score / 10.0));
-                printf(" depth %d score %s", self->depth, scoreString);
+                        listPrintf(&infoLine, "cp %.0f", round(self->score / 10.0));
         }
 
         double nps = (self->seconds > 0.0) ? self->nodeCount / self->seconds : 0.0;
-        printf(" nodes %lld nps %.0f", self->nodeCount, nps);
+        listPrintf(&infoLine, " nodes %lld nps %.0f", self->nodeCount, nps);
 
         double ttLoad = ttCalcLoad(self);
-        printf(" hashfull %d", (int) round(ttLoad * 1000.0));
+        listPrintf(&infoLine, " hashfull %d", (int) round(ttLoad * 1000.0));
 
         for (int i=0; i<self->pv.len; i++) {
                 char moveString[maxMoveSize];
-                int move = self->pv.v[i];
-                assert(move != 0);
-                moveToUci(board(self), moveString, move);
-                printf("%s %s", (i == 0) ? " pv" : "", moveString);
-                makeMove(board(self), move); // TODO: uci notation shouldn't need this
+                moveToUci(moveString, self->pv.v[i]);
+                listPrintf(&infoLine, "%s %s", (i == 0) ? " pv" : "", moveString);
         }
 
-        for (int i=0; i<self->pv.len; i++)
-                undoMove(board(self));
-
-        putchar('\n');
+        puts(infoLine.v); // Should be atomic and adds a newline
         if (self->seconds >= 0.1)
                 fflush(stdout);
+        freeList(infoLine);
 }
 
 /*----------------------------------------------------------------------+
@@ -390,13 +385,13 @@ static void uciBestMove(Engine_t self)
         char moveString[maxMoveSize];
 
         if (self->bestMove) {
-                moveToUci(board(self), moveString, self->bestMove);
+                moveToUci(moveString, self->bestMove);
                 printf("bestmove %s", moveString);
         } else
                 printf("bestmove 0000"); // When in doubt, do as Shredder
 
         if (self->ponderMove) {
-                moveToUci(board(self), moveString, self->ponderMove);
+                moveToUci(moveString, self->ponderMove);
                 printf(" ponder %s", moveString);
         }
         putchar('\n');

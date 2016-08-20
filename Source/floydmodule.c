@@ -82,6 +82,8 @@ floydmodule_evaluate(PyObject *self, PyObject *args)
         if (len <= 0)
                 return PyErr_Format(PyExc_ValueError, "Invalid FEN (%s)", fen);
 
+        if (globalVectorChanged)
+                resetEvaluate();
         int score = evaluate(&board);
 
         return PyFloat_FromDouble(score / 1000.0);
@@ -114,7 +116,7 @@ floydmodule_setCoefficient(PyObject *self, PyObject *args)
 
         long oldValue = globalVector[coef];
         globalVector[coef] = newValue;
-        globalVectorBaseHash = ~xorshift64star(~globalVectorBaseHash); // invalidate the pawnKingTable
+        globalVectorChanged |= (newValue != oldValue); // invalidate evaluation caches
 
         PyObject *result = PyTuple_New(2);
         if (!result)
@@ -195,7 +197,13 @@ floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
         engine.infoFunction = infoFunction;
         engine.infoData = infoData;
 
+        if (globalVectorChanged)
+                resetEvaluate();
         rootSearch(&engine);
+        cleanupEngine(&engine);
+
+        if (PyErr_Occurred())
+                return null;
 
         PyObject *result = PyTuple_New(2);
         if (!result)
@@ -209,7 +217,7 @@ floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
         PyObject *bestMove;
         if (engine.bestMove != 0) {
                 char moveString[maxMoveSize];
-                moveToUci(&engine.board, moveString, engine.bestMove);
+                moveToUci(moveString, engine.bestMove);
                 bestMove = PyString_FromString(moveString);
         } else {
                 bestMove = Py_None;
@@ -221,8 +229,6 @@ floydmodule_search(PyObject *self, PyObject *args, PyObject *keywords)
                 Py_DECREF(result);
                 return null;
         }
-
-        cleanupEngine(&engine);
 
         return result;
 }

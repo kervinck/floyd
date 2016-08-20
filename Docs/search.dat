@@ -1,0 +1,10 @@
+7041 -149 v0.7      Release
+7522    0 v0.8.1    Release
+7751   58 x800ecb47 History counters
+7785   65 x0e0dc088 Integrate older tuning
+7807   85 x7c96b2ca Unconditional null move, i.s.o. evaluation
+7875   89 xc6c5dae2 Simple delta pruning
+7898  104 x0dac97eb Only odd moves + CtrlC
+7900  102 xa416cb63 Slightly tighter bound (aka xaef137c2)
+7904  108 xa882bde3 Null move verification 1
+7932  104 x4318fa13 Avoid double null move

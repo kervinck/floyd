@@ -17,6 +17,13 @@
  |      Includes                                                        |
  +----------------------------------------------------------------------*/
 
+// Python API (must come first)
+#ifdef PYTHON_MODULE
+ #include "Python.h"
+#else
+ #define PyErr_CheckSignals() 0 // Stub
+#endif
+
 // C standard
 #include <assert.h>
 #include <math.h>
@@ -44,20 +51,29 @@ struct Node {
         int moveList[maxMoves];
 };
 
-#define moveMask ((int) ones(16))
-#define moveScore(longMove) ((longMove) >> 16) // Extract score from move list entry
+// 6 bits signed        11 bits        3 bits     6 bits       6 bits
+// +------------+---------------------+-------+------------+------------+
+// |  SEE score |    history score    |  tag  |    from    |     to     |
+// +------------+---------------------+-------+------------+------------+
+//  31        26 25                 15 14   12 11         6 5          0
+//                                    `---------------------------------'
+//                                             moveMask (15 bits)
+#define moveMask ((int) ones(15))
+#define moveScore(longMove) ((longMove) >> 26) // Extract score from move list entry
+#define historyBits 11 // 15 for a move and 6 for SEE leaves 11 for history
+#define historyIndex(move) ((int) ((move) & ones(12)))
 
 /*----------------------------------------------------------------------+
  |      Functions                                                       |
  +----------------------------------------------------------------------*/
 
 static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex);
-static int scout(Engine_t self, int depth, int alpha, int nodeType);
+static int scout(Engine_t self, int depth, int alpha, int pvDistance, int lastMove);
 static int qSearch(Engine_t self, int alpha);
 
 static int updateBestAndPonderMove(Engine_t self);
 static int staticMoveScore(Board_t self, int move);
-static int filterAndSort(Board_t self, int moveList[], int nrMoves, int moveFilter);
+static int filterAndSort(Engine_t self, int moveList[], int nrMoves, int moveFilter);
 static int filterLegalMoves(Board_t self, int moveList[], int nrMoves);
 static bool moveToFront(int moveList[], int nrMoves, int move);
 static bool repetition(Engine_t self);
@@ -65,6 +81,7 @@ static bool allowNullMove(Board_t self);
 
 static void killersToFront(Engine_t self, int ply, int moveList[], int nrMoves);
 static void updateKillers(Engine_t self, int ply, int move);
+static void updateHistory(short historyCounts[], int index, int depth);
 
 static int makeFirstMove(Engine_t self, struct Node *node);
 static int makeNextMove(Engine_t self, struct Node *node);
@@ -93,6 +110,7 @@ void rootSearch(Engine_t self)
                 self->killers.len = 0;
                 self->bestMove = self->ponderMove = 0;
                 self->tt.now = (self->tt.now + 1) & ones(ttDateBits);
+                memset(self->historyCounts, 0, sizeof self->historyCounts);
         }
 
         if (self->target.maxTime > 0.0 && !self->pondering)
@@ -132,12 +150,12 @@ void rootSearch(Engine_t self)
 }
 
 /*----------------------------------------------------------------------+
- |      gameEndScore / drawScore                                        |
+ |      gameOverScore / drawScore                                       |
  +----------------------------------------------------------------------*/
 
-static inline int gameEndScore(Engine_t self, bool check)
+static inline int gameOverScore(Engine_t self, bool inCheck)
 {
-        return check ? minMate + ply(self) : 0;
+        return inCheck ? minMate + ply(self) : 0;
 }
 
 static inline int drawScore(Engine_t self)
@@ -150,7 +168,6 @@ static inline int drawScore(Engine_t self)
  |      pvSearch                                                        |
  +----------------------------------------------------------------------*/
 
-// TODO: killers
 // TODO: end game extension
 // TODO: singular extension
 static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
@@ -171,17 +188,15 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                  || (slot.isUpperBound && slot.isLowerBound && alpha < slot.score && slot.score < beta))
                         return cutPv(), slot.score;
 
-        int check = inCheck(board(self));
+        int inCheck = isInCheck(board(self));
         int moveFilter = minInt; // All moves
         int bestScore = minInt;
 
         // Quiescence search
-        if (depth == 0 && !check) {
+        if (depth == 0 && !inCheck) {
                 bestScore = eval;
-                if (bestScore >= beta) {
-                        self->pv.len = pvIndex;
-                        return ttWrite(self, slot, depth, bestScore, alpha, beta);
-                }
+                if (bestScore >= beta)
+                        return cutPv(), ttWrite(self, slot, depth, bestScore, alpha, beta);
                 moveFilter = 0; // Only good captures
         }
 
@@ -192,21 +207,20 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                 nrMoves = self->searchMoves.len;
                 memcpy(moveList, self->searchMoves.v, nrMoves * sizeof(int));
         }
-        nrMoves = filterAndSort(board(self), moveList, nrMoves, moveFilter);
+        nrMoves = filterAndSort(self, moveList, nrMoves, moveFilter);
         nrMoves = filterLegalMoves(board(self), moveList, nrMoves); // Easier for PVS
         moveToFront(moveList, nrMoves, slot.move);
 
         // Search the first move with open alpha-beta window
         if (nrMoves > 0) {
-                int move = moveList[0];
                 if (pvIndex < self->pv.len)
                         moveToFront(moveList, nrMoves, self->pv.v[pvIndex]); // Follow the PV
                 else
-                        pushList(self->pv, move); // Expand the PV
-
+                        pushList(self->pv, moveList[0]); // Expand the PV
+                int move = moveList[0];
                 bool recapture = moveScore(move) > 0 && to(move) == recaptureSquare(board(self));
                 makeMove(board(self), move);
-                int extension = (check || recapture) + (nrMoves == 1 && (depth > 0));
+                int extension = (inCheck || recapture) + (nrMoves == 1 && (depth > 0));
                 int newDepth = max(0, depth - 1 + extension);
                 int newAlpha = max(alpha, bestScore);
                 int score = -pvSearch(self, newDepth, -beta, -newAlpha, pvIndex + 1);
@@ -225,10 +239,10 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
                 int move = moveList[i];
                 bool recapture = moveScore(move) > 0 && to(move) == recaptureSquare(board(self));
                 makeMove(board(self), move);
-                int extension = (check || recapture);
+                int extension = (inCheck || recapture);
                 int newDepth = max(0, depth - 1 + extension - reduction);
                 int newAlpha = max(alpha, bestScore);
-                int score = -scout(self, newDepth, -(newAlpha+1), 1);
+                int score = -scout(self, newDepth, -(newAlpha+1), 1, move);
                 if (!isMateScore(score) && !isDrawScore(score))
                         self->mateStop = false; // Shortest mate not yet proven
                 if (score > bestScore) {
@@ -250,7 +264,7 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
         }
 
         if (bestScore == minInt) // No legal moves
-                bestScore = gameEndScore(self, check);
+                bestScore = gameOverScore(self, inCheck);
 
         return ttWrite(self, slot, depth, bestScore, alpha, beta);
 }
@@ -259,16 +273,12 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
  |      scout                                                           |
  +----------------------------------------------------------------------*/
 
-#define isCutNode(nodeType) (( nodeType) & 1)
-#define isAllNode(nodeType) ((~nodeType) & 1)
-
-// TODO: futility
-static int scout(Engine_t self, int depth, int alpha, int nodeType)
+static int scout(Engine_t self, int depth, int alpha, int pvDistance, int lastMove)
 {
         self->nodeCount++;
         if (repetition(self)) return drawScore(self);
-        if (depth == 0) return qSearch(self, alpha);
-        if (self->nodeCount >= self->target.nodeCount)
+        if (depth == 0) return qSearch(self, alpha); // TODO: we can put horizon stuff here
+        if (self->nodeCount >= self->target.nodeCount || PyErr_CheckSignals() == -1)
                 longjmp(self->abortTarget, 1); // Raise abort
 
         // Mate distance pruning
@@ -283,46 +293,83 @@ static int scout(Engine_t self, int depth, int alpha, int nodeType)
                  || (node.slot.isLowerBound && node.slot.score > alpha))
                         return node.slot.score;
 
-        // Null move pruning
-        int check = inCheck(board(self));
-        if (depth >= 2 && isCutNode(nodeType)
-         && minEval <= alpha && alpha < maxEval
-         && !check && allowNullMove(board(self))) {
+        // Null move pruning or reduction (aka verification)
+        int inCheck = isInCheck(board(self));
+        if (depth >= 2 && inRange(alpha, minEval, maxEval-1)
+         && lastMove != 0000 && !inCheck && allowNullMove(board(self))) {
                 makeNullMove(board(self));
-                int reduction = 2;
-                int score = -scout(self, max(0, depth - reduction - 1), -(alpha+1), nodeType+1);
+                int reduction = min((depth + 1) / 2, 3); // R = 1..3
+                int score = -scout(self,  depth - reduction - 1, -(alpha+1), pvDistance+1, 0000);
                 undoMove(board(self));
-                if (score > alpha)
-                        return ttWrite(self, node.slot, depth, score, alpha, alpha+1);
+                if (score > alpha && depth >= 5 && isOdd(pvDistance)) // Verification
+                        #define reduceIfEven(d) ((((d) + 1) & ~1) - 1) // Chop off the last reply
+                        return scout(self, reduceIfEven(depth - reduction), alpha, pvDistance, 0000);
+                if (score > alpha) // Pruning
+                        return ttWrite(self, node.slot, depth, min(score, maxEval), alpha, alpha+1);
+        }
+
+        // Futility pruning at frontier nodes
+        int bestScore = minInt;
+        int moveFilter = minInt;
+        if (depth == 1 && inRange(alpha, minEval, maxEval-1) && !inCheck) {
+                int eval = evaluate(board(self));
+                if (eval - board(self)->futilityMargin > alpha) // Reverse futility (aka static null move)
+                        return ttWrite(self, node.slot, depth, alpha+1, alpha, alpha+1);
+                static const int margin[]  = { 2000, 1500 };
+                if (eval + margin[pvDistance&1] <= alpha) // Futility
+                        moveFilter = 0, bestScore = eval + margin[pvDistance&1];
+        }
+        else if (depth == 2 && inRange(alpha, minEval, maxEval-1) && !inCheck) {
+                // Extended futility at pre-frontier nodes
+                int eval = evaluate(board(self));
+                if (eval + 4000 <= alpha)
+                        moveFilter = 0, bestScore = eval + 4000;
+        }
+        else if (depth == 3 && inRange(alpha, minEval, maxEval-1) && !inCheck) {
+                // Razoring at pre-pre-frontier nodes
+                int eval = evaluate(board(self));
+                if (eval + 6000 <= alpha) {
+                        int score = scout(self, depth-2, alpha, pvDistance, 0000);
+                        node.slot = ttRead(self);
+                        if (score <= alpha)
+                                return ttWrite(self, node.slot, depth, score, alpha, alpha+1);
+                }
         }
 
         // Internal iterative deepening
-        if (depth >= 3 && isCutNode(nodeType) && !node.slot.move) {
-                scout(self, depth - 2, alpha, nodeType);
+        #define isCutNode(pvDistance) isOdd(pvDistance)
+        if (depth >= 3 && isCutNode(pvDistance) && !node.slot.move) {
+                scout(self, depth - 2, alpha, pvDistance, lastMove);
                 node.slot = ttRead(self);
         }
 
-        // Recursively search all other moves until exhausted or one fails high
-        int extension = check;
-        int bestScore = minInt;
+        // Recursively search all moves until exhausted or one fails high
+        int extension = inCheck;
         for (int move=makeFirstMove(self,&node), j=0; move; move=makeNextMove(self,&node), j++) {
+                if (move < moveFilter && !isInCheck(board(self))) {
+                        undoMove(board(self)); // Move is futile and unlikely to fail high
+                        continue;
+                }
                 int newDepth = max(0, depth - 1 + extension);
-                int reduction = (depth >= 4) && (j >= 1) && (move < 0) && isCutNode(nodeType);
+                int reduction = (depth >= 4) && (j >= 1) && (move < 0);
                 int reducedDepth = max(0, newDepth - reduction);
-                int score = -scout(self, reducedDepth, -(alpha+1), nodeType+1);
+                int score = -scout(self, reducedDepth, -(alpha+1), pvDistance+1, move);
                 if (score > alpha && reducedDepth < newDepth)
-                        score = -scout(self, newDepth, -(alpha+1), nodeType+1);
+                        score = -scout(self, newDepth, -(alpha+1), pvDistance+1, move);
                 undoMove(board(self));
                 bestScore = max(bestScore, score);
                 if (score > alpha) { // Fail high
                         node.slot.move = move & moveMask;
-                        if (j > 0) updateKillers(self, ply(self), move);
+                        if (j > 0) {
+                                updateKillers(self, ply(self), move);
+                                updateHistory(self->historyCounts, historyIndex(move), depth);
+                        }
                         break;
                 }
         }
 
         if (bestScore == minInt) // No legal moves
-                bestScore = gameEndScore(self, check);
+                bestScore = gameOverScore(self, inCheck);
 
         return ttWrite(self, node.slot, depth, bestScore, alpha, alpha+1);
 }
@@ -340,19 +387,28 @@ static int qSearch(Engine_t self, int alpha)
                 return slot.score;
 
         // Stand pat if evaluation is good and not in check
-        int check = inCheck(board(self));
-        int bestScore = check ? minInt : evaluate(board(self));
+        int inCheck = isInCheck(board(self));
+        int bestScore = inCheck ? minInt : evaluate(board(self));
         if (bestScore > alpha)
                 return ttWrite(self, slot, 0, bestScore, alpha, alpha+1);
 
         // Generate good captures, or all escapes when in check
         int moveList[maxMoves];
         int nrMoves = generateMoves(board(self), moveList);
-        nrMoves = filterAndSort(board(self), moveList, nrMoves, check ? minInt : 0);
+        nrMoves = filterAndSort(self, moveList, nrMoves, inCheck ? minInt : 0);
         moveToFront(moveList, nrMoves, slot.move);
 
         // Try if any generated move can improve the result
         for (int i=0; i<nrMoves && bestScore<=alpha; i++) {
+                if (!inCheck) {
+                        // Regular delta pruning
+                        assert(moveList[i] >= 0);
+                        int maxDelta = (moveList[i] >> 26) * 1200 + 1450;
+                        if (maxDelta <= alpha - bestScore)
+                                return ttWrite(self, slot, 0, bestScore + maxDelta, alpha, alpha+1);
+                }
+
+                // Search deeper
                 makeMove(board(self), moveList[i]);
                 if (wasLegalMove(board(self))) {
                         self->nodeCount++;
@@ -365,7 +421,7 @@ static int qSearch(Engine_t self, int alpha)
         }
 
         if (bestScore == minInt) // No legal moves
-                bestScore = gameEndScore(self, check);
+                bestScore = gameOverScore(self, inCheck);
 
         return ttWrite(self, slot, 0, bestScore, alpha, alpha+1);
 }
@@ -413,7 +469,7 @@ static int makeNextMove(Engine_t self, struct Node *node)
         if (node->phase == 0) {
                 int ttMove = node->moveList[0];
                 node->nrMoves = generateMoves(board(self), node->moveList);
-                node->nrMoves = filterAndSort(board(self), node->moveList, node->nrMoves, minInt);
+                node->nrMoves = filterAndSort(self, node->moveList, node->nrMoves, minInt);
                 killersToFront(self, ply(self), node->moveList, node->nrMoves);
                 node->i = moveToFront(node->moveList, node->nrMoves, ttMove); // skip if already emitted
                 node->phase = 1;
@@ -495,13 +551,15 @@ static int compareMoves(const void *ap, const void *bp)
         return (a < b) - (a > b);
 }
 
-static int filterAndSort(Board_t self, int moveList[], int nrMoves, int moveFilter)
+static int filterAndSort(Engine_t self, int moveList[], int nrMoves, int moveFilter)
 {
         int j = 0;
         for (int i=0; i<nrMoves; i++) {
-                int moveScore = staticMoveScore(self, moveList[i]);
+                int moveScore = staticMoveScore(board(self), moveList[i]);
                 if (moveScore >= moveFilter)
-                        moveList[j++] = (moveScore << 16) + (moveList[i] & moveMask);
+                        moveList[j++] = (moveScore << 26)
+                                      + (self->historyCounts[historyIndex(moveList[i])] << 15)
+                                      + (moveList[i] & moveMask);
         }
         qsort(moveList, j, sizeof(moveList[0]), compareMoves);
         return j;
@@ -532,10 +590,10 @@ static void killersToFront(Engine_t self, int ply, int moveList[], int nrMoves)
         while (self->killers.len <= ply) // Expand table when needed
                 pushList(self->killers, (killersTuple) {.v={0}});
 
-        int j = 0;
-        while (j < nrMoves && moveScore(moveList[j]) >= 3) j++;
+        int j = 0; // Find insertion place: after the good captures
+        while (j < nrMoves && moveScore(moveList[j]) >= 0) j++;
 
-        for (int i=nrKillers-1; i>=0; i--)
+        for (int i=nrKillers-1; i>=0; i--) // Bring killers forward, one by one in reverse order
                 moveToFront(moveList+j, nrMoves-j, self->killers.v[ply].v[i]);
 }
 
@@ -557,6 +615,14 @@ static void updateKillers(Engine_t self, int ply, int move)
                 killers->v[i] = killers->v[i-1];
                 killers->v[i-1] = move & moveMask;
         }
+}
+
+static void updateHistory(short historyCounts[], int index, int depth)
+{
+        historyCounts[index] += min(64, depth * depth); // Rookie v1
+        if (historyCounts[index] >= (1 << historyBits))
+                for (int i=0; i <= historyIndex(~0); i++)
+                        historyCounts[i] >>= 1;
 }
 
 /*----------------------------------------------------------------------+

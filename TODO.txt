@@ -1,3 +1,377 @@
+Floyd 0.9 dev status:
+ Elo Test Version         EloChange
+-149 7041 Floyd 0.7       Older version
+   0 7522 Floyd 0.8       Reference
+  58 7751 Floyd x800ecb47 History counters
+  65 7785 Floyd x0e0dc088 Integrate older tuning
+  85 7807 Floyd x7c96b2ca Unconditional null move, i.s.o. evaluation
+  89 7875 Floyd xc6c5dae2 Simple delta pruning
+  95      Floyd x354d5f3a Delta pruning option 3 (pseudo fail-soft, aka xec39d0d0)
+ 102 7900 Floyd xa416cb63 Slightly tighter bound (aka xaef137c2)
+ 104      Floyd x8399a075 SEE>0 before killers; PV bug fix
+ 104 7932 Floyd x4318fa13 Avoid double null move
+ 108 7904 Floyd xa882bde3 Null move verification 1
+ 104      Floyd x3c65e794 Only odd nodes
+ 102      Floyd x1f1cd580 Delta pruning tuning
+ 108      Floyd x6302ff3a Hanging pieces with basic tuning
+ 122 8045 Floyd x8dae39c2 Extended tuning and material table
+ 125 8064 Floyd xc9494dd4 Second run of extended tuning
+ 120 8030 Floyd xdedb91e0 Simplistic futility
+ 140 8195 Floyd xbfe5344c Simple dynamic futility pruning
+ 150 8242 Floyd x0c9ee9d5 Manual tuning of futility margin
+ 144 8249 Floyd xaab4c50a Qsearch slot promotion
+ 178 8315 Floyd x17e8d8d4 Basic futility pruning
+ 182 8373 Floyd xb1a327b4 Extended futility pruning
+ 182 8390 Floyd xff208d49 Razoring
+
+------------------------------------------------------------------------
+        Search
+------------------------------------------------------------------------
+
+|Todo| Futility at depth 2 for bad positions [search]
+
+// TODO: try reduce depth or just drop into qSearch
+// TODO: margins dependent on node type and board features
+
+Or use from last ply:
+        if depth=2 FH, then use as depth=3 result :-)
+
+|Todo| Update razoring [search]
+
+Current version is useless (Floyd 0.9)
+
+Rank Name                Elo    +    - games score oppo. draws
+   1 Fruit 2.1           343    1    1 340815   77%   111   12%
+   2 Floyd xb1a327b4     182    4    4 24000   52%   172   19%
+   3 Floyd xff208d49     182    4    4 24000   52%   172   19% <-- doesn't do anything
+   4 Floyd x17e8d8d4     179    4    4 24000   52%   172   19%
+
+Basically preselecting for standing pat at depth 1
+if depth == 3 and nullMove FL but "eval > alpha":
+        if search(2) > alpha // drop last move, reduceIfOdd
+                return
+
+|Todo| Do futility filtering before makeMove [speed]
+
+Need 'isCheckMove' function however
+isCheckMove()
+{
+        1. New piece gives check on to-square
+        2. Piece discovers check
+                If it is attacked by the right type of slider, and
+                in the right direction, and
+                without path to king being blocked, and
+                and the move is away from that attacking line
+}
++12% nps expected
+
+|Todo| Evaluation cache [search]
+
+At least avoid double evaluation, eg after null move.
+(Or: evaluate both sides at the same time, bacause of w/b
+difference due to tempo and hanging piece component?)
+
+|Todo| Checks in qsearch, at least in PV [search]
+
+#define minDepth -7
+scout:
+        if (inCheck)
+                qSearchWithCheck // horizon()
+        else
+                qSearch
+qSearchWithCheck() # No TT?
+        filter, keep good checks and good captures
+        for (move in moves)
+                if (inCheck || giveCheck)
+                        qSearchWithCheck
+                else
+                        qSearch
+
+|Todo| Strong moves in PV qsearch [search]
+
+Good moves: those that improve eval more than the tempo loss
+aka PV tip extensions
+Simplest is to keep all moves and let recursion+evaluation cull the bad ones?
+This can work. But bad captures should still be pruned
+
+|Todo| Checks after null move [search]
+
+|Todo| Evaluation filtering for null move (retry) [search]
+
+Prerequisite: cache evaluations to prevent the NPS drop
+
+|Todo| Move classes [search]
+
+  tactical      Discover from the to-square and board
+  safe          From SEE bits
+  strong        Discover after makeMove (from evaluate)
+  check         Discover after makeMove (from attacks)
+  pawn          From the move tag bits
+
+  strong: moveScore == -1 and deltaEval > 0
+  weak:   moveScore < -1 or deltaEval <= 0
+
+  isPromotion(move)    (moveTag(move) >= promoteBishopTag)
+  isTacticalMove(move) (board[to(move)] != empty or isPromotion(move))
+  isSafeMove(move)     (moveScore(move) >= -1)
+  isStrongMove(move)   (deltaEval > 0) // after makeMove
+  isCheckingMove(move) (inCheck())     // after makeMove
+  isPawnMove(move)     (moveTag(move) == movePawnTag)
+
+Flags must support more ordering:
+1. Hash move
+2. Good captures
+3. Killer moves
+4. Counter moves (1st and 2nd order), connected moves
+5. Safe checks
+6. Bad captures
+7. Strong moves
+8. Weak moves
+
+|Todo| Collect statistics for delta pruning [search]
+
+|Todo| Undo reductions for difficult sub-trees [search]
+
+Positions with biggest subtree should be unreduced and retried?
+
+|Todo| Don't reduce and then drop directly into qsearch [search]
+
+But allow this for futility?
+
+|Todo| History with (piece, to) instead of (from, to) [search]
+
+At least include color
+
+Redesignate special bits as follows:
+        P  NBR Q  K
+        =B =R =N =Q
+
+ enum {
+   movePawnTag,                 000
+   moveKnightBishopRookTag,     001
+   moveQueenTag,                010
+   moveKingTag,                 011
+   promoteBishopTag,            100     specialDoublePush from=2, specialEnPassant from=5, specialCastling from=1
+   promoteRookTag,              101
+   promoteKnightTag,            110
+   promoteQueenTag,             111
+ }
+
+|Todo| Remember more than 1 good move in PV nodes
+
+For example in additional ttable slots.
+
+|Todo| More agressive null move tuning
+
+|Todo| More agressive LMR tuning
+
+1. Hash move            No reduction
+2. Good captures        No reduction
+3. Killer moves         No reduction
+4. Counter move         No reduction
+5. Safe checks          No reduction
+6. Bad captures         No reduction
+7. Strong moves (sorted by history) No reduction
+8. Weak moves, sorted by history
+
+ Reduction for
+   weakquiet moves or bad checks
+
+--> Register the likelihood that the move fails high
+
+|Todo| Upcoming repetition detection
+
+|Todo| Underpromotion pruning [search]
+
+In qsearch
+ Only queening and knights that give check
+ If depth >= xxx, add underpromotions, but reduce depth
+
+ Problem with reducing underpromotions could be that the can
+ transpose into the same line as queening, and then wreck the
+ hash table?  Not if queen goes first? Higher depth etc
+
+|Todo| Extended testing of null move options [search]
+
+-- 1. isOdd() condition might be a slight regression in 10+0.15 testing
+
+However:
+tc 60+1
+Score of Floyd x3c65e794 vs Floyd xa882bde3: 313 - 297 - 390  [0.508] 1000
+ELO difference: 6
+Winning fraction: 0.464052
+Elo difference: -25.0222
+p-value: 0.0020376
+
+tc 30+0.5
+Score of Floyd x3c65e794 vs Floyd xa882bde3: 1880 - 1820 - 2300  [0.505] 6000
+ELO difference: 3
+Winning fraction: 0.505
+Elo difference: +3.47447
+p-value: 0.83803
+
+tc 60+1 (fx8350-1)
+Score of Floyd x3c65e794 vs Floyd xa882bde3: 3633 - 3535 - 4832  [0.504] 12000
+ELO difference: 3
+Winning fraction: 0.504125
+Elo difference: +2.86665
+p-value: 0.878881
+
+tc 180+3
+Score of Floyd x3c65e794 vs Floyd xa882bde3: 701 - 726 - 1118  [0.495] 2545
+Rank Name              Elo    +    - games score oppo. draws
+   1 Floyd xa882bde3     2   11   11  2545   50%    -2   44%
+   2 Floyd x3c65e794    -2   11   11  2545   50%     2   44%
+                 Fl Fl
+Floyd xa882bde3     71
+Floyd x3c65e794  28
+Winning fraction: 0.495088
+Elo difference: -3.41303
+p-value: 0.254049
+
+--> 2. Same for double nullmove avoidance
+
+   2 Floyd x8399a075   105    4    4 24000   44%   166   19%
+   3 Floyd x4318fa13   102    4    4 24000   43%   166   19% <-- might be regression
+
+Floyd x8399a075   0    83 91 99 99 99100100100100100
+Floyd x4318fa13   0 16    65 99 99 99100100100100100 <-- might be regression
+
+--> Conclusion: Investigate these better.
+
+ Double null move (off,on)
+ Null move verification (any,odd,none)
+6 combinations, tc 60+1?
+
+Might take a while
+
+|Todo| Staged null move [search]
+
+One with large reduction, second with lower R
+
+        R1 = 4, R2 = 2
+Score of Floyd x833a9c04 vs Floyd 0.8: 459 - 260 - 281  [0.600] 1000
+ELO difference: 70
+Finished match
+
+floyd1 x0e0dc088 vanilla nullmove (R=2)
+floyd2 x833a9c04 staged nullmove (R=4, R=2)
+
+Score of floyd1 vs floyd2: 343 - 361 - 296  [0.491] 1000
+ELO difference: -6
+Finished match
+
+Winning fraction: 0.491
+Elo difference: -6.25452
+p-value: 0.248759
+
+|Todo| Try a finer model for dynamic futility margin [search]
+
+- Tempo
+- Threats, 1 weight for each hangingPiece[0..2]
+- Passers
+- King attacks
+- Node type parity
+
+|Todo| Depth promotion of qsearch entries [search,ttable]
+
+Revisit this failed idea:
+
+Use "depth 0 fail highs with a move" also when probing with depth 1
+
+For example, do this by storing them as depth 1, so they also stay
+in the table a bit longer.
+
+return ttWrite(self, slot, !inCheck && (slot.move && bestScore > alpha) ? 1 : 0, bestScore, alpha, alpha+1)
+
+Score of Floyd xf463760a vs Floyd x0c9ee9d5: 69 - 80 - 96  [0.478] 245
+ELO difference: -16
+Finished match
+Winning fraction: 0.477551
+Elo difference: -15.6096
+p-value: 0.183753
+
+passed 8192 total 20000 (ref: 8242)
+
+So this is 10-20 elo weaker. Why? Overwriting of more valuable entries?
+
+Try the other way: only bump up the depth when reading
+
+Floyd Chess Engine - Version xaab4c50a
+passed 8249 total 20000 (good!)
+
+But:
+
+Score of Floyd xaab4c50a vs Floyd x0c9ee9d5: 128 - 158 - 133  [0.464] 419
+ELO difference: -25
+Finished match
+Winning fraction: 0.4642
+Elo difference: -24.9187
+p-value: 0.0380368
+
+make wac look very good also:
+passed 275 total 300
+
+Conclusion: test longer
+
+--
+
+ 144 8249 Floyd xaab4c50a QSearch slot promotion
+
+Maybe slight regression comes from that
+
+Rank Name              Elo    +    - games score oppo. draws
+   2 Floyd x0c9ee9d5   150    4    4 24000   48%   170   18%
+   3 Floyd xaab4c50a   144    4    4 24000   48%   170   18% <-- not good enough
+
+                 Fr Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl
+Fruit 2.1          100100100100100100100100100100100100100100100100100100100100100100
+Floyd x0c9ee9d5   0    97 99 99100100100100100100100100100100100100100100100100100100
+Floyd xaab4c50a   0  2    89 99 99 99100100100100100100100100100100100100100100100100 <-- not good enough
+
+Nps before: 781676
+Nps after: 777086 (99.4%) --> Not sufficient to explain the difference
+
+|Todo| Don't reduce safe checks
+
+|Todo| Sort all captures before non-captures [search]
+
+|Todo| Inverse delta pruning [search]
+
+        if (nrMoves > 0 && !inCheck) {
+                // Inverse delta pruning
+                assert(moveList[0] >= 0);
+                int minDelta = (moveList[0] >> 26) * 1000 - 1000;
+                if (minDelta > alpha - bestScore)
+                        return ttWrite(self, slot, 0, bestScore + minDelta, alpha, alpha+1);
+        }
+
+------------------------------------------------------------------------
+        Evaluate
+------------------------------------------------------------------------
+
+|Todo| Hanging piece evaluation [evaluate]
+
+- SEE for each attacked piece
+- Implement as lookup table [256][256] or [128][256]
+- Weights depend on side to move: total 6 parameters to tune
+- Rethink mobility as well
+
+|Todo| 4-piece eg heuristics [eg,evaluate]
+
+- K+minor vs K+minor
+- KNNK
+- KBNK [eg,evaluate]
+- KP(a)KB of wrong color
+
+        if (nrEffectivePieces == 4) {
+                if (nrMinors(side) > 0 && nrMinors(xside) > 0)
+                        return 0; // K+minor vs K+minor
+                if (nrKnights(side) == 2 || nrKnights(xside) == 2)
+                        return 0; // KNN vs K
+        }
+
+|Todo| Rook or Queen and/vs pawn span [evaluate]
 
 |Todo| Strong squares / outposts [evaluate]
 
@@ -60,16 +434,7 @@ Mobility = what can I actually move to a square, safely
 
 |Todo| Attacking a non-mobile pawn
 |Todo| Attacks on backward/weak pawns
-
 |Todo| Attack x piece matrix [evaluate]
-
-|Todo| Threats [evaluate]
-
-Threat: weaker attacks stronger piece or undefended piece
-
-1st threat
-2nd threat
-3rd threat
 
 |Todo| Undrawness of material advantage [evaluate]
 
@@ -103,16 +468,17 @@ Ref: http://www.top-5000.nl/authors/rebel/chess840.htm
 "The only rule that applies in this ending: if the black king is
 in front of the white pawn the game is a draw"
 
+Recognize when either king is in split from the pawn
+
 |Todo| Pawn storm
 
 |Todo| Bring back the symmetry to reduce parameters
 |Todo| Simplify bishop tables again
 
 |Todo| Add white/black testing [qa,evaluate]
-
 |Todo| Add left/right testing [qa,evaluate]
 
-|Todo| Train specific exchange compensations
+|Todo| Train specific exchange compensations [evaluate,eg]
 
 R vs B
 R vs B+P
@@ -126,51 +492,27 @@ More complex:
 RP vs NN
 Q vs RR
 
-|Todo| Another minor parsing hickup [bug]
+|Todo| Alekhine's Gun [evaluate]
 
-debug on
-position fen 2rq1rk1/1b2ppbp/1p3np1/pN1p4/2PPn3/BQ2PN1P/P3BPP1/2R2RK1 w - - 5 15 moves f3e5 e4d2 b3c2 d2f1 g1f1
-info sting input position fen 2rq1rk1/1b2ppbp/1p3np1/pN1p4/2PPn3/BQ2PN1P/P3BPP1/2R2RK1 w - - 5 15 moves f3e5 e4d2 b3c2 d2f1 g1f1
-info string Illegal move
+"I should mention, too that you do need to handle stacked attackers
+such as "Alekhine's Gun". This is commonly done by considering own
+rooks as transparent when calculating rank/file attacks, as well
+as as Queens being "transparent" when considering Bishop attacks."
+
+http://talkchess.com/forum/viewtopic.php?p=665703#665703
+
+|Todo| Rook doubling on open files [evaluate]
 
 ------------------------------------------------------------------------
+        Other
+------------------------------------------------------------------------
 
-|Todo| Basic history heuristic [search]
+|Todo| Replace 'double' with 'float' or even 'short' evaluate [speed]
 
-|Todo| Introduction of material table [speed]
+- assert(sizeof(struct mSlot) <= 32)
+- replace wiloScore[2] with a single value
 
 Floyd is slow, but we should aim to keep it above 1Mnps
-
-|Todo| Introduce move flags for 32 bit
-
-- Simplify UCI move formatting
-
-|Todo| Extend move flags
-
-- Extend flags beyond
-
-Concept choice: keep flags with move or in seperate table?
-
-          search                     board
-+------------+------------+------------+-------------+
-| SEE/killer |   history  | properties |     move    |
-+------------+------------+------------+-------------+
-      16            16           16           16
-
-        moveList[i] += self->history[moveList[i] & moveMask]
-
-1. Sort a long key.
-        - Makes everyone migrate to Move_t
-        + Can use standard qsort
-2. Sort only the scores, with back reference to the move (index)
-3. Sort through a history table, requires modified qsort
-4. Hide all in a move picker object
-5. Place scores at index+256
-        - Doesn't work with qsort
-
-Desirable properties
-- generateMoves still generates ints (32bit)
-- can use stdlib qsort
 
 |Todo| Win64 version from Makefile [win64]
 
@@ -204,12 +546,6 @@ Merge release into master:
         git branch -d v0.8
         git push origin dev
 
-|Todo| Basic counter move? [search]
-
-|Todo| Checks in qsearch, at least in PV and after null move
-
-#define minDepth -7
-
 |Todo| Granularity of win32 clock too low? [win32]
 
 |Todo| Terminology: coefficient or parameter [qa]
@@ -238,18 +574,6 @@ https://en.wikipedia.org/wiki/Rosenbrock_function
 
 As a callback interface with the search info data
 
-|Todo| Move ordering based on delta eval [search]
-
-Then also cache evaluation in ttable
-
-|Todo| Consider persistent alarm thread [speed]
-
-Profile first
-
-|Todo| Consider persistent search thread [speed]
-
-Profile first
-
 |Todo| Implement 50 move rule [50move]
 
 Also recognize 50-move as a game during search.
@@ -269,8 +593,6 @@ Platform: UNKNOWN
 6RQ/6pP/p5K1/1r2p2N/p3k3/R7/B7/B7 w - - acn 106602; acs 0; bm Qxg7 Rc3; ce 32758; dm 5; pv Rc3 Rb6+ Kg5 Rg6+ Kxg6 a3 Rd8 a5 Bb1#;
 
 |Todo| Move logit() from evaluate to rootSearch [speed]
-
-|Todo| Null move for zugzwang
 
 |Todo| Calculate the impact of each parameter [tune]
 
@@ -294,82 +616,76 @@ This is double indirect:
 2. Putting the solution in "safety", instead of elsewhere
 There must be a cleaner way
 
-|Todo| Rook doubling on open files [evaluate]
-
-|Todo| False mate score [bug]
-
-Floyd (2244) vs. honestFrnd (1341) --- Thu Jan 28, 23:07 ??? 2016
-Rated blitz match, initial time: 5 minutes, increment: 0 seconds.
-
-Move  Floyd                   honestFrnd
-----  ---------------------   ---------------------
-  1.  e4      (0:00.000)      e5      (0:00.000)
-  2.  Nf3     (0:00.100)      d6      (0:00.966)
-  3.  d4      (0:00.100)      Nd7     (0:02.163)
-  4.  Bc4     (0:00.100)      f6      (0:00.887)
-  5.  Nc3     (0:00.100)      c6      (0:00.960)
-  6.  a4      (0:11.282)      Ne7     (0:00.652)
-  7.  O-O     (0:09.515)      Qc7     (0:00.683)
-  8.  dxe5    (0:07.084)      dxe5    (0:01.423)
-  9.  h4      (0:15.474)      b6      (0:08.678)
- 10.  Be3     (0:11.819)      Ng6     (0:03.429)
- 11.  Qe2     (0:10.984)      Be7     (0:03.578)
- 12.  Rad1    (0:05.970)      Nc5     (0:08.167)
- 13.  h5      (0:05.513)      Nf8     (0:02.080)
- 14.  h6      (0:05.587)      g6      (0:02.819)
- 15.  b4      (0:06.126)      Nce6    (0:03.189)
- 16.  Bb3     (0:05.095)      Bxb4    (0:02.835)
- 17.  Nb5     (0:05.740)      cxb5    (0:03.939)
- 18.  Qxb5+   (0:11.572)      Bd7     (0:29.267)
- 19.  Qxb4    (0:04.703)      Nc5     (0:16.457)
- 20.  Bxc5    (0:32.666)      Qxc5    (0:03.680)
- 21.  Qe1     (0:26.072)      Ne6     (0:04.932)
- 22.  Rd5     (0:02.704)      Qc7     (0:11.412)
- 23.  Qb4     (0:08.736)      a5      (0:16.546)
- 24.  Qd6     (0:02.686)      Qxd6    (0:03.811)
- 25.  Rxd6    (0:06.903)      Ke7     (0:16.178)
- 26.  Rfd1    (0:03.852)      Nc5     (0:11.258)
- 27.  Rxb6    (0:12.258)      Bg4     (0:02.805)
- 28.  Rb5     (0:02.248)      Nxe4    (0:03.003)
- 29.  Rb7+    (0:03.457)      Ke8     (0:06.774)
- 30.  Bd5     (0:02.883)      Ng5     (0:10.945)
-
-Floyd(C)(2244)[327] whispers: depth=8 score=3.17 time=3.32 node=257743 speed=77633 pv=Nxg5 fxg5 Re1 Bd7 Rb6 Rc8 Rxe5+ Kd8 Bb3 Kc7
- 31.  Nxg5    (0:03.325)      Bxd1    (0:05.666)
-
-Floyd(C)(2244)[327] whispers: depth=9 score=99.93 time=0.77 node=115634 speed=150174 pv=Bc6+ Kd8 Nf7+ Kc8 Nd6+ Kd8 Rd7#
- 32.  Bc6+    (0:00.782)      Kf8     (0:07.388)
-
-Floyd(C)(2244)[327] whispers: depth=3 score=99.97 time=0.00 node=354 speed=0 pv=Nxh7+ Rxh7 Rg7
- 33.  Nxh7+   (0:00.100)      Rxh7    (0:09.833)
-
-Floyd(C)(2244)[327] whispers: depth=12 score=8.23 time=20.49 node=1876960 speed=91603 pv=Rxh7 Kg8 Rg7+ Kh8 Bxa8 Bxc2 Bc6 e4 Ra7 e3 fxe3 f5 Rxa5 Bxa4 Bxa4
- 34.  Rxh7    (0:07.747)      Rc8     (0:18.823)
- 35.  Rh8+    (0:01.431)      Ke7     (0:05.406)
- 36.  Rxc8    (0:09.119)
-      {Black resigns} 1-0
-
 |Todo| Rename pawnKingHash [qa]
 
 Because we want to add bishop colors as well, and
-reduce the king component to their files.
+simplify the king component to just their files.
 
-Candidates:
-        subHash <-- looks best
+Candidates (best first):
+        structureHash
+        subHash
+        pkbHash
+        coarseHash
+Bad names:
         miniHash
-        structHash
+        hash2
+        pawnHash
         xHash
         pHash
-        pawnHash
         slowHash
-        coarseHash
 
-|Todo| Alekhine's Gun [evaluate]
+|Todo| Validate correctness of PV [qa]
 
-"I should mention, too that you do need to handle stacked attackers
-such as "Alekhine's Gun". This is commonly done by considering own
-rooks as transparent when calculating rank/file attacks, as well
-as as Queens being "transparent" when considering Bishop attacks."
+At least in debugging mode.
 
-http://talkchess.com/forum/viewtopic.php?p=665703#665703
+|Todo| Easy move, hard move [playing]
 
+Keep track of PV stability
+
+Idea 1: Keep track of singularity only in first iterations or nodes
+Idea 2: Maintain number of moves unchanged per length in rootSearch
+Idea 3: If second move is not disjoint, it is not an easy move.
+Disjoint means different from and to squares (maybe also include
+intermediate squares in this definition): moves that can be made in
+arbitrary order.
+Idea 4: Panic if `previousDepth - 2' not reached
+Idea 5: More time for slow iterations or for move changes
+
+|Todo| Cleanup header files [qa]
+
+Strip function explanation away and move to C files.
+
+|Todo| Remove cplus.h stuff that is not used [qa]
+
+|Todo| Endgame logic [evaluate]
+
+Distance to weak pawns
+Counting arguments
+Fortresses
+
+|Todo| Evalaution granularity
+
+Two ways:
+- Round evaluation (what everyone is doing)
+- Scout offsets (more attractive idea), 3 sub-options:
+        scout research
+        >0    >0
+        0     >0
+        >0    0
+
+|Todo| Try gcc sanitizers [qa]
+
+-fsanitize=address
+-fsanitize=undefined
+
+|todo| Debugging compile [qa]
+
+And optimization again for the Python module
+
+|Todo| Multi PV [uci,usability]
+
+For v1.0?
+
+|Todo| Lazy SMP [search]
+
+For v1.0?

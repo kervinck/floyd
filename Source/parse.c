@@ -251,12 +251,10 @@ extern int parseUciMove(Board_t self, const char *line, int xMoves[maxMoves], in
         // Find matching move from move list and verify its legality
         for (int i=0; i<xlen; i++) {
                 int xMove = xMoves[i];
-                if ((xMove & ~specialMoveFlag) == rawMove && isLegalMove(self, xMove)) {
-                        *move = xMove;
-                        return ix;
-                }
+                if ((xMove & ~specialMoveFlag) == rawMove && isLegalMove(self, xMove))
+                        return (*move = xMove), ix;
         }
-        return 0;
+        return (*move = -1), ix;
 }
 
 /*----------------------------------------------------------------------+

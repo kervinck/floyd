@@ -78,6 +78,7 @@ struct Board {
         sByteList undoStack;
 
         int *movePtr; // Used only during move generation
+        int futilityMargin; // Calculated by evaluate()
 };
 
 /*
@@ -162,7 +163,7 @@ int setupBoard(Board_t self, const char *fen);
 
 /*
  *  Update attack tables and king locations. To be used after
- *  setupBoard or makeMove. Used by generateMoves, inCheck.
+ *  setupBoard or makeMove. Used by generateMoves, isInCheck.
  *  Can be invalidated by moveToStandardAlgebraic,
  *  getCheckMark, isLegalMove, normalizeEnPassantStatus.
  */
@@ -214,7 +215,7 @@ void makeNullMove(Board_t self);
 /*
  *  Convert move to computer notation (UCI)
  */
-char *moveToUci(Board_t self, char moveString[maxMoveSize], int move);
+char *moveToUci(char moveString[maxMoveSize], int move);
 
 /*
  *  Parse move input, disambiguate abbreviated notations
@@ -228,13 +229,10 @@ extern int parseUciMove(Board_t self, const char *line, int xmoves[maxMoves], in
 extern void normalizeEnPassantStatus(Board_t self);
 
 // Side to move in check?
-extern int inCheck(Board_t self);
+extern int isInCheck(Board_t self);
 
 // Is move legal? Move must come from generateMoves, so be safe to make.
 extern bool isLegalMove(Board_t self, int move);
-
-// Is the move a pawn promotion?
-extern bool isPromotion(Board_t self, int from, int to);
 
 // Search tree to fixed depth for correctness testing
 extern long long moveTest(Board_t self, int depth);

@@ -47,7 +47,7 @@ echo help | ./floyd
 echo
 
 echo "*** Smoke tests:"
-make easy | grep result
+make easy | sort -n
 echo bench | ./floyd
 echo bench | wine ./floyd.w32.exe
 echo
@@ -58,17 +58,17 @@ echo
 
 echo "*** Evaluation residual:"
 make residual
-echo
+#echo
 
 echo "*** Game playing:"
 cutechess-cli -concurrency 4 -rounds 50 -repeat -each tc=10+0.15\
 	-openings file=Data/book-6000-openings.pgn order=random\
 	-engine cmd=./floyd-pgo2 proto=uci\
-	-engine cmd=floyd0.7 proto=uci # user must have this version installed
+	-engine cmd=floyd0.8 proto=uci # user must have this version installed
 echo
 
 echo "*** Tactics:"
-make wac | grep result
+make wac | sort -n
 echo
 
 echo "*** Strategy:"
@@ -76,9 +76,13 @@ make sts
 echo
 
 echo "*** Check mate:"
-head -100 Data/qmate.epd | time python Tools/epdtest.py 10 | grep result
+head -100 Data/qmate.epd | time python Tools/epdtest.py 10 | sort -n
+echo
+
+echo "*** Zugzwang:"
+python Tools/epdtest.py -n 1 10 < Data/zz.epd
 echo
 
 echo "*** Speed:"
-echo 'bench movetime 3000 bestof 3' | ./floyd-pgo2
+echo 'bench movetime 1500 bestof 5' | ./floyd-pgo2
 echo

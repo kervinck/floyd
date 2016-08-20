@@ -359,7 +359,7 @@ extern int generateMoves(Board_t self, int moveList[maxMoves])
         /*
          *  Generate castling moves
          */
-        if (self->castleFlags && !inCheck(self)) {
+        if (self->castleFlags && !isInCheck(self)) {
                 static const int flags[2][2] = {
                         { castleFlagWhiteKside, castleFlagWhiteQside },
                         { castleFlagBlackKside, castleFlagBlackQside }
@@ -811,16 +811,6 @@ uint64_t pawnKingHash(Board_t self)
 }
 
 /*----------------------------------------------------------------------+
- |      isPromotion                                                     |
- +----------------------------------------------------------------------*/
-
-bool isPromotion(Board_t self, int from, int to)
-{
-        return (self->squares[from] == whitePawn && rank(to) == rank8)
-            || (self->squares[from] == blackPawn && rank(to) == rank1);
-}
-
-/*----------------------------------------------------------------------+
  |      isLegalMove                                                     |
  +----------------------------------------------------------------------*/
 
@@ -833,10 +823,10 @@ bool isLegalMove(Board_t self, int move)
 }
 
 /*----------------------------------------------------------------------+
- |      inCheck                                                         |
+ |      isInCheck                                                       |
  +----------------------------------------------------------------------*/
 
-int inCheck(Board_t self)
+int isInCheck(Board_t self)
 {
         updateSideInfo(self);
         int side = sideToMove(self);

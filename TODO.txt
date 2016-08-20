@@ -21,75 +21,14 @@ Floyd 0.9 dev status:
  150 8242 Floyd x0c9ee9d5 Manual tuning of futility margin
  144 8249 Floyd xaab4c50a Qsearch slot promotion
  178 8315 Floyd x17e8d8d4 Basic futility pruning
- 187 8373 Floyd xb1a327b4 Extended futility pruning
-     8390 Floyd x707b9383 Razoring
-
-marcelk@beobook3:~/Projects/floyd> ./floyd
-
-Floyd Chess Engine - Version
-
-Tentative release notes for v0.9:
-- Gained approximately 150 elo at fast time controls
-- Better handling of zugzwang positions
-- Fixed illegal moves deep in PV (reported by Dirk-Jan D.)
-- Full solution for the "0readyok" problem: also don't split info lines
-- Able to abort search in Python module (e.g. by Ctrl-C)
-Under the hood:
-- Added history counters for move ordering
-- Improved move ordering for killers
-- Improved null move pruning/reductions (aka verification)
-- Added delta pruning
-- Added hanging piece evaluation
-- Added basic futility pruning, razoring and stand pat pruning
-- Some minor evaluation weight tuning
-- Simplified UCI move printing
-- Eliminated spurious "Illegal move" in debug mode
-
-Rank Name                Elo    +    - games score oppo. draws
-   1 Fruit 2.1           342    1    1 304815   78%   102   12%
-   2 Floyd x0c9ee9d5-1   151    6    6 12798   49%   171   19%
-   3 Floyd x0c9ee9d5     151    4    4 24000   48%   171   18%
-   4 Floyd xb3eba936     149    4    4 20827   48%   171   19% <-- last ok
-   5 Floyd xb0fbc619-1   149    4    4 24000   48%   171   19%
-   6 Floyd xd1e0b3a5     148    4    4 24000   48%   171   19%
-   7 Floyd xaab4c50a     145    4    4 24000   48%   171   18%
-   8 Floyd xb0fbc619     144    4    4 24000   48%   171   18%
-   9 Floyd xbfe5344c     141    4    4 24000   47%   171   19%
-  10 Floyd xc9494dd4     127    4    4 24000   46%   171   19%
-  11 Floyd x8dae39c2     123    4    4 24000   45%   171   19%
-  12 Floyd xdedb91e0     121    4    4 24000   45%   171   19%
-  13 Floyd x51f810f6     112    4    4 24000   44%   171   19%
-  14 Floyd xa882bde3     111    4    4 24000   44%   171   19%
-  15 Floyd x6302ff3a     110    4    4 24000   44%   171   19%
-  16 Floyd x8399a075     110    4    4 24000   44%   171   19%
-  17 Floyd x3c65e794     107    4    4 24000   43%   171   19%
-  18 Floyd x4318fa13     107    4    4 24000   43%   171   19%
-  19 Floyd xa416cb63     105    4    4 24000   43%   171   19%
-  20 Floyd x1f1cd580     105    4    4 24000   43%   171   19%
-  21 Floyd x354d5f3a      98    4    4 24000   42%   171   19%
-  22 Floyd xc6c5dae2      92    4    4 24000   42%   171   19%
-  23 Floyd x7c96b2ca      88    4    4 24000   41%   171   20%
-  24 Floyd x0e0dc088      68    4    4 24000   39%   171   19%
-  25 Floyd x800ecb47      61    4    4 24000   38%   171   19%
-  26 Floyd 0.8             0    1    1 304810   34%   115   24%
-  27 Floyd 0.7          -147    4    4 36000   38%    -3   13%
-  28 Floyd 0.6          -351    6    6 12000   24%  -147   18%
-                   Fr Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl Fl
-Fruit 2.1            100100100100100100100100100100100100100100100100100100100100100100100100100100100
-Floyd x0c9ee9d5-1   0    58 71 75 83 96 97 99 99 99100100100100100100100100100100100100100100100100100
-Floyd x0c9ee9d5     0 41    66 71 81 97 98 99 99100100100100100100100100100100100100100100100100100100
-Floyd xb3eba936     0 28 33    55 66 92 94 99 99100100100100100100100100100100100100100100100100100100
-Floyd xb0fbc619-1   0 24 28 44    62 90 93 99 99100100100100100100100100100100100100100100100100100100
-Floyd xd1e0b3a5     0 16 18 33 37    84 87 98 99 99100100100100100100100100100100100100100100100100100
-Floyd xaab4c50a     0  3  2  7  9 15    56 89 99 99 99100100100100100100100100100100100100100100100100
-Floyd xb0fbc619     0  2  1  5  6 12 43    86 99 99 99100100100100100100100100100100100100100100100100
-Floyd xbfe5344c     0  0  0  0  0  1 10 13    99 99 99100100100100100100100100100100100100100100100100
+ 182 8373 Floyd xb1a327b4 Extended futility pruning
+ 182 8390 Floyd xff208d49 Razoring
 
 ------------------------------------------------------------------------
-        Version 0.9
+        Search
 ------------------------------------------------------------------------
 
-|Ongoing| Futility at depth 2 for bad positions [search]
+|Todo| Futility at depth 2 for bad positions [search]
 
 // TODO: try reduce depth or just drop into qSearch
 // TODO: margins dependent on node type and board features
@@ -97,37 +36,20 @@ Floyd xbfe5344c     0  0  0  0  0  1 10 13    99 99 9910010010010010010010010010
 Or use from last ply:
         if depth=2 FH, then use as depth=3 result :-)
 
-|Todo| Razoring [search]
+|Todo| Update razoring [search]
 
-        else if (depth == 3 && inRange(alpha, minEval, maxEval-1) && !inCheck) {
-                // Razoring at pre-pre-frontier nodes
-                int eval = evaluate(board(self));
-                if (eval + 6000 <= alpha) {
-                        int score = scout(self, depth-2, alpha, pvDistance, 0000);
-                        node.slot = ttRead(self);
-                        if (score <= alpha)
-                                return ttWrite(self, node.slot, depth, score, alpha, alpha+1);
-                }
-        }
+Current version is useless (Floyd 0.9)
 
-Potential:
-passed 8395 total 20000 (new high)
-
- x2457e7c3 Razoring
-passed 8328 total 20000
-
- x707b9383
-passed 8390 total 20000
-passed 8322 total 20000
+Rank Name                Elo    +    - games score oppo. draws
+   1 Fruit 2.1           343    1    1 340815   77%   111   12%
+   2 Floyd xb1a327b4     182    4    4 24000   52%   172   19%
+   3 Floyd xff208d49     182    4    4 24000   52%   172   19% <-- doesn't do anything
+   4 Floyd x17e8d8d4     179    4    4 24000   52%   172   19%
 
 Basically preselecting for standing pat at depth 1
 if depth == 3 and nullMove FL but "eval > alpha":
         if search(2) > alpha // drop last move, reduceIfOdd
                 return
-
-------------------------------------------------------------------------
-        Search
-------------------------------------------------------------------------
 
 |Todo| Do futility filtering before makeMove [speed]
 
@@ -142,7 +64,6 @@ isCheckMove()
                 and the move is away from that attacking line
 }
 +12% nps expected
-
 
 |Todo| Evaluation cache [search]
 
@@ -177,15 +98,15 @@ This can work. But bad captures should still be pruned
 
 |Todo| Evaluation filtering for null move (retry) [search]
 
-Cache evaluations to prevent the NPS drop
+Prerequisite: cache evaluations to prevent the NPS drop
 
 |Todo| Move classes [search]
 
-  tactical      Discover from to-square and board
+  tactical      Discover from the to-square and board
   safe          From SEE bits
   strong        Discover after makeMove (from evaluate)
   check         Discover after makeMove (from attacks)
-  pawn          From special bits
+  pawn          From the move tag bits
 
   strong: moveScore == -1 and deltaEval > 0
   weak:   moveScore < -1 or deltaEval <= 0
@@ -238,6 +159,8 @@ Redesignate special bits as follows:
 
 |Todo| Remember more than 1 good move in PV nodes
 
+For example in additional ttable slots.
+
 |Todo| More agressive null move tuning
 
 |Todo| More agressive LMR tuning
@@ -255,16 +178,6 @@ Redesignate special bits as follows:
    weakquiet moves or bad checks
 
 --> Register the likelihood that the move fails high
-
-|Todo| Inverse delta pruning [search]
-
-        if (nrMoves > 0 && !inCheck) {
-                // Inverse delta pruning
-                assert(moveList[0] >= 0);
-                int minDelta = (moveList[0] >> 26) * 1000 - 1000;
-                if (minDelta > alpha - bestScore)
-                        return ttWrite(self, slot, 0, bestScore + minDelta, alpha, alpha+1);
-        }
 
 |Todo| Upcoming repetition detection
 
@@ -419,9 +332,19 @@ Floyd xaab4c50a   0  2    89 99 99 991001001001001001001001001001001001001001001
 Nps before: 781676
 Nps after: 777086 (99.4%) --> Not sufficient to explain the difference
 
+|Todo| Don't reduce safe checks
+
 |Todo| Sort all captures before non-captures [search]
 
-|Todo| Don't reduce safe checks
+|Todo| Inverse delta pruning [search]
+
+        if (nrMoves > 0 && !inCheck) {
+                // Inverse delta pruning
+                assert(moveList[0] >= 0);
+                int minDelta = (moveList[0] >> 26) * 1000 - 1000;
+                if (minDelta > alpha - bestScore)
+                        return ttWrite(self, slot, 0, bestScore + minDelta, alpha, alpha+1);
+        }
 
 ------------------------------------------------------------------------
         Evaluate
@@ -434,7 +357,12 @@ Nps after: 777086 (99.4%) --> Not sufficient to explain the difference
 - Weights depend on side to move: total 6 parameters to tune
 - Rethink mobility as well
 
-|Todo| 4-piece eg heuristics [evaluate]
+|Todo| 4-piece eg heuristics [eg,evaluate]
+
+- K+minor vs K+minor
+- KNNK
+- KBNK [eg,evaluate]
+- KP(a)KB of wrong color
 
         if (nrEffectivePieces == 4) {
                 if (nrMinors(side) > 0 && nrMinors(xside) > 0)
@@ -507,13 +435,6 @@ Mobility = what can I actually move to a square, safely
 |Todo| Attacking a non-mobile pawn
 |Todo| Attacks on backward/weak pawns
 |Todo| Attack x piece matrix [evaluate]
-|Todo| Threats [evaluate]
-
-Threat: weaker attacks stronger piece or undefended piece
-
-1st threat
-2nd threat
-3rd threat
 
 |Todo| Undrawness of material advantage [evaluate]
 
@@ -581,9 +502,6 @@ as as Queens being "transparent" when considering Bishop attacks."
 http://talkchess.com/forum/viewtopic.php?p=665703#665703
 
 |Todo| Rook doubling on open files [evaluate]
-
-|Todo| KBNK [eg,evaluate]
-|Todo| KP(a)KB of wrong color [eg,evaluate]
 
 ------------------------------------------------------------------------
         Other
@@ -701,16 +619,17 @@ There must be a cleaner way
 |Todo| Rename pawnKingHash [qa]
 
 Because we want to add bishop colors as well, and
-reduce the king component to their files.
+simplify the king component to just their files.
 
 Candidates (best first):
-        subHash <-- looks best
-        miniHash
+        structureHash
+        subHash
         pkbHash
         coarseHash
+Bad names:
+        miniHash
         hash2
         pawnHash
-        structHash
         xHash
         pHash
         slowHash
@@ -729,6 +648,8 @@ Idea 3: If second move is not disjoint, it is not an easy move.
 Disjoint means different from and to squares (maybe also include
 intermediate squares in this definition): moves that can be made in
 arbitrary order.
+Idea 4: Panic if `previousDepth - 2' not reached
+Idea 5: More time for slow iterations or for move changes
 
 |Todo| Cleanup header files [qa]
 
@@ -742,10 +663,24 @@ Distance to weak pawns
 Counting arguments
 Fortresses
 
+|Todo| Evalaution granularity
+
+Two ways:
+- Round evaluation (what everyone is doing)
+- Scout offsets (more attractive idea), 3 sub-options:
+        scout research
+        >0    >0
+        0     >0
+        >0    0
+
 |Todo| Try gcc sanitizers [qa]
 
 -fsanitize=address
 -fsanitize=undefined
+
+|todo| Debugging compile [qa]
+
+And optimization again for the Python module
 
 |Todo| Multi PV [uci,usability]
 

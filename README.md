@@ -1,3 +1,5 @@
+![Logo courtesy of Daniel Schweinert](https://marcelk.net/floyd/.floyd-logo-260x130.png)
+
 Floyd chess engine
 ==================
 

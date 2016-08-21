@@ -1,69 +1,37 @@
-Floyd 0.9 dev status:
- Elo Test Version         EloChange
--149 7041 Floyd 0.7       Older version
-   0 7522 Floyd 0.8       Reference
-  58 7751 Floyd x800ecb47 History counters
-  65 7785 Floyd x0e0dc088 Integrate older tuning
-  85 7807 Floyd x7c96b2ca Unconditional null move, i.s.o. evaluation
-  89 7875 Floyd xc6c5dae2 Simple delta pruning
-  95      Floyd x354d5f3a Delta pruning option 3 (pseudo fail-soft, aka xec39d0d0)
- 102 7900 Floyd xa416cb63 Slightly tighter bound (aka xaef137c2)
- 104      Floyd x8399a075 SEE>0 before killers; PV bug fix
- 104 7932 Floyd x4318fa13 Avoid double null move
- 108 7904 Floyd xa882bde3 Null move verification 1
- 104      Floyd x3c65e794 Only odd nodes
- 102      Floyd x1f1cd580 Delta pruning tuning
- 108      Floyd x6302ff3a Hanging pieces with basic tuning
- 122 8045 Floyd x8dae39c2 Extended tuning and material table
- 125 8064 Floyd xc9494dd4 Second run of extended tuning
- 120 8030 Floyd xdedb91e0 Simplistic futility
- 140 8195 Floyd xbfe5344c Simple dynamic futility pruning
- 150 8242 Floyd x0c9ee9d5 Manual tuning of futility margin
- 144 8249 Floyd xaab4c50a Qsearch slot promotion
- 178 8315 Floyd x17e8d8d4 Basic futility pruning
- 182 8373 Floyd xb1a327b4 Extended futility pruning
- 182 8390 Floyd xff208d49 Razoring
+
+Tentative release notes:
+
+Main changes:
+- Handle squashed names in setoption (reported by Dirk-Jan D.)
+- Fully support halfmove clock and move number of "position fen"
+Under the hood:
+-
+
+
+Rank Name        Elo    +    - games score oppo. draws
+   1 Fruit 2.1   145    4    4 36000   83%  -165   10%
+   2 Floyd 0.9     0    4    4 24000   52%   -13   19%
+   3 Floyd 0.8  -171    4    4 36000   37%   -59   16%
+   4 Floyd 0.7  -324    4    4 36000   38%  -184   13%
+   5 Floyd 0.6  -528    6    6 12000   24%  -324   18%
+           Fr Fl Fl Fl Fl
+Fruit 2.1    100100100100
+Floyd 0.9   0   100100100
+Floyd 0.8   0  0   100100
+Floyd 0.7   0  0  0   100
+Floyd 0.6   0  0  0  0
 
 ------------------------------------------------------------------------
         Search
 ------------------------------------------------------------------------
 
-|Todo| Futility at depth 2 for bad positions [search]
+|Todo| Measure repeatability of "make search" test
 
-// TODO: try reduce depth or just drop into qSearch
-// TODO: margins dependent on node type and board features
-
-Or use from last ply:
-        if depth=2 FH, then use as depth=3 result :-)
-
-|Todo| Update razoring [search]
-
-Current version is useless (Floyd 0.9)
-
-Rank Name                Elo    +    - games score oppo. draws
-   1 Fruit 2.1           343    1    1 340815   77%   111   12%
-   2 Floyd xb1a327b4     182    4    4 24000   52%   172   19%
-   3 Floyd xff208d49     182    4    4 24000   52%   172   19% <-- doesn't do anything
-   4 Floyd x17e8d8d4     179    4    4 24000   52%   172   19%
-
-Basically preselecting for standing pat at depth 1
-if depth == 3 and nullMove FL but "eval > alpha":
-        if search(2) > alpha // drop last move, reduceIfOdd
-                return
-
-|Todo| Do futility filtering before makeMove [speed]
-
-Need 'isCheckMove' function however
-isCheckMove()
-{
-        1. New piece gives check on to-square
-        2. Piece discovers check
-                If it is attacked by the right type of slider, and
-                in the right direction, and
-                without path to king being blocked, and
-                and the move is away from that attacking line
-}
-+12% nps expected
+passed 7999 total 20000
+passed 8001 total 20000
+passed 8011 total 20000
+passed 8000 total 20000
+passed 8008 total 20000
 
 |Todo| Evaluation cache [search]
 
@@ -128,8 +96,6 @@ Flags must support more ordering:
 7. Strong moves
 8. Weak moves
 
-|Todo| Collect statistics for delta pruning [search]
-
 |Todo| Undo reductions for difficult sub-trees [search]
 
 Positions with biggest subtree should be unreduced and retried?
@@ -161,8 +127,6 @@ Redesignate special bits as follows:
 
 For example in additional ttable slots.
 
-|Todo| More agressive null move tuning
-
 |Todo| More agressive LMR tuning
 
 1. Hash move            No reduction
@@ -179,6 +143,45 @@ For example in additional ttable slots.
 
 --> Register the likelihood that the move fails high
 
+|Todo| Collect statistics for delta pruning [search]
+
+|Todo| Futility at depth 2 for bad positions [search]
+
+// TODO: try reduce depth or just drop into qSearch
+// TODO: margins dependent on node type and board features
+
+Or use from last ply:
+        if depth=2 FH, then use as depth=3 result :-)
+
+|Todo| Update razoring [search]
+
+Current version is useless (Floyd 0.9)
+
+Rank Name                Elo    +    - games score oppo. draws
+   1 Fruit 2.1           343    1    1 340815   77%   111   12%
+   2 Floyd xb1a327b4     182    4    4 24000   52%   172   19%
+   3 Floyd xff208d49     182    4    4 24000   52%   172   19% <-- doesn't do anything
+   4 Floyd x17e8d8d4     179    4    4 24000   52%   172   19%
+
+Basically preselecting for standing pat at depth 1
+if depth == 3 and nullMove FL but "eval > alpha":
+        if search(2) > alpha // drop last move, reduceIfOdd
+                return
+
+|Todo| Do futility filtering before makeMove [speed]
+
+Need 'isCheckMove' function however
+isCheckMove()
+{
+        1. New piece gives check on to-square
+        2. Piece discovers check
+                If it is attacked by the right type of slider, and
+                in the right direction, and
+                without path to king being blocked, and
+                and the move is away from that attacking line
+}
++12% nps expected
+
 |Todo| Upcoming repetition detection
 
 |Todo| Underpromotion pruning [search]
@@ -191,6 +194,7 @@ In qsearch
  transpose into the same line as queening, and then wreck the
  hash table?  Not if queen goes first? Higher depth etc
 
+|Todo| More agressive null move tuning
 |Todo| Extended testing of null move options [search]
 
 -- 1. isOdd() condition might be a slight regression in 10+0.15 testing
@@ -331,8 +335,6 @@ Floyd xaab4c50a   0  2    89 99 99 991001001001001001001001001001001001001001001
 
 Nps before: 781676
 Nps after: 777086 (99.4%) --> Not sufficient to explain the difference
-
-|Todo| Don't reduce safe checks
 
 |Todo| Sort all captures before non-captures [search]
 
@@ -507,13 +509,6 @@ http://talkchess.com/forum/viewtopic.php?p=665703#665703
         Other
 ------------------------------------------------------------------------
 
-|Todo| Replace 'double' with 'float' or even 'short' evaluate [speed]
-
-- assert(sizeof(struct mSlot) <= 32)
-- replace wiloScore[2] with a single value
-
-Floyd is slow, but we should aim to keep it above 1Mnps
-
 |Todo| Win64 version from Makefile [win64]
 
 Joost: Intel C compiler versie 15
@@ -546,25 +541,13 @@ Merge release into master:
         git branch -d v0.8
         git push origin dev
 
-|Todo| Granularity of win32 clock too low? [win32]
-
 |Todo| Terminology: coefficient or parameter [qa]
-
-|Todo| Consider gradient descent [tune]
-
-Or better:
-https://en.wikipedia.org/wiki/Conjugate_gradient_method
-
-|Todo| Test tuner on Rosenbrock function [tune]
-
-https://en.wikipedia.org/wiki/Rosenbrock_function
 
 |Todo| Parameter graphs (tune.dir) [tune]
 
 |Todo| Reject illegal positions [usability]
 
 - pawns on rank 1 and 8
-- not one king per side
 - too many pawns or promoted pieces
 - side to move attacks other king
 
@@ -592,13 +575,11 @@ Platform: UNKNOWN
 2RR2bK/b1N4p/1pkNp1r1/p3p2r/6P1/n1p5/n5P1/6B1 w - - acn 330710; acs 1; bm g3; ce 32758; dm 5; pv g3 h6 Ncb5+ Kd5 Nxc3+ Nxc3 Nc4+ Ke4 Nd2#;
 6RQ/6pP/p5K1/1r2p2N/p3k3/R7/B7/B7 w - - acn 106602; acs 0; bm Qxg7 Rc3; ce 32758; dm 5; pv Rc3 Rb6+ Kg5 Rg6+ Kxg6 a3 Rd8 a5 Bb1#;
 
-|Todo| Move logit() from evaluate to rootSearch [speed]
-
 |Todo| Calculate the impact of each parameter [tune]
 
 Lazy method: set each to 0 and compute the delta of the residual
 
-|Todo| Auto jitter monitoring [timecontrol]
+|Todo| Auto jitter monitoring [gameplay]
 
 Keep track of maximum jitter in a session, and use that instead of the
 2.5 seconds safety margin. Then see if we can reduce 2.5 to 0.5 with this
@@ -608,7 +589,7 @@ and gain some fake elo at ultra fast tc.
 
 For decorrelation of parameters
 
-|Todo| Clearer handling of minmovetime [timecontrol]
+|Todo| Clearer handling of minmovetime [gameplay]
 
 Now we increase safety to 20 s when increment is (almost) 0.
 This is double indirect:
@@ -638,7 +619,7 @@ Bad names:
 
 At least in debugging mode.
 
-|Todo| Easy move, hard move [playing]
+|Todo| Easy move, hard move [gameplay]
 
 Keep track of PV stability
 
@@ -650,6 +631,8 @@ intermediate squares in this definition): moves that can be made in
 arbitrary order.
 Idea 4: Panic if `previousDepth - 2' not reached
 Idea 5: More time for slow iterations or for move changes
+
+Doesn't help for analysis
 
 |Todo| Cleanup header files [qa]
 
@@ -663,7 +646,7 @@ Distance to weak pawns
 Counting arguments
 Fortresses
 
-|Todo| Evalaution granularity
+|Todo| Evaluation granularity
 
 Two ways:
 - Round evaluation (what everyone is doing)
@@ -672,11 +655,6 @@ Two ways:
         >0    >0
         0     >0
         >0    0
-
-|Todo| Try gcc sanitizers [qa]
-
--fsanitize=address
--fsanitize=undefined
 
 |todo| Debugging compile [qa]
 
@@ -689,3 +667,13 @@ For v1.0?
 |Todo| Lazy SMP [search]
 
 For v1.0?
+
+|Todo| Chess960 [usability]
+
+Arena wants castling as O-O and O-O-O instead of king takes rook?
+
+|Todo| Deprecated function warnings on win64 compilation [qa]
+
+_ftime64 ->  _ftime64_s
+strerror -> strerror_s
+sscanf -> sscanf_s

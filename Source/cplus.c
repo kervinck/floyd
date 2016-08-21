@@ -72,15 +72,21 @@ err_t freeErr(err_t err)
 err_t listEnsureMaxLen(voidList *list, int itemSize, int minLen, int minSize)
 {
         err_t err = OK;
+        assert(itemSize > 0);
         assert(minLen >= list->len);
-        assert(minLen > 0);
+        assert(minSize >= 0);
+        assert(minSize <= maxInt - (itemSize - 1));
 
         if ((list->maxLen == 0) && (list->v != null))
                 xRaise("Invalid operation on fixed-length list");
 
+        int hardMax = maxInt / itemSize;
+        if (minLen > hardMax)
+                xRaise("List too long");
+
         int newMax = max(1, (minSize + itemSize - 1) / itemSize);
         while (newMax < minLen)
-                newMax *= 2; // TODO: make this robust for huge lists (overflows etc)
+                newMax = (newMax <= hardMax - newMax) ? newMax * 2 : hardMax;
 
         if (newMax != list->maxLen) {
                 void *v = realloc(list->v, newMax * itemSize);
@@ -105,7 +111,7 @@ void listPrintf(charList *list, const char *format, ...)
         if (len == -1) xAbort(errno, "vsnprintf");
         preparePushList(*list, len+1); // include trailing '\0'
         va_start(args, format); // MUST redo this!
-        vsprintf(&list->v[list->len], format, args);
+        (void)vsnprintf(&list->v[list->len], len+1, format, args); // `vsprintf' can give deprecation warnings
         va_end(args);
         list->len += len;
 }
@@ -122,7 +128,7 @@ void listPrintf(charList *list, const char *format, ...)
 double xTime(void)
 {
         struct _timeb t;
-        _ftime(&t);
+        _ftime(&t); // 64 Hz resolution only
         return t.time + t.millitm * 1e-3;
 }
 #endif

@@ -21,6 +21,7 @@
 #include <ctype.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 
 // C extension
@@ -33,10 +34,7 @@
  |      Definitions                                                     |
  +----------------------------------------------------------------------*/
 
-/*
- *  Square notation
- */
-
+// Algebraic square notation
 #define rankToChar(rank)        ('1'   + rankStep * ((rank) - rank1))
 #define charToRank(c)           (rank1 + rankStep * ((c) - '1'))
 #define fileToChar(file)        ('a'   + fileStep * ((file) - fileA))
@@ -66,9 +64,7 @@ static const char promotionPieceToChar[] = { 'Q', 'R', 'B', 'N' };
  |      Convert a move to UCI output                                    |
  +----------------------------------------------------------------------*/
 
-/*
- *  Convert into UCI notation
- */
+// Convert move into UCI notation
 extern char *moveToUci(char moveString[maxMoveSize], int move)
 {
         int from = from(move);
@@ -90,11 +86,10 @@ extern char *moveToUci(char moveString[maxMoveSize], int move)
  |      Convert board to FEN notation                                   |
  +----------------------------------------------------------------------*/
 
+// Convert move into 6-field Forsyth-Edwards Notation (FEN)
 extern void boardToFen(Board_t self, char *fen)
 {
-        /*
-         *  Squares
-         */
+        // Squares
         for (int rank=rank8; rank!=rank1-rankStep; rank-=rankStep) {
                 int emptySquares = 0;
                 for (int file=fileA; file!=fileH+fileStep; file+=fileStep) {
@@ -112,15 +107,11 @@ extern void boardToFen(Board_t self, char *fen)
                 if (rank != rank1) *fen++ = '/';
         }
 
-        /*
-         *  Side to move
-         */
+        // Side to move
         *fen++ = ' ';
         *fen++ = (sideToMove(self) == white) ? 'w' : 'b';
 
-        /*
-         *  Castling flags
-         */
+        // Castling flags
         *fen++ = ' ';
         if (self->castleFlags) {
                 if (self->castleFlags & castleFlagWhiteKside) *fen++ = 'K';
@@ -130,9 +121,7 @@ extern void boardToFen(Board_t self, char *fen)
         } else
                 *fen++ = '-';
 
-        /*
-         *  En-passant square
-         */
+        // En passant square
         *fen++ = ' ';
         normalizeEnPassantStatus(self);
         if (self->enPassantPawn) {
@@ -141,15 +130,8 @@ extern void boardToFen(Board_t self, char *fen)
         } else
                 *fen++ = '-';
 
-        /*
-         *  Move number (TODO)
-         */
-
-        /*
-         *  Halfmove clock (TODO)
-         */
-
-        *fen = '\0';
+        // Halfmove clock and move number
+        sprintf(fen, " %d %d", self->halfmoveClock, self->plyNumber >> 1);
 }
 
 /*----------------------------------------------------------------------+

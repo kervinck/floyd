@@ -406,7 +406,7 @@ static void searchThreadStart(void *args)
         Engine_t self = args;
         rootSearch(self);
         while (self->pondering)
-                pass; // TODO: change into a sempahore
+                pass; // TODO: change into a semaphore one day
         uciBestMove(self);
 }
 

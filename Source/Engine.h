@@ -34,8 +34,8 @@ typedef void searchInfo_fn(void *infoData);
 #define ttDateBits 12
 
 enum {
-        minMate = -32000, minEval = -29999, minDtz  = -31000,
-        maxMate =  32000, maxEval =  29999, maxDtz  =  31000,
+        minMate = -32000, minDtz  = -31000, minEval = -29999,
+        maxMate =  32000, maxDtz  =  31000, maxEval =  29999,
 };
 #define isDrawScore(score)     ((score) == 0)
 #define isWinScore(score)      ((score) > maxEval)

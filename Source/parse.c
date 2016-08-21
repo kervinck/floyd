@@ -21,6 +21,7 @@
 #include <ctype.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 
 // C extension
@@ -33,10 +34,7 @@
  |      Definitions                                                     |
  +----------------------------------------------------------------------*/
 
-/*
- *  Square notation
- */
-
+// Algebraic square notation
 #define rankToChar(rank)        ('1'   + rankStep * ((rank) - rank1))
 #define charToRank(c)           (rank1 + rankStep * ((c) - '1'))
 #define fileToChar(file)        ('a'   + fileStep * ((file) - fileA))
@@ -63,12 +61,8 @@ extern int setupBoard(Board_t self, const char *fen)
 {
         int ix = 0;
 
-        /*
-         *  Squares
-         */
-
+        // Squares
         while (isspace(fen[ix])) ix++;
-
         int file = fileA, rank = rank8;
         int nrWhiteKings = 0, nrBlackKings = 0;
         memset(self->squares, empty, boardSize);
@@ -108,20 +102,13 @@ extern int setupBoard(Board_t self, const char *fen)
         }
         if (nrWhiteKings != 1 || nrBlackKings != 1) return 0;
 
-        /*
-         *  Side to move
-         */
-
-        self->plyNumber = 2 + (fen[ix+1] == 'b'); // 2 means full move number starts at 1
-        //self->lastZeroing = self->plyNumber;
-        ix += 2;
-
-        /*
-         *  Castling flags
-         */
-
+        // Side to move
         while (isspace(fen[ix])) ix++;
+        self->plyNumber = 1 * 2 + (fen[ix] == 'b'); // Default move number is 1
+        ix++;
 
+        // Castling flags
+        while (isspace(fen[ix])) ix++;
         self->castleFlags = 0;
         for (;; ix++) {
                 switch (fen[ix]) {
@@ -135,18 +122,14 @@ extern int setupBoard(Board_t self, const char *fen)
                 break;
         }
 
-        /*
-         *  En passant square
-         */
-
+        // En passant square
         while (isspace(fen[ix])) ix++;
-
         if ('a' <= fen[ix] && fen[ix] <= 'h') {
                 file = charToFile(fen[ix]);
                 ix++;
 
                 rank = (sideToMove(self) == white) ? rank5 : rank4;
-                if (isdigit(fen[ix])) ix++; // ignore what it says
+                if (isdigit(fen[ix])) ix++; // Ignore what it says
 
                 self->enPassantPawn = square(file, rank);
         } else {
@@ -155,13 +138,16 @@ extern int setupBoard(Board_t self, const char *fen)
                         ix++;
         }
 
-        // Eat move number and halfmove clock. TODO: process this properly
-        while (isspace(fen[ix])) ix++;
-        while (isdigit(fen[ix])) ix++;
-        while (isspace(fen[ix])) ix++;
-        while (isdigit(fen[ix])) ix++;
+        // (Optional) Halfmove clock and move number
+        int hm, fm, n;
+        if (sscanf(fen+ix, " %d %d%n", &hm, &fm, &n) == 2 && hm >= 0 && fm >= 0) {
+                self->halfmoveClock = min(hm, 100);
+                self->plyNumber = min(fm, 10000) * 2 + sideToMove(self);
+                ix += n;
+        } else
+                self->halfmoveClock = 0; // plyNumber already set above
 
-        self->sideInfoPlyNumber = -1; // side info is invalid now
+        self->sideInfoPlyNumber = -1; // sides[] contents are invalid now
 
         // Reset the undo stack
         self->undoStack.len = 0;
@@ -173,7 +159,7 @@ extern int setupBoard(Board_t self, const char *fen)
         self->pawnKingHash = pawnKingHash(self);
         self->pkHashHistory.len = 0;
 
-        normalizeEnPassantStatus(self); // Only safe after update of hash
+        normalizeEnPassantStatus(self); // Only safe to do after updating hash
 
         self->eloDiff = 0;
 

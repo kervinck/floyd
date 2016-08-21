@@ -29,9 +29,9 @@
 // {
         P(eloDiff, 51),
         P(tempo, 61),
-        P(hanging_0, -23), // Side to move
-        P(hanging_1, -112),
-        P(hanging_2, -89),
+        P(hanging_0, 23), // Side to move
+        P(hanging_1, 112),
+        P(hanging_2, 89),
         P(hanging_0x, 14), // Other side
         P(hanging_1x, 3),
         P(hanging_2x, 104),
@@ -419,8 +419,8 @@
         P(passerVsKnight, -860),
         P(passerVsPawn, 256),
 
-        P(protectedPasser, -9), // TODO: check this after tuning
-        P(connectedPasser, -41), // TODO: check this after tuning
+        P(protectedPasser, -9),
+        P(connectedPasser, -41),
 
         P(safePasser, 180), // no blocker and totally safe passage
 
@@ -430,8 +430,8 @@
         P(blocker_3, -1),
         P(blocker_4, -10), // -furtest square
 
-        P(blockedByOwn, 5), // TODO: check this after tuning
-        P(blockedByOther, -113), // TODO: check this after tuning
+        P(blockedByOwn, 5),
+        P(blockedByOther, -113),
 
         P(controller_0, -72), // stop square
         P(controller_1, -53),

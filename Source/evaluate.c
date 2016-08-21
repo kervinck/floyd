@@ -57,10 +57,10 @@ enum vector {
 
 struct mSlot {
         uint64_t materialKey;
-        int wiloScore[2];
-        int drawScore;
-        double passerScaling[2];
-        double safetyScaling[2];
+        float passerScaling[2];
+        float safetyScaling[2];
+        short wiloScore[2];
+        short drawScore;
 };
 
 struct pkSlot {
@@ -158,14 +158,14 @@ static void evaluatePawnFile(Board_t self, const int v[vectorLen], struct pkSlot
 static int evaluatePasser(Board_t self, const int v[vectorLen], int fileFlag, int side, int passerSquare[2][8]);
 static int evaluateKnight(Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side);
 static int evaluateBishop(Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side);
-static int evaluateRook  (Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side, double safetyScaling[2], int passerSquare[2][8]);
+static int evaluateRook  (Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side, float safetyScaling[2], int passerSquare[2][8]);
 static int evaluateQueen (Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side, int passerSquare[2][8]);
 static int evaluateKing  (              const int v[vectorLen],                             int square, int side);
 
 static int shelterPenalty(const int v[vectorLen], int side, int file, int maxPawnFromFirst[2][10][2]);
 
-static double sigmoid(double x);
-static double logit(double p);
+static float sigmoidf(float x);
+static float logitf(float p);
 static int squareOf(Board_t self, int piece);
 
 /*----------------------------------------------------------------------+
@@ -404,7 +404,7 @@ int evaluate(Board_t self)
         int xhangScore = hangingPieces[xside][0] * v[hanging_0x]
                        + hangingPieces[xside][1] * v[hanging_1x]
                        + hangingPieces[xside][2] * v[hanging_2x];
-        wiloScore[side] += hangScore + xhangScore;
+        wiloScore[side] += xhangScore - hangScore;
 
         wiloScore[white] += self->eloDiff * v[eloDiff] / 10; // contempt
 
@@ -416,7 +416,7 @@ int evaluate(Board_t self)
          |      Safety margin for futility pruning                      |
          +--------------------------------------------------------------*/
 
-        self->futilityMargin = (nrSliders(side) > 1) ? 122 - 7*hangScore : 5000;
+        self->futilityMargin = (nrSliders(side) > 1) ? 122 + 7*hangScore : 5000;
 
         /*--------------------------------------------------------------+
          |      Special endgames                                        |
@@ -470,31 +470,25 @@ int evaluate(Board_t self)
                         }
                 }
         }
-#if 0
-        if (nrEffectivePieces == 4) {
-                if (nrKnights(xside) == 2)
-                        return 0; // KKNN, draw if lone king is to move
 
-                if (nrEffectiveBishops(side) == 1 && nrKnights(xside) == 1)
-                        return 0; // KBKN, draw if bishop side is to move
+        if (nrEffectivePieces == 4) {
+                if (allKnights == 2)
+                        return 0; // KNNK, KNKN
         }
-#endif
 
         /*--------------------------------------------------------------+
          |      Total                                                   |
          +--------------------------------------------------------------*/
 
         // Combine wiloScore and drawScore into an expected game result
-        double Wp = sigmoid(wiloSum * 1e-3);
-        double D = sigmoid(drawScore * 1e-3);
-        double P = 0.5 * D + Wp - D * Wp;
+        float Wp = sigmoidf(wiloSum * 1e-3f);
+        float D = sigmoidf(drawScore * 1e-3f);
+        float P = 0.5f * D + Wp - D * Wp;
 
-        //printf("wiloSum %+d drawScore %+d P %f\n", wiloSum, drawScore, P);
+        static const float mCi = 1e+3 * 4.0 / M_LN10;
+        int score = roundf(mCi * logitf(P));
 
-        static const double Ci = 4.0 / M_LN10;
-        int score = round(Ci * logit(P) * 1e+3);
-
-        if (score == 0) score++; // Reserve 0 exclusively for draws
+        score += !score; // Reserve 0 exclusively for draws
         score = min(score,  maxEval);
         score = max(score, -maxEval);
 
@@ -517,7 +511,7 @@ static void evaluateMaterial(Board_t self, struct mSlot *mSlot)
                 int xside = other(side);
 
                 // Material balance
-                mSlot->wiloScore[side] =
+                int wiloScore =
                         nrQueens(side) * (
                                 + v[queenValue]
                                 + v[queenAndQueen]  * (nrQueens(side) - 1)
@@ -566,10 +560,12 @@ static void evaluateMaterial(Board_t self, struct mSlot *mSlot)
                                 + v[knightVsPawn_2]  * nrPawns(xside) * nrPawns(xside) / 8);
 
                 if (nrPawns(side) > 0)
-                        mSlot->wiloScore[side] += v[pawnValue1 + nrPawns(side) - 1];
+                        wiloScore += v[pawnValue1 + nrPawns(side) - 1];
+
+                mSlot->wiloScore[side] = min(wiloScore, maxEval);
 
                 // Passer scaling
-                mSlot->passerScaling[side] = sigmoid(1e-3 * (v[passerScalingOffset]
+                mSlot->passerScaling[side] = sigmoidf(1e-3f * (v[passerScalingOffset]
                         + nrQueens(side)   * v[passerAndQueen]
                         + nrRooks(side)    * v[passerAndRook]
                         + nrBishops(side)  * v[passerAndBishop]
@@ -582,7 +578,7 @@ static void evaluateMaterial(Board_t self, struct mSlot *mSlot)
                         + nrPawns(xside)   * v[passerVsPawn]));
 
                 // King safety scaling
-                mSlot->safetyScaling[side] = sigmoid(1e-3 * (v[safetyScalingOffset]
+                mSlot->safetyScaling[side] = sigmoidf(1e-3f * (v[safetyScalingOffset]
                         + nrQueens(side)   * v[safetyAndQueen]
                         + nrRooks(side)    * v[safetyAndRook]
                         + nrBishops(side)  * v[safetyAndBishop]
@@ -655,6 +651,7 @@ static void evaluateMaterial(Board_t self, struct mSlot *mSlot)
                 }
 
         // Wrap-up
+        assert(inRange(drawScore, minEval, maxEval));
         mSlot->drawScore = drawScore;
         mSlot->materialKey = self->materialKey;
 }
@@ -1074,7 +1071,7 @@ static int evaluateBishop(Board_t self, const int v[vectorLen], const struct pkS
  |      evaluateRook                                                    |
  +----------------------------------------------------------------------*/
 
-static int evaluateRook(Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side, double safetyScaling[2], int passerSquare[2][8])
+static int evaluateRook(Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side, float safetyScaling[2], int passerSquare[2][8])
 {
         int rookScore = 0;
 
@@ -1194,14 +1191,14 @@ static int evaluateKing(const int v[vectorLen], int square, int side)
  |      sigmoid and logit                                               |
  +----------------------------------------------------------------------*/
 
-static double sigmoid(double x)
+static float sigmoidf(float x)
 {
-        return 1.0 / (1.0 + exp(-x));
+        return 1.0 / (1.0 + expf(-x));
 }
 
-static double logit(double p)
+static float logitf(float p)
 {
-        return log(p / (1.0 - p));
+        return logf(p / (1.0 - p));
 }
 
 /*----------------------------------------------------------------------+

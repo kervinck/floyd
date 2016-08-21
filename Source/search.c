@@ -158,9 +158,8 @@ static inline int gameOverScore(Engine_t self, bool inCheck)
         return inCheck ? minMate + ply(self) : 0;
 }
 
-static inline int drawScore(Engine_t self)
+static inline int drawScore(void /*Board_t self*/)
 {
-        unused(self);
         return 0; // TODO: heuristic draws
 }
 
@@ -178,14 +177,14 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
         int eval = evaluate(board(self));
 
         if (!inRoot && (eval == 0 || repetition(self)))
-                return cutPv(), drawScore(self);
+                return cutPv(), drawScore();
 
         // Transposition table pruning
         struct ttSlot slot = ttRead(self);
         if ((slot.depth >= depth || slot.isHardBound) && !inRoot)
                 if ((slot.isUpperBound && slot.score <= alpha)
                  || (slot.isLowerBound && slot.score >= beta)
-                 || (slot.isUpperBound && slot.isLowerBound && alpha < slot.score && slot.score < beta))
+                 || (slot.isUpperBound && slot.isLowerBound && inRange(slot.score, alpha+1, beta-1)))
                         return cutPv(), slot.score;
 
         int inCheck = isInCheck(board(self));
@@ -276,7 +275,7 @@ static int pvSearch(Engine_t self, int depth, int alpha, int beta, int pvIndex)
 static int scout(Engine_t self, int depth, int alpha, int pvDistance, int lastMove)
 {
         self->nodeCount++;
-        if (repetition(self)) return drawScore(self);
+        if (repetition(self)) return drawScore();
         if (depth == 0) return qSearch(self, alpha); // TODO: we can put horizon stuff here
         if (self->nodeCount >= self->target.nodeCount || PyErr_CheckSignals() == -1)
                 longjmp(self->abortTarget, 1); // Raise abort
@@ -308,27 +307,25 @@ static int scout(Engine_t self, int depth, int alpha, int pvDistance, int lastMo
                         return ttWrite(self, node.slot, depth, min(score, maxEval), alpha, alpha+1);
         }
 
-        // Futility pruning at frontier nodes
         int bestScore = minInt;
         int moveFilter = minInt;
-        if (depth == 1 && inRange(alpha, minEval, maxEval-1) && !inCheck) {
-                int eval = evaluate(board(self));
-                if (eval - board(self)->futilityMargin > alpha) // Reverse futility (aka static null move)
-                        return ttWrite(self, node.slot, depth, alpha+1, alpha, alpha+1);
-                static const int margin[]  = { 2000, 1500 };
-                if (eval + margin[pvDistance&1] <= alpha) // Futility
-                        moveFilter = 0, bestScore = eval + margin[pvDistance&1];
-        }
-        else if (depth == 2 && inRange(alpha, minEval, maxEval-1) && !inCheck) {
+        int eval = evaluate(board(self));
+
+        if (!inCheck && inRange(alpha, minEval, maxEval-1)) {
+                // Futility pruning at frontier nodes
+                if (depth == 1) {
+                        if (eval - board(self)->futilityMargin > alpha) // Reverse futility (aka static null move)
+                                return ttWrite(self, node.slot, depth, alpha+1, alpha, alpha+1);
+                        static const int margin[]  = { 2000, 1500 };
+                        if (eval + margin[pvDistance&1] <= alpha) // Futility
+                                moveFilter = 0, bestScore = eval + margin[pvDistance&1];
+                }
                 // Extended futility at pre-frontier nodes
-                int eval = evaluate(board(self));
-                if (eval + 4000 <= alpha)
+                if (depth == 2 && eval + 4000 <= alpha) {
                         moveFilter = 0, bestScore = eval + 4000;
-        }
-        else if (depth == 3 && inRange(alpha, minEval, maxEval-1) && !inCheck) {
+                }
                 // Razoring at pre-pre-frontier nodes
-                int eval = evaluate(board(self));
-                if (eval + 6000 <= alpha) {
+                if (depth == 3 && eval + 6000 <= alpha) {
                         int score = scout(self, depth-2, alpha, pvDistance, 0000);
                         node.slot = ttRead(self);
                         if (score <= alpha)

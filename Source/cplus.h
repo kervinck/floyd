@@ -29,7 +29,6 @@
 #if !defined(max)
  #define max(a, b) ((a) >= (b) ? (a) : (b))
 #endif
-
 #if !defined(min)
  #define min(a, b) ((a) <= (b) ? (a) : (b))
 #endif
@@ -39,10 +38,8 @@
 
 #define maxInt ((int)(~0U >> 1))
 #define minInt (-maxInt - 1)
-
 #define maxLong ((long)(~0UL >> 1))
 #define minLong (-maxLong - 1L)
-
 #define maxLongLong ((long long)(~0ULL >> 1))
 #define minLongLong (-maxLongLong - 1LL)
 

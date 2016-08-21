@@ -184,10 +184,10 @@ void uciMain(Engine_t self)
                         printf("debug %s\n", debug ? "on" : "off");
                 }
                 else if (scan("setoption")) {
-                        if (scanValue("name Hash value %ld", &newOptions.Hash)) pass;
-                        else if (scan("name Ponder value true")) pass;
-                        else if (scan("name Ponder value false")) pass; // just ignore it
-                        else if (scan("name Clear Hash")) newOptions.ClearHash = !oldOptions.ClearHash;
+                        if (scanValue("name %*[Hh]ash value %ld", &newOptions.Hash)) pass;
+                        else if (scan("name %*[Pp]onder value true")) pass;
+                        else if (scan("name %*[Pp]onder value false")) pass; // just ignore it
+                        else if (scan("name %*[Cc]lear %*[Hh]ash")) newOptions.ClearHash = !oldOptions.ClearHash;
                 }
                 else if (scan("isready")) {
                         updateOptions(self, &oldOptions, &newOptions);
@@ -195,7 +195,6 @@ void uciMain(Engine_t self)
                 }
                 else if (scan("ucinewgame"))
                         pass;
-
                 else if (scan("position")) {
                         searchThread = stopSearch(self, searchThread);
 

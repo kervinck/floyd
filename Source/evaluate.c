@@ -1193,12 +1193,12 @@ static int evaluateKing(const int v[vectorLen], int square, int side)
 
 static float sigmoidf(float x)
 {
-        return 1.0 / (1.0 + expf(-x));
+        return 0.5f + 0.5f * x / (1.0f + fabs(x)); // fast sigmoid (scaled)
 }
 
 static float logitf(float p)
 {
-        return logf(p / (1.0 - p));
+        return logf(p / (1.0f - p));
 }
 
 /*----------------------------------------------------------------------+

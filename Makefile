@@ -189,11 +189,11 @@ search: .module floyd
 
 # Shootout against last version, 1000 games 10+0.15
 shootout: floyd-pgo2
-	cutechess-cli -concurrency 8 -rounds 1000 -repeat -each tc=10+0.15\
+	cutechess-cli -concurrency 8 -rounds 5000 -repeat -each tc=10+0.15\
 	 -openings file=Data/book-6000-openings.pgn order=random\
 	 -resign movecount=1 score=500\
 	 -engine cmd=./floyd-pgo2 proto=uci\
-	 -engine cmd=floyd0.8 proto=uci\
+	 -engine cmd=floyd0.9 proto=uci\
 	 -pgnout shootout.pgn
 
 # Show simplified git log

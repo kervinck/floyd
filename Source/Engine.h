@@ -31,7 +31,7 @@ typedef void searchInfo_fn(void *infoData);
  */
 
 #define ttDepthBits 8
-#define ttDateBits 12
+#define ttDateBits 4
 
 enum {
         minMate = -32000, minDtz  = -31000, minEval = -29999,

@@ -42,6 +42,8 @@
 #ifndef M_LN10
 #define M_LN10 2.30258509299404568401799145468436421 // log(10)
 #endif
+#define sigmoidf(x) (1.0f / (1.0f + expf(-(x))))
+#define logitf(p) logf((p) / (1.0f - (p)))
 
 #define flip(fileOrRank) ((fileOrRank) ^ 7)
 #define kingDistance(a, b) (max(abs(file(a) - file(b)), abs(rank(a) - rank(b))) - 1)
@@ -161,11 +163,7 @@ static int evaluateBishop(Board_t self, const int v[vectorLen], const struct pkS
 static int evaluateRook  (Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side, float safetyScaling[2], int passerSquare[2][8]);
 static int evaluateQueen (Board_t self, const int v[vectorLen], const struct pkSlot *pawns, int square, int side, int passerSquare[2][8]);
 static int evaluateKing  (              const int v[vectorLen],                             int square, int side);
-
 static int shelterPenalty(const int v[vectorLen], int side, int file, int maxPawnFromFirst[2][10][2]);
-
-static float sigmoidf(float x);
-static float logitf(float p);
 static int squareOf(Board_t self, int piece);
 
 /*----------------------------------------------------------------------+
@@ -1185,20 +1183,6 @@ static int evaluateKing(const int v[vectorLen], int square, int side)
         if (rankIndex < 7) kingScore += v[kingByRank_0 + rankIndex];
 
         return kingScore;
-}
-
-/*----------------------------------------------------------------------+
- |      sigmoid and logit                                               |
- +----------------------------------------------------------------------*/
-
-static float sigmoidf(float x)
-{
-        return 1.0f / (1.0f + expf(-x));
-}
-
-static float logitf(float p)
-{
-        return logf(p / (1.0f - p));
 }
 
 /*----------------------------------------------------------------------+

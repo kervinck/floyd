@@ -2,8 +2,8 @@
 Tentative release notes:
 
 Main changes:
-- Handle squashed names in setoption (reported by Dirk-Jan D.)
-- Fully support halfmove clock and move number of "position fen"
+- Handle squashed names in UCI "setoption" (reported by Dirk-Jan D.)
+- Fully support halfmove clock and move number of UCI "position fen"
 Under the hood:
 -
 
@@ -25,13 +25,33 @@ Floyd 0.6   0  0  0  0
         Search
 ------------------------------------------------------------------------
 
-|Todo| Measure repeatability of "make search" test
+|Ongoing| Measure repeatability of "make search" test
 
 passed 7999 total 20000
 passed 8001 total 20000
 passed 8011 total 20000
 passed 8000 total 20000
 passed 8008 total 20000
+passed 8023 total 20000
+passed 8006 total 20000
+passed 8011 total 20000
+passed 8007 total 20000
+passed 8017 total 20000
+passed 8020 total 20000
+passed 8010 total 20000
+passed 8009 total 20000
+passed 8006 total 20000
+passed 8010 total 20000
+passed 8018 total 20000
+passed 8015 total 20000
+passed 7994 total 20000
+passed 7994 total 20000
+passed 7999 total 20000
+passed 8016 total 20000
+passed 8018 total 20000
+passed 8007 total 20000
+
+epdTest score
 
 |Todo| Evaluation cache [search]
 
@@ -347,6 +367,12 @@ Nps after: 777086 (99.4%) --> Not sufficient to explain the difference
                 if (minDelta > alpha - bestScore)
                         return ttWrite(self, slot, 0, bestScore + minDelta, alpha, alpha+1);
         }
+
+|Todo| Zugzwang a la Joost [search]
+
+"The criteria that Nightmare uses for doing null-move are very simple,
+a king-move and at least 1 move with another piece to a not attacked
+square."
 
 ------------------------------------------------------------------------
         Evaluate

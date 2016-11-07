@@ -127,7 +127,7 @@ typedef List(void)      voidList;
 )
 
 #define preparePushList(list, nrItems) Statement(\
-        if ((list).len + (nrItems) > (list).maxLen) {           \
+        if ((list).maxLen - (list).len < (nrItems)) {           \
                 err_t _err = listEnsureMaxLen(                  \
                         (voidList*)&(list), sizeof((list).v[0]),\
                         (list).len + (nrItems), 128);           \

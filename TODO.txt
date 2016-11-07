@@ -5,21 +5,30 @@ Main changes:
 - Handle squashed names in UCI "setoption" (reported by Dirk-Jan D.)
 - Fully support halfmove clock and move number of UCI "position fen"
 Under the hood:
--
+- Minor eval tuning
 
+Rank Name              Elo    +    - games score oppo. draws
+   1 Fruit 2.1         147    3    3 48000   79%  -123   11%
+   2 Floyd x2b288170     2    4    4 24000   41%    73   24% <-- locmin-1.json
+   3 Floyd 0.9           0    3    3 36000   51%    -7   24%
+   4 Floyd 0.8        -170    4    4 36000   37%   -59   16%
+   5 Floyd 0.7        -323    4    4 36000   38%  -183   13%
+   6 Floyd 0.6        -527    6    6 12000   24%  -323   18%
+                 Fr Fl Fl Fl Fl Fl
+Fruit 2.1          100100100100100
+Floyd x2b288170   0    85100100100
+Floyd 0.9         0 14   100100100
+Floyd 0.8         0  0  0   100100
+Floyd 0.7         0  0  0  0   100
+Floyd 0.6         0  0  0  0  0
 
-Rank Name        Elo    +    - games score oppo. draws
-   1 Fruit 2.1   145    4    4 36000   83%  -165   10%
-   2 Floyd 0.9     0    4    4 24000   52%   -13   19%
-   3 Floyd 0.8  -171    4    4 36000   37%   -59   16%
-   4 Floyd 0.7  -324    4    4 36000   38%  -184   13%
-   5 Floyd 0.6  -528    6    6 12000   24%  -324   18%
-           Fr Fl Fl Fl Fl
-Fruit 2.1    100100100100
-Floyd 0.9   0   100100100
-Floyd 0.8   0  0   100100
-Floyd 0.7   0  0  0   100
-Floyd 0.6   0  0  0  0
+Finetuning eval:
+Score of Floyd x2b288170 vs Floyd 0.9: 919 - 980 - 1101  [0.490] 3000
+ELO difference: -7
+los 919 980 1101
+Winning fraction: 0.489833
+Elo difference: -7.0655
+p-value: 0.080786
 
 ------------------------------------------------------------------------
         Search
@@ -703,3 +712,36 @@ Arena wants castling as O-O and O-O-O instead of king takes rook?
 _ftime64 ->  _ftime64_s
 strerror -> strerror_s
 sscanf -> sscanf_s
+
+|Todo| Compile warning on cluster [qa]
+
+gcc (Ubuntu 5.4.0-6ubuntu1~16.04.2) 5.4.0 20160609
+Linux node1 4.4.0-31-generic #50-Ubuntu SMP Wed Jul 13 00:07:12 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+
+Source/cplus.c: In function ‘readLine’:
+Source/cplus.c:173:5: warning: assuming signed overflow does not occur when assuming that (X + c) < X is always false [-Wstrict-overflow]
+ int readLine(void *fpPointer, charList *lineBuffer)
+     ^
+Source/cplus.c:173:5: warning: assuming signed overflow does not occur when assuming that (X + c) < X is always false [-Wstrict-overflow]
+
+|Todo| Negative zero in "score cp" [bug,uci]
+
+position fen 4k3/pppppppp/pppppppp/pppppppp/PPPPPPPP/PPPPPPPP/PPPPPPPP/4K3 w - - 68 1
+debug on
+debug on
+position
+info string input position
+info string fen 4k3/pppppppp/pppppppp/pppppppp/PPPPPPPP/PPPPPPPP/PPPPPPPP/4K3 w - -
+info string 8  .  .  .  .  k  .  .  .
+info string 7  p  p  p  p  p  p  p  p
+info string 6  p  p  p  p  p  p  p  p
+info string 5  p  p  p  p  p  p  p  p
+info string 4  P  P  P  P  P  P  P  P
+info string 3  P  P  P  P  P  P  P  P
+info string 2  P  P  P  P  P  P  P  P
+info string 1  .  .  .  .  K  .  .  .
+info string    a  b  c  d  e  f  g  h
+go
+info string input go
+info time 1 depth 0 score cp 0 nodes 15 nps 14218 hashfull 0
+info time 1 depth 1 score cp -0 nodes 46 nps 35414 hashfull 0 pv h4g5

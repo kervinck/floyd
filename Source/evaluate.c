@@ -785,7 +785,7 @@ static void evaluatePawnFile(Board_t self, const int v[vectorLen], struct pkSlot
         int sentryW  = ((1 << minRank(-1, xside)) | (1 << maxRank(-1, xside))) & pawnZone;
         int sentryE  = ((1 << minRank(+1, xside)) | (1 << maxRank(+1, xside))) & pawnZone;
         int xPawns   = ((1 << minRank( 0, xside)) | (1 << maxRank( 0, xside))) & pawnZone;
-        int frontSpan = (~0 << (frontPawn + 1)) & ones(8);
+        int frontSpan = (~0U << (frontPawn + 1)) & ones(8);
         int helperControl = (helperW | helperE) << 1;
         int sentryControl = (sentryW | sentryE) >> 1;
         bool openFile = !(xPawns & frontSpan);
